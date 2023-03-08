@@ -1,0 +1,30 @@
+<script lang="ts" setup>
+
+definePageMeta({ auth: false })
+
+const name = useRuntimeConfig().NAME
+</script>
+
+<template>
+  <section class="bg-gray-50 dark:bg-gray-900">
+    <div class="md:h-screen lg:py-0">
+      <div class="navbar bg-base-100 px-8">
+        <div class="flex-1">
+          <a class="font-bold normal-case text-xl">{{ name }}</a>
+        </div>
+        <div class="navbar-end flex gap-4">
+          <NuxtLink to="/auth" class="primary text-sm">
+            Вход
+          </NuxtLink>
+          <NuxtLink to="/register" class="btn btn-primary btn-sm font-medium normal-case text-white">
+            Регистрация
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</template>
+
+<style scoped></style>
+

@@ -1,0 +1,63 @@
+import { getServerSession } from '#auth'
+import { User } from '~~/server/lib/models/User'
+import MailService from '~~/server/lib/mailService.js'
+import bcrypt from 'bcrypt'
+import { uuid } from 'uuidv4'
+
+function hasWhiteSpace(s: string) {
+  return s.indexOf(' ') >= 0 || !/^[a-zA-Z0-9_-]{4,14}$/.test(s)
+}
+export default eventHandler(async (event) => {
+  const body = await readBody(event)
+
+  const { email, password } = body
+
+  if (!email || !password) {
+    return { status: 'error', error: 'missing email or password' }
+  }
+  if (hasWhiteSpace(password)) {
+    return {
+      status: 'error',
+      error:
+        'Пароль не должен содержать пробелов и состоять из английских букв и цифр.',
+    }
+  }
+  if (password.length < 6 || password.length > 14) {
+    return {
+      status: 'error',
+      error: 'Пароль должен быть от 6 до 14 символов.',
+    }
+  }
+  const session = await getServerSession(event)
+  if (session) {
+    return { status: 'error', error: 'Вы уже авторизованы.' }
+  }
+
+  const candidate = await User.findOne({ email })
+  if (candidate) {
+    return {
+      status: 'error',
+      error: 'Пользователь с таким email уже существует.',
+    }
+  }
+
+  const hash = bcrypt.hashSync(password, 7)
+
+  const user = new User({
+    email,
+    password: hash,
+    roles: ['user'],
+    uuid: uuid(),
+  })
+  const url = useRuntimeConfig().PUBLIC_SITE_URL
+  const link = `${url}/api/auth/activate?uuid=${user.uuid}`
+  try {
+    await MailService.sendActivationMail(user.email, link)
+  } catch (error) {
+    console.log(error)
+    return { status: 'error', error: 'Ошибка отправки письма.' }
+  }
+
+  await user.save()
+  return { status: 'ok' }
+})
