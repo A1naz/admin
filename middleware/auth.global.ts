@@ -3,7 +3,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   if (status.value === 'authenticated') {
     console.log(to.path)
     if (to.path === '/auth' || to.path === '/register') {
-      return navigateTo('/app')
+      return navigateTo('/buyouts')
     }
   }
 })

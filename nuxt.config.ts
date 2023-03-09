@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   app: {},
   auth: {
-    origin: 'http://localhost:3000',
+    origin: process.env.PUBLIC_SITE_URL,
 
     enableGlobalAppMiddleware: true,
     defaultProvider: 'credentials',
@@ -17,6 +17,7 @@ export default defineNuxtConfig({
     'nuxt-icon',
     '@sidebase/nuxt-auth',
     '@nuxt/devtools',
+    '@vueuse/nuxt',
   ],
   imports: {
     dirs: ['./stores'],
@@ -33,5 +34,6 @@ export default defineNuxtConfig({
     smtpPass: process.env.smtpPass,
     privateKey: process.env.privateKey,
     PUBLIC_SITE_URL: process.env.PUBLIC_SITE_URL,
+    BOT_TOKEN: process.env.BOT_TOKEN,
   },
 })

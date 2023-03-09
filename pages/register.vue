@@ -4,7 +4,9 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, email, sameAs, minLength, helpers } from '@vuelidate/validators';
 definePageMeta({ auth: false })
 const { status } = useSession()
-
+const alert = ref(false)
+const alertText = ref('')
+const alertType = ref('success')
 const name = useRuntimeConfig().NAME
 const result = ref()
 const formData = reactive({
@@ -12,7 +14,7 @@ const formData = reactive({
   password: '',
   confirmPassword: ''
 });
-
+const loading = ref(false)
 const rules = computed(() => {
   return {
     email: {
@@ -37,6 +39,7 @@ const submitForm = async () => {
   console.log('err', v$.value.$error)
   console.log('err', v$.value)
   if (!v$.value.$error) {
+    loading.value = true
     const response = await useFetch('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(formData),
@@ -44,6 +47,23 @@ const submitForm = async () => {
     console.log('response', response)
     result.value = response
 
+    if (response.data.value?.status === 'error') {
+      alert.value = true
+      alertType.value = 'error'
+      alertText.value = response.data.value.error as string
+      useTimeoutFn(() => {
+        alert.value = false
+      }, 3000)
+
+    } else {
+      alert.value = true
+      alertType.value = 'success'
+      alertText.value = 'Пользователь зарегистрирован. Проверьте почту для подтверждения'
+      useTimeoutFn(() => {
+        alert.value = false
+      }, 3000)
+    }
+    loading.value = false
   }
 }
 
@@ -56,50 +76,72 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section class="bg-gray-50 dark:bg-gray-900">
+  <section class="">
+    <Toast :type="alertType" :active="alert">
+      {{ alertText }} </Toast>
     <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-      <NuxtLink to="/" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-        <img class="w-8 h-8 mr-2" src="" alt="logo">
+      <NuxtLink to="/" class="flex items-center mb-6 text-2xl font-semibold ">
+        <Icon name="logos:nuxt-icon" size="32"></Icon>
         {{ name }}
       </NuxtLink>
-      <div
-        class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+      <div class="card shadow-lg w-full rounded-lg md:mt-0 sm:max-w-md xl:p-0 ">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-          <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+          <h1 class="text-xl font-bold leading-tight tracking-tight  md:text-2xl ">
             Регистрация
           </h1>
 
           <form class="space-y-4 md:space-y-6 relative" action="#">
-            <p v-if="v$.$errors.length" class="text-center text-sm text-warning absolute right-0">
-              {{ v$.$errors[0].$message }}
-            </p>
             <div>
-              <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+              <label for="email" class="block mb-2 text-sm font-medium ">Email</label>
               <input type="email" name="email" id="email" v-model="formData.email"
-                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="name@company.com" required="true" @change="v$.email.$touch">
+                class="input input-bordered	sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
+                :class="{
+                  'input-error': v$.email.$error
+                }" placeholder="name@company.com" required="true" @change="v$.email.$touch">
+              <div class="input-errors text-sm text-error mt-1 flex justify-end absolute r-0 w-full"
+                v-for="error of v$.email.$errors" :key="error.$uid">
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
             </div>
             <div>
-              <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Пароль</label>
+              <label for="password" class="block mb-2 text-sm font-medium ">Пароль</label>
               <input type="password" name="password" id="password" placeholder="••••••••" v-model="formData.password"
-                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                required="true" @change="v$.password.$touch">
+                class="input input-bordered	sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
+                :class="{
+                  'input-error': v$.password.$error
+                }" required="true" @change="v$.password.$touch">
+              <div class="input-errors text-sm text-error mt-1 flex justify-end absolute r-0 w-full"
+                v-for="error of v$.password.$errors" :key="error.$uid">
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
             </div>
             <div>
-              <label for="confirm-password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Пароль
+              <label for="confirm-password" class="block mb-2 text-sm font-medium ">Пароль
                 еще раз</label>
               <input type="password" name="confirm-password" id="confirm-password" placeholder="••••••••"
                 v-model="formData.confirmPassword"
-                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                required="true" @change="v$.confirmPassword.$touch">
+                class="input input-bordered sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                :class="{
+                  'input-error': v$.confirmPassword.$error
+                }" required="true" @change="v$.confirmPassword.$touch">
+              <div class="input-errors text-sm text-error mt-1 flex justify-end absolute r-0 w-full"
+                v-for="error of v$.confirmPassword.$errors" :key="error.$uid">
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
             </div>
 
-            <button type="submit" @click.prevent="submitForm"
-              class="w-full btn btn-primary text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Зарегистироваться</button>
-            <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+            <button type="submit" @click.prevent="submitForm" :class="{
+              'loading': loading,
+            }"
+              class="btn btn-block btn-primary  bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mt-6">Зарегистироваться</button>
+            <p class="text-sm font-light ">
               Уже есть аккаунт? <NuxtLink to="/auth"
                 class="font-medium text-primary-600 hover:underline dark:text-primary-500">Войдите здесь</NuxtLink>
             </p>
+            <div class="divider">Или</div>
+
+            <TelegramLoginButton mode="callback" telegram-login="topvtop_authbot" size="medium" class="rounded-lg m-auto"
+              userpic="false" />
           </form>
         </div>
       </div>

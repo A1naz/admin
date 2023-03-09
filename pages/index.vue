@@ -1,15 +1,20 @@
 <script lang="ts" setup>
-
+const { signIn } = useSession()
 definePageMeta({ auth: false })
 
 const name = useRuntimeConfig().NAME
+
+
+
 </script>
 
 <template>
-  <section class="bg-gray-50 dark:bg-gray-900">
+  <section class="">
     <div class="md:h-screen lg:py-0">
       <div class="navbar bg-base-100 px-8">
         <div class="flex-1">
+          <Icon name="logos:nuxt-icon" size="32"></Icon>
+
           <a class="font-bold normal-case text-xl">{{ name }}</a>
         </div>
         <div class="navbar-end flex gap-4">

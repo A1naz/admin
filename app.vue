@@ -1,3 +1,19 @@
+<script lang="ts" setup>
+import { themeChange } from 'theme-change'
+import { useMainStore } from '@/stores/main'
+
+const { status, data } = useSession()
+
+const store = useMainStore()
+onMounted(async () => {
+  themeChange(false)
+  console.log(status.value)
+  if (status.value === 'authenticated') {
+    store.getClient()
+  }
+
+})
+</script>
 <template>
   <div>
     <NuxtLayout>
