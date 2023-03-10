@@ -15,11 +15,15 @@
     "@types/bcrypt": "^5.0.0",
     "@types/nodemailer": "^6.4.7",
     "nuxt": "^3.2.3",
-    "nuxt-icon": "^0.3.2"
+    "nuxt-icon": "^0.3.2",
+    "nuxt-security": "^0.12.0"
   },
   "dependencies": {
     "@next-auth/mongodb-adapter": "^1.1.1",
+    "@nuxtjs/html-validator": "^1.2.4",
     "@pinia/nuxt": "^0.4.7",
+    "@tailwindcss/typography": "^0.5.9",
+    "@types/validator": "^13.7.13",
     "@vuelidate/core": "^2.0.0",
     "@vuelidate/validators": "^2.0.0",
     "@vueuse/nuxt": "^9.13.0",
@@ -31,6 +35,7 @@
     "nodemailer": "^6.9.1",
     "nuxt-route-meta": "^3.0.1",
     "theme-change": "^2.5.0",
-    "uuidv4": "^6.2.13"
+    "uuidv4": "^6.2.13",
+    "validator": "^13.9.0"
   }
 }

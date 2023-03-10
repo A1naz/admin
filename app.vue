@@ -8,11 +8,12 @@ const store = useMainStore()
 onMounted(async () => {
   themeChange(false)
   console.log(status.value)
-  if (status.value === 'authenticated') {
-    store.getClient()
-  }
+
 
 })
+if (status.value === 'authenticated') {
+  await store.getClient()
+}
 </script>
 <template>
   <div>
@@ -32,5 +33,18 @@ onMounted(async () => {
 .page-leave-to {
   opacity: 0;
   filter: blur(0.5rem);
+}
+
+
+.heading {
+  @apply text-xl font-bold mt-1
+}
+
+.title {
+  @apply text-2xl font-bold mt-1
+}
+
+.description {
+  @apply text-sm text-gray-500 font-light mt-1
 }
 </style>

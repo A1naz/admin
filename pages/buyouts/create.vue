@@ -2,12 +2,12 @@
 definePageMeta({
     layout: 'app',
     auth: true,
-    name: 'Выкупы',
+    breadcrumb: ['Выкупы', 'Добавить выкуп'],
 })
 </script>
 <template>
     <div>
-
+        create
     </div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex justify-center" ref="telegram">
     <label @click="login" class="btn gap-2 btn-outline normal-case font-medium btn-block border-blue-500 text-blue-500">
-      <Icon size="24" name="logos:telegram"></Icon>
+      <Icon size="24" name="logos:telegram" />
       Войти через Telegram
     </label>
   </div>

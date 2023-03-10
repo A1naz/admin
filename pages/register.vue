@@ -14,7 +14,7 @@ const formData = reactive({
   password: '',
   confirmPassword: ''
 });
-const loading = ref(false)
+let loading = ref(false)
 const rules = computed(() => {
   return {
     email: {
@@ -39,18 +39,18 @@ const submitForm = async () => {
   console.log('err', v$.value.$error)
   console.log('err', v$.value)
   if (!v$.value.$error) {
-    loading.value = true
-    const response = await useFetch('/api/auth/register', {
+    const { pending, data } = await useLazyFetch('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(formData),
     });
-    console.log('response', response)
-    result.value = response
+    loading = pending
+    console.log('response', data)
+    result.value = data
 
-    if (response.data.value?.status === 'error') {
+    if (data.value?.status === 'error') {
       alert.value = true
       alertType.value = 'error'
-      alertText.value = response.data.value.error as string
+      alertText.value = data.value.error as string
       useTimeoutFn(() => {
         alert.value = false
       }, 3000)
@@ -90,7 +90,7 @@ onMounted(async () => {
             Регистрация
           </h1>
 
-          <form class="space-y-4 md:space-y-6 relative" action="#">
+          <form class="space-y-6 md:space-y-7 relative" action="#">
             <div>
               <label for="email" class="block mb-2 text-sm font-medium ">Email</label>
               <input type="email" name="email" id="email" v-model="formData.email"
@@ -133,7 +133,7 @@ onMounted(async () => {
             <button type="submit" @click.prevent="submitForm" :class="{
               'loading': loading,
             }"
-              class="btn btn-block btn-primary  bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mt-6">Зарегистироваться</button>
+              class="btn btn-block btn-primary  bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mt-10">Зарегистироваться</button>
             <p class="text-sm font-light ">
               Уже есть аккаунт? <NuxtLink to="/auth"
                 class="font-medium text-primary-600 hover:underline dark:text-primary-500">Войдите здесь</NuxtLink>

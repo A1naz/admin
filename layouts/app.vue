@@ -4,17 +4,36 @@ const store = useMainStore();
 
 const theme = ref('light')
 const route = useRoute()
-
+const themes = ["cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula", "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter"]
 onMounted(() => {
   console.log(route.meta)
   theme.value = localStorage.getItem('theme') || 'light'
-  theme.value === 'light' ? document.documentElement.setAttribute('data-theme', 'light') : document.documentElement.setAttribute('data-theme', 'dark')
+  console.log(theme.value)
 })
 const { status, data, signIn, signOut } = useSession()
 const name = useRuntimeConfig().NAME
 const currentPath = ref(useRoute().path)
-
+const clicks = ref(0)
+let timer: NodeJS.Timeout | null = null
 const changeTheme = () => {
+  clicks.value++
+  if (timer !== null) {
+    clearTimeout(timer)
+  } else {
+    timer = setTimeout(() => {
+      clicks.value = 0
+      timer = null
+    }, 3000)
+  }
+  if (clicks.value === 10) {
+    alert('Ты слишком много кликаешь, давай без фанатизма')
+    const picked = themes[Math.floor(Math.random() * themes.length)]
+    theme.value = picked
+    localStorage.setItem('theme', picked)
+    document.documentElement.setAttribute('data-theme', picked)
+    clicks.value = 0
+    return
+  }
   if (theme.value === 'light') {
     theme.value = 'dark'
     localStorage.setItem('theme', 'dark')
@@ -25,8 +44,6 @@ const changeTheme = () => {
     document.documentElement.setAttribute('data-theme', 'light')
 
   }
-  themeChange()
-
 }
 
 const logout = async () => {
@@ -34,17 +51,15 @@ const logout = async () => {
   store.setClient({})
 }
 
-watch(() => route.path, () => {
-  currentPath.value = route.path
-}, { immediate: true });
+
 
 
 </script>
 <template>
   <div class="drawer drawer-mobile">
-    <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+    <input id="my-drawer" type="checkbox" class="drawer-toggle lg:" />
 
-    <div class="drawer-content flex flex-col items-center">
+    <div class="drawer-content">
       <div class="w-full navbar bg-base-100 lg:hidden">
         <div class="flex-none">
           <label for="my-drawer" class="btn btn-square btn-ghost drawer-button">
@@ -58,17 +73,17 @@ watch(() => route.path, () => {
       </div>
 
       <!-- Page content here -->
-      <div class="p-4 absolute l-0 self-start">
-        <div class="text-sm breadcrumbs">
+      <div class="px-6 py-2 lg:p-6 block">
+        <div v-if="route.path != '/profile'" class="breadcrumbs p-0 lg:text-sm">
           <ul>
             <li>
               <a>
                 <img src="/icons/wb.svg" alt="" srcset="">
               </a>
             </li>
-            <li>
+            <li v-for="crumb of route.meta.breadcrumb">
               <a>
-                {{ route.meta.name }}
+                {{ crumb }}
               </a>
             </li>
           </ul>
@@ -80,56 +95,52 @@ watch(() => route.path, () => {
     </div>
     <div class="drawer-side">
       <label for="my-drawer" class="drawer-overlay"></label>
-      <ul class="menu w-80 bg-base-200 rounded-xl m-2 text-base-content justify-start">
+      <ul class="menu w-72 bg-base-200 rounded-xl lg:m-2 text-base-content justify-start">
         <!-- Sidebar content here -->
         <div class="hidden title w-full justify-center p-2 lg:flex">
           <h1 class="card-title text-center">{{ name }}</h1>
 
         </div>
-        <div class="card m-4 mx-4 bg-neutral-focus text-neutral-content">
-          <div class="card-body items-center text-center">
-            <div>
-              Привет {{ store.client?.username || data?.user?.email }}!
-            </div>
-            <div v-if="store.client.userpic" class="avatar">
-              <div class="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                <img :src="store.client.userpic" />
+        <div class="card m-4 mx-4 bg-[#121212] text-neutral-content">
+          <div class="card-body p-4">
+            <div class="flex justify-between items-center">
+              <div class="text-sm">
+                {{ store.client?.username ? store.client.username : data?.user?.email }}
+                <button></button>
+
               </div>
+              <NuxtLink to="/profile" class="btn btn-square btn-sm btn-ghost">
+                <IconCSS name="material-symbols:account-box" size="24" />
+              </NuxtLink>
+
             </div>
+
+
           </div>
 
         </div>
-        <li :class="{ 'bordered': currentPath == '/buyouts' }">
-          <NuxtLink to="/buyouts">
-            <Icon name="material-symbols:credit-card" size="24"></Icon><span>Выкупы</span>
-          </NuxtLink>
-        </li>
-        <li :class="{ 'bordered': currentPath == '/delivery' }">
-          <NuxtLink to="/delivery">
-            <Icon name="mdi:truck-delivery" size="24"></Icon><span>Доставки</span>
-          </NuxtLink>
-        </li>
+        <SidebarItem title="Выкупы" icon="material-symbols:credit-card" href="/buyouts"></SidebarItem>
+        <SidebarItem title="Доставки" icon="mdi:truck-delivery" href="/delivery"></SidebarItem>
         <li>
         </li>
         <li class="mt-auto w-full no-animation hover:bg-base-200">
 
-          <a class="w-full no-animation hover:bg-base-200 hover:cursor-default p-0">
+          <div class="w-full no-animation hover:bg-base-200 hover:cursor-default p-0">
             <div class="flex justify-between w-full items-center p-0 m-0">
               <div
-                class="btn btn-ghost flex justify-center items-center normal-case w-[80%] hover:cursor-pointer rounded-lg p-0 m-0"
+                class="btn btn-ghost gap-2 flex justify-center items-center normal-case w-[80%] hover:cursor-pointer rounded-lg p-0 m-0"
                 @click="logout">
                 <Icon name="material-symbols:logout" size="24"></Icon>
                 <span>
                   Выйти
                 </span>
               </div>
-              <label @click="changeTheme" class="btn btn-ghost btn-square z-10 w-[20%]" data-toggle-theme="dark,light"
-                data-act-class="toggled">
+              <label @click="changeTheme" class="btn btn-ghost btn-square z-10 w-[20%]">
                 <Icon name="mdi:theme-light-dark" size="24"></Icon>
               </label>
             </div>
 
-          </a>
+          </div>
 
         </li>
 
