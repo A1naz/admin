@@ -49,21 +49,20 @@ export default NuxtAuthHandler({
 			name: "Telegram Login",
 			credentials: {},
 			async authorize(credentials: any, req: any) {
-				const config = useRuntimeConfig();
 				const user = { ...req.body };
 				delete user.callbackUrl;
 				delete user.csrfToken;
 				delete user.redirect;
 				delete user.json;
 
-				const valid = checkSignature(config.BOT_TOKEN, user);
+				const valid = checkSignature(runtimeConfig.BOT_TOKEN, user);
 
 				if (!valid) {
 					console.log("invalid signature");
 					throw new Error("invalid signature");
 				}
 
-				const foundUser = await User.findOne({ uuid: user.id.toString() });
+				const foundUser = await User.findOne({ telegram: user.username });
 				if (foundUser) {
 					return foundUser;
 				} else {
@@ -106,7 +105,7 @@ export default NuxtAuthHandler({
 				if (!email || !password) {
 					return null;
 				}
-				const user = await User.findOne({ username: email });
+				const user = await User.findOne({ email: email });
 
 				if (!user) {
 					throw new Error("User not found");

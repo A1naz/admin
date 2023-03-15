@@ -14,10 +14,10 @@ watchEffect(() => {
 </script>
 
 <template>
-  <li :class="{ 'bordered': currentPath == props.href }">
+  <li :class="{ 'bordered': currentPath.includes(props.href) }">
     <NuxtLink :to="props.href" class="mx-4 rounded-lg">
       <IconCSS :class="{
-        'text-primary': currentPath == props.href
+        'text-primary': currentPath.includes(props.href)
       }" :name="icon" size="24"></IconCSS><span>{{ title }}</span>
     </NuxtLink>
   </li>

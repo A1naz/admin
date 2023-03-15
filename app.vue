@@ -8,7 +8,7 @@ const store = useMainStore()
 onMounted(async () => {
   themeChange(false)
   console.log(status.value)
-
+  store.theme = document.documentElement.getAttribute('data-theme') === 'dracula' ? 'dracula' : 'light'
 
 })
 if (status.value === 'authenticated') {
@@ -17,13 +17,61 @@ if (status.value === 'authenticated') {
 </script>
 <template>
   <div>
+    <notifications position="bottom right">
+      <template #body="props">
+        <div style="padding: 1rem">
+          <div class="notif-card">
+            <p class="notif-title">
+              {{ props.item.title }}
+            </p>
+            <div class="notif-text" v-html="props.item.text" />
+          </div>
+        </div>
+      </template>
+    </notifications>
     <NuxtLayout>
       <NuxtLoadingIndicator /> <!-- here -->
-      <NuxtPage></NuxtPage>
+      <NuxtPage>
+      </NuxtPage>
     </NuxtLayout>
+
   </div>
 </template>
 <style>
+.notif-text {
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: gray
+}
+
+.notif-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: white
+}
+
+.notif-card {
+  padding: 1rem;
+  background-color: #121212;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  width: 300px;
+  max-width: 100%;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 .page-enter-active,
 .page-leave-active {
   transition: all 0.4s;

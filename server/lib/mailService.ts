@@ -4,7 +4,7 @@ const config = useRuntimeConfig();
 const { smtpHost, smtpPort, smtpUser, smtpPass, privateKey } = config;
 console.log("smtpHost", smtpHost);
 const alias = "support@topvtop.com";
-class MailServiceClass {
+class MailService {
 	constructor() {
 		this.tranporter = nodemailer.createTransport({
 			host: smtpHost,
@@ -39,18 +39,19 @@ class MailServiceClass {
 				console.log(info);
 			});
 	}
-	async sendResetPasswordMail(to, link, username) {
+	async sendChangePasswordMail(to, link, username) {
 		await this.tranporter
 			.sendMail({
 				from: alias,
 				to: to,
-				subject: "Восстановление пароля на  TOPVTOP",
+				subject: "Смена пароля на TOPVTOP",
 				text: "",
 				html: `
                 <div>
                     <h1>Привет, ${username}!</h1>
-                    <h2>Для восстановления пароля перейдите по ссылке</h2>
-                    <a href="${link}">${link}</a>
+					<h2>Вы собираетесь сменить пароль! Если это сделали не вы, то проигнорируйте это сообщение.</h2>
+                    <h2>Для подтверждения смены пароля на перейдите по ссылке</h2>
+                    <a href="${link}">Ссылка</a>
                 </div>
             `,
 			})
@@ -60,4 +61,4 @@ class MailServiceClass {
 	}
 }
 
-export default new MailServiceClass();
+export default new MailService();

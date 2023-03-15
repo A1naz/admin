@@ -35,19 +35,22 @@ const changeTheme = () => {
     return
   }
   if (theme.value === 'light') {
-    theme.value = 'dark'
-    localStorage.setItem('theme', 'dark')
-    document.documentElement.setAttribute('data-theme', 'dark')
+    theme.value = 'dracula'
+    localStorage.setItem('theme', 'dracula')
+    document.documentElement.setAttribute('data-theme', 'dracula')
+    store.theme = 'dracula'
   } else {
     theme.value = 'light'
     localStorage.setItem('theme', 'light')
     document.documentElement.setAttribute('data-theme', 'light')
-
+    store.theme = 'light'
   }
 }
 
 const logout = async () => {
-  await signOut()
+  await signOut({
+    callbackUrl: '/auth',
+  })
   store.setClient({})
 }
 
@@ -58,7 +61,6 @@ const logout = async () => {
 <template>
   <div class="drawer drawer-mobile">
     <input id="my-drawer" type="checkbox" class="drawer-toggle lg:" />
-
     <div class="drawer-content">
       <div class="w-full navbar bg-base-100 lg:hidden">
         <div class="flex-none">
@@ -94,11 +96,11 @@ const logout = async () => {
 
     </div>
     <div class="drawer-side">
-      <label for="my-drawer" class="drawer-overlay"></label>
+      <label for="my-drawer" class="drawer-overlay rounded-xl lg:m-2"></label>
       <ul class="menu w-72 bg-base-200 rounded-xl lg:m-2 text-base-content justify-start">
         <!-- Sidebar content here -->
         <div class="hidden title w-full justify-center p-2 lg:flex">
-          <h1 class="card-title text-center">{{ name }}</h1>
+          <Logo></Logo>
 
         </div>
         <div class="card m-4 mx-4 bg-[#121212] text-neutral-content">

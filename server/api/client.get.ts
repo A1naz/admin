@@ -16,7 +16,7 @@ export default eventHandler(async (event) => {
 	return {
 		client: {
 			email: user.email,
-			username: user.username,
+			username: user.email === user.username ? undefined : user.username,
 			uuid: user.uuid,
 			telegram: user.telegram || undefined,
 			firstName: user.firstName,

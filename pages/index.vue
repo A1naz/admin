@@ -13,9 +13,7 @@ const name = useRuntimeConfig().NAME
     <div class="md:h-screen lg:py-0">
       <div class="navbar bg-base-100 px-8">
         <div class="flex-1">
-          <Icon name="logos:nuxt-icon" size="32"></Icon>
-
-          <a class="font-bold normal-case text-xl">{{ name }}</a>
+          <Logo />
         </div>
         <div class="navbar-end flex gap-4">
           <NuxtLink to="/auth" class="primary text-sm">

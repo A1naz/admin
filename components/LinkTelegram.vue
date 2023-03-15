@@ -1,23 +1,22 @@
 <template>
-  <div class="w-full flex justify-center" ref="telegram">
-    <label @click="login" class="btn gap-2 btn-outline normal-case font-medium btn-block border-blue-500 text-blue-500">
-      <Icon size="24" name="logos:telegram" />
-      Войти через Telegram
-    </label>
-  </div>
+  <button @click="login" ref="telegram" :disabled="store.client?.telegram" class="btn btn-primary">{{
+    store.client?.telegram ?
+    'Привязан'
+    : 'Привязать' }}</button>
 </template>
 <script lang="ts" setup>
+
 import { ref, onMounted } from 'vue';
 import { useMainStore } from '~~/stores/main';
-const store = useMainStore();
-const { signIn } = useSession();
+
 const bot_id = useRuntimeConfig().BOT_ID
 const bot_login = useRuntimeConfig().BOT_LOGIN
-
+const store = useMainStore();
+const { signIn } = useSession();
 const props = defineProps({
   mode: {
     type: String,
-    required: true,
+    default: 'callback',
     validator(value: string) {
       return ['callback', 'redirect'].includes(value);
     },
@@ -26,15 +25,18 @@ const props = defineProps({
 const emit = defineEmits(['callback']);
 const onTelegramAuth = async (user: any) => {
   console.log('user-----', user);
-  const { error, url } = await signIn('telegram-login', { ...user, redirect: false })
-
-  if (error) {
+  const { error, data } = await useFetch('/api/user/linkTelegram', {
+    method: 'POST',
+    body: JSON.stringify(user),
+  })
+  if (error.value) {
     console.log(error)
+    emit('callback', { status: 'error', error: error.value })
   } else {
     // No error, continue with the sign in, e.g., by following the returned redirect:
-    console.log('authed', url)
-    store.getClient()
-    return navigateTo('/buyouts', { external: true })
+    store.client.telegram = user.username
+    await store.getClient()
+    emit('callback', { status: 'ok', data: data.value })
   }
 };
 const telegram = ref();

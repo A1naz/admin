@@ -58,6 +58,15 @@ onMounted(async () => {
       alert.value = false
     }, 3000)
   }
+  if (params?.passwordChanged) {
+    alertText.value = 'Пароль успешно изменен!'
+    setTimeout(() => {
+      alert.value = true
+    }, 0)
+    setTimeout(() => {
+      alert.value = false
+    }, 3000)
+  }
 })
 
 
@@ -65,6 +74,7 @@ const rules = computed(() => {
   return {
     email: {
       required: helpers.withMessage('Введите email или логин', required),
+      email: helpers.withMessage('Введите корректный email', email),
     },
     password: {
       required: helpers.withMessage('Введите пароль', required),
@@ -85,9 +95,8 @@ const v$ = useVuelidate(rules, formData);
       {{ alertText }} </Toast>
     <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
 
-      <NuxtLink to="/" class="flex items-center mb-6 text-2xl font-semibold ">
-        <Icon name="logos:nuxt-icon" size="32"></Icon>
-        {{ name }}
+      <NuxtLink to="/" class="flex items-center text-2xl font-semibold ">
+        <Logo />
       </NuxtLink>
       <div class="card w-full rounded-lg shadow-lg  md:mt-0 sm:max-w-md xl:p-0 ">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -96,7 +105,7 @@ const v$ = useVuelidate(rules, formData);
           </h1>
           <form class="space-y-4 md:space-y-6" action="#">
             <div>
-              <label for="email" class="block mb-2 text-sm font-medium ">Email или логин</label>
+              <label for="email" class="block mb-2 text-sm font-medium ">Email</label>
               <input type="email" name="email" id="email" v-model="formData.email"
                 class="input input-bordered  sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
                 :class="{
@@ -113,8 +122,8 @@ const v$ = useVuelidate(rules, formData);
             </div>
             <div class="flex items-center justify-between">
 
-              <a href="#" class="text-sm font-medium  hover:underline ">Забыли
-                пароль?</a>
+              <NuxtLink to="/resetPassword" class="link link-hover text-sm font-medium  hover:underline ">Забыли
+                пароль?</NuxtLink>
             </div>
             <button @click.prevent="login" type="submit" :class="{
               'loading': loading
@@ -127,8 +136,7 @@ const v$ = useVuelidate(rules, formData);
             </p>
             <div class="divider">Или</div>
 
-            <TelegramLoginButton mode="callback" telegram-login="topvtop_authbot" size="medium" radius="10"
-              class="rounded-lg m-auto" userpic="false" />
+            <TelegramLoginButton mode="callback" class="rounded-lg m-auto" />
 
           </form>
         </div>

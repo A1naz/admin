@@ -41,7 +41,7 @@ export default eventHandler(async (event) => {
 	if (foundByEmail && foundByEmail.uuid !== user.uuid) {
 		throw createError({
 			statusCode: 400,
-			message: "Email already taken",
+			message: "Email уже занят",
 		});
 	}
 	user.username = body.username;

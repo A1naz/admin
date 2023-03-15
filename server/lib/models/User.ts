@@ -3,7 +3,7 @@ const UserSchema = new Schema({
 	username: { type: String, unique: true, required: true, text: true },
 	firstName: { type: String, required: false },
 	lastName: { type: String, required: false },
-	email: { type: String, unique: true, required: false },
+	email: { type: String, unique: false, required: false },
 	password: { type: String, required: false },
 	uuid: { type: String, unique: true, required: true },
 	roles: [{ type: String, ref: "Role" }],

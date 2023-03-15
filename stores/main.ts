@@ -5,6 +5,7 @@ export const useMainStore = defineStore("main", {
 	// a function that returns a fresh state
 	state: () => ({
 		client: {} as any,
+		theme: "light",
 	}),
 	// optional actions
 

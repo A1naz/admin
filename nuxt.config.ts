@@ -1,12 +1,21 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 	app: {},
+	vue: {},
 	auth: {
 		origin: process.env.PUBLIC_SITE_URL,
 		enableGlobalAppMiddleware: true,
 		defaultProvider: "credentials",
 	},
 	nitro: {
+		storage: {
+			db: {
+				driver: "mongodb",
+				connectionString: process.env.MONGODB_URI,
+				databaseName: "site",
+				collectionName: "serverStorage",
+			},
+		},
 		plugins: ["~/server/index.ts"],
 	},
 	modules: [
@@ -15,7 +24,6 @@ export default defineNuxtConfig({
 		"@pinia/nuxt",
 		"nuxt-icon",
 		"@sidebase/nuxt-auth",
-		"@nuxt/devtools",
 		"@vueuse/nuxt",
 		"nuxt-security",
 	],
@@ -25,6 +33,8 @@ export default defineNuxtConfig({
 	runtimeConfig: {
 		public: {
 			NAME: process.env.NAME,
+			BOT_ID: process.env.BOT_ID,
+			BOT_LOGIN: process.env.BOT_LOGIN,
 		},
 		MONGODB_URI: process.env.MONGODB_URI,
 		SECRET: process.env.SECRET,

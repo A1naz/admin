@@ -8,11 +8,11 @@ definePageMeta({
 <template>
     <div>
         <h1 class="text-2xl font-bold mt-1">Выкупы</h1>
-        <p class="text-sm text-gray-500 font-light mt-1">
+        <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
             Здесь формируются и оплачиваются выкупы на Wildberries. Для добавления, нажмите на кнопку "Добавить выкуп".
         </p>
-        <div class="flex justify-between mb-8 mt-4">
-            <div>
+        <div class="flex justify-between mb-8 mt-6 items-center">
+            <div class="hidden lg:block">
                 <button class="btn btn-ghost btn-sm normal-case font-medium btn-active">
                     Все выкупы
                 </button>
@@ -23,9 +23,14 @@ definePageMeta({
                     Завершенные
                 </button>
             </div>
-            <NuxtLink to="/buyouts/create" class="btn btn-primary btn-sm gap-2 font-medium normal-case text-white">
+            <select class="select select-bordered select-sm lg:hidden">
+                <option selected>Все выкупы</option>
+                <option>Активные</option>
+                <option>Завершенные</option>
+            </select>
+            <NuxtLink to="/buyouts/create" class="btn btn-primary btn-sm gap-2 font-medium normal-case text-white self-end">
                 <Icon name="material-symbols:add" size="24"></Icon>
-                Добавить выкуп
+                Добавить выкупы
             </NuxtLink>
         </div>
     </div>

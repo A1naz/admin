@@ -80,9 +80,9 @@ onMounted(async () => {
     <Toast :type="alertType" :active="alert">
       {{ alertText }} </Toast>
     <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-      <NuxtLink to="/" class="flex items-center mb-6 text-2xl font-semibold ">
-        <Icon name="logos:nuxt-icon" size="32"></Icon>
-        {{ name }}
+      <NuxtLink to="/" class="flex items-center text-2xl font-semibold ">
+        <Logo />
+
       </NuxtLink>
       <div class="card shadow-lg w-full rounded-lg md:mt-0 sm:max-w-md xl:p-0 ">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -90,7 +90,7 @@ onMounted(async () => {
             Регистрация
           </h1>
 
-          <form class="space-y-6 md:space-y-7 relative" action="#">
+          <form class="space-y-4 md:space-y-6 relative" action="#">
             <div>
               <label for="email" class="block mb-2 text-sm font-medium ">Email</label>
               <input type="email" name="email" id="email" v-model="formData.email"
@@ -115,7 +115,7 @@ onMounted(async () => {
                 <div class="error-msg">{{ error.$message }}</div>
               </div>
             </div>
-            <div>
+            <div class="pb-4">
               <label for="confirm-password" class="block mb-2 text-sm font-medium ">Пароль
                 еще раз</label>
               <input type="password" name="confirm-password" id="confirm-password" placeholder="••••••••"
@@ -124,9 +124,10 @@ onMounted(async () => {
                 :class="{
                   'input-error': v$.confirmPassword.$error
                 }" required="true" @change="v$.confirmPassword.$touch">
-              <div class="input-errors text-sm text-error mt-1 flex justify-end absolute r-0 w-full"
-                v-for="error of v$.confirmPassword.$errors" :key="error.$uid">
-                <div class="error-msg">{{ error.$message }}</div>
+              <div v-if="v$.confirmPassword.$errors"
+                class="input-errors text-sm text-error mt-1 flex justify-end absolute r-0 w-full">
+
+                <div class="error-msg">{{ v$.confirmPassword?.$errors[0]?.$message }}</div>
               </div>
             </div>
 
@@ -140,8 +141,7 @@ onMounted(async () => {
             </p>
             <div class="divider">Или</div>
 
-            <TelegramLoginButton mode="callback" telegram-login="topvtop_authbot" size="medium" class="rounded-lg m-auto"
-              userpic="false" />
+            <TelegramLoginButton mode="callback" class="rounded-lg m-auto" />
           </form>
         </div>
       </div>
