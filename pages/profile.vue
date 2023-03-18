@@ -39,7 +39,7 @@ const update = async () => {
         return
     }
 
-    const { data, error } = await useLazyFetch('/api/user/update', {
+    const { data, error } = await useFetch('/api/user/update', {
         method: 'POST',
         body: JSON.stringify(form),
         headers,

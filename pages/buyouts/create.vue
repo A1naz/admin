@@ -1,17 +1,17 @@
 <script setup lang="tsx">
 import { useMainStore } from '~~/stores/main';
-import {
-    FlexRender,
-    getCoreRowModel,
-    useVueTable,
-    createColumnHelper,
-} from '@tanstack/vue-table'
 import IconVue from 'nuxt-icon/dist/runtime/IconCSS.vue';
 import { useNotification } from "@kyvg/vue3-notification";
 
 const { notify } = useNotification()
 const dp = ref()
-
+const headers = useRequestHeaders(['cookie']) as HeadersInit
+definePageMeta({
+    layout: 'app',
+    auth: true,
+    title: 'Добавить выкупы',
+})
+const selectPointModal = ref() as Ref<HTMLElement>
 type Item = {
     image: string,
     name: string,
@@ -22,17 +22,13 @@ type Item = {
     sex: string,
     searchQuery: string,
     adress: string,
-    dateRange: [Date | null, Date | null],
+    dateRange: [Date | null, Date | null] | [],
     selectedSize: number,
     rules: {
         [key: number]: boolean
     },
 }
-definePageMeta({
-    layout: 'app',
-    auth: true,
-    breadcrumb: ['Выкупы', 'Добавить выкуп'],
-})
+
 const defaultRules = {
     1: false,
     2: false,
@@ -65,15 +61,19 @@ const defaultData: Item[] = [
 
 const store = useMainStore();
 const article = ref('')
-const products = ref(defaultData)
+const products = ref<Item[]>([])
+const loading = ref(false)
+const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 const addProduct = async () => {
     if (article.value === '') {
         return
     }
-    const { data, error } = await useLazyFetch(`/api/product/${article.value}`, {
+    loading.value = true
+
+    const { data, error } = await useFetch(`/api/product/${article.value}`, {
         method: 'GET',
     })
-
+    loading.value = false
     if (error.value) {
         notify({
             title: 'Ошибка',
@@ -84,14 +84,14 @@ const addProduct = async () => {
 
     const product = data.value?.product as Item
     products.value.push(reactive({
-        image: '',
+        image: 'https://basket-10.wb.ru/vol1437/part143767/143767420/images/c246x328/1.jpg',
         name: product.name,
         article: product.article,
         price: product.price,
         quantity: 1,
         sex: 'Нет',
         sizes: product?.sizes,
-        dateRange: [new Date(), null],
+        dateRange: [startDate.value, null],
         adress: '',
         searchQuery: '',
         selectedSize: product?.sizes[0],
@@ -120,13 +120,13 @@ const onRuleChange = (event: Event, index: number, rule: number) => {
 const removeProduct = (index: number) => {
     products.value.splice(index, 1)
 }
-const getFirstDate = (dates: [Date | null, Date | null]) => {
+const getFirstDate = (dates: [Date | null, Date | null] | []) => {
     if (dates[0]) {
         return `${dates[0].toLocaleDateString()}`
     }
     return ''
 }
-const getSecondDate = (dates: [Date | null, Date | null]) => {
+const getSecondDate = (dates: [Date | null, Date | null] | []) => {
     if (dates[1]) {
         return `${dates[1].toLocaleDateString()}`
 
@@ -143,26 +143,53 @@ const totalQuantity = computed(() => {
         return acc + item.quantity
     }, 0)
 })
+const pickpoints = ref()
+const modalOpen = ref(false)
+const closeModal = () => {
+    modalOpen.value = false
+}
 
-const createBuyout = () => {
+const handleAdress = (address: string) => {
+    const index = store.selectedItem!
+    products.value[index].adress = address
+}
 
-    let error = false
+const createBuyout = async () => {
+
+    let valid = true
     let errorMsg = ''
     products.value.forEach((item) => {
         if (!item.adress) {
-            error = true
+            valid = false
             errorMsg = 'Не у всех товаров указан адрес доставки'
         }
         if (!item.dateRange[0] || !item.dateRange[1]) {
-            error = true
+            valid = false
             errorMsg = 'Не у всех товаров указаны даты выкупов'
+        }
+        if (!item.searchQuery) {
+            valid = false
+            errorMsg = 'Не у всех товаров указан поисковый запрос'
         }
 
     })
-    if (error) {
+    if (!valid) {
         notify({
             title: 'Что-то пошло не так',
             text: errorMsg,
+            type: 'error',
+            duration: 3000,
+        })
+        return
+    }
+    const { data, error } = await useFetch('/api/buyout/create', {
+        method: 'POST',
+        body: JSON.stringify(products.value)
+    })
+    if (error.value) {
+        notify({
+            title: 'Что-то пошло не так',
+            text: error.value?.data.message,
             type: 'error',
             duration: 3000,
         })
@@ -173,6 +200,7 @@ const createBuyout = () => {
         type: 'success',
         duration: 3000,
     })
+    navigateTo('/buyouts')
 }
 
 watch(products.value, (old, value) => {
@@ -186,12 +214,27 @@ watch(products.value, (old, value) => {
     })
 })
 
-onMounted(async () => {
-    const pickpoints = await $fetch('/api/pickpoints', {
+const getPickpoints = async () => {
+    const data: any = await $fetch('/api/buyout/pickpoints', {
         method: 'GET',
     })
+    pickpoints.value = data.points
+}
 
-    console.log(pickpoints)
+const pointModalOpen = async (index: number) => {
+
+    if (!pickpoints.value) {
+        loading.value = true
+        await getPickpoints()
+        loading.value = false
+    }
+    store.drawerz = -1
+    store.selectedItem = index
+    modalOpen.value = true
+
+}
+onMounted(async () => {
+    getPickpoints()
 })
 
 </script>
@@ -204,187 +247,206 @@ onMounted(async () => {
         </p>
         <div class="mt-6 flex items-center">
             <div class="relative flex justify-end items-center flex-grow-0 w-60">
-                <input @keydown.enter="addProduct" v-model="article" placeholder="Артикул"
+                <input @keydown.enter="addProduct" type="number" v-model="article" placeholder="Артикул"
                     class="input input-sm input-bordered w-full">
                 <button @click="addProduct" class="btn btn-ghost btn-sm absolute normal-case">Добавить</button>
             </div>
         </div>
         <ClientOnly>
-            <table class="table table-compact w-full mt-4">
-                <!-- head -->
-                <thead>
-                    <tr>
-                        <th>
+            <div class="">
 
-                        </th>
-                        <th class="w-8">
-                            <IconCSS name="material-symbols:image-outline" size="20"></IconCSS>
-                        </th>
-                        <th class="w-48">
-                            Название
-                        </th>
-                        <th>
-                            Цена
-                        </th>
-                        <th>
-                            Количество
-                        </th>
-                        <th>
-                            Размер
-                        </th>
-                        <th>
-                            Пол
-                        </th>
-                        <th>
-                            Поисковый запрос
-                        </th>
-                        <th class="min-w-40">
-                            Адрес
-                        </th>
-                        <th>
-                            Даты выкупов
-                        </th>
-                        <th>
-                            Правила
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-auto-animate v-for="(product, index) in products" :key="product.article">
-                        <td>
-                            {{ index + 1 }}
-                        </td>
-                        <td>
-                            <Icon name="material-symbols:image-outline" size="20"></Icon>
-                        </td>
-                        <td class="">
-                            <div class="w-48 truncate">
-                                <div class="text-sm font-medium truncate">
-                                    {{ product.name }}
+                <table class="table table-compact w-full mt-4">
+                    <!-- head -->
+                    <thead class="relative">
+                        <tr>
+                            <th>
+
+                            </th>
+                            <th class="w-12">
+                                <IconCSS name="material-symbols:image-outline" size="20"></IconCSS>
+                            </th>
+                            <th class="w-48">
+                                Название
+                            </th>
+                            <th>
+                                Цена
+                            </th>
+                            <th>
+                                Количество
+                            </th>
+                            <th>
+                                Размер
+                            </th>
+                            <th>
+                                Пол
+                            </th>
+                            <th>
+                                Поисковый запрос
+                            </th>
+                            <th class="min-w-40">
+                                Адрес
+                            </th>
+                            <th>
+                                Даты выкупов
+                            </th>
+                            <th>
+                                Правила
+                            </th>
+                        </tr>
+                        <progress v-if="loading" class="absolute progress progress-primary w-full"></progress>
+
+                    </thead>
+
+                    <tbody v-auto-animate>
+                        <tr v-for="(product, index) in products" :key="product.article">
+                            <td>
+                                {{ index + 1 }}
+                            </td>
+                            <td>
+                                <div
+                                    style="width: 28px; height: 28px; overflow: hidden; position: relative; border-radius: 4px">
+                                    <nuxt-img loading="lazy" fit="fill" :src="product.image"></nuxt-img>
                                 </div>
-                                <a :href="`https://www.wildberries.ru/catalog/${product.article}/detail.aspx`"
-                                    target="_blank" class="text-sm text-primary link link-hover">
-                                    {{ product.article }}
-                                </a>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="text-sm">
-                                {{ product.price }}₽
-
-                            </div>
-                        </td>
-                        <td>
-                            <div class="relative flex items-center flex-grow-0 w-full">
-                                <div @click="product.quantity--" class="absolute left-0 btn btn-ghost btn-sm btn-square">
-
-                                    <IconCSS size="16" name="ic:round-minus" />
+                            </td>
+                            <td class="">
+                                <div class="w-48 truncate">
+                                    <div class="text-sm font-medium truncate">
+                                        {{ product.name }}
+                                    </div>
+                                    <a :href="`https://www.wildberries.ru/catalog/${product.article}/detail.aspx`"
+                                        target="_blank" class="text-sm text-primary link link-hover">
+                                        {{ product.article }}
+                                    </a>
                                 </div>
-                                <input type="number" min="1" max="1000" v-model="product.quantity"
-                                    class="input input-bordered input-sm w-full text-center">
-                                <div @click="product.quantity++" class="absolute right-0 btn btn-ghost btn-sm btn-square">
-                                    <IconCSS size="16" name="ic:round-plus" />
+                            </td>
+                            <td>
+                                <div class="text-sm">
+                                    {{ product.price }}₽
 
                                 </div>
+                            </td>
+                            <td>
+                                <div class="relative flex items-center flex-grow-0 w-full">
+                                    <div @click="product.quantity--"
+                                        class="absolute left-0 btn btn-ghost btn-sm btn-square">
 
-                            </div>
-                        </td>
-                        <td>
-                            <div class="w-full flex items-center">
-                                <select @change="onSizeChange($event, index)" v-if="product.sizes.length"
-                                    class="select select-sm select-bordered w-full">
-                                    <option v-for="size in product.sizes" :key="size" :value="size">{{ size }}</option>
-                                </select>
-                                <div v-else class="text-sm text-center ml-2">
-                                    Нет
+                                        <IconCSS size="16" name="ic:round-minus" />
+                                    </div>
+                                    <input type="number" min="1" max="1000" v-model="product.quantity"
+                                        class="input input-bordered input-sm w-full text-center">
+                                    <div @click="product.quantity++"
+                                        class="absolute right-0 btn btn-ghost btn-sm btn-square">
+                                        <IconCSS size="16" name="ic:round-plus" />
+
+                                    </div>
+
                                 </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="w-full">
-                                <select @change="onSexChange($event, index)"
-                                    class="select select-sm select-bordered w-full">
-                                    <option value="any">Нет</option>
-                                    <option value="male">Муж</option>
-                                    <option value="female">Жен</option>
-                                </select>
+                            </td>
+                            <td>
+                                <div class="w-20 xl:w-full flex items-center">
+                                    <select @change="onSizeChange($event, index)" v-if="product.sizes.length"
+                                        class="select select-sm select-bordered w-full">
+                                        <option v-for="size in product.sizes" :selected="product.selectedSize === size"
+                                            :key="size" :value="size">{{ size }}</option>
+                                    </select>
+                                    <div v-else class="text-sm text-center ml-2">
+                                        Нет
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="w-20 xl:w-full">
+                                    <select @change="onSexChange($event, index)"
+                                        class="select select-sm select-bordered w-full appearance-none">
+                                        <option value="any">Нет</option>
+                                        <option value="male">Муж</option>
+                                        <option value="female">Жен</option>
+                                    </select>
 
-                            </div>
-                        </td>
-                        <td>
-                            <div class="w-full">
-                                <input type="text" placeholder="Ввести" class="input input-bordered input-sm w-full"
-                                    v-model="product.searchQuery">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="w-full">
-                                <button :class="{
-                                    'btn-outline': product.adress,
-                                }" class="btn btn-primary btn-sm normal-case w-full">{{ product.adress ?
-    'Изменить' : 'Добавить' }}</button>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="flex justify-between items-center">
+                                </div>
+                            </td>
+                            <td>
                                 <div class="w-full">
+                                    <input type="text" placeholder="Ввести" class="input input-bordered input-sm w-full"
+                                        v-model="product.searchQuery">
+                                </div>
+                            </td>
+                            <td>
+                                <div v-auto-animate class="w-full flex flex-col items-start justify-center gap-1">
+                                    <div v-if="product.adress" class="text-xs mb-1 truncate w-40"><span>{{ product.adress
+                                    }}</span></div>
+                                    <a @click="pointModalOpen(index)" :class="{
+                                        'btn-outline': product.adress,
+                                    }" class="btn btn-primary btn-sm normal-case w-full">{{ product.adress ?
+    'Изменить' : 'Добавить' }}</a>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="flex justify-between items-center">
+                                    <div class="w-full">
 
-                                    <VueDatePicker v-model="product.dateRange" ref="dp" :dark="store.theme === 'dracula'"
-                                        locale="ru" range cancelText="" select-text="Сохранить">
-                                        <template #trigger>
-                                            <button :class="{
-                                                'btn-outline': product.dateRange[0] && product.dateRange[1],
-                                            }" class="btn btn-primary btn-sm normal-case w-full">{{
+                                        <VueDatePicker class="absolute" v-model="product.dateRange" ref="dp"
+                                            :dark="store.theme === 'dracula'" locale="ru" range cancelText=""
+                                            select-text="Сохранить">
+                                            <template #trigger>
+                                                <button :class="{
+                                                    'btn-outline': product.dateRange[0] && product.dateRange[1],
+                                                }" class="btn btn-primary btn-sm normal-case w-full">{{
     product.dateRange[0] && product.dateRange[1] ? 'Изменить' : 'Выбрать'
 }}</button>
-                                        </template>
-                                        <template #action-preview="{ value }">
-                                            <div class="flex flex-col w-full">
-                                                <div class="flex justify-between">
-                                                    <span>Начало:</span> <span>{{ getFirstDate(value) }}</span>
+                                            </template>
+                                            <template #action-preview="{ value }">
+                                                <div class="flex flex-col w-full">
+                                                    <div class="flex justify-between">
+                                                        <span>Начало:</span> <span>{{ getFirstDate(value) }}</span>
+                                                    </div>
+                                                    <div class="flex justify-between">
+                                                        <span>Конец:</span> <span>{{ getSecondDate(value) }}</span>
+                                                    </div>
                                                 </div>
-                                                <div class="flex justify-between">
-                                                    <span>Конец:</span> <span>{{ getSecondDate(value) }}</span>
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </VueDatePicker>
+                                            </template>
+                                        </VueDatePicker>
+                                    </div>
+
                                 </div>
 
-                            </div>
-
-                        </td>
-                        <td>
-                            <div class="w-full flex justify-between">
-                                <label :for="'modal' + index" :class="{
-                                    'btn-outline': product.rules,
-                                }" class="btn btn-primary btn-sm normal-case ">{{ 'Настроить' }}
-                                </label>
-                                <div @click="removeProduct(index)" class="ml-2 w-8 btn btn-ghost btn-sm btn-square">
-                                    <IconCSS name="material-symbols:delete-outline" size="20"></IconCSS>
+                            </td>
+                            <td>
+                                <div class="w-full flex justify-between">
+                                    <label :for="'modal' + index" :class="{
+                                        'btn-outline': product.rules,
+                                    }" class="btn btn-primary btn-sm normal-case ">{{ 'Настроить' }}
+                                    </label>
+                                    <div @click="removeProduct(index)" class="ml-2 w-8 btn btn-ghost btn-sm btn-square">
+                                        <IconCSS name="material-symbols:close" size="20"></IconCSS>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <input type="checkbox" :id="'modal' + index" class="modal-toggle" />
-                        <label :for="'modal' + index" class="modal modal-bottom sm:modal-middle">
-                            <label for="" class="modal-box relative">
-                                <label :for="'modal' + index"
-                                    class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</label>
-                                <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
-                                <label v-for="(value, key) of products[index].rules" class="label cursor-pointer">
-                                    <span class="label-text text-lg">Правило {{ key }}</span>
-                                    <input type="checkbox" @change="onRuleChange($event, index, key)"
-                                        class="checkbox checkbox-primary" />
+                            </td>
+                            <input type="checkbox" :id="'modal' + index" class="modal-toggle" />
+                            <label :for="'modal' + index" class="modal modal-bottom sm:modal-middle">
+                                <label for="" class="modal-box relative">
+                                    <label :for="'modal' + index"
+                                        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</label>
+                                    <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
+                                    <label v-for="(value, key) of products[index].rules" class="label cursor-pointer">
+                                        <span class="label-text text-lg">Правило {{ key }}</span>
+                                        <input type="checkbox" @change="onRuleChange($event, index, key)"
+                                            class="checkbox checkbox-primary" />
+                                    </label>
                                 </label>
                             </label>
-                        </label>
-                    </tr>
+                        </tr>
 
-                </tbody>
-                <!-- foot -->
+                    </tbody>
+                    <!-- foot -->
 
-            </table>
+                </table>
+            </div>
+            <SelectPointModal v-if="modalOpen" @callback="handleAdress" :style="{
+                'visibility': modalOpen ? 'visible' : 'hidden'
+            }" @close="closeModal" :pickpoints="pickpoints" />
         </ClientOnly>
+
         <div class="mt-6 flex justify-between items-center" v-if="products.length">
             <div class="info">
                 <div class="text-sm">
@@ -407,5 +469,23 @@ onMounted(async () => {
 <style scoped>
 th {
     @apply normal-case;
+}
+
+table td,
+table td * {
+    vertical-align: top;
+}
+
+select {
+    /* for Firefox */
+    -moz-appearance: none;
+    /* for Chrome */
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* For IE10 */
+select::-ms-expand {
+    display: none;
 }
 </style>

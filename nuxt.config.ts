@@ -7,13 +7,30 @@ export default defineNuxtConfig({
 		enableGlobalAppMiddleware: true,
 		defaultProvider: "credentials",
 	},
+	image: {
+		domains: [
+			"wb.ru",
+			"basket-10.wb.ru",
+			"basket-1.wb.ru",
+			"basket-2.wb.ru",
+			"basket-3.wb.ru",
+			"basket-4.wb.ru",
+			"basket-5.wb.ru",
+			"basket-6.wb.ru",
+			"basket-7.wb.ru",
+		],
+	},
 	nitro: {
 		storage: {
 			db: {
 				driver: "mongodb",
 				connectionString: process.env.MONGODB_URI,
-				databaseName: "site",
-				collectionName: "serverStorage",
+			},
+		},
+		devStorage: {
+			db: {
+				driver: "mongodb",
+				connectionString: process.env.MONGODB_URI,
 			},
 		},
 		plugins: ["~/server/index.ts"],

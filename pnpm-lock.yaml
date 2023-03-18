@@ -10,7 +10,6 @@ specifiers:
   '@pinia/nuxt': ^0.4.7
   '@sidebase/nuxt-auth': ^0.4.3
   '@tailwindcss/typography': ^0.5.9
-  '@tanstack/vue-table': ^8.7.9
   '@types/bcrypt': ^5.0.0
   '@types/jsonwebtoken': ^9.0.1
   '@types/nodemailer': ^6.4.7
@@ -19,8 +18,10 @@ specifiers:
   '@vuelidate/validators': ^2.0.0
   '@vuepic/vue-datepicker': ^4.2.0
   '@vueuse/nuxt': ^9.13.0
+  '@yandex/ymaps3-types': ^0.0.5
   bcrypt: ^5.1.0
   daisyui: ^2.51.3
+  dayjs: ^1.11.7
   jsonwebtoken: ^9.0.0
   mongodb: ^5.1.0
   mongoose: ^7.0.1
@@ -31,6 +32,7 @@ specifiers:
   nuxt-route-meta: ^3.0.1
   nuxt-security: ^0.12.0
   theme-change: ^2.5.0
+  unstorage: ^1.4.0
   uuidv4: ^6.2.13
   validator: ^13.9.0
   vue-yandex-maps: ^1.0.8
@@ -42,7 +44,6 @@ dependencies:
   '@nuxtjs/html-validator': 1.2.4
   '@pinia/nuxt': 0.4.7_3qtbwstkj2gmwqrbqf6sgl34me
   '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.7
-  '@tanstack/vue-table': 8.7.9_vue@3.2.47
   '@types/validator': 13.7.13
   '@vuelidate/core': 2.0.0_vue@3.2.47
   '@vuelidate/validators': 2.0.0_vue@3.2.47
@@ -50,6 +51,7 @@ dependencies:
   '@vueuse/nuxt': 9.13.0_nuxt@3.2.3+vue@3.2.47
   bcrypt: 5.1.0
   daisyui: 2.51.3_gbtt6ss3tbiz4yjtvdr6fbrj44
+  dayjs: 1.11.7
   jsonwebtoken: 9.0.0
   mongodb: 5.1.0
   mongoose: 7.0.1
@@ -57,6 +59,7 @@ dependencies:
   nodemailer: 6.9.1
   nuxt-route-meta: 3.0.1
   theme-change: 2.5.0
+  unstorage: 1.4.0
   uuidv4: 6.2.13
   validator: 13.9.0
   vue-yandex-maps: 1.0.8
@@ -68,6 +71,7 @@ devDependencies:
   '@types/bcrypt': 5.0.0
   '@types/jsonwebtoken': 9.0.1
   '@types/nodemailer': 6.4.7
+  '@yandex/ymaps3-types': 0.0.5
   nuxt: 3.2.3_typescript@4.2.4
   nuxt-icon: 0.3.2_vue@3.2.47
   nuxt-security: 0.12.0
@@ -2119,21 +2123,6 @@ packages:
       tailwindcss: 3.2.7_postcss@8.4.21
     dev: false
 
-  /@tanstack/table-core/8.7.9:
-    resolution: {integrity: sha512-4RkayPMV1oS2SKDXfQbFoct1w5k+pvGpmX18tCXMofK/VDRdA2hhxfsQlMvsJ4oTX8b0CI4Y3GDKn5T425jBCw==}
-    engines: {node: '>=12'}
-    dev: false
-
-  /@tanstack/vue-table/8.7.9_vue@3.2.47:
-    resolution: {integrity: sha512-NdMwwytlthZYP1U71rWON/quuJtPS3lIQVA7nEGte6DtnVQgSB1jus921WaAqpA4UPQz+3qjfUJz5SB7Nc3xfg==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      vue: ^3.2.33
-    dependencies:
-      '@tanstack/table-core': 8.7.9
-      vue: 3.2.47
-    dev: false
-
   /@tootallnate/once/2.0.0:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
@@ -2683,6 +2672,10 @@ packages:
 
   /@xtuc/long/4.2.2:
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
+    dev: true
+
+  /@yandex/ymaps3-types/0.0.5:
+    resolution: {integrity: sha512-M7DmUjIop5Kfk4xr2dxmnRFu/FYz/sfNAe+PXdgjV1U58I7Eh6NAC0sbFhsRmnfNs9aQX/cQgF1J7pHeHmOTVA==}
     dev: true
 
   /abab/2.0.6:
@@ -3861,6 +3854,10 @@ packages:
   /date-fns/2.29.3:
     resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
     engines: {node: '>=0.11'}
+    dev: false
+
+  /dayjs/1.11.7:
+    resolution: {integrity: sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==}
     dev: false
 
   /de-indent/1.0.2:
@@ -6823,7 +6820,7 @@ packages:
       ufo: 1.1.1
       unenv: 1.2.1
       unimport: 2.2.4_rollup@3.18.0
-      unstorage: 1.3.0
+      unstorage: 1.4.0
     transitivePeerDependencies:
       - debug
       - encoding
@@ -9390,8 +9387,8 @@ packages:
       isobject: 3.0.1
     dev: false
 
-  /unstorage/1.3.0:
-    resolution: {integrity: sha512-2ux0UDXBTR7VzJHZFBiLM1b5sB9XEXMlqoG8cd6lkBIxrD8jhj5tZGkRXTD2RgNXp+ndCgSOs9oUmEV5VpR8WQ==}
+  /unstorage/1.4.0:
+    resolution: {integrity: sha512-l4ggmklguKsfkoEcO9QiSgnYLEUTVqHk+Sl9Y63FzhUnCqGz7icxLX7WmvDwPtAYH6qI4hBkfJbVVjS5rispMQ==}
     dependencies:
       anymatch: 3.1.3
       chokidar: 3.5.3

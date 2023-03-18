@@ -2,7 +2,7 @@
 definePageMeta({
     layout: 'app',
     auth: true,
-    breadcrumb: ['Доставки'],
+    title: 'Доставки'
 })
 </script>
 

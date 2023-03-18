@@ -3,5 +3,11 @@
   "extends": "./.nuxt/tsconfig.json",
   "types": ["@nuxt/types", "@nuxt/image", "@pinia/nuxt"],
   "noImplicitAny": true,
-  "allowJs": true
+  "allowJs": true,
+  "compilerOptions": {
+      "typeRoots": [
+      "./node_modules/@yandex/ymaps3-types"
+      ]
+}
+
 }

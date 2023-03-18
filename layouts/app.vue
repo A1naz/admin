@@ -5,11 +5,7 @@ const store = useMainStore();
 const theme = ref('light')
 const route = useRoute()
 const themes = ["cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula", "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter"]
-onMounted(() => {
-  console.log(route.meta)
-  theme.value = localStorage.getItem('theme') || 'light'
-  console.log(theme.value)
-})
+
 const { status, data, signIn, signOut } = useSession()
 const name = useRuntimeConfig().NAME
 const currentPath = ref(useRoute().path)
@@ -53,8 +49,32 @@ const logout = async () => {
   })
   store.setClient({})
 }
+const getBreadcrumbs = () => {
+  const route = useRoute()
 
+  const pathArray = route.path.split('/')
+  pathArray.shift()
+  const breadcrumbs = pathArray.reduce((breadcrumbArray: any, path, idx) => {
+    const currPath = breadcrumbArray[idx - 1]
+      ? breadcrumbArray[idx - 1].to + '/' + path
+      : '/' + path
+    breadcrumbArray.push({
+      to: !!breadcrumbArray[idx - 1]
+        ? breadcrumbArray[idx - 1].to + '/' + path
+        : '/' + path,
+      title: useRouter().resolve(currPath).meta.title,
+    })
+    return breadcrumbArray
+  }, [])
+  return breadcrumbs
+}
 
+onMounted(() => {
+  console.log(route.meta)
+  theme.value = localStorage.getItem('theme') || 'light'
+  console.log(theme.value)
+})
+const breadcrumbs = computed(() => getBreadcrumbs())
 
 
 </script>
@@ -71,7 +91,9 @@ const logout = async () => {
             </svg>
           </label>
         </div>
-        <div class="flex-1 justify-center mr-12">{{ name }}</div>
+        <div class="flex-1 justify-center mr-12">
+          <Logo></Logo>
+        </div>
       </div>
 
       <!-- Page content here -->
@@ -83,10 +105,10 @@ const logout = async () => {
                 <img src="/icons/wb.svg" alt="" srcset="">
               </a>
             </li>
-            <li v-for="crumb of route.meta.breadcrumb">
-              <a>
-                {{ crumb }}
-              </a>
+            <li v-for="crumb of breadcrumbs">
+              <NuxtLink :to="crumb.to">
+                {{ crumb.title }}
+              </NuxtLink>
             </li>
           </ul>
         </div>
@@ -96,8 +118,9 @@ const logout = async () => {
 
     </div>
     <div class="drawer-side">
-      <label for="my-drawer" class="drawer-overlay rounded-xl lg:m-2"></label>
-      <ul class="menu w-72 bg-base-200 rounded-xl lg:m-2 text-base-content justify-start">
+      <label for="my-drawer" class="drawer-overlay rounded-xl lg:m-2" :style="{ 'z-index': store.drawerz }"></label>
+      <ul class="menu w-72 bg-base-200 rounded-xl lg:m-2 text-base-content justify-start"
+        :style="{ 'z-index': store.drawerz }">
         <!-- Sidebar content here -->
         <div class="hidden title w-full justify-center p-2 lg:flex">
           <Logo></Logo>
@@ -105,7 +128,7 @@ const logout = async () => {
         </div>
         <div class="card m-4 mx-4 bg-[#121212] text-neutral-content">
           <div class="card-body p-4">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center text-white">
               <div class="text-sm">
                 {{ store.client?.username ? store.client.username : data?.user?.email }}
                 <button></button>

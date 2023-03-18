@@ -6,6 +6,9 @@ export const useMainStore = defineStore("main", {
 	state: () => ({
 		client: {} as any,
 		theme: "light",
+		drawerz: 1,
+		pickpoints: [] as any,
+		selectedItem: null as number | null,
 	}),
 	// optional actions
 
@@ -23,6 +26,12 @@ export const useMainStore = defineStore("main", {
 		},
 		reset() {
 			// `this` is the store instance
+		},
+		hideDrawer() {
+			this.drawerz = -1;
+		},
+		returnDrawer() {
+			this.drawerz = 1;
 		},
 	},
 });

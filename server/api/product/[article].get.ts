@@ -26,8 +26,6 @@ export default eventHandler(async (event) => {
 	const sizes = data?.sizes_table?.values
 		? data?.sizes_table?.values.map((size: any) => size.tech_size)
 		: [];
-	console.log(data?.sizes_table?.values);
-	console.log(sizes);
 	const priceData = JSON.parse(rawData);
 	const price = priceData?.data?.products[0]?.salePriceU
 		.toString()
