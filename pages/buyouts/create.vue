@@ -2,7 +2,12 @@
 import { useMainStore } from '~~/stores/main';
 import IconVue from 'nuxt-icon/dist/runtime/IconCSS.vue';
 import { useNotification } from "@kyvg/vue3-notification";
+import { useWindowSize } from '@vueuse/core'
 
+const { $dayjs } = useNuxtApp();
+const currency = useCurrency()
+
+const { width, height } = useWindowSize()
 const { notify } = useNotification()
 const dp = ref()
 const headers = useRequestHeaders(['cookie']) as HeadersInit
@@ -12,18 +17,20 @@ definePageMeta({
     title: 'Добавить выкупы',
 })
 const selectPointModal = ref() as Ref<HTMLElement>
+
 type Item = {
     image: string,
     name: string,
     article: number,
     price: number,
+    priceText: string,
     quantity: number,
-    sizes: number[],
+    sizes: number[] | string[],
     sex: string,
     searchQuery: string,
     adress: string,
-    dateRange: [Date | null, Date | null] | [],
-    selectedSize: number,
+    dateRange: [Date | null, Date | null],
+    selectedSize: number | string,
     rules: {
         [key: number]: boolean
     },
@@ -47,6 +54,7 @@ const defaultData: Item[] = [
         name: 'Кроссовки Nike Air Max 270 React',
         article: 123456789,
         price: 1000,
+        priceText: '1000 руб.',
         quantity: 1,
         sizes: [39],
         sex: 'Нет',
@@ -58,7 +66,7 @@ const defaultData: Item[] = [
     })
 ]
 
-
+const route = useRoute()
 const store = useMainStore();
 const article = ref('')
 const products = ref<Item[]>([])
@@ -82,7 +90,7 @@ const addProduct = async () => {
         })
     }
 
-    const product = data.value?.product as Item
+    const product = data.value?.product as unknown as Item
     products.value.push(reactive({
         image: 'https://basket-10.wb.ru/vol1437/part143767/143767420/images/c246x328/1.jpg',
         name: product.name,
@@ -95,6 +103,7 @@ const addProduct = async () => {
         adress: '',
         searchQuery: '',
         selectedSize: product?.sizes[0],
+        priceText: product.priceText,
         rules: defaultRules
     }))
 
@@ -120,19 +129,7 @@ const onRuleChange = (event: Event, index: number, rule: number) => {
 const removeProduct = (index: number) => {
     products.value.splice(index, 1)
 }
-const getFirstDate = (dates: [Date | null, Date | null] | []) => {
-    if (dates[0]) {
-        return `${dates[0].toLocaleDateString()}`
-    }
-    return ''
-}
-const getSecondDate = (dates: [Date | null, Date | null] | []) => {
-    if (dates[1]) {
-        return `${dates[1].toLocaleDateString()}`
 
-    }
-    return ''
-}
 const totalSum = computed(() => {
     return products.value.reduce((acc, item) => {
         return acc + item.price * item.quantity
@@ -170,6 +167,9 @@ const createBuyout = async () => {
         if (!item.searchQuery) {
             valid = false
             errorMsg = 'Не у всех товаров указан поисковый запрос'
+        }
+        if (!item.selectedSize) {
+            item.selectedSize = 'none'
         }
 
     })
@@ -215,26 +215,64 @@ watch(products.value, (old, value) => {
 })
 
 const getPickpoints = async () => {
-    const data: any = await $fetch('/api/buyout/pickpoints', {
-        method: 'GET',
-    })
-    pickpoints.value = data.points
+    try {
+        const data = await $fetch('/api/buyout/pickpoints', {
+            method: 'GET',
+            headers: headers,
+        })
+        pickpoints.value = (data as any).points
+        loading.value = false
+    } catch (e: any) {
+        notify({
+            title: 'Что-то пошло не так',
+            text: e?.message,
+            type: 'error',
+            duration: 3000,
+        })
+    }
 }
 
 const pointModalOpen = async (index: number) => {
-
     if (!pickpoints.value) {
         loading.value = true
-        await getPickpoints()
-        loading.value = false
     }
     store.drawerz = -1
     store.selectedItem = index
-    modalOpen.value = true
+    setTimeout(() => {
+        modalOpen.value = true
+    }, 50)
 
 }
 onMounted(async () => {
     getPickpoints()
+    if (route.query.uuid) {
+        loading.value = true
+        const { data, error } = await useFetch(`/api/buyout/clone`, {
+            query: {
+                uuid: route.query.uuid
+            },
+            method: 'GET',
+            headers: headers
+        })
+        if (error.value) {
+            notify({
+                title: 'Что-то пошло не так',
+                text: error.value?.data.message,
+                type: 'error',
+                duration: 3000,
+            })
+            return
+        }
+        if (data.value) {
+            const product = {
+                ...data.value,
+                rules: defaultRules,
+                dateRange: [startDate.value, null],
+            }
+            products.value.push(product as any)
+        }
+        loading.value = false
+    }
 })
 
 </script>
@@ -253,7 +291,12 @@ onMounted(async () => {
             </div>
         </div>
         <ClientOnly>
-            <div class="">
+            <div v-if="width < 1024" class="products-card grid grid-cols-1 gap-4 md:grid-cols-2 lg:hidden mt-4">
+                <CreateBuyoutCard :loading="!pickpoints?.length" @point-modal-open="pointModalOpen" @remove="removeProduct"
+                    @change-sex="onSexChange" @change-size="onSizeChange" :product="product" :index="index"
+                    v-for="(product, index) in products" :key="index" />
+            </div>
+            <div v-else class="products-table hidden lg:block">
 
                 <table class="table table-compact w-full mt-4">
                     <!-- head -->
@@ -321,7 +364,7 @@ onMounted(async () => {
                             </td>
                             <td>
                                 <div class="text-sm">
-                                    {{ product.price }}₽
+                                    {{ product.priceText }}
 
                                 </div>
                             </td>
@@ -343,7 +386,7 @@ onMounted(async () => {
                                 </div>
                             </td>
                             <td>
-                                <div class="w-20 xl:w-full flex items-center">
+                                <div class="w-20 2xl:w-full flex items-center">
                                     <select @change="onSizeChange($event, index)" v-if="product.sizes.length"
                                         class="select select-sm select-bordered w-full">
                                         <option v-for="size in product.sizes" :selected="product.selectedSize === size"
@@ -355,10 +398,10 @@ onMounted(async () => {
                                 </div>
                             </td>
                             <td>
-                                <div class="w-20 xl:w-full">
+                                <div class="w-20 2xl:w-full">
                                     <select @change="onSexChange($event, index)"
                                         class="select select-sm select-bordered w-full appearance-none">
-                                        <option value="any">Нет</option>
+                                        <option value="none">Нет</option>
                                         <option value="male">Муж</option>
                                         <option value="female">Жен</option>
                                     </select>
@@ -375,37 +418,18 @@ onMounted(async () => {
                                 <div v-auto-animate class="w-full flex flex-col items-start justify-center gap-1">
                                     <div v-if="product.adress" class="text-xs mb-1 truncate w-40"><span>{{ product.adress
                                     }}</span></div>
-                                    <a @click="pointModalOpen(index)" :class="{
+                                    <button :disabled="!pickpoints" @click="pointModalOpen(index)" :class="{
                                         'btn-outline': product.adress,
-                                    }" class="btn btn-primary btn-sm normal-case w-full">{{ product.adress ?
-    'Изменить' : 'Добавить' }}</a>
+                                    }" class="btn btn-primary btn-sm normal-case w-full">{{ pickpoints ? product.adress
+    ?
+    'Изменить' : 'Добавить' : 'Загрузка...' }}</button>
                                 </div>
                             </td>
                             <td>
                                 <div class="flex justify-between items-center">
                                     <div class="w-full">
 
-                                        <VueDatePicker class="absolute" v-model="product.dateRange" ref="dp"
-                                            :dark="store.theme === 'dracula'" locale="ru" range cancelText=""
-                                            select-text="Сохранить">
-                                            <template #trigger>
-                                                <button :class="{
-                                                    'btn-outline': product.dateRange[0] && product.dateRange[1],
-                                                }" class="btn btn-primary btn-sm normal-case w-full">{{
-    product.dateRange[0] && product.dateRange[1] ? 'Изменить' : 'Выбрать'
-}}</button>
-                                            </template>
-                                            <template #action-preview="{ value }">
-                                                <div class="flex flex-col w-full">
-                                                    <div class="flex justify-between">
-                                                        <span>Начало:</span> <span>{{ getFirstDate(value) }}</span>
-                                                    </div>
-                                                    <div class="flex justify-between">
-                                                        <span>Конец:</span> <span>{{ getSecondDate(value) }}</span>
-                                                    </div>
-                                                </div>
-                                            </template>
-                                        </VueDatePicker>
+                                        <DateRangePicker v-model="product.dateRange" :start-date="startDate" />
                                     </div>
 
                                 </div>
@@ -454,7 +478,8 @@ onMounted(async () => {
                     }} шт.</span>
                 </div>
                 <div class="text-sm">
-                    <span class="text-gray-500">Сумма:</span> <span class="font-bold">{{ totalSum }}₽</span>
+                    <span class="text-gray-500">Сумма:</span> <span class="font-bold">{{ currency.format(totalSum)
+                    }}</span>
                 </div>
             </div>
             <button @click="createBuyout" class="btn btn-primary btn-sm normal-case">{{ products.length > 1 ? `Создать

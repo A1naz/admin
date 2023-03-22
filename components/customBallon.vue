@@ -1,3 +1,12 @@
+<script setup lang="ts">
+const props = defineProps<{
+    point: any
+}>()
+const emit = defineEmits(['select'])
+const selectPoint = () => {
+    emit('select', props.point.a)
+}
+</script>
 <template>
     <div class="card">
         <div>
@@ -9,14 +18,6 @@
     </div>
 </template>
 
-<script setup lang="ts">
-const props = defineProps<{
-    point: any
-}>()
-const emit = defineEmits(['select'])
-const selectPoint = () => {
-    emit('select', props.point.a)
-}
-</script>
+
 
 <style scoped></style>

@@ -1,9 +1,3 @@
-<template>
-  <button @click="login" ref="telegram" :disabled="store.client?.telegram" class="btn btn-primary">{{
-    store.client?.telegram ?
-    'Привязан'
-    : 'Привязать' }}</button>
-</template>
 <script lang="ts" setup>
 
 import { ref, onMounted } from 'vue';
@@ -83,4 +77,11 @@ onMounted(() => {
 
 
 </script>
+<template>
+  <button @click="login" ref="telegram" :disabled="store.client?.telegram" class="btn btn-primary">{{
+    store.client?.telegram ?
+    'Привязан'
+    : 'Привязать' }}</button>
+</template>
+
 <style></style>

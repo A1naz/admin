@@ -38,6 +38,8 @@ if (status.value === 'authenticated') {
   </div>
 </template>
 <style>
+@import '~~/assets/style/datepicker.css';
+
 .notif-text {
   font-size: 0.9rem;
   font-weight: 400;

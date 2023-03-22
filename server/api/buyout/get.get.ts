@@ -15,37 +15,45 @@ export default eventHandler(async (event) => {
 	}
 	let buyouts;
 	if (status === "all") {
-		buyouts = await Buyout.find({ user: user });
+		buyouts = await Buyout.find({ user: user }).sort({ createdAt: -1 });
 	} else if (status === "active") {
-		buyouts = await Buyout.find({ user: user, status: "Активный" });
+		buyouts = await Buyout.find({ user: user, status: "active" }).sort({
+			createdAt: -1,
+		});
 	} else if (status === "completed") {
-		buyouts = await Buyout.find({ user: user, status: "Завершен" });
+		buyouts = await Buyout.find({ user: user, status: "completed" }).sort({
+			createdAt: -1,
+		});
 	} else if (status === "canceled") {
-		buyouts = await Buyout.find({ user: user, status: "Отменен" });
+		buyouts = await Buyout.find({ user: user, status: "canceled" }).sort({
+			createdAt: -1,
+		});
+	} else if (status === "archived") {
+		buyouts = await Buyout.find({ user: user, status: "archived" }).sort({
+			createdAt: -1,
+		});
 	} else {
-		buyouts = await Buyout.find({ user: user });
+		buyouts = await Buyout.find({ user: user }).sort({ createdAt: -1 });
 	}
 
-	const format = buyouts
-		.map((buyout) => {
-			return {
-				uuid: buyout.uuid,
-				article: buyout.article,
-				searchQuery: buyout.searchQuery,
-				point: buyout.point,
-				dateStart: buyout.dateStart,
-				dateEnd: buyout.dateEnd,
-				sizeparam: buyout.sizeparam,
-				quantity: buyout.quantity,
-				gender: buyout.gender,
-				status: buyout.status,
-				orderPaymentStatus: buyout.orderPaymentStatus,
-				servicePaymentStatus: buyout.servicePaymentStatus,
-				rules: buyout.rules,
-				createdAt: buyout.createdAt,
-				product: buyout.product,
-			};
-		})
-		.reverse();
+	const format = buyouts.map((buyout) => {
+		return {
+			uuid: buyout.uuid,
+			article: buyout.article,
+			searchQuery: buyout.searchQuery,
+			point: buyout.point,
+			dateStart: buyout.dateStart,
+			dateEnd: buyout.dateEnd,
+			sizeparam: buyout.sizeparam,
+			quantity: buyout.quantity,
+			gender: buyout.gender,
+			status: buyout.status,
+			orderPaymentStatus: buyout.orderPaymentStatus,
+			servicePaymentStatus: buyout.servicePaymentStatus,
+			rules: buyout.rules,
+			createdAt: buyout.createdAt,
+			product: buyout.product,
+		};
+	});
 	return format;
 });

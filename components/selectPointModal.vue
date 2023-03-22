@@ -13,7 +13,7 @@ const closeModal = () => {
   store.returnDrawer()
   emit('close')
 }
-
+const loading = ref(false)
 const map = ref()
 const emit = defineEmits(['callback', 'close']);
 const handleSelect = (address: string) => {
@@ -38,6 +38,7 @@ const settings = {
 };
 
 onMounted(async () => {
+  loading.value = true
   await loadYmap(settings);
   await ymaps.ready
   const myMap = new ymaps.Map('ymap', {
@@ -133,16 +134,20 @@ onMounted(async () => {
     const geoObject = objectManager.objects.getById(objectId);
     console.log(geoObject)
   });
+  loading.value = false
 
 })
 </script>
 
 <template>
   <div ref="modal" style="z-index: 150 !important" class="modal modal-open" id="selectPointModal">
-    <div class="modal-box w-11/12 max-w-7xl h-[100vh]" style="z-index: 150 !important">
+    <div class="modal-box w-11/12 max-w-7xl overflow-y-hidden" style="z-index: 150 !important">
       <div class="">
         <a @click="closeModal" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</a>
         <div class="title mb-2">Выберите ПВЗ</div>
+        <div v-if="loading" class="loading flex justify-center items-center h-full">
+          <Icon class="animate-spin" size="60" name="mdi:loading"></Icon>
+        </div>
         <div class="w-full h-full">
           <div id="ymap" class="yandex-container">
           </div>
@@ -154,7 +159,7 @@ onMounted(async () => {
 
 <style>
 .yandex-container {
-  height: 70vh;
+  height: 75vh;
   width: 100%;
 }
 

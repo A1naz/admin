@@ -27,21 +27,30 @@ export default eventHandler(async (event) => {
 		? data?.sizes_table?.values.map((size: any) => size.tech_size)
 		: [];
 	const priceData = JSON.parse(rawData);
-	const price = priceData?.data?.products[0]?.salePriceU
-		.toString()
-		.replace(/0/g, "");
-	if (!price || !sizes) {
+	const priceRaw = priceData?.data?.products[0]?.salePriceU.toString();
+	if (!priceRaw || !sizes) {
 		return createError({
 			statusCode: 400,
 			message: "Не удалось получить данные о товаре",
 		});
 	}
+	const price = priceRaw?.substring(0, priceRaw.length - 2);
+	console.log(price);
+	const currency = new Intl.NumberFormat("ru-RU", {
+		style: "currency",
+		currency: "RUB",
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0,
+	});
+	const priceText = currency.format(price);
+
 	return {
 		product: {
 			article: (data.nm_id as number) || (params.article as number),
 			name: `${data.selling.brand_name} / ${data.imt_name}` || "",
 			sizes: (sizes as number[]) || [],
 			price: (price as number) || 0,
+			priceText: (priceText as string) || "",
 		},
 	};
 });

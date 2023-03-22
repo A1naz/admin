@@ -1,6 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-	app: {},
+	app: {
+		head: {
+			title: process.env.NAME,
+			link: [{ rel: "icon", href: "/favicon.svg" }],
+		},
+	},
 	vue: {},
 	auth: {
 		origin: process.env.PUBLIC_SITE_URL,

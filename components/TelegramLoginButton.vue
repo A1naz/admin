@@ -1,11 +1,3 @@
-<template>
-  <div class="w-full flex justify-center" ref="telegram">
-    <label @click="login" class="btn gap-2 btn-outline normal-case font-medium btn-block border-blue-500 text-blue-500">
-      <Icon size="24" name="logos:telegram" />
-      Войти через Telegram
-    </label>
-  </div>
-</template>
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { useMainStore } from '~~/stores/main';
@@ -81,4 +73,13 @@ onMounted(() => {
 
 
 </script>
+<template>
+  <div class="w-full flex justify-center" ref="telegram">
+    <label @click="login" class="btn gap-2 btn-outline normal-case font-medium btn-block border-blue-500 text-blue-500">
+      <Icon size="24" name="logos:telegram" />
+      Войти через Telegram
+    </label>
+  </div>
+</template>
+
 <style></style>

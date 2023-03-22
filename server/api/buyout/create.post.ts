@@ -7,13 +7,14 @@ type Item = {
 	name: string;
 	article: number;
 	price: number;
+	priceText: string;
 	quantity: number;
-	sizes: number[];
+	sizes: number[] | string[];
 	sex: string;
 	searchQuery: string;
 	adress: string;
 	dateRange: [Date, Date];
-	selectedSize: number;
+	selectedSize: number | string;
 	rules: {
 		[key: number | string]: boolean;
 	};
@@ -45,7 +46,7 @@ export default eventHandler(async (event) => {
 			sizeparam: product.selectedSize,
 			quantity: product.quantity,
 			gender: product.sex,
-			status: "Активный",
+			status: "active",
 			orderPaymentStatus: "Не оплачен",
 			servicePaymentStatus: "Не оплачен",
 			user,
@@ -53,6 +54,7 @@ export default eventHandler(async (event) => {
 			product: {
 				name: product.name,
 				price: product.price,
+				priceText: product.priceText,
 				image: product.image,
 			},
 		});
