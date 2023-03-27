@@ -1,0 +1,28 @@
+import { Schema, model } from "mongoose";
+const DeliverySchema = new Schema({
+	article: { type: Number, required: true },
+	pricebuy: { type: Number, required: true },
+	point: { type: String, required: true },
+	user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+	idbuyout: { type: Schema.Types.ObjectId, ref: "Buyout", required: true },
+	statusdelivery: { type: Array, required: true },
+	receiptcode: { type: Number, required: false },
+	receiptcodeqr: { type: String, required: false },
+	recipient: { type: String, required: true },
+	recipientphone: { type: String, required: true },
+	status: { type: String, required: true },
+	updatedAt: { type: Date, required: true, default: new Date() },
+	data5: { type: {}, default: "" },
+	data6: { type: {}, default: "" },
+	data7: { type: {}, default: "" },
+	data8: { type: {}, default: "" },
+	data9: { type: {}, default: "" },
+	data10: { type: {}, default: "" },
+	data11: { type: {}, default: "" },
+	data12: { type: {}, default: "" },
+	data13: { type: {}, default: "" },
+	data14: { type: {}, default: "" },
+	data15: { type: {}, default: "" },
+});
+
+export const Delivery = model("Delivery", DeliverySchema);

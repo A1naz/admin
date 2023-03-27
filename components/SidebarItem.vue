@@ -14,11 +14,14 @@ watchEffect(() => {
 </script>
 
 <template>
-  <li :class="{ 'bordered': currentPath.includes(props.href) }">
+  <li>
     <NuxtLink :to="props.href" class="mx-4 rounded-lg">
       <IconCSS :class="{
+        'opacity-70': !currentPath.includes(props.href),
         'text-primary': currentPath.includes(props.href)
-      }" :name="icon" size="24"></IconCSS><span>{{ title }}</span>
+      }" :name="icon" size="24"></IconCSS><span :class="{
+  'opacity-70': !currentPath.includes(props.href),
+}" class="">{{ title }}</span>
     </NuxtLink>
   </li>
 </template>

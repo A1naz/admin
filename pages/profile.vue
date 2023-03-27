@@ -2,7 +2,7 @@
 definePageMeta({
     layout: 'app',
     auth: true,
-    breadcrumb: ['Профиль'],
+    title: 'Профиль',
 })
 
 const store = useMainStore();

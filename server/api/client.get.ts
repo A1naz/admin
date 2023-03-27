@@ -1,6 +1,7 @@
 import { User } from "@/server/lib/models/User";
 import { getServerSession } from "#auth";
-
+import { Buyout } from "@/server/lib/models/Buyout";
+import { Delivery } from "../lib/models/Delivery";
 export default eventHandler(async (event) => {
 	const session = (await getServerSession(event)) as any;
 
@@ -11,7 +12,8 @@ export default eventHandler(async (event) => {
 	if (!user) {
 		return sendRedirect(event, "/auth", 302);
 	}
-
+	const buyouts = await Buyout.find({ user: user });
+	const deliveries = await Delivery.find({ user: user });
 	console.log("session", session);
 	return {
 		client: {
@@ -21,6 +23,8 @@ export default eventHandler(async (event) => {
 			telegram: user.telegram || undefined,
 			firstName: user.firstName,
 			lastName: user.lastName,
+			buyouts: buyouts.length,
+			deliveries: deliveries.length,
 		},
 		status: "ok",
 	};

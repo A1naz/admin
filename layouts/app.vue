@@ -5,7 +5,7 @@ const store = useMainStore();
 const theme = ref('light')
 const route = useRoute()
 const themes = ["cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula", "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter"]
-
+const numberFormat = new Intl.NumberFormat()
 const { status, data, signIn, signOut } = useSession()
 const name = useRuntimeConfig().NAME
 const currentPath = ref(useRoute().path)
@@ -126,9 +126,9 @@ const breadcrumbs = computed(() => getBreadcrumbs())
           <Logo></Logo>
 
         </div>
-        <div class="card m-4 mx-4 bg-[#121212] text-neutral-content">
+        <div class="card m-4 mx-4 bg-neutral-focus text-neutral-content">
           <div class="card-body p-4">
-            <div class="flex justify-between items-center text-white">
+            <div class="flex justify-between items-center ">
               <div class="text-sm">
                 {{ store.client?.username ? store.client.username : data?.user?.email }}
                 <button></button>
@@ -139,13 +139,23 @@ const breadcrumbs = computed(() => getBreadcrumbs())
               </NuxtLink>
 
             </div>
-
-
           </div>
-
         </div>
+        <!-- 
+                          <div class="stats shadow m-4">
+                            <div class="stat p-2 px-4">
+                              <div class="stat-title text-sm">Выкупы:</div>
+                              <div class="stat-value text-sm">{{ numberFormat.format(store.client?.buyouts) }}</div>
+                            </div>
+                            <div class="stat p-2 px-4">
+                              <div class="stat-title text-sm">Доставки:</div>
+                              <div class="stat-value text-sm">{{ numberFormat.format(store.client?.deliveries) }}</div>
+                            </div>
+                          </div> -->
         <SidebarItem title="Выкупы" icon="material-symbols:credit-card" href="/buyouts"></SidebarItem>
         <SidebarItem title="Доставки" icon="mdi:truck-delivery" href="/delivery"></SidebarItem>
+        <SidebarItem title="Отзывы" icon="material-symbols:rate-review" href="/reviews"></SidebarItem>
+
         <li>
         </li>
         <li class="mt-auto w-full no-animation hover:bg-base-200">

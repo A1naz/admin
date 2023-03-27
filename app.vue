@@ -30,7 +30,7 @@ if (status.value === 'authenticated') {
       </template>
     </notifications>
     <NuxtLayout>
-      <NuxtLoadingIndicator /> <!-- here -->
+      <NuxtLoadingIndicator color="#570df8" /> <!-- here -->
       <NuxtPage>
       </NuxtPage>
     </NuxtLayout>

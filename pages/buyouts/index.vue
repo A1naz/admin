@@ -105,8 +105,8 @@ watch(modal, (value) => {
             </NuxtLink>
         </div>
         <div v-if="buyouts.length" v-auto-animate class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
-            <BuyoutCard @open-modal="openModal" @remove="removeBuyout" :index="index" v-for="(buyout, index) of buyouts"
-                :key="buyout.uuid" :info="buyout"></BuyoutCard>
+            <BuyoutCard @open-modal="openModal" @remove="removeBuyout" :index="buyouts.length - index - 1"
+                v-for="(buyout, index) of buyouts" :key="buyout.uuid" :info="buyout"></BuyoutCard>
         </div>
 
 

@@ -146,7 +146,7 @@ const closeModal = () => {
     modalOpen.value = false
 }
 
-const handleAdress = (address: string) => {
+const handleAddress = (address: string) => {
     const index = store.selectedItem!
     products.value[index].adress = address
 }
@@ -466,7 +466,7 @@ onMounted(async () => {
 
                 </table>
             </div>
-            <SelectPointModal v-if="modalOpen" @callback="handleAdress" :style="{
+            <SelectPointModal v-if="modalOpen" @callback="handleAddress" :style="{
                 'visibility': modalOpen ? 'visible' : 'hidden'
             }" @close="closeModal" :pickpoints="pickpoints" />
         </ClientOnly>
