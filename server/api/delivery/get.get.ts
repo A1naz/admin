@@ -40,29 +40,29 @@ export default eventHandler(async (event) => {
 			error: "Неизвестный статус",
 		};
 	}
-	const buyout = await Buyout.findOne({ user: user }).sort({ _id: -1 });
-	if (!deliveries.length) {
-		const created = new Delivery({
-			article: buyout?.article,
-			pricebuy: buyout?.product.price,
-			point: buyout?.point,
-			user: user,
-			idbuyout: buyout,
-			uuidbuyout: buyout?.uuid,
-			statusdelivery: [{ status: "Отправлен на сборку", date: new Date() }],
-			// receiptcode: 520,
-			// receiptcodeqr: await QRCode.toDataURL("520", {
-			// 	width: 250,
-			// 	scale: 8,
-			// 	margin: 0,
-			// }),
-			recipient: "Данил",
-			recipientphone: "+7 (999) 999 99 99",
-			status: "active",
-			updatedAt: new Date(),
-		});
-		await created.save();
-	}
+	// const buyout = await Buyout.findOne({ user: user }).sort({ _id: -1 });
+	// if (!deliveries.length) {
+	// 	const created = new Delivery({
+	// 		article: buyout?.article,
+	// 		pricebuy: buyout?.product.price,
+	// 		point: buyout?.point,
+	// 		user: user,
+	// 		idbuyout: buyout,
+	// 		uuidbuyout: buyout?.uuid,
+	// 		statusdelivery: [{ status: "Отправлен на сборку", date: new Date() }],
+	// 		// receiptcode: 520,
+	// 		// receiptcodeqr: await QRCode.toDataURL("520", {
+	// 		// 	width: 250,
+	// 		// 	scale: 8,
+	// 		// 	margin: 0,
+	// 		// }),
+	// 		recipient: "Данил",
+	// 		recipientphone: "+7 (999) 999 99 99",
+	// 		status: "active",
+	// 		updatedAt: new Date(),
+	// 	});
+	// 	await created.save();
+	// }
 	const format = await Promise.all(
 		deliveries.map(async (delivery) => {
 			const buyout = await Buyout.findOne({ _id: delivery.idbuyout });
