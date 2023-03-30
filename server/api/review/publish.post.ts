@@ -5,7 +5,6 @@ import { Delivery } from "@/server/lib/models/Delivery";
 import { Buyout } from "@/server/lib/models/Buyout";
 import { Review } from "@/server/lib/models/Review";
 import QRCode from "qrcode";
-import { imgbox } from "imgbox-js";
 
 import fs from "fs";
 function decodeBase64Image(base64Str: string) {
