@@ -7,10 +7,13 @@ const props = defineProps({
   pickpoints: {
     type: Array,
     required: true
+  },
+  state: {
+    type: Boolean,
+    required: true
   }
 })
 const closeModal = () => {
-  store.returnDrawer()
   emit('close')
 }
 const loading = ref(false)
@@ -140,21 +143,25 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div ref="modal" style="z-index: 150 !important" class="modal modal-open" id="selectPointModal">
-    <div class="modal-box w-11/12 max-w-7xl overflow-y-hidden" style="z-index: 150 !important">
-      <div class="">
-        <a @click="closeModal" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</a>
-        <div class="title mb-2">Выберите ПВЗ</div>
-        <div v-if="loading" class="loading flex justify-center items-center h-full">
-          <Icon class="animate-spin" size="60" name="mdi:loading"></Icon>
-        </div>
-        <div class="w-full h-full">
-          <div id="ymap" class="yandex-container">
+  <Teleport to="body">
+    <div ref="modal" class="modal" :class="{
+      'modal-open': props.state
+    }" id="selectPointModal">
+      <div v-if="state" class="modal-box w-11/12 max-w-7xl overflow-y-hidden">
+        <div class="">
+          <a @click="closeModal" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</a>
+          <div class="title mb-2">Выберите ПВЗ</div>
+          <div v-if="loading" class="loading flex justify-center items-center h-full">
+            <Icon class="animate-spin" size="60" name="mdi:loading"></Icon>
+          </div>
+          <div class="w-full h-full">
+            <div id="ymap" class="yandex-container">
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style>

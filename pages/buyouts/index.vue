@@ -14,14 +14,12 @@ const modal = ref(false)
 const selectedBuyout = ref({})
 const selectedIndex = ref(-1)
 const store = useMainStore()
-
+const selectedPlace = ref(-1)
 const openModal = (index: number) => {
-    store.drawerz = -10
     selectedIndex.value = index
+    selectedPlace.value = buyouts.value.length - index
     selectedBuyout.value = buyouts.value[index]
-    setTimeout(() => {
-        modal.value = true
-    }, 50)
+    modal.value = true
 
 }
 const { data } = await useFetch('/api/buyout/get', {
@@ -59,12 +57,7 @@ watch(route, async (newRoute) => {
     buyouts.value = data.value
 
 })
-watch(modal, (value) => {
-    if (value) {
-    } else {
-        store.drawerz = 1
-    }
-})
+
 </script>
 <template>
     <div>
@@ -105,7 +98,7 @@ watch(modal, (value) => {
             </NuxtLink>
         </div>
         <div v-if="buyouts.length" v-auto-animate class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
-            <BuyoutCard @open-modal="openModal" @remove="removeBuyout" :index="buyouts.length - index - 1"
+            <BuyoutCard :place="buyouts.length - index" @open-modal="openModal" @remove="removeBuyout" :index="index"
                 v-for="(buyout, index) of buyouts" :key="buyout.uuid" :info="buyout"></BuyoutCard>
         </div>
 
@@ -118,7 +111,8 @@ watch(modal, (value) => {
                 </div>
             </div>
         </div>
-        <BuyoutInfoModal @close="modal = false" :info="selectedBuyout" :state="modal" :index="selectedIndex">
+        <BuyoutInfoModal :place="selectedPlace" @close="modal = false" :info="selectedBuyout" :state="modal"
+            :index="selectedIndex">
         </BuyoutInfoModal>
     </div>
 </template>

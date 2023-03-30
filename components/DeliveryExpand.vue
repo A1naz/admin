@@ -4,6 +4,7 @@ const { $dayjs } = useNuxtApp();
 const currency = useCurrency()
 const store = useMainStore()
 const opened = ref()
+const emit = defineEmits(['openModal']);
 const props = defineProps({
     info: {
         type: Object as any,
@@ -20,8 +21,6 @@ const props = defineProps({
 const qrCode = ref(null)
 onMounted(async () => {
     opened.value = props.state
-    console.log(props.info.receiptcodeqr)
-    console.log(props.info.receiptcode)
 
 })
 watch(() => props.state, (newState) => {
@@ -32,7 +31,7 @@ watch(() => props.state, (newState) => {
 <template>
     <div class="collapse collapse-arrow border border-base-200 bg-base-100 rounded-box">
         <input v-model="opened" type="checkbox" />
-        <div class="collapse-title text-xl font-medium">
+        <div class="collapse-title relative text-xl font-medium">
             <div class="flex justify-between flex-wrap">
                 <span> Доставка №{{ index + 1 }}
                 </span>
@@ -47,7 +46,10 @@ watch(() => props.state, (newState) => {
                 <div class="mt-2 lg:m-0 text-xs">Обновлено {{ $dayjs(info.updatedAt).format('D MMMM HH:mm') }}
                 </div>
             </div>
-
+            <nuxt-img fit="fill" :class="{
+                'opacity-0': opened
+            }" :src="info.productimage" width="36"
+                class="absolute top-4 left-64 rounded-lg transition-opacity ease-in-out duration-200"></nuxt-img>
         </div>
         <div class="collapse-content">
             <div class="product flex gap-4 lg:gap-8 items-center flex-wrap">
@@ -55,7 +57,7 @@ watch(() => props.state, (newState) => {
                 <div>
                     <div class="text-sm text-gray-500">Артикул</div>
                     <a :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`" target="_blank"
-                        class=" text-primary link link-hover">
+                        class=" text-secondary link link-hover">
                         {{ info.article }}
                     </a>
                 </div>
@@ -65,7 +67,7 @@ watch(() => props.state, (newState) => {
                 </div>
                 <div>
                     <div class="text-sm text-gray-500">Размер</div>
-                    {{ info.size }}
+                    {{ info.size === 'none' ? 'Не указан' : info.size }}
                 </div>
                 <div class="flex-end">
                     <div class="text-sm text-gray-500">Цена</div>
@@ -80,9 +82,9 @@ watch(() => props.state, (newState) => {
                     <div class="text-sm text-gray-500">Получатель:</div>
                     {{ info.recipient }} {{ info.recipientphone }}
                 </div>
-                <div>
+                <div class="w-60 overflow-hidden truncate">
                     <div class="text-sm text-gray-500">Адрес:</div>
-                    <a class="text-primary link link-hover"
+                    <a target="_blank" class="text-secondary link link-hover w-60 truncate "
                         :href="`https://yandex.ru/maps/?mode=search&text=${info.point}`"> {{ info.point }}
                     </a>
                 </div>
@@ -91,26 +93,16 @@ watch(() => props.state, (newState) => {
                     {{ info?.receiptcode ? info?.receiptcode : 'Товар не доставлен' }}
                 </div>
                 <div v-if="info.receiptcodeqr">
-                    <label @click="store.drawerz = -1" for="qr-modal" class="btn btn-primary btn-sm flex gap-2">
+                    <label for="qr-modal" @click="emit('openModal',
+                        info.receiptcode,
+                        info.receiptcodeqr
+                    )" class="btn btn-primary btn-sm flex gap-2">
                         <Icon name="material-symbols:qr-code" size="24"></Icon> <span>QR-код</span>
                     </label>
                 </div>
             </div>
         </div>
-        <input type="checkbox" id="qr-modal" class="modal-toggle" />
-        <label v-if="info.receiptcodeqr" @click="store.drawerz = 10" for="qr-modal" class="modal">
-            <label class="modal-box relative w-80">
-                <label @click="store.drawerz = 10" for="qr-modal"
-                    class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</label>
-                <h3 class="text-lg font-bold mb-2">QR-Код для получения</h3>
 
-                <div class="w-full flex flex-col justify-center items-center">
-                    <img ref="qrCode" class="rounded-lg" height="250" :alt="info.receiptcode" width="250"
-                        :src="`${props.info.receiptcodeqr}`" />
-                </div>
-
-            </label>
-        </label>
     </div>
 </template>
 

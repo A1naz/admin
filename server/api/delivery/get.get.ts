@@ -18,41 +18,44 @@ export default eventHandler(async (event) => {
 	}
 	let deliveries;
 	if (status === "all") {
-		deliveries = await Delivery.find({ user: user }).sort({ createdAt: -1 });
+		deliveries = await Delivery.find({ user: user }).sort({ _id: -1 });
 	} else if (status === "active") {
 		deliveries = await Delivery.find({ user: user, status: "active" }).sort({
-			createdAt: -1,
+			_id: -1,
 		});
 	} else if (status === "completed") {
 		deliveries = await Delivery.find({ user: user, status: "completed" }).sort({
-			createdAt: -1,
+			_id: -1,
 		});
 	} else if (status === "canceled") {
 		deliveries = await Delivery.find({ user: user, status: "canceled" }).sort({
-			createdAt: -1,
+			_id: -1,
 		});
 	} else if (status === "archived") {
 		deliveries = await Delivery.find({ user: user, status: "archived" }).sort({
-			createdAt: -1,
+			_id: -1,
 		});
 	} else {
-		deliveries = await Delivery.find({ user: user }).sort({ createdAt: -1 });
+		return {
+			error: "Неизвестный статус",
+		};
 	}
-	const buyout = await Buyout.findOne({ user: user });
+	const buyout = await Buyout.findOne({ user: user }).sort({ _id: -1 });
 	if (!deliveries.length) {
 		const created = new Delivery({
-			article: 57940457,
-			pricebuy: 4919,
-			point: "Москва, Волочаевская Улица 2к1",
+			article: buyout?.article,
+			pricebuy: buyout?.product.price,
+			point: buyout?.point,
 			user: user,
 			idbuyout: buyout,
+			uuidbuyout: buyout?.uuid,
 			statusdelivery: [{ status: "Отправлен на сборку", date: new Date() }],
-			receiptcode: 425,
-			receiptcodeqr: await QRCode.toDataURL("425", {
-				width: 250,
-				scale: 8,
-				margin: 0,
-			}),
+			// receiptcode: 520,
+			// receiptcodeqr: await QRCode.toDataURL("520", {
+			// 	width: 250,
+			// 	scale: 8,
+			// 	margin: 0,
+			// }),
 			recipient: "Данил",
 			recipientphone: "+7 (999) 999 99 99",
 			status: "active",

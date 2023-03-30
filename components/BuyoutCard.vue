@@ -12,6 +12,10 @@ const props = defineProps({
     index: {
         type: Number,
         required: true
+    },
+    place: {
+        type: Number,
+        required: true
     }
 
 })
@@ -81,8 +85,8 @@ const getStatus = computed(() => {
             </div>
 
             <div>
-                <h2 class="card-title">Выкуп №{{ index + 1 }}</h2>
-                <span class="text-xs text-gray-500">#{{ info.uuid }}</span>
+                <h2 class="card-title">Выкуп №{{ place }}</h2>
+                <span class="text-xs text-gray-500 truncate">#{{ info.uuid }}</span>
 
             </div>
             <div class="flex justify-between">
@@ -106,14 +110,14 @@ const getStatus = computed(() => {
 
             <div class="flex gap-4">
                 <div class="flex-none" style="width: 100px; height: 150px;">
-                    <nuxt-img class="rounded-xl" width="100" height="150"
+                    <nuxt-img class="rounded-xl h-full" width="100" height="150"
                         :src="info?.product?.image || '/logo/logocolor.svg'"></nuxt-img>
                 </div>
                 <div class="flex flex-col truncate">
                     <div class="mb-2">
                         <div class=" truncate">{{ info.product?.name }}</div>
                         <a :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`" target="_blank"
-                            class="text-sm text-primary link link-hover">
+                            class="text-sm text-secondary link link-hover">
                             {{ info.article }}
                         </a>
                     </div>

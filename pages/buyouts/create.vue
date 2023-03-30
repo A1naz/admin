@@ -92,7 +92,7 @@ const addProduct = async () => {
 
     const product = data.value?.product as unknown as Item
     products.value.push(reactive({
-        image: 'https://basket-10.wb.ru/vol1437/part143767/143767420/images/c246x328/1.jpg',
+        image: product.image,
         name: product.name,
         article: product.article,
         price: product.price,
@@ -236,11 +236,8 @@ const pointModalOpen = async (index: number) => {
     if (!pickpoints.value) {
         loading.value = true
     }
-    store.drawerz = -1
     store.selectedItem = index
-    setTimeout(() => {
-        modalOpen.value = true
-    }, 50)
+    modalOpen.value = true
 
 }
 onMounted(async () => {
@@ -296,7 +293,8 @@ onMounted(async () => {
                     @change-sex="onSexChange" @change-size="onSizeChange" :product="product" :index="index"
                     v-for="(product, index) in products" :key="index" />
             </div>
-            <div v-else class="products-table hidden lg:block">
+            <div v-else
+                class="products-table hidden lg:block overflow-x-auto scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
 
                 <table class="table table-compact w-full mt-4">
                     <!-- head -->
@@ -357,7 +355,7 @@ onMounted(async () => {
                                         {{ product.name }}
                                     </div>
                                     <a :href="`https://www.wildberries.ru/catalog/${product.article}/detail.aspx`"
-                                        target="_blank" class="text-sm text-primary link link-hover">
+                                        target="_blank" class="text-sm text-secondary link link-hover">
                                         {{ product.article }}
                                     </a>
                                 </div>
@@ -420,9 +418,10 @@ onMounted(async () => {
                                     }}</span></div>
                                     <button :disabled="!pickpoints" @click="pointModalOpen(index)" :class="{
                                         'btn-outline': product.adress,
-                                    }" class="btn btn-primary btn-sm normal-case w-full">{{ pickpoints ? product.adress
+                                        'loading': !pickpoints,
+                                    }" class="btn btn-primary btn-sm normal-case w-full">{{ product.adress
     ?
-    'Изменить' : 'Добавить' : 'Загрузка...' }}</button>
+    'Изменить' : 'Добавить' }}</button>
                                 </div>
                             </td>
                             <td>
@@ -446,19 +445,22 @@ onMounted(async () => {
                                     </div>
                                 </div>
                             </td>
-                            <input type="checkbox" :id="'modal' + index" class="modal-toggle" />
-                            <label :for="'modal' + index" class="modal modal-bottom sm:modal-middle">
-                                <label for="" class="modal-box relative">
-                                    <label :for="'modal' + index"
-                                        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</label>
-                                    <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
-                                    <label v-for="(value, key) of products[index].rules" class="label cursor-pointer">
-                                        <span class="label-text text-lg">Правило {{ key }}</span>
-                                        <input type="checkbox" @change="onRuleChange($event, index, key)"
-                                            class="checkbox checkbox-primary" />
+                            <Teleport to="body">
+
+                                <input type="checkbox" :id="'modal' + index" class="modal-toggle" />
+                                <label :for="'modal' + index" class="modal modal-bottom sm:modal-middle">
+                                    <label for="" class="modal-box relative">
+                                        <label :for="'modal' + index"
+                                            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</label>
+                                        <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
+                                        <label v-for="(value, key) of products[index].rules" class="label cursor-pointer">
+                                            <span class="label-text text-lg">Правило {{ key }}</span>
+                                            <input type="checkbox" @change="onRuleChange($event, index, key)"
+                                                class="checkbox checkbox-primary" />
+                                        </label>
                                     </label>
                                 </label>
-                            </label>
+                            </Teleport>
                         </tr>
 
                     </tbody>
@@ -466,9 +468,8 @@ onMounted(async () => {
 
                 </table>
             </div>
-            <SelectPointModal v-if="modalOpen" @callback="handleAddress" :style="{
-                'visibility': modalOpen ? 'visible' : 'hidden'
-            }" @close="closeModal" :pickpoints="pickpoints" />
+            <SelectPointModal v-if="modalOpen" :state="modalOpen" @callback="handleAddress" @close="closeModal"
+                :pickpoints="pickpoints" />
         </ClientOnly>
 
         <div class="mt-6 flex justify-between items-center" v-if="products.length">

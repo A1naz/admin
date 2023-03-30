@@ -90,15 +90,15 @@ const onSexChange = (event: Event) => {
 
 
             <div class="flex gap-4">
-                <div class="flex items-center flex-none h-full" style="width: 130px;">
-                    <nuxt-img fit="contain" class="rounded-xl" width="130" height="204"
-                        :src="product?.image || '/logo/logocolor.svg'"></nuxt-img>
+                <div class="flex items-center flex-none flex-0 flex-shrink-0 h-full" style="width: 130px;">
+                    <img style="object-fit: fill" class="rounded-xl h-full" width="130" height="204"
+                        :src="product?.image || '/logo/logocolor.svg'" />
                 </div>
                 <div class="flex flex-col truncate">
                     <div class="mb-2">
                         <div class="text-sm truncate">{{ product.name }}</div>
                         <a :href="`https://www.wildberries.ru/catalog/${product.article}/detail.aspx`" target="_blank"
-                            class="text-sm text-primary link link-hover">
+                            class="text-sm text-secondary link link-hover">
                             {{ product.article }}
                         </a>
                     </div>

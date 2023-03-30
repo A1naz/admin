@@ -17,7 +17,17 @@ const selectStatus = (e: Event) => {
         }
     })
 }
-
+const modalInfo = reactive({
+    src: '',
+    code: 0
+})
+const modal = ref(false)
+const openModal = (code: number, src: string) => {
+    console.log(code, src)
+    modalInfo.src = src
+    modalInfo.code = code
+    modal.value = true
+}
 const { data } = await useFetch('/api/delivery/get', {
     method: 'GET',
     query: {
@@ -64,10 +74,11 @@ watch(route, async (newRoute) => {
                 </div>
             </div>
         </div>
-        <div v-if="deliveries.length" v-auto-animate class="grid grid-cols-1 gap-3">
 
-            <DeliveryExpand :state="openAll" v-for="(delivery, index) of deliveries" :key="delivery.id"
-                :index="deliveries.length - index - 1" :info="delivery" />
+        <div v-if="deliveries.length" v-auto-animate class="grid grid-cols-1 gap-3">
+            <DeliveryExpand @open-modal="openModal" :state="openAll" v-for="(delivery, index) of deliveries"
+                :key="delivery.id" :index="deliveries.length - index - 1" :info="delivery" />
+            <QrModal v-if="modal" :code="modalInfo.code" :src="modalInfo.src" />
         </div>
         <div v-else class="hero">
             <div class="hero-content text-center flex justify-center items-center h-80">

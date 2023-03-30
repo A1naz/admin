@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import { themeChange } from 'theme-change'
 import { useMainStore } from '@/stores/main'
+const colorMode = useColorMode()
 
 const { status, data } = useSession()
 
 const store = useMainStore()
 onMounted(async () => {
-  themeChange(false)
   console.log(status.value)
   store.theme = document.documentElement.getAttribute('data-theme') === 'dracula' ? 'dracula' : 'light'
 
@@ -30,15 +29,19 @@ if (status.value === 'authenticated') {
       </template>
     </notifications>
     <NuxtLayout>
-      <NuxtLoadingIndicator color="#570df8" /> <!-- here -->
+      <NuxtLoadingIndicator :color="colorMode.value === 'light' ? '#570df8' : '#ff79c6'" /> <!-- here -->
       <NuxtPage>
       </NuxtPage>
     </NuxtLayout>
 
   </div>
 </template>
-<style>
+<style lang="css">
 @import '~~/assets/style/datepicker.css';
+
+body {
+  @apply scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin
+}
 
 .notif-text {
   font-size: 0.9rem;
@@ -72,6 +75,27 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .4s linear;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.pop-enter-active,
+.pop-leave-active {
+  transition: transform 0.4s cubic-bezier(0.5, 0, 0.5, 1), opacity 0.4s linear;
+}
+
+.pop-enter,
+.pop-leave-to {
+  opacity: 0;
+  transform: scale(0.3) translateY(-50%);
 }
 
 .page-enter-active,

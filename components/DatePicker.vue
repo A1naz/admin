@@ -6,29 +6,13 @@ const { $dayjs } = useNuxtApp();
 const props = defineProps({
     modelValue: {
         required: true,
-        type: Array
-    },
-    startDate: {
-        required: true,
         type: Date
-    }
+    },
 })
+const startDate = ref(new Date())
 const emit = defineEmits(['update:modelValue'])
 const date = ref(props.modelValue)
 const store = useMainStore()
-const getFirstDate = (dates: [Date | null, Date | null] | []) => {
-    if (dates && dates[0]) {
-        return `${$dayjs(dates[0]).format('D MMMM HH:mm')}`
-    }
-    return ''
-}
-const getSecondDate = (dates: [Date | null, Date | null] | []) => {
-    if (dates && dates[1]) {
-        return `${$dayjs(dates[1]).format('D MMMM HH:mm')}`
-
-    }
-    return ''
-}
 type UpdateMonthYear = (month: number, year: number) => void;
 
 const updateMonth = (event: InputEvent, updateMonthYear: UpdateMonthYear, year: number) => {
@@ -41,28 +25,23 @@ const handleDate = (modelData: any) => {
 }
 </script>
 <template>
-    <div>
-        <VueDatePicker :teleport="true" class="absolute" @update:model-value="handleDate" v-model="date" ref="dp"
-            :min-date="startDate" :prevent-min-max-navigation="true" :dark="colorMode.value === 'dark'" locale="ru" range
+    <ClientOnly>
+        <VueDatePicker teleport-center :teleport="true" @update:model-value="handleDate" v-model="date" ref="dp"
+            :min-date="startDate" :prevent-min-max-navigation="true" :dark="colorMode.value === 'dark'" locale="ru"
             cancelText="" select-text="Сохранить">
             <template #trigger>
-                <button :class="{
-                    'btn-outline': date[0] && date[1],
-                }" class="btn btn-primary btn-sm normal-case w-full">{{
-    date[0] && date[1] ? 'Изменить' : 'Выбрать'
-}}</button>
+                <button class="btn btn-primary btn-sm normal-case w-full">{{
+                    date ? 'Изменить' : 'Выбрать'
+                }}</button>
             </template>
             <template #action-row="{ internalModelValue, selectDate }">
                 <div class="action-row flex flex-col justify-center gap-2 w-full">
                     <div class="flex flex-col w-full">
                         <div class="flex justify-between">
-                            <span>Начало:</span> <span>{{ getFirstDate(internalModelValue)
+                            <span>Выбрано:</span> <span>{{ $dayjs(internalModelValue).format('D MMMM HH:mm')
                             }}</span>
                         </div>
-                        <div class="flex justify-between">
-                            <span>Конец:</span> <span>{{ getSecondDate(internalModelValue)
-                            }}</span>
-                        </div>
+
                     </div>
                     <button class="btn btn-primary btn-sm block normal-case" @click="selectDate">Применить</button>
                 </div>
@@ -93,7 +72,7 @@ const handleDate = (modelData: any) => {
                 </div>
             </template>
         </VueDatePicker>
-    </div>
+    </ClientOnly>
 </template>
 
 

@@ -6,6 +6,11 @@ export default defineNuxtConfig({
 			link: [{ rel: "icon", href: "/favicon.svg" }],
 		},
 	},
+	colorMode: {
+		preference: "system", // default theme
+		dataValue: "theme", // activate data-theme in <html> tag
+		classSuffix: "",
+	},
 	vue: {},
 	auth: {
 		origin: process.env.PUBLIC_SITE_URL,
@@ -25,7 +30,9 @@ export default defineNuxtConfig({
 			"basket-7.wb.ru",
 		],
 	},
+
 	nitro: {
+		compressPublicAssets: true,
 		storage: {
 			db: {
 				driver: "mongodb",
@@ -48,7 +55,15 @@ export default defineNuxtConfig({
 		"@sidebase/nuxt-auth",
 		"@vueuse/nuxt",
 		"nuxt-security",
+		"@nuxtjs/color-mode",
+		"@vite-pwa/nuxt",
 	],
+	pwa: {
+		registerType: "autoUpdate",
+		devOptions: {
+			enabled: false,
+		},
+	},
 	imports: {
 		dirs: ["./stores"],
 	},
