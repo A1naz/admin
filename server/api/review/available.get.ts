@@ -1,9 +1,7 @@
 import { User } from "@/server/lib/models/User";
 import { getServerSession } from "#auth";
-import { context } from "esbuild";
 import { Delivery } from "@/server/lib/models/Delivery";
 import { Buyout } from "@/server/lib/models/Buyout";
-import QRCode from "qrcode";
 
 export default eventHandler(async (event) => {
 	const session = (await getServerSession(event)) as any;
