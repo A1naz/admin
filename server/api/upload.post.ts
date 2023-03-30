@@ -42,6 +42,6 @@ export default eventHandler(async (event) => {
 	await upload.save();
 	return {
 		success: true,
-		url: `${runtimeConfig.PUBLIC_SITE_URL}api/uploads/${filename}`,
+		url: `${runtimeConfig.PUBLIC_SITE_URL}/api/uploads/${filename}`,
 	};
 });
