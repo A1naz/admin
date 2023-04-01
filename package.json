@@ -40,7 +40,6 @@
 		"bcrypt": "^5.1.0",
 		"daisyui": "^2.51.3",
 		"dayjs": "^1.11.7",
-		"google-libphonenumber": "^3.2.32",
 		"jsonwebtoken": "^9.0.0",
 		"mongodb": "^5.1.0",
 		"mongoose": "^7.0.1",

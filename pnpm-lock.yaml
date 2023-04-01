@@ -27,7 +27,6 @@ specifiers:
   bcrypt: ^5.1.0
   daisyui: ^2.51.3
   dayjs: ^1.11.7
-  google-libphonenumber: ^3.2.32
   jsonwebtoken: ^9.0.0
   mongodb: ^5.1.0
   mongoose: ^7.0.1
@@ -59,7 +58,6 @@ dependencies:
   bcrypt: 5.1.0
   daisyui: 2.51.3_gbtt6ss3tbiz4yjtvdr6fbrj44
   dayjs: 1.11.7
-  google-libphonenumber: 3.2.32
   jsonwebtoken: 9.0.0
   mongodb: 5.1.0
   mongoose: 7.0.1
@@ -6783,11 +6781,6 @@ packages:
       ignore: 5.2.4
       merge2: 1.4.1
       slash: 4.0.0
-
-  /google-libphonenumber/3.2.32:
-    resolution: {integrity: sha512-mcNgakausov/B/eTgVeX8qc8IwWjRrupk9UzZZ/QDEvdh5fAjE7Aa211bkZpZj42zKkeS6MTT8avHUwjcLxuGQ==}
-    engines: {node: '>=0.10'}
-    dev: false
 
   /gopd/1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
