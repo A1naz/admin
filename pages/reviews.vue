@@ -9,10 +9,14 @@ const store = useMainStore();
 const reviews = ref([]) as any
 const router = useRouter()
 const status = ref(route.query.status || 'available')
+const openedPhoto = ref('')
 if (status.value === 'available') {
     const { data } = await useFetch('/api/review/available', {
         method: 'GET',
         headers: useRequestHeaders(['cookie']) as HeadersInit,
+        query: {
+            limit: 50,
+        }
     })
     reviews.value = data.value
 }
@@ -21,6 +25,10 @@ if (status.value === 'published') {
     const { data } = await useFetch('/api/review/published', {
         method: 'GET',
         headers: useRequestHeaders(['cookie']) as HeadersInit,
+        query: {
+            limit: 50,
+        }
+
     })
     reviews.value = data.value
 }
@@ -32,10 +40,13 @@ const headers = useRequestHeaders(['cookie']) as HeadersInit
 
 watch(route, async (newRoute) => {
     console.log(newRoute.query.status)
-    if (newRoute.query.status === 'available') {
+    if (newRoute.query.status === 'available' || !newRoute.query.status) {
         const { data } = await useFetch('/api/review/available', {
             method: 'GET',
             headers: useRequestHeaders(['cookie']) as HeadersInit,
+            query: {
+                limit: 50,
+            }
         })
         reviews.value = data.value
         status.value = 'available'
@@ -45,6 +56,9 @@ watch(route, async (newRoute) => {
         const { data } = await useFetch('/api/review/published', {
             method: 'GET',
             headers: useRequestHeaders(['cookie']) as HeadersInit,
+            query: {
+                limit: 50,
+            }
         })
         reviews.value = data.value
         status.value = 'published'
@@ -53,6 +67,9 @@ watch(route, async (newRoute) => {
 
 
 })
+const openPhoto = (src: string) => {
+    openedPhoto.value = src
+}
 const modalOpen = ref(false)
 const openModal = (uuid: string) => {
     selectedUUID.value = uuid
@@ -89,8 +106,8 @@ const closeModal = () => {
             <ReviewCard v-if="status === 'available'" @open-modal="openModal" :index="index" :info="review"
                 v-for="(review, index) of reviews" :key="index">
             </ReviewCard>
-            <PublishedReviewCard :place="reviews.length - index" v-if="status === 'published'" :index="index" :info="review"
-                v-for="(review, index) of reviews" :key="index"> </PublishedReviewCard>
+            <PublishedReviewCard @open-image="openPhoto" :place="reviews.length - index" v-if="status === 'published'"
+                :index="index" :info="review" v-for="(review, index) of reviews" :key="index"> </PublishedReviewCard>
         </div>
         <div v-else class="hero">
             <div class="hero-content text-center flex justify-center items-center h-80">
@@ -103,6 +120,18 @@ const closeModal = () => {
         <ReviewModal @publish="router.push('/reviews?status=published')" @close="closeModal" :state="modalOpen"
             :uuid="selectedUUID" />
 
+        <!-- Put this part before </body> tag -->
+        <Teleport to="body">
+            <input type="checkbox" id="reviewImageModal" class="modal-toggle" />
+
+            <label for="reviewImageModal" class="modal cursor-pointer">
+                <label for="" class="modal-box w-11/12 max-w-7xl p-0">
+                    <label for="reviewImageModal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2">✕</label>
+
+                    <nuxt-img v-if="openedPhoto" width="100%" class="w-full" :src="openedPhoto"></nuxt-img>
+                </label>
+            </label>
+        </Teleport>
     </div>
 </template>
 

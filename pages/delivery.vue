@@ -28,10 +28,21 @@ const openModal = (code: number, src: string) => {
     modalInfo.code = code
     modal.value = true
 }
+const target = ref(null)
+const targetIsVisible = ref(false)
+const { stop } = useIntersectionObserver(
+    target,
+    ([{ isIntersecting }], observerElement) => {
+        targetIsVisible.value = isIntersecting
+    },
+)
+const skip = ref(50)
+const end = ref(false)
 const { data } = await useFetch('/api/delivery/get', {
     method: 'GET',
     query: {
         status: route.query?.status || 'all',
+        limit: 50,
     },
     headers: useRequestHeaders(['cookie']) as HeadersInit,
 })
@@ -40,12 +51,35 @@ onMounted(async () => {
     console.log(data.value)
 
 })
+watch(targetIsVisible, async (isVisible) => {
+    if (isVisible) {
+        if (end.value) return
+        const { data, error } = await useFetch('/api/delivery/get', {
+            method: 'GET',
+            query: {
+                status: route.query?.status || 'all',
+                limit: 50,
+                skip: skip.value
+            },
+            headers: useRequestHeaders(['cookie']) as HeadersInit,
+        })
+        if ((data.value as any)?.length === 0) {
+            end.value = true
+            return
+        }
+        deliveries.value = [...deliveries.value, ...data.value! as any]
+        skip.value += 50
+    }
+})
 watch(route, async (newRoute) => {
+    skip.value = 50
+    end.value = false
     console.log(newRoute)
     const { data } = await useFetch('/api/delivery/get', {
         method: 'GET',
         query: {
             status: newRoute?.query?.status || 'all',
+            limit: 50,
         },
         headers: useRequestHeaders(['cookie']) as HeadersInit,
     })
@@ -58,14 +92,13 @@ watch(route, async (newRoute) => {
     <div>
         <h1 class="text-2xl font-bold mt-1">Доставки</h1>
         <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
-            Как только выкуп оплачен, он моментально появится в доставках. Дальше мы отслеживаем его статус. "Доставлен" -
-            можно забирать с пункта выдачи. </p>
+            В этом разделе можно отследить статусы выкупов после оплаты. Статус "Доставлен" означает, что товар можно
+            забирать из пункта выдачи. </p>
         <div class="flex justify-between mb-8 mt-6 items-center">
             <select @change="selectStatus" class="select select-bordered select-sm">
                 <option value="all" :selected="route.query.status === undefined">Все доставки</option>
                 <option value="active" :selected="route.query.status === 'active'">Активные</option>
                 <option value="completed" :selected="route.query.status === 'completed'">Завершенные</option>
-                <option value="archived" :selected="route.query.status === 'archived'">В архиве</option>
             </select>
             <div class="flex items-center">
                 <div class="flex items-center">
@@ -75,9 +108,12 @@ watch(route, async (newRoute) => {
             </div>
         </div>
 
-        <div v-if="deliveries.length" v-auto-animate class="grid grid-cols-1 gap-3">
-            <DeliveryExpand @open-modal="openModal" :state="openAll" v-for="(delivery, index) of deliveries"
-                :key="delivery.id" :index="deliveries.length - index - 1" :info="delivery" />
+        <div v-if="deliveries.length" class="grid grid-cols-1 gap-3">
+            <transition-group name="fade">
+                <DeliveryExpand @open-modal="openModal" :state="openAll" v-for="(delivery, index) of deliveries"
+                    :key="index" :info="delivery" />
+            </transition-group>
+            <div ref="target" class="flex justify-center items-center"></div>
             <QrModal v-if="modal" :code="modalInfo.code" :src="modalInfo.src" />
         </div>
         <div v-else class="hero">
@@ -93,4 +129,15 @@ watch(route, async (newRoute) => {
 
 
 
-<style lang="scss" scoped></style>
+<style scoped>
+.list-enter-active,
+.list-leave-active {
+    transition: all 0.5s ease-in-out;
+}
+
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+}
+</style>

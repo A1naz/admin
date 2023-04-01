@@ -22,8 +22,8 @@ const emit = defineEmits(['openModal']);
                 <nuxt-img fit="fill" class="w-full h-100" :src="info.productimage" /> </a>
         </figure>
         <div class="card-body overflow-hidden">
-            <div>
-                <h2 class="card-title truncate mb-0 pb-0">{{ info.productname }}</h2>
+            <div class="truncate">
+                <div class="card-title truncate mb-0 pb-0"> <span class="truncate">{{ info.productname }}</span> </div>
                 <a :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`" target="_blank"
                     class="text-sm text-secondary link link-hover">
                     {{ info.article }}

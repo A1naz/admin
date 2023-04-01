@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { storeToRefs } from '@pinia/nuxt/dist/runtime/composables';
 
 definePageMeta({
     layout: 'app',
@@ -22,15 +21,49 @@ const openModal = (index: number) => {
     modal.value = true
 
 }
+const target = ref(null)
+const targetIsVisible = ref(false)
+const { stop } = useIntersectionObserver(
+    target,
+    ([{ isIntersecting }], observerElement) => {
+        targetIsVisible.value = isIntersecting
+    },
+)
+const skip = ref(50)
+const end = ref(false)
 const { data } = await useFetch('/api/buyout/get', {
     method: 'GET',
     query: {
         status: route.query?.status || 'all',
+        limit: 50,
     },
     headers: useRequestHeaders(['cookie']) as HeadersInit,
 })
 const removeBuyout = (uuid: string) => {
     buyouts.value = buyouts.value.filter((buyout: any) => buyout.uuid !== uuid)
+}
+const archiveBuyout = (uuid: string) => {
+    buyouts.value = buyouts.value.map((buyout: any) => {
+        if (buyout.uuid === uuid) {
+            buyout.status = 'archived'
+        }
+        return buyout
+    })
+    if (route.query.status && route.query?.status !== 'archived' && route.query?.status !== 'all') {
+        buyouts.value = buyouts.value.filter((buyout: any) => buyout.uuid !== uuid)
+    }
+}
+
+const unarchiveBuyout = (uuid: string) => {
+    buyouts.value = buyouts.value.map((buyout: any) => {
+        if (buyout.uuid === uuid) {
+            buyout.status = 'active'
+        }
+        return buyout
+    })
+    if (route.query.status && route.query?.status !== 'active' && route.query?.status !== 'all') {
+        buyouts.value = buyouts.value.filter((buyout: any) => buyout.uuid !== uuid)
+    }
 }
 const selectStatus = (e: Event) => {
     const target = e.target as HTMLSelectElement
@@ -45,12 +78,36 @@ onMounted(async () => {
     buyouts.value = data.value
 })
 
+watch(targetIsVisible, async (isVisible) => {
+    if (isVisible) {
+        if (end.value) return
+        const { data } = await useFetch('/api/buyout/get', {
+            method: 'GET',
+            query: {
+                status: route.query?.status || 'all',
+                limit: 50,
+                skip: skip.value,
+            },
+            headers: useRequestHeaders(['cookie']) as HeadersInit,
+        })
+        if (data.value!.length === 0) {
+            end.value = true
+            return
+        }
+        buyouts.value = [...buyouts.value, ...data.value!]
+        skip.value += 50
+    }
+})
+
 watch(route, async (newRoute) => {
+    skip.value = 50
+    end.value = false
     console.log(newRoute)
     const { data } = await useFetch('/api/buyout/get', {
         method: 'GET',
         query: {
             status: newRoute?.query?.status || 'all',
+            limit: 50,
         },
         headers: useRequestHeaders(['cookie']) as HeadersInit,
     })
@@ -63,7 +120,7 @@ watch(route, async (newRoute) => {
     <div>
         <h1 class="text-2xl font-bold mt-1">Выкупы</h1>
         <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
-            Здесь формируются и оплачиваются выкупы на Wildberries. Для добавления, нажмите на кнопку "Добавить выкупы".
+            Здесь формируются и оплачиваются выкупы на Wildberries. Для добавления нажмите на кнопку "Добавить выкупы".
         </p>
         <div class="flex justify-between mb-8 mt-6 items-center">
             <div class="hidden lg:block">
@@ -97,11 +154,16 @@ watch(route, async (newRoute) => {
                 Добавить выкупы
             </NuxtLink>
         </div>
-        <div v-if="buyouts.length" v-auto-animate class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
-            <BuyoutCard :place="buyouts.length - index" @open-modal="openModal" @remove="removeBuyout" :index="index"
-                v-for="(buyout, index) of buyouts" :key="buyout.uuid" :info="buyout"></BuyoutCard>
-        </div>
+        <div v-if="buyouts.length">
+            <transition-group class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4" tag="ul" name="fade">
+                <BuyoutCard @unarchive="unarchiveBuyout" @archive="archiveBuyout" :place="buyouts.length - index"
+                    @open-modal="openModal" @remove="removeBuyout" :index="index" v-for="(buyout, index) of buyouts"
+                    :key="buyout.uuid" :info="buyout"></BuyoutCard>
 
+            </transition-group>
+            <div ref="target" class="p-2 w-full col-span-1"></div>
+
+        </div>
 
         <div v-else class="hero">
             <div class="hero-content text-center flex justify-center items-center h-80">
@@ -111,8 +173,7 @@ watch(route, async (newRoute) => {
                 </div>
             </div>
         </div>
-        <BuyoutInfoModal :place="selectedPlace" @close="modal = false" :info="selectedBuyout" :state="modal"
-            :index="selectedIndex">
+        <BuyoutInfoModal @close="modal = false" :info="selectedBuyout" :state="modal" :index="selectedIndex">
         </BuyoutInfoModal>
     </div>
 </template>

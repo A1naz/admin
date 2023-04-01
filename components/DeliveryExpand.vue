@@ -10,10 +10,6 @@ const props = defineProps({
         type: Object as any,
         required: true
     },
-    index: {
-        type: Number,
-        required: true
-    },
     state: {
         type: Boolean,
     }
@@ -29,11 +25,11 @@ watch(() => props.state, (newState) => {
 </script>
 
 <template>
-    <div class="collapse collapse-arrow border border-base-200 bg-base-100 rounded-box">
+    <div class="collapse collapse-arrow border border-base-200 bg-base-100 rounded-box overflow-visible">
         <input v-model="opened" type="checkbox" />
         <div class="collapse-title relative text-xl font-medium">
             <div class="flex justify-between flex-wrap">
-                <span> Доставка №{{ index + 1 }}
+                <span> Доставка №{{ info.place }}
                 </span>
                 <label class="text-[0.6rem] lg:text-xs text-gray-500">#{{ info.uuid }}</label>
             </div>
@@ -52,8 +48,16 @@ watch(() => props.state, (newState) => {
                 class="absolute top-4 left-64 rounded-lg transition-opacity ease-in-out duration-200"></nuxt-img>
         </div>
         <div class="collapse-content">
-            <div class="product flex gap-4 lg:gap-8 items-center flex-wrap">
-                <nuxt-img :src="info.productimage" width="24" class="justify-self-start	rounded-lg"></nuxt-img>
+            <div class="product flex gap-4 lg:gap-8 items-center flex-wrap overflow-visible">
+                <div class="dropdown dropdown-hover z-10 static">
+                    <label tabindex="0"> <nuxt-img width="24" class="rounded-lg" loading="lazy" fit="fill"
+                            :src="info.productimage"></nuxt-img>
+                    </label>
+                    <ul tabindex="0" class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52">
+                        <nuxt-img class="rounded-lg" loading="lazy" fit="fill" :src="info.productimage"></nuxt-img>
+                    </ul>
+
+                </div>
                 <div>
                     <div class="text-sm text-gray-500">Артикул</div>
                     <a :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`" target="_blank"

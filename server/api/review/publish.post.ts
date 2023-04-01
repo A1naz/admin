@@ -26,6 +26,12 @@ export default eventHandler(async (event) => {
 		});
 	}
 	const delivery = await Delivery.findOne({ idbuyout: buyout._id });
+	if (!delivery) {
+		return createError({
+			statusCode: 400,
+			message: "Доставка не найдена",
+		});
+	}
 	const review = new Review({
 		article: buyout.article,
 		name: buyout.product.name,
@@ -38,6 +44,8 @@ export default eventHandler(async (event) => {
 		status: "created",
 	});
 	await review.save();
+	delivery.reviewed = true;
+	await delivery.save();
 	return {
 		message: "Отзыв успешно добавлен",
 	};

@@ -4,7 +4,12 @@ const DeliverySchema = new Schema({
 	pricebuy: { type: Number, required: true },
 	point: { type: String, required: true },
 	user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-	idbuyout: { type: Schema.Types.ObjectId, ref: "Buyout", required: true },
+	idbuyout: {
+		type: Schema.Types.ObjectId,
+		ref: "Buyout",
+		required: true,
+		unique: true,
+	},
 	uuidbuyout: { type: String, required: true },
 	statusdelivery: { type: Array, required: true },
 	receiptcode: { type: Number, required: false },

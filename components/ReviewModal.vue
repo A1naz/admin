@@ -210,7 +210,7 @@ onMounted(() => {
                             </div>
                         </div>
                         <div>
-                            <div class="pb-2">Фото для отзыва</div>
+                            <div class="pb-2">Фото</div>
 
                             <div
                                 class="flex gap-2 items-center overflow-x-scroll flex-nowrap basis-32 pb-4 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin scrollbar-rounded-[12px]">

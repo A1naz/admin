@@ -294,14 +294,14 @@ onMounted(async () => {
                     v-for="(product, index) in products" :key="index" />
             </div>
             <div v-else
-                class="products-table hidden lg:block overflow-x-auto scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
+                class="products-table hidden lg:block scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
 
                 <table class="table table-compact w-full mt-4">
                     <!-- head -->
-                    <thead class="relative">
+                    <thead class="relative mb-2">
                         <tr>
-                            <th>
-
+                            <th class="">
+                                №
                             </th>
                             <th class="w-12">
                                 <IconCSS name="material-symbols:image-outline" size="20"></IconCSS>
@@ -334,7 +334,8 @@ onMounted(async () => {
                                 Правила
                             </th>
                         </tr>
-                        <progress v-if="loading" class="absolute progress progress-primary w-full"></progress>
+                        <progress v-show="loading"
+                            class="progress absolute bottom-[-2] mb-2 z-10 progress-primary w-full"></progress>
 
                     </thead>
 
@@ -344,10 +345,21 @@ onMounted(async () => {
                                 {{ index + 1 }}
                             </td>
                             <td>
+
                                 <div
-                                    style="width: 28px; height: 28px; overflow: hidden; position: relative; border-radius: 4px">
-                                    <nuxt-img loading="lazy" fit="fill" :src="product.image"></nuxt-img>
+                                    style="width: 28px; height: 36px; overflow: visible; position: relative; border-radius: 4px">
+                                    <div class="dropdown dropdown-hover">
+                                        <label tabindex="0"> <nuxt-img class="rounded-lg" loading="lazy" fit="fill"
+                                                :src="product.image"></nuxt-img>
+                                        </label>
+                                        <ul tabindex="0"
+                                            class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52">
+                                            <nuxt-img class="rounded-lg" loading="lazy" fit="fill"
+                                                :src="product.image"></nuxt-img>
+                                        </ul>
+                                    </div>
                                 </div>
+
                             </td>
                             <td class="">
                                 <div class="w-48 truncate">

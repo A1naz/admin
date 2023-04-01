@@ -70,11 +70,27 @@ export default eventHandler(async (event) => {
 		? data?.sizes_table?.values.map((size: any) => size.tech_size)
 		: [];
 	const priceData = JSON.parse(rawData);
-	const priceRaw = priceData?.data?.products[0]?.salePriceU.toString();
+	const product = priceData?.data?.products.find(
+		(item: any) => item.id === Number(article),
+	);
+	const priceRaw = product?.salePriceU.toString();
+	let instock = false;
+	product.sizes.forEach((size: any) => {
+		if (size.stocks.length > 0) {
+			instock = true;
+		}
+	});
+
 	if (!priceRaw || !sizes) {
 		return createError({
 			statusCode: 400,
 			message: "Не удалось получить данные о товаре",
+		});
+	}
+	if (!instock) {
+		return createError({
+			statusCode: 400,
+			message: "Товара нет в наличии",
 		});
 	}
 	const price = priceRaw?.substring(0, priceRaw.length - 2);

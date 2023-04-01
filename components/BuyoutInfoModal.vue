@@ -15,10 +15,7 @@ const props = defineProps({
         type: Boolean,
         required: true
     },
-    place: {
-        type: Number,
-        required: true
-    }
+
 })
 const store = useMainStore()
 const getStatus = computed(() => {
@@ -51,7 +48,7 @@ const getGender = computed(() => {
             <div v-if="state" class="modal-box max-w-2xl">
                 <div class="">
                     <a @click="$emit('close')" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</a>
-                    <div class="text-xl font-bold">Информация о выкупе № {{ place }} </div>
+                    <div class="text-xl font-bold">Информация о выкупе № {{ info.place }} </div>
                     <span class="text-xs text-gray-500">#{{ info.uuid }}</span>
 
                     <div class="flex flex-col gap-2 justify-center">

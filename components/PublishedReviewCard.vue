@@ -19,7 +19,7 @@ const props = defineProps({
     }
 
 })
-const emit = defineEmits(['callback', 'remove', 'openModal']);
+const emit = defineEmits(['callback', 'remove', 'openModal', 'openImage']);
 onMounted(() => {
     console.log(props.info.rating)
 })
@@ -39,17 +39,16 @@ const getStatus = computed(() => {
 <template>
     <div class="buyout-card card bg-base-200 shadow-lg">
         <div class="card-body flex-shrink-0 flex flex-col justify-start p-4 relative">
-            <div>
-                <h2 class="card-title">Отзыв №{{ place }}</h2>
-            </div>
-            <span :class="{
+            <div class="flex justify-between item mb-2">
+                <h2 class="card-title">Отзыв №{{ place }}</h2> <span :class="{
 
-                'bg-green-600': info.status === 'working' || info.status === 'published',
-                'bg-warning': info.status === 'waiting' || info.status === 'created',
-            }" class="text-primary-content p-2 rounded-lg text-center">{{ getStatus }}</span>
+                    'bg-green-600': info.status === 'working' || info.status === 'published',
+                    'bg-warning': info.status === 'waiting' || info.status === 'created',
+                }" class="text-primary-content p-2 px-8 rounded-lg text-center">{{ getStatus }}</span>
+            </div>
+
             <div class="flex flex-col gap-4">
                 <div class="flex flex-col">
-                    <div class="font-bold">Товар</div>
                     <div class="relative w-full rounded-lg">
                         <div class="truncate">{{ info.name }}</div>
                         <a :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`" target="_blank"
@@ -91,19 +90,20 @@ const getStatus = computed(() => {
                     </div>
                 </div>
                 <div>
-                    <div class="font-bold pb-2">Фото для отзыва</div>
+                    <div class="font-bold pb-2">Фото</div>
 
                     <div
                         class="flex gap-2 items-center overflow-x-auto flex-nowrap basis-32 pb-4 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin scrollbar-rounded-[12px]">
                         <div v-for="(photo, index) of info.images">
-
-                            <div v-if="photo"
-                                class="border border-base-300 relative text-primary hover:text-primary-focus cursor-pointer w-32 h-32 hover:bg-base-200 rounded-lg flex-none">
-                                <div class="absolute inset-0">
-                                    <nuxt-img loading="lazy" :src="photo" class="w-full h-full object-contain rounded-lg" />
+                            <label v-if="photo" for="reviewImageModal">
+                                <div @click="() => emit('openImage', photo)"
+                                    class="border border-base-300 relative text-primary hover:text-primary-focus cursor-pointer w-32 h-32 hover:bg-base-200 rounded-lg flex-none">
+                                    <div class="absolute inset-0">
+                                        <nuxt-img loading="lazy" :src="photo"
+                                            class="w-full h-full object-contain rounded-lg" />
+                                    </div>
                                 </div>
-
-                            </div>
+                            </label>
                         </div>
                     </div>
                 </div>

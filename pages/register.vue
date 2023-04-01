@@ -38,15 +38,16 @@ const submitForm = async () => {
   v$.value.$validate();
   console.log('err', v$.value.$error)
   console.log('err', v$.value)
+
   if (!v$.value.$error) {
-    const { pending, data } = await useLazyFetch('/api/auth/register', {
+    loading.value = true
+    const { pending, data } = await useFetch('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(formData),
     });
-    loading = pending
     console.log('response', data)
     result.value = data
-
+    loading.value = false
     if (data.value?.status === 'error') {
       alert.value = true
       alertType.value = 'error'

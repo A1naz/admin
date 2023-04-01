@@ -1,7 +1,6 @@
 import { User } from "@/server/lib/models/User";
 import { getServerSession } from "#auth";
 import { Buyout } from "@/server/lib/models/Buyout";
-import { Delivery } from "@/server/lib/models/Delivery";
 import fs from "fs";
 export default eventHandler(async (event) => {
 	const session = (await getServerSession(event)) as any;
@@ -23,26 +22,12 @@ export default eventHandler(async (event) => {
 	) {
 		throw createError({
 			statusCode: 400,
-			message: "Нельзя удалить заказ, который оплачен",
+			message: "Нельзя архивировать выкуп, который оплачен",
 		});
 	}
-	const delivery = await Delivery.findOne({ idbuyout: found._id });
-	if (delivery) {
-		throw createError({
-			statusCode: 400,
-			message: "Нельзя удалить заказ, который оплачен",
-		});
-	}
-
-	const deleted = await Buyout.deleteOne({ uuid: body.uuid });
-	console.log(deleted);
-	if (deleted) {
-		return {
-			status: "ok",
-		};
-	}
-	throw createError({
-		statusCode: 500,
-		message: "Не удалось удалить заказ",
-	});
+	found.status = "archived";
+	await found.save();
+	return {
+		status: "ok",
+	};
 });

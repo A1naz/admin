@@ -77,9 +77,20 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease-in-out;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity .4s linear;
+  transition: opacity .2s linear;
 }
 
 .fade-enter,

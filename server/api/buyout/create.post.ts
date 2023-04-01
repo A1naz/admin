@@ -1,7 +1,7 @@
 import { Buyout } from "@/server/lib/models/Buyout";
 import { getServerSession } from "#auth";
 import { User } from "~~/server/lib/models/User";
-import { ok } from "assert";
+import { uuid } from "uuidv4";
 type Item = {
 	image: string;
 	name: string;
@@ -57,10 +57,11 @@ export default eventHandler(async (event) => {
 				priceText: product.priceText,
 				image: product.image,
 			},
+			uuid: uuid(),
 		});
 		await buyout.save();
 	}
 	return {
-		status: ok,
+		status: "ok",
 	};
 });

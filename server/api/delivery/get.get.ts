@@ -11,30 +11,39 @@ export default eventHandler(async (event) => {
 	if (!session) {
 		return sendRedirect(event, "/auth", 302);
 	}
-	const { status } = getQuery(event);
+	const { status, limit, skip } = getQuery(event);
 	const user = await User.findOne({ uuid: session.uuid });
 	if (!user) {
 		return sendRedirect(event, "/auth", 302);
 	}
+	const all = await Delivery.find({ user: user });
 	let deliveries;
 	if (status === "all") {
-		deliveries = await Delivery.find({ user: user }).sort({ _id: -1 });
+		deliveries = await Delivery.find({ user: user })
+			.sort({ _id: -1 })
+			.skip(skip as number)
+			.limit(limit as number);
 	} else if (status === "active") {
-		deliveries = await Delivery.find({ user: user, status: "active" }).sort({
-			_id: -1,
-		});
+		deliveries = await Delivery.find({ user: user, status: "active" })
+			.sort({
+				_id: -1,
+			})
+			.skip(skip as number)
+			.limit(limit as number);
 	} else if (status === "completed") {
-		deliveries = await Delivery.find({ user: user, status: "completed" }).sort({
-			_id: -1,
-		});
+		deliveries = await Delivery.find({ user: user, status: "completed" })
+			.sort({
+				_id: -1,
+			})
+			.skip(skip as number)
+			.limit(limit as number);
 	} else if (status === "canceled") {
-		deliveries = await Delivery.find({ user: user, status: "canceled" }).sort({
-			_id: -1,
-		});
-	} else if (status === "archived") {
-		deliveries = await Delivery.find({ user: user, status: "archived" }).sort({
-			_id: -1,
-		});
+		deliveries = await Delivery.find({ user: user, status: "canceled" })
+			.sort({
+				_id: -1,
+			})
+			.skip(skip as number)
+			.limit(limit as number);
 	} else {
 		return {
 			error: "Неизвестный статус",
@@ -67,7 +76,11 @@ export default eventHandler(async (event) => {
 		deliveries.map(async (delivery) => {
 			const buyout = await Buyout.findOne({ _id: delivery.idbuyout });
 			if (!buyout) return;
+			const place = all.findIndex(
+				(item) => item._id.toString() === delivery._id.toString(),
+			);
 			return {
+				place: place + 1,
 				uuid: buyout.uuid,
 				article: delivery.article,
 				pricebuy: delivery.pricebuy,
@@ -91,5 +104,6 @@ export default eventHandler(async (event) => {
 			};
 		}),
 	);
+	console.log(format);
 	return format;
 });

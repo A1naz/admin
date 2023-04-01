@@ -16,10 +16,13 @@ export default eventHandler(async (event) => {
 	const readyForReview = await Delivery.find({
 		user: user,
 		status: "completed",
+		reviewed: false,
 	}).sort({
 		createdAt: -1,
 	});
-
+	if (!readyForReview) {
+		return [];
+	}
 	const format = await Promise.all(
 		readyForReview.map(async (delivery) => {
 			const buyout = await Buyout.findOne({ _id: delivery.idbuyout });

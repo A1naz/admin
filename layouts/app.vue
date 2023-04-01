@@ -112,7 +112,7 @@ const breadcrumbs = computed(() => getBreadcrumbs())
               <NuxtLink :class="{
                 'bg-neutral-focus': route.path !== '/profile',
               }" to="/profile" class="btn btn-square btn-sm hover:bg-neutral">
-                <IconCSS name="ic:baseline-person-outline" size="24" />
+                <IconCSS name="material-symbols:person" size="24" />
               </NuxtLink>
 
             </div>
@@ -120,15 +120,15 @@ const breadcrumbs = computed(() => getBreadcrumbs())
         </div>
 
         <!-- <div class="stats shadow m-4 mb-2">
-                                              <div class="stat p-2 px-4">
-                                                <div class="stat-title text-sm">Выкупы:</div>
-                                                <div class="stat-value text-sm">{{ numberFormat.format(store.client?.buyouts) }}</div>
-                                              </div>
-                                              <div class="stat p-2 px-4">
-                                                <div class="stat-title text-sm">Доставки:</div>
-                                                <div class="stat-value text-sm">{{ numberFormat.format(store.client?.deliveries) }}</div>
-                                              </div>
-                                            </div> -->
+                                                <div class="stat p-2 px-4">
+                                                  <div class="stat-title text-sm">Выкупы:</div>
+                                                  <div class="stat-value text-sm">{{ numberFormat.format(store.client?.buyouts) }}</div>
+                                                </div>
+                                                <div class="stat p-2 px-4">
+                                                  <div class="stat-title text-sm">Доставки:</div>
+                                                  <div class="stat-value text-sm">{{ numberFormat.format(store.client?.deliveries) }}</div>
+                                                </div>
+                                              </div> -->
         <SidebarItem title="Выкупы" icon="material-symbols:credit-card" href="/buyouts"></SidebarItem>
         <SidebarItem title="Доставки" icon="mdi:truck-delivery" href="/delivery"></SidebarItem>
         <SidebarItem title="Отзывы" icon="material-symbols:rate-review" href="/reviews"></SidebarItem>
