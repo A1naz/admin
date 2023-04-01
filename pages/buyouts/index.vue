@@ -76,6 +76,34 @@ const selectStatus = (e: Event) => {
 }
 onMounted(async () => {
     buyouts.value = data.value
+    if (route.query?.uuid) {
+        const uuid = route.query?.uuid
+        if (buyouts.value) {
+            console.log(buyouts.value)
+            const index = buyouts.value!.findIndex((buyout: any) => buyout.uuid === uuid)
+            console.log(index)
+            if (index !== -1) {
+                openModal(index)
+            } else {
+                const { data, error } = await useFetch('/api/buyout/getOne', {
+                    method: 'GET',
+                    query: {
+                        uuid,
+                    },
+                    headers: useRequestHeaders(['cookie']) as HeadersInit,
+                })
+                if (error.value) {
+                    console.log(error.value)
+                }
+                if (data.value) {
+                    buyouts.value = [data.value, ...buyouts.value]
+                    openModal(0)
+                }
+
+            }
+        }
+
+    }
 })
 
 watch(targetIsVisible, async (isVisible) => {

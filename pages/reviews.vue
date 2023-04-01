@@ -125,10 +125,9 @@ const closeModal = () => {
             <input type="checkbox" id="reviewImageModal" class="modal-toggle" />
 
             <label for="reviewImageModal" class="modal cursor-pointer">
-                <label for="" class="modal-box w-11/12 max-w-7xl p-0">
+                <label for="" class="modal-box w-11/12 max-w-5xl p-0">
                     <label for="reviewImageModal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2">✕</label>
-
-                    <nuxt-img v-if="openedPhoto" width="100%" class="w-full" :src="openedPhoto"></nuxt-img>
+                    <nuxt-img fit="contain" class="object-contain" v-if="openedPhoto" :src="openedPhoto" />
                 </label>
             </label>
         </Teleport>

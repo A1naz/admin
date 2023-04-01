@@ -12,7 +12,7 @@ const DeliverySchema = new Schema({
 	},
 	uuidbuyout: { type: String, required: true },
 	statusdelivery: { type: Array, required: true },
-	receiptcode: { type: Number, required: false },
+	receiptcode: { type: String, required: false },
 	receiptcodeqr: { type: String, required: false },
 	recipient: { type: String, required: true },
 	recipientphone: { type: String, required: true },

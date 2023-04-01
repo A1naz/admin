@@ -3,6 +3,7 @@ import QRCode from 'qrcode';
 const { $dayjs } = useNuxtApp();
 const currency = useCurrency()
 const store = useMainStore()
+const router = useRouter()
 const opened = ref()
 const emit = defineEmits(['openModal']);
 const props = defineProps({
@@ -15,6 +16,9 @@ const props = defineProps({
     }
 })
 const qrCode = ref(null)
+const openBuyout = () => {
+    router.push(`/buyouts?uuid=${props.info.uuid}`)
+}
 onMounted(async () => {
     opened.value = props.state
 
@@ -31,7 +35,10 @@ watch(() => props.state, (newState) => {
             <div class="flex justify-between flex-wrap">
                 <span> Доставка №{{ info.place }}
                 </span>
-                <label class="text-[0.6rem] lg:text-xs text-gray-500">#{{ info.uuid }}</label>
+                <div @click="openBuyout" class="tooltip z-10" data-tip="Перейти к выкупу">
+                    <label class="text-[0.6rem] link link-hover lg:text-xs text-gray-500 hover:text-primary z-10">#{{
+                        info.uuid }}</label>
+                </div>
             </div>
             <div class="flex justify-between flex-wrap">
                 <div class="text-sm"><span class="text-gray-400">Статус: </span> <span>

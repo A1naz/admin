@@ -9,6 +9,7 @@ const ReviewSchema = new Schema({
 	delivery: { type: Schema.Types.ObjectId, ref: "Delivery", required: true },
 	images: { type: Array, required: false },
 	status: { type: String, required: true },
+	recipientphone: { type: String, required: true },
 });
 
 export const Review = model("Review", ReviewSchema);

@@ -108,7 +108,7 @@ watch(route, async (newRoute) => {
             </div>
         </div>
 
-        <div v-if="deliveries.length" class="grid grid-cols-1 gap-3">
+        <div v-if="deliveries?.length" class="grid grid-cols-1 gap-3">
             <transition-group name="fade">
                 <DeliveryExpand @open-modal="openModal" :state="openAll" v-for="(delivery, index) of deliveries"
                     :key="index" :info="delivery" />

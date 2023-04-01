@@ -4,7 +4,8 @@ import { context } from "esbuild";
 import { Delivery } from "@/server/lib/models/Delivery";
 import { Buyout } from "@/server/lib/models/Buyout";
 import QRCode from "qrcode";
-
+import libphonenumber from "google-libphonenumber";
+const phoneUtil = libphonenumber.PhoneNumberUtil.getInstance();
 export default eventHandler(async (event) => {
 	const session = (await getServerSession(event)) as any;
 
@@ -49,7 +50,7 @@ export default eventHandler(async (event) => {
 			error: "Неизвестный статус",
 		};
 	}
-	// const buyout = await Buyout.findOne({ user: user }).sort({ _id: -1 });
+	// const buyout = await Buyout.findOne({ user: user }).sort({ _id: 1 });
 	// if (!deliveries.length) {
 	// 	const created = new Delivery({
 	// 		article: buyout?.article,
@@ -59,12 +60,12 @@ export default eventHandler(async (event) => {
 	// 		idbuyout: buyout,
 	// 		uuidbuyout: buyout?.uuid,
 	// 		statusdelivery: [{ status: "Отправлен на сборку", date: new Date() }],
-	// 		// receiptcode: 520,
-	// 		// receiptcodeqr: await QRCode.toDataURL("520", {
-	// 		// 	width: 250,
-	// 		// 	scale: 8,
-	// 		// 	margin: 0,
-	// 		// }),
+	// 		receiptcode: "520",
+	// 		receiptcodeqr: await QRCode.toDataURL("520", {
+	// 			width: 250,
+	// 			scale: 8,
+	// 			margin: 0,
+	// 		}),
 	// 		recipient: "Данил",
 	// 		recipientphone: "+7 (999) 999 99 99",
 	// 		status: "active",
@@ -79,6 +80,10 @@ export default eventHandler(async (event) => {
 			const place = all.findIndex(
 				(item) => item._id.toString() === delivery._id.toString(),
 			);
+
+			const phone = delivery.recipientphone;
+			const replaced = `+${phone[0]} (***) *** ${phone.slice(7)}`;
+
 			return {
 				place: place + 1,
 				uuid: buyout.uuid,
@@ -99,7 +104,7 @@ export default eventHandler(async (event) => {
 					? delivery.receiptcodeqr
 					: undefined,
 				recipient: delivery.recipient,
-				recipientphone: delivery.recipientphone,
+				recipientphone: replaced,
 				updatedAt: delivery.updatedAt,
 			};
 		}),
