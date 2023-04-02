@@ -22,6 +22,7 @@ specifiers:
   '@vuelidate/core': ^2.0.0
   '@vuelidate/validators': ^2.0.0
   '@vuepic/vue-datepicker': ^4.2.0
+  '@vueuse/components': ^9.13.0
   '@vueuse/nuxt': ^9.13.0
   '@yandex/ymaps3-types': ^0.0.5
   bcrypt: ^5.1.0
@@ -54,6 +55,7 @@ dependencies:
   '@vuelidate/core': 2.0.0_vue@3.2.47
   '@vuelidate/validators': 2.0.0_vue@3.2.47
   '@vuepic/vue-datepicker': 4.2.0_vue@3.2.47
+  '@vueuse/components': 9.13.0_vue@3.2.47
   '@vueuse/nuxt': 9.13.0_ax7mrarjjew6fnvrqrc4rzxtlu
   bcrypt: 5.1.0
   daisyui: 2.51.3_gbtt6ss3tbiz4yjtvdr6fbrj44
@@ -4240,6 +4242,17 @@ packages:
       date-fns: 2.29.3
       date-fns-tz: 1.3.8_date-fns@2.29.3
       vue: 3.2.47
+    dev: false
+
+  /@vueuse/components/9.13.0_vue@3.2.47:
+    resolution: {integrity: sha512-UJ8PjQ4SGb2rsVIy9vhEc6aCu+3+2cc+xEfGNX8/M1NKIuL2Vo6c2Kc2fYFaRzWZkP8HWXu+IcwvnAzL44IEFA==}
+    dependencies:
+      '@vueuse/core': 9.13.0_vue@3.2.47
+      '@vueuse/shared': 9.13.0_vue@3.2.47
+      vue-demi: 0.13.11_vue@3.2.47
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - vue
     dev: false
 
   /@vueuse/core/9.13.0_vue@3.2.47:

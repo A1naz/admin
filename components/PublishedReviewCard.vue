@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { notify } from '@kyvg/vue3-notification';
+import { UseImage } from '@vueuse/components'
 
 const { $dayjs } = useNuxtApp();
 const currency = useCurrency()
@@ -99,8 +100,23 @@ const getStatus = computed(() => {
                                 <div @click="() => emit('openImage', photo)"
                                     class="border border-base-300 relative text-primary hover:text-primary-focus cursor-pointer w-32 h-32 hover:bg-base-200 rounded-lg flex-none">
                                     <div class="absolute inset-0">
-                                        <nuxt-img loading="lazy" :src="photo"
-                                            class="w-full h-full object-contain rounded-lg" />
+                                        <UseImage :src="photo">
+                                            <template #default>
+                                                <nuxt-img :src="photo" class="w-full h-full object-contain rounded-lg" />
+                                            </template>
+                                            <template #loading>
+                                                <div class="absolute inset-0 flex items-center justify-center">
+                                                    <Icon name="mdi:loading"
+                                                        class="loader ease-linear h-8 w-8 animate-spin">
+                                                    </Icon>
+                                                </div>
+                                            </template>
+                                            <template #error>
+                                                <div class="absolute inset-0 flex items-center justify-center">
+                                                    <div class="text-red-500 text-center">Ошибка загрузки</div>
+                                                </div>
+                                            </template>
+                                        </UseImage>
                                     </div>
                                 </div>
                             </label>

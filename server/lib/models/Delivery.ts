@@ -8,7 +8,7 @@ const DeliverySchema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: "Buyout",
 		required: true,
-		unique: true,
+		unique: false,
 	},
 	uuidbuyout: { type: String, required: true },
 	statusdelivery: { type: Array, required: true },

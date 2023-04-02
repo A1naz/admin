@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { useNotification } from '@kyvg/vue3-notification';
+import { UseImage } from '@vueuse/components'
 
 const { $dayjs } = useNuxtApp()
+const now = useNow()
 const form = reactive({
     text: '',
     rating: 5,
-    date: new Date(),
+    date: now.value,
     photos: ['', '', '', '', ''] as string[],
 })
+
 const props = defineProps({
     state: {
         type: Boolean,
@@ -49,51 +52,38 @@ const uploadPhoto = async (e: Event, index: number) => {
         quality: 0.7,
         type: file.type
     })
-    const reader = new FileReader()
-    reader.readAsDataURL(compressed)
-    reader.onerror = () => {
-        console.log(reader.error)
+    const { base64 } = useBase64(compressed)
+    const { data, error } = await useFetch('/api/upload',
+        {
+            method: 'POST',
+            headers,
+            body: {
+                data: base64,
+                type: file.type
+            }
+        })
+    if (error.value) {
+        if (error.value.statusCode === 413) {
+            notify({
+                title: 'Что-то пошло не так',
+                text: 'Фото слишком большое',
+                type: 'error',
+                duration: 3000
+            })
+            return
+        }
         notify({
             title: 'Что-то пошло не так',
             text: 'Не удалось загрузить фото',
             type: 'error',
             duration: 3000
         })
-
     }
-    reader.onload = async () => {
-        console.log(reader.result)
-        const { data, error } = await useFetch('/api/upload',
-            {
-                method: 'POST',
-                headers,
-                body: {
-                    data: reader.result,
-                    type: file.type
-                }
-            })
-        if (data.value) {
-            form.photos[index] = data.value?.url!
-        }
-        if (error.value) {
-            if (error.value.statusCode === 413) {
-                notify({
-                    title: 'Что-то пошло не так',
-                    text: 'Фото слишком большое',
-                    type: 'error',
-                    duration: 3000
-                })
-                return
-            }
-            notify({
-                title: 'Что-то пошло не так',
-                text: 'Не удалось загрузить фото',
-                type: 'error',
-                duration: 3000
-            })
-        }
-
+    if (data.value) {
+        form.photos[index] = data.value?.url!
     }
+
+
 
     console.log(form.photos)
 }
@@ -202,7 +192,7 @@ onMounted(() => {
                     <div>
                         <div class="pb-2">Запланировать отзыв</div>
                         <div class="relative w-full p-6 bg-base-200 rounded-lg">
-                            <div class="absolute left-3 top-3">{{ form.date <= new Date() ? 'Опубликовать сейчас' :
+                            <div class="absolute left-3 top-3">{{ form.date <= now ? 'Опубликовать сейчас' :
                                 $dayjs(form.date).format('D MMMM HH:mm') }}</div>
                                     <div class="absolute right-3 top-2 w-30" style="z-index: 9999999">
                                         <DatePicker v-model="form.date" />
@@ -226,15 +216,28 @@ onMounted(() => {
                                             class="file-select w-full h-full flex justify-center items-center hover:cursor-pointer">
                                             <input @input="uploadPhoto($event, index)" :ref="'fileInput' + index"
                                                 accept="image/*" type="file" class="hidden">
-                                            <IconCSS :class="{
-                                                'loading': loading
-                                            }" class="" name="material-symbols:add-photo-alternate-outline" size="30">
+                                            <IconCSS name="material-symbols:add-photo-alternate-outline" size="30">
                                             </IconCSS>
                                         </label>
 
                                         <div v-else class="absolute inset-0">
-                                            <nuxt-img loading="lazy" :src="photo"
-                                                class="w-full h-full object-contain rounded-lg" />
+                                            <UseImage :src="photo">
+                                                <template #default>
+                                                    <nuxt-img :src="photo"
+                                                        class="w-full h-full object-contain rounded-lg" />
+                                                </template>
+                                                <template #loading>
+                                                    <div class="absolute inset-0 flex items-center justify-center">
+                                                        <Icon name="mdi:loading" class="h-8 w-8 animate-spin">
+                                                        </Icon>
+                                                    </div>
+                                                </template>
+                                                <template #error>
+                                                    <div class="absolute inset-0 flex items-center justify-center">
+                                                        <div class="text-red-500 text-center">Ошибка загрузки</div>
+                                                    </div>
+                                                </template>
+                                            </UseImage>
                                         </div>
 
                                     </div>

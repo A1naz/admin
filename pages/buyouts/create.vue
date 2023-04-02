@@ -48,30 +48,12 @@ const defaultRules = {
     9: false,
     10: false,
 }
-const defaultData: Item[] = [
-    reactive({
-        image: '',
-        name: 'Кроссовки Nike Air Max 270 React',
-        article: 123456789,
-        price: 1000,
-        priceText: '1000 руб.',
-        quantity: 1,
-        sizes: [39],
-        sex: 'Нет',
-        searchQuery: 'Кроссовки Nike Air Max 270 React',
-        adress: 'Москва, ул. Ленина, д. 1',
-        dateRange: [new Date(), null],
-        selectedSize: 39,
-        rules: defaultRules
-    })
-]
-
 const route = useRoute()
 const store = useMainStore();
 const article = ref('')
 const products = ref<Item[]>([])
 const loading = ref(false)
-const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
+const startDate = useNow()
 const addProduct = async () => {
     if (article.value === '') {
         return
@@ -140,7 +122,7 @@ const totalQuantity = computed(() => {
         return acc + item.quantity
     }, 0)
 })
-const pickpoints = ref()
+const pickpoints = shallowRef()
 const modalOpen = ref(false)
 const closeModal = () => {
     modalOpen.value = false
