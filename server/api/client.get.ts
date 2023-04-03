@@ -25,6 +25,7 @@ export default eventHandler(async (event) => {
 			lastName: user.lastName,
 			buyouts: buyouts.length,
 			deliveries: deliveries.length,
+			hasPassword: user.password ? true : false,
 		},
 		status: "ok",
 	};

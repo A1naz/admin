@@ -3,6 +3,7 @@ import { useNotification } from '@kyvg/vue3-notification';
 import { UseImage } from '@vueuse/components'
 
 const { $dayjs } = useNuxtApp()
+
 const now = useNow()
 const form = reactive({
     text: '',

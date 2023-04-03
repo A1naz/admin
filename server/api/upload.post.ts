@@ -43,5 +43,6 @@ export default eventHandler(async (event) => {
 	return {
 		success: true,
 		url: `${runtimeConfig.PUBLIC_SITE_URL}/api/uploads/${filename}`,
+		filename: filename,
 	};
 });

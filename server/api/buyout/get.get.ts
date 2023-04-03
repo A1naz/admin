@@ -58,7 +58,7 @@ export default eventHandler(async (event) => {
 	const format = buyouts.map((buyout) => {
 		const place = all.findIndex((item) => item.uuid === buyout.uuid);
 		return {
-			place: place + 1,
+			place: buyout.place ? buyout.place : place + 1,
 			uuid: buyout.uuid,
 			article: buyout.article,
 			searchQuery: buyout.searchQuery,

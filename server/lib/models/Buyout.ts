@@ -30,6 +30,7 @@ const BuyoutSchema = new Schema({
 	user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 	uuid: { type: String, default: uuid() },
 	createdAt: { type: Date, default: Date.now },
+	place: { type: Number, required: true },
 	data5: { type: {}, default: "" },
 	data6: { type: {}, default: "" },
 	data7: { type: {}, default: "" },
