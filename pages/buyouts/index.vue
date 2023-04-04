@@ -177,8 +177,8 @@ watch(route, async (newRoute) => {
                 <option value="completed" :selected="route.query.status === 'completed'">Завершенные</option>
                 <option value="archived" :selected="route.query.status === 'archived'">В архиве</option>
             </select>
-            <NuxtLink to="/buyouts/create" class="btn btn-primary btn-sm gap-2 font-medium normal-case text-white self-end">
-                <Icon name="material-symbols:add" size="24"></Icon>
+            <NuxtLink to="/buyouts/create" class="btn btn-primary btn-sm gap-2 font-medium normal-case self-end">
+                <Icon name="fluent:add-24-filled" size="24"></Icon>
                 Добавить выкупы
             </NuxtLink>
         </div>

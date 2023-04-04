@@ -106,8 +106,8 @@ const closeModal = () => {
             <ReviewCard v-if="status === 'available'" @open-modal="openModal" :index="index" :info="review"
                 v-for="(review, index) of reviews" :key="index">
             </ReviewCard>
-            <PublishedReviewCard @open-image="openPhoto" :place="reviews.length - index" v-if="status === 'published'"
-                :index="index" :info="review" v-for="(review, index) of reviews" :key="index"> </PublishedReviewCard>
+            <ReviewPublishedCard @open-image="openPhoto" :place="reviews.length - index" v-if="status === 'published'"
+                :index="index" :info="review" v-for="(review, index) of reviews" :key="index"> </ReviewPublishedCard>
         </div>
         <div v-else class="hero">
             <div class="hero-content text-center flex justify-center items-center h-80">

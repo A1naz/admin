@@ -121,7 +121,7 @@ const getStatus = computed(() => {
                     </label>
                     <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
                         <li><a @click="cloneBuyout">
-                                <Icon name="material-symbols:content-copy-outline"></Icon>Дублировать
+                                <Icon name="fluent:copy-24-filled"></Icon>Дублировать
                             </a></li>
                         <li v-if="info.status !== 'archived'"><a @click="archiveBuyout">
                                 <Icon name="material-symbols:archive"></Icon>Архивировать
@@ -131,7 +131,7 @@ const getStatus = computed(() => {
                             </a></li>
                         <li v-if="info.orderPaymentStatus === 'Не оплачен' && info.servicePaymentStatus === 'Не оплачен'"><a
                                 @click="deleteBuyOut">
-                                <Icon name="material-symbols:delete-outline"></Icon>Удалить
+                                <Icon name="fluent:delete-24-filled"></Icon>Удалить
                             </a></li>
 
                     </ul>

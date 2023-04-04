@@ -146,7 +146,7 @@ const onTelegramLink = (data: any) => {
         </div>
         <section
             class="profile-options flex flex-col justify-center items-center gap-6 lg:gap-32 lg:pr-12 lg:flex-row lg:justify-between lg:items-start">
-            <div class="description-container lg:basis-1/3">
+            <div class="self-start description-container lg:basis-1/3">
                 <div class="heading">Контактные данные</div>
                 <div class="text-xs text-gray-400">Заполните свои контактные данные, чтобы получать актуальные рекомендации
                     по
@@ -163,9 +163,9 @@ const onTelegramLink = (data: any) => {
                     <input v-model="form.email" type="text" placeholder="Почта (email)"
                         class="input input-bordered w-full" />
                 </div>
-                <div class="flex w-full justify-between">
+                <div class="flex w-full gap-4 justify-between">
                     <div class="tg w-full justify-between flex gap-2 lg:gap-4 lg:w-1/2 д">
-                        <div class="relative flex justify-end items-center flex-grow-0">
+                        <div class="relative flex justify-end w-full items-center flex-grow-0">
                             <input :value="store.client?.telegram ? `@${store.client.telegram}` : ''" placeholder="Telegram"
                                 class="input input-bordered w-full" disabled>
                             <Icon class="absolute mr-4" size="24" name="logos:telegram" />
@@ -192,7 +192,7 @@ const onTelegramLink = (data: any) => {
         </section>
         <section
             class="profile-options mt-20 flex flex-col justify-center items-center gap-6 lg:gap-32 lg:pr-12 lg:flex-row lg:justify-between lg:items-start">
-            <div class="description-container lg:basis-1/3">
+            <div class="self-start description-container lg:basis-1/3">
                 <div class="heading">Пароль</div>
                 <div class="text-xs text-gray-400">Установите или поменяйте пароль для вашего аккаунта</div>
             </div>

@@ -11,8 +11,8 @@ export default defineNuxtPlugin(() => {
 
 	dayjs.updateLocale("ru", {
 		calendar: {
-			lastDay: "[Вчера] HH:mm",
-			sameDay: "HH:mm",
+			lastDay: "[Вчера,] HH:mm",
+			sameDay: "[Сегодня,] HH:mm",
 			nextDay: "[Завтра в] HH:mm",
 			lastWeek: "DD MMMM HH:mm",
 			nextWeek: "dddd [в] HH:mm",

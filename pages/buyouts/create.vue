@@ -271,7 +271,7 @@ onMounted(async () => {
         </div>
         <ClientOnly>
             <div v-if="width < 1024" class="products-card grid grid-cols-1 gap-4 md:grid-cols-2 lg:hidden mt-4">
-                <CreateBuyoutCard :loading="!pickpoints?.length" @point-modal-open="pointModalOpen" @remove="removeProduct"
+                <BuyoutCreateCard :loading="!pickpoints?.length" @point-modal-open="pointModalOpen" @remove="removeProduct"
                     @change-sex="onSexChange" @change-size="onSizeChange" :product="product" :index="index"
                     v-for="(product, index) in products" :key="index" />
             </div>
@@ -422,7 +422,7 @@ onMounted(async () => {
                                 <div class="flex justify-between items-center">
                                     <div class="w-full">
 
-                                        <DateRangePicker v-model="product.dateRange" :start-date="startDate" />
+                                        <BuyoutDateRangePicker v-model="product.dateRange" :start-date="startDate" />
                                     </div>
 
                                 </div>
@@ -462,7 +462,7 @@ onMounted(async () => {
 
                 </table>
             </div>
-            <SelectPointModal v-if="modalOpen" :state="modalOpen" @callback="handleAddress" @close="closeModal"
+            <BuyoutSelectPointModal v-if="modalOpen" :state="modalOpen" @callback="handleAddress" @close="closeModal"
                 :pickpoints="pickpoints" />
         </ClientOnly>
 

@@ -114,7 +114,7 @@ watch(route, async (newRoute) => {
                     :key="index" :info="delivery" />
             </transition-group>
             <div ref="target" class="flex justify-center items-center"></div>
-            <QrModal v-if="modal" :code="modalInfo.code" :src="modalInfo.src" />
+            <DeliveryQrModal v-if="modal" :code="modalInfo.code" :src="modalInfo.src" />
         </div>
         <div v-else class="hero">
             <div class="hero-content text-center flex justify-center items-center h-80">

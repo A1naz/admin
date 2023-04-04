@@ -16,10 +16,10 @@ watchEffect(() => {
 <template>
   <li>
     <NuxtLink :to="props.href" class="mx-4 rounded-lg">
-      <IconCSS :class="{
+      <Icon :class="{
         'opacity-70': !currentPath.includes(props.href),
         'text-primary': currentPath.includes(props.href)
-      }" :name="icon" size="24"></IconCSS><span :class="{
+      }" :name="icon" size="24"></Icon><span :class="{
   'opacity-70': !currentPath.includes(props.href),
 }" class="">{{ title }}</span>
     </NuxtLink>

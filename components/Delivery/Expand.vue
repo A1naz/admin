@@ -52,7 +52,7 @@ watch(() => props.state, (newState) => {
             <nuxt-img fit="fill" :class="{
                 'opacity-0': opened
             }" :src="info.productimage" width="36"
-                class="absolute top-4 left-64 rounded-lg transition-opacity ease-in-out duration-200"></nuxt-img>
+                class="absolute top-4 left-40 rounded-lg transition-opacity ease-in-out duration-200"></nuxt-img>
         </div>
         <div class="collapse-content">
             <div class="product flex gap-4 lg:gap-8 items-center flex-wrap overflow-visible">
@@ -93,9 +93,9 @@ watch(() => props.state, (newState) => {
                     <div class="text-sm text-gray-500">Получатель:</div>
                     {{ info.recipient }} {{ info.recipientphone }}
                 </div>
-                <div class="w-60 overflow-hidden truncate">
+                <div class="w-76 overflow-hidden truncate">
                     <div class="text-sm text-gray-500">Адрес:</div>
-                    <a target="_blank" class="text-secondary link link-hover w-60 truncate "
+                    <a target="_blank" class="text-secondary link link-hover w-76 truncate "
                         :href="`https://yandex.ru/maps/?mode=search&text=${info.point}`"> {{ info.point }}
                     </a>
                 </div>

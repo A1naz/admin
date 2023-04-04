@@ -64,15 +64,15 @@ const breadcrumbs = computed(() => getBreadcrumbs())
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               class="inline-block w-6 h-6 stroke-current">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </label>
+            </svg>
+          </label>
+        </div>
+        <div class="flex-1 justify-center mr-12">
+          <Logo></Logo>
+        </div>
       </div>
-      <div class="flex-1 justify-center mr-12">
-        <Logo></Logo>
-      </div>
-    </div>
 
-    <!-- Page content here -->
+      <!-- Page content here -->
       <div class="px-6 py-2 lg:p-6 block">
         <div v-if="route.path != '/profile'" class="breadcrumbs p-0 lg:text-sm">
           <ul>
@@ -111,27 +111,18 @@ const breadcrumbs = computed(() => getBreadcrumbs())
               </div>
               <NuxtLink :class="{
                 'bg-neutral-focus': route.path !== '/profile',
-              }" to="/profile" class="btn btn-square btn-sm hover:bg-neutral">
-                <IconCSS name="material-symbols:person" size="24" />
+              }" to="/profile" class="btn btn-circle btn-sm hover:bg-neutral">
+                <IconCSS name="fluent:person-24-filled" size="24" />
               </NuxtLink>
 
             </div>
           </div>
         </div>
+        <SidebarItem title="Выкупы" icon="fluent:payment-24-filled" href="/buyouts"></SidebarItem>
+        <SidebarItem title="Доставки" icon="fluent:box-24-filled" href="/delivery"></SidebarItem>
+        <SidebarItem title="Отзывы" icon="fluent:comment-add-24-filled" href="/reviews"></SidebarItem>
+        <SidebarItem title="Лайки на отзывы" icon="fluent:thumb-like-24-filled" href="/likes"></SidebarItem>
 
-        <!-- <div class="stats shadow m-4 mb-2">
-                                                <div class="stat p-2 px-4">
-                                                  <div class="stat-title text-sm">Выкупы:</div>
-                                                  <div class="stat-value text-sm">{{ numberFormat.format(store.client?.buyouts) }}</div>
-                                                </div>
-                                                <div class="stat p-2 px-4">
-                                                  <div class="stat-title text-sm">Доставки:</div>
-                                                  <div class="stat-value text-sm">{{ numberFormat.format(store.client?.deliveries) }}</div>
-                                                </div>
-                                              </div> -->
-        <SidebarItem title="Выкупы" icon="material-symbols:credit-card" href="/buyouts"></SidebarItem>
-        <SidebarItem title="Доставки" icon="mdi:truck-delivery" href="/delivery"></SidebarItem>
-        <SidebarItem title="Отзывы" icon="material-symbols:rate-review" href="/reviews"></SidebarItem>
 
         <li>
         </li>
@@ -142,13 +133,13 @@ const breadcrumbs = computed(() => getBreadcrumbs())
               <div
                 class="btn btn-ghost gap-2 flex justify-center items-center normal-case w-[80%] hover:cursor-pointer rounded-lg p-0 m-0"
                 @click="logout">
-                <Icon name="material-symbols:logout" size="24"></Icon>
+                <Icon name="fluent:sign-out-24-filled" size="24"></Icon>
                 <span>
                   Выйти
                 </span>
               </div>
               <label @click="changeTheme" class="btn btn-ghost btn-square z-10 w-[20%]">
-                <Icon name="mdi:theme-light-dark" size="24"></Icon>
+                <Icon name="fluent:dark-theme-24-filled" size="24"></Icon>
               </label>
             </div>
 

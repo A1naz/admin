@@ -41,7 +41,7 @@ export default eventHandler(async (event) => {
 		user: user,
 		delivery: delivery,
 		images: photos,
-		status: "created",
+		status: "waiting",
 		recipientphone: delivery.recipientphone,
 	});
 	await review.save();
