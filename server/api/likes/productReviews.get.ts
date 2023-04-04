@@ -60,7 +60,7 @@ export default eventHandler(async (event) => {
 			id: feedback.id,
 			rating: feedback.productValuation,
 			text: feedback.text,
-			date: feedback.updatedDate ? feedback.updatedDate : feedback.createdDate,
+			date: feedback.createdDate,
 			user: {
 				name: feedback.wbUserDetails.name
 					? feedback.wbUserDetails.name
