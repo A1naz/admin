@@ -3,13 +3,30 @@ import { useNotification } from '@kyvg/vue3-notification';
 import { UseImage } from '@vueuse/components'
 
 const { $dayjs } = useNuxtApp()
+const { upload, getPublicUrl, remove } = useS3Object();
 
 const now = useNow()
 const form = reactive({
     text: '',
     rating: 5,
     date: now.value,
-    photos: ['', '', '', '', ''] as string[],
+    photos: [{
+        url: '',
+        public: '',
+    }, {
+        url: '',
+        public: '',
+    }, {
+        url: '',
+        public: '',
+    }, {
+        url: '',
+        public: '',
+    },
+    {
+        url: '',
+        public: '',
+    }],
 })
 
 const props = defineProps({
@@ -22,46 +39,47 @@ const props = defineProps({
         required: true
     }
 })
-const compressImage = async (file: File, { quality = 1, type = file.type }) => {
-    // Get as image data
-    const imageBitmap = await createImageBitmap(file);
 
-    // Draw to canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = imageBitmap.width;
-    canvas.height = imageBitmap.height;
-    const ctx = canvas.getContext('2d');
-    ctx!.drawImage(imageBitmap, 0, 0);
+const loadingIndex = ref(null) as Ref<number | null>
 
-    // Turn into Blob
-    const blob = await new Promise((resolve) =>
-        canvas.toBlob(resolve, type, quality)
-    ) as any
-
-    // Turn Blob into File
-    return new File([blob], file.name, {
-        type: blob.type,
-    });
-};
-const loading = ref(false)
 const emit = defineEmits(['close', 'publish'])
 const fileInput = ref()
-const uploadPhoto = async (e: Event, index: number) => {
-    loading.value = true
-    const file = (e.target! as HTMLInputElement).files![0]
-    const compressed = await compressImage(file, {
-        quality: 0.7,
-        type: file.type
+const url = ref('')
+const uploadToS3 = async (event: Event, index: number) => {
+    loadingIndex.value = index
+    const fileList = (event.target! as HTMLInputElement).files
+    const files = Array.from(fileList!)
+    if (!files) return
+    const { data, error } = await upload({
+        files,
+        url: null
     })
-    const { base64 } = useBase64(compressed)
+    if (error.value) {
+        console.log(error.value.message)
+        notify({
+            title: 'Что-то пошло не так',
+            text: 'Не удалось загрузить фото',
+            type: 'error',
+            duration: 3000
+        })
+    }
+    if (data.value) {
+        form.photos[index] = { url: data.value[0].url, public: getPublicUrl(data.value[0].url) }
+    }
+    console.log(form.photos)
+    loadingIndex.value = null
+}
+const uploadPhoto = async (e: Event, index: number) => {
+    loadingIndex.value = index
+    const file = (e.target! as HTMLInputElement).files![0]
+    const formData = new FormData()
+    formData.append('file', file)
+    const { base64 } = useBase64(file)
     const { data, error } = await useFetch('/api/upload',
         {
             method: 'POST',
             headers,
-            body: {
-                data: base64,
-                type: file.type
-            }
+            body: formData
         })
     if (error.value) {
         if (error.value.statusCode === 413) {
@@ -83,16 +101,49 @@ const uploadPhoto = async (e: Event, index: number) => {
     if (data.value) {
         form.photos[index] = data.value?.url!
     }
-
-
-
-    console.log(form.photos)
 }
-const clearForm = () => {
+const clearForm = async () => {
     form.date = new Date()
     form.text = ''
     form.rating = 5
-    form.photos = ['', '', '', '', '']
+    const photos = form.photos
+
+
+    for await (const [index, photo] of photos.entries()) {
+        loadingIndex.value = index
+        if (photo.url) {
+            const { data, error } = await remove({
+                url: photo.url
+            })
+            if (error.value) {
+                notify({
+                    title: 'Что-то пошло не так',
+                    text: 'Не удалось удалить фото',
+                    type: 'error',
+                    duration: 3000
+                })
+                return
+            }
+        }
+    }
+
+    loadingIndex.value = null
+    form.photos = [{
+        url: '',
+        public: '',
+    }, {
+        url: '',
+        public: '',
+    }, {
+        url: '',
+        public: '',
+    }, {
+        url: '',
+        public: '',
+    }, {
+        url: '',
+        public: '',
+    }]
 }
 const { notify } = useNotification()
 
@@ -125,21 +176,33 @@ const publishReview = async () => {
     emit('publish')
 }
 const removePhoto = async (index: number) => {
-    const url = form.photos[index]
-    form.photos[index] = ''
-    const { data, error } = await useFetch(url, {
-        method: 'DELETE',
-        headers
+    loadingIndex.value = index
+    const url = form.photos[index].url
+
+    form.photos[index] = {
+        url: '',
+        public: '',
+    }
+    const { data, error } = await remove({
+        url
     })
     if (error.value) {
         notify({
             title: 'Что-то пошло не так',
-            text: error.value?.data?.message,
+            text: 'Не удалось удалить фото',
             type: 'error',
             duration: 3000
         })
         return
     }
+    if (data.value) {
+        form.photos[index] = {
+            url: '',
+            public: '',
+        }
+    }
+    loadingIndex.value = null
+
 
 }
 
@@ -202,48 +265,56 @@ onMounted(() => {
                         </div>
                         <div>
                             <div class="pb-2">Фото</div>
+                            <ClientOnly>
+                                <div
+                                    class="flex gap-2 items-center overflow-x-scroll flex-nowrap basis-32 pb-4 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin scrollbar-rounded-[12px]">
+                                    <div v-for="(photo, index) of form.photos">
 
-                            <div
-                                class="flex gap-2 items-center overflow-x-scroll flex-nowrap basis-32 pb-4 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin scrollbar-rounded-[12px]">
-                                <div v-for="(photo, index) of form.photos">
+                                        <div
+                                            class="border border-base-300 relative text-primary hover:text-primary-focus cursor-pointer w-32 h-32 hover:bg-base-200 rounded-lg flex-none">
+                                            <div @click="removePhoto(index)" v-if="photo.url"
+                                                class="absolute right-0 top-0 z-50">
+                                                <label for="photo" class="btn btn-sm btn-circle btn-ghost">✕</label>
+                                            </div>
 
-                                    <div
-                                        class="border border-base-300 relative text-primary hover:text-primary-focus cursor-pointer w-32 h-32 hover:bg-base-200 rounded-lg flex-none">
-                                        <div @click="removePhoto(index)" v-if="photo" class="absolute right-0 top-0 z-50">
-                                            <label for="photo" class="btn btn-sm btn-circle btn-ghost">✕</label>
+                                            <label v-show="!photo.public"
+                                                class="file-select w-full h-full flex justify-center items-center hover:cursor-pointer">
+                                                <div v-show="loadingIndex === index"
+                                                    class="absolute inset-0 flex items-center justify-center">
+                                                    <Icon name="mdi:loading" class="h-8 w-8 animate-spin">
+                                                    </Icon>
+                                                </div>
+                                                <input @change="(e) => uploadToS3(e, index)" :ref="'fileInput' + index"
+                                                    type="file" class="hidden">
+                                                <IconCSS v-show="loadingIndex !== index"
+                                                    name="material-symbols:add-photo-alternate-outline" size="30">
+                                                </IconCSS>
+                                            </label>
+
+                                            <div v-show="photo.public" class="absolute inset-0">
+                                                <UseImage :src="photo.public">
+                                                    <template #default>
+                                                        <nuxt-img :src="photo.public" fit="contain"
+                                                            class="w-full h-full object-contain rounded-lg" />
+                                                    </template>
+                                                    <template #loading>
+                                                        <div class="absolute inset-0 flex items-center justify-center">
+                                                            <Icon name="mdi:loading" class="h-8 w-8 animate-spin">
+                                                            </Icon>
+                                                        </div>
+                                                    </template>
+                                                    <template #error>
+                                                        <div class="absolute inset-0 flex items-center justify-center">
+                                                            <div class="text-red-500 text-center">Ошибка загрузки</div>
+                                                        </div>
+                                                    </template>
+                                                </UseImage>
+                                            </div>
+
                                         </div>
-
-                                        <label v-if="!photo"
-                                            class="file-select w-full h-full flex justify-center items-center hover:cursor-pointer">
-                                            <input @input="uploadPhoto($event, index)" :ref="'fileInput' + index"
-                                                accept="image/*" type="file" class="hidden">
-                                            <IconCSS name="material-symbols:add-photo-alternate-outline" size="30">
-                                            </IconCSS>
-                                        </label>
-
-                                        <div v-else class="absolute inset-0">
-                                            <UseImage :src="photo">
-                                                <template #default>
-                                                    <nuxt-img :src="photo"
-                                                        class="w-full h-full object-contain rounded-lg" />
-                                                </template>
-                                                <template #loading>
-                                                    <div class="absolute inset-0 flex items-center justify-center">
-                                                        <Icon name="mdi:loading" class="h-8 w-8 animate-spin">
-                                                        </Icon>
-                                                    </div>
-                                                </template>
-                                                <template #error>
-                                                    <div class="absolute inset-0 flex items-center justify-center">
-                                                        <div class="text-red-500 text-center">Ошибка загрузки</div>
-                                                    </div>
-                                                </template>
-                                            </UseImage>
-                                        </div>
-
                                     </div>
                                 </div>
-                            </div>
+                            </ClientOnly>
                         </div>
                     </div>
                     <div class="modal-action justify-between">

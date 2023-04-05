@@ -21,7 +21,6 @@ export default eventHandler(async (event) => {
 		},
 	);
 	const imt_id = data?.imt_id;
-	console.log(imt_id);
 	if (!imt_id) {
 		throw createError({
 			statusCode: 404,
@@ -48,7 +47,6 @@ export default eventHandler(async (event) => {
 			message: "Не удалось получить информацию по товару",
 		});
 	}
-	console.log(feedbackData.feedbacks);
 	const feedbacks = feedbackData.feedbacks.map((feedback: any) => {
 		const likes = feedback?.feedbackHelpfulness?.filter(
 			(help: any) => help.helpfulness === "plus",

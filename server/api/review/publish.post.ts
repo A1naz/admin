@@ -3,7 +3,6 @@ import { getServerSession } from "#auth";
 import { Delivery } from "@/server/lib/models/Delivery";
 import { Buyout } from "@/server/lib/models/Buyout";
 import { Review } from "@/server/lib/models/Review";
-
 export default eventHandler(async (event) => {
 	const session = (await getServerSession(event)) as any;
 
@@ -32,6 +31,8 @@ export default eventHandler(async (event) => {
 			message: "Доставка не найдена",
 		});
 	}
+	const images = photos.map((photo: any) => photo.public);
+
 	const review = new Review({
 		article: buyout.article,
 		name: buyout.product.name,
@@ -40,7 +41,7 @@ export default eventHandler(async (event) => {
 		date: date,
 		user: user,
 		delivery: delivery,
-		images: photos,
+		images,
 		status: "waiting",
 		recipientphone: delivery.recipientphone,
 	});

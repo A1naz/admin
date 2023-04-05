@@ -8,7 +8,7 @@ const route = useRoute()
 const store = useMainStore();
 const reviews = ref([]) as any
 const router = useRouter()
-const status = ref(route.query.status || 'available')
+const status = ref(route.query?.status || 'available')
 const openedPhoto = ref('')
 if (status.value === 'available') {
     const { data } = await useFetch('/api/review/available', {
@@ -125,9 +125,9 @@ const closeModal = () => {
             <input type="checkbox" id="reviewImageModal" class="modal-toggle" />
 
             <label for="reviewImageModal" class="modal cursor-pointer">
-                <label for="" class="modal-box w-11/12 max-w-5xl p-0">
+                <label for="" class="modal-box min-w-0 max-w-5xl p-0">
                     <label for="reviewImageModal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2">✕</label>
-                    <nuxt-img fit="contain" class="object-contain" v-if="openedPhoto" :src="openedPhoto" />
+                    <nuxt-img fit="contain" class="object-contain m-auto" v-if="openedPhoto" :src="openedPhoto" />
                 </label>
             </label>
         </Teleport>

@@ -14,11 +14,12 @@ export const useMainStore = defineStore("main", {
 
 	actions: {
 		async getClient() {
-			const { data: client } = await useFetch("/api/client", {
-				transform: (res) => res.client,
+			const { data } = await useFetch("/api/user/client", {
+				headers: useRequestHeaders(["cookie"]) as HeadersInit,
 			});
-			console.log(client.value);
-			this.setClient(client.value as object);
+			console.log(data.value);
+			const client = data.value?.client;
+			this.setClient(client as object);
 		},
 
 		setClient(client: object) {

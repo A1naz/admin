@@ -20,6 +20,7 @@ export default defineNuxtConfig({
 	image: {
 		domains: [
 			"wb.ru",
+			"storage.yandexcloud.net",
 			"basket-10.wb.ru",
 			"basket-1.wb.ru",
 			"basket-2.wb.ru",
@@ -57,7 +58,26 @@ export default defineNuxtConfig({
 		"nuxt-security",
 		"@nuxtjs/color-mode",
 		"@vite-pwa/nuxt",
+		"@bg-dev/nuxt-s3",
 	],
+	s3: {
+		client: {
+			credentials: {
+				secretAccessKey: "YCNnWGgkItHnLLEKtqCq4LP-cmCtcMpydXKJnbO5",
+				accessKeyId: "YCAJEdIRUFVg4W949lwNMEivY",
+			},
+			region: "ru-central1",
+			endpoint: "https://storage.yandexcloud.net",
+		},
+		publicBucketUrl: "https://shifft.storage.yandexcloud.net/",
+		bucket: "shifft",
+		image: {
+			compression: {
+				maxSizeMB: 2,
+				maxWidthOrHeight: 1920,
+			},
+		},
+	},
 	pwa: {
 		registerType: "autoUpdate",
 		devOptions: {

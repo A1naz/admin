@@ -53,7 +53,7 @@ watch(() => props.state, (newState) => {
             <nuxt-img fit="fill" :class="{
                 'opacity-0': opened
             }" :src="info.productimage" width="36"
-                class="absolute top-4 left-48 rounded-lg transition-opacity ease-in-out duration-200 hidden lg:block"></nuxt-img>
+                class="absolute top-4 left-[25%] rounded-lg transition-opacity ease-in-out duration-200 hidden lg:block"></nuxt-img>
         </div>
         <div class="collapse-content">
             <div class="product flex gap-4 lg:gap-8 items-center flex-wrap overflow-visible">

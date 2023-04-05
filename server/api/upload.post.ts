@@ -1,12 +1,8 @@
 import { User } from "@/server/lib/models/User";
 import { getServerSession } from "#auth";
-import { context } from "esbuild";
-import { Delivery } from "@/server/lib/models/Delivery";
-import { Buyout } from "@/server/lib/models/Buyout";
-import { Review } from "@/server/lib/models/Review";
 import { Upload } from "@/server/lib/models/Upload";
+import path from "path";
 
-import fs from "fs";
 function decodeBase64Image(base64Str: string) {
 	const matches = base64Str.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
 	const image = {} as any;
@@ -25,21 +21,24 @@ export default eventHandler(async (event) => {
 	if (!session) {
 		return sendRedirect(event, "/auth", 302);
 	}
-	const body = await readBody(event);
-	const user = await User.findOne({ uuid: session.uuid });
-	if (!user) {
-		return sendRedirect(event, "/auth", 302);
-	}
-	const { type, data } = body;
-	const image = decodeBase64Image(data);
 	const filename = `${Date.now()}.png`;
+	const files = await readMultipartFormData(event);
+	if (!files?.length) {
+		return {
+			success: false,
+			message: "No file uploaded",
+		};
+	}
+	const file = files[0];
+	const { name, type, data } = file;
+	if (!type?.startsWith("image/")) {
+		return {
+			success: false,
+			message: "Only image files are allowed",
+		};
+	}
 
-	const upload = new Upload({
-		type,
-		filename,
-		data: image.data,
-	});
-	await upload.save();
+	// save file logic
 	return {
 		success: true,
 		url: `${runtimeConfig.PUBLIC_SITE_URL}/api/uploads/${filename}`,

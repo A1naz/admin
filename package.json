@@ -8,11 +8,13 @@
 		"postinstall": "nuxt prepare"
 	},
 	"devDependencies": {
+		"@bg-dev/nuxt-s3": "^0.2.1",
 		"@nuxt/image-edge": "1.0.0-27968280.9739e4d",
 		"@nuxtjs/color-mode": "^3.2.0",
 		"@nuxtjs/tailwindcss": "^6.4.1",
 		"@sidebase/nuxt-auth": "^0.4.3",
 		"@types/bcrypt": "^5.0.0",
+		"@types/formidable": "^2.0.5",
 		"@types/google-libphonenumber": "^7.4.23",
 		"@types/gridfs-stream": "^0.5.36",
 		"@types/jsonwebtoken": "^9.0.1",
