@@ -39,11 +39,7 @@ const removeDislike = () => {
     addDislikes.value--
     emit('removeDislike', props.info.id)
 }
-watchEffect(() => {
-    if (addLikes.value > 0) {
-        addDislikes.value = 0
-    }
-})
+
 </script>
 
 <template>
