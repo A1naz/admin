@@ -36,8 +36,9 @@ watch(() => props.state, (newState) => {
                 <span> Доставка №{{ info.place }}
                 </span>
                 <div @click="openBuyout" class="tooltip z-10" data-tip="Перейти к выкупу">
-                    <label class="text-[0.6rem] link link-hover lg:text-xs text-gray-500 hover:text-primary z-10">#{{
-                        info.uuid }}</label>
+                    <label
+                        class="text-[0.6rem] link link-hover sm:text-[0.8rem] lg:text-xs text-gray-500 hover:text-primary z-10 truncate">#{{
+                            info.uuid }}</label>
                 </div>
             </div>
             <div class="flex justify-between flex-wrap">
@@ -52,7 +53,7 @@ watch(() => props.state, (newState) => {
             <nuxt-img fit="fill" :class="{
                 'opacity-0': opened
             }" :src="info.productimage" width="36"
-                class="absolute top-4 left-40 rounded-lg transition-opacity ease-in-out duration-200"></nuxt-img>
+                class="absolute top-4 left-48 rounded-lg transition-opacity ease-in-out duration-200 hidden lg:block"></nuxt-img>
         </div>
         <div class="collapse-content">
             <div class="product flex gap-4 lg:gap-8 items-center flex-wrap overflow-visible">

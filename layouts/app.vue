@@ -120,7 +120,7 @@ const breadcrumbs = computed(() => getBreadcrumbs())
         </div>
         <SidebarItem title="Выкупы" icon="fluent:payment-24-filled" href="/buyouts"></SidebarItem>
         <SidebarItem title="Доставки" icon="fluent:box-24-filled" href="/delivery"></SidebarItem>
-        <SidebarItem title="Отзывы" icon="fluent:comment-add-24-filled" href="/reviews"></SidebarItem>
+        <SidebarItem title="Отзывы" icon="fluent:comment-24-filled" href="/reviews"></SidebarItem>
         <SidebarItem title="Лайки на отзывы" icon="fluent:thumb-like-24-filled" href="/likes"></SidebarItem>
 
 

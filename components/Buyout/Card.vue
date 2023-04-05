@@ -137,7 +137,7 @@ const getStatus = computed(() => {
                     </ul>
                 </div>
 
-                <div>
+                <div class="truncate">
                     <h2 class="card-title">Выкуп №{{ info.place }}</h2>
                     <span class="text-xs text-gray-500 truncate">#{{ info.uuid }}</span>
 

@@ -34,12 +34,15 @@ const initialForm = reactive({
     email: '',
     username: '',
 })
-onMounted(async () => {
-    console.log(store.client)
+const updateInitital = () => {
     initialForm.firstName = store.client.firstName
     initialForm.lastName = store.client.lastName
     initialForm.email = store.client.email
     initialForm.username = store.client.username
+}
+onMounted(async () => {
+    console.log(store.client)
+    updateInitital()
     form.firstName = store.client.firstName
     form.lastName = store.client.lastName
     form.email = store.client.email
@@ -102,6 +105,7 @@ const update = async () => {
     }
     start()
     await store.getClient()
+    updateInitital()
 }
 const unlinkTelegram = async () => {
     const { data, error } = await useFetch('/api/user/unlinkTelegram', {
@@ -114,7 +118,7 @@ const unlinkTelegram = async () => {
         alert.type = 'error'
     } else {
         alert.show = true
-        alert.message = 'Telegram аккаунт успешно отвязан'
+        alert.message = 'Telegram успешно отвязан'
         alert.type = 'success'
     }
     start()
@@ -124,7 +128,7 @@ const onTelegramLink = (data: any) => {
     console.log(data)
     if (data.status === 'ok') {
         alert.show = true
-        alert.message = 'Telegram аккаунт успешно привязан'
+        alert.message = 'Telegram успешно привязан'
         alert.type = 'success'
     } else {
         alert.show = true
@@ -163,8 +167,8 @@ const onTelegramLink = (data: any) => {
                     <input v-model="form.email" type="text" placeholder="Почта (email)"
                         class="input input-bordered w-full" />
                 </div>
-                <div class="flex w-full gap-4 justify-between">
-                    <div class="tg w-full justify-between flex gap-2 lg:gap-4 lg:w-1/2 д">
+                <div class="flex flex-col w-full gap-4 justify-between xl:flex-row">
+                    <div class="tg w-full justify-between flex gap-2 lg:gap-4 xl:w-1/2">
                         <div class="relative flex justify-end w-full items-center flex-grow-0">
                             <input :value="store.client?.telegram ? `@${store.client.telegram}` : ''" placeholder="Telegram"
                                 class="input input-bordered w-full" disabled>
@@ -175,7 +179,7 @@ const onTelegramLink = (data: any) => {
                         <LinkTelegram v-if="!store.client.telegram" @callback="onTelegramLink" class="lg:mr-4">
                         </LinkTelegram>
                         <button v-if="store.client.telegram" @click="unlinkTelegram"
-                            class="btn btn-primary lg:mr-4">Отвязать</button>
+                            class="btn btn-primary xl:mr-4">Отвязать</button>
 
 
                     </div>
@@ -197,7 +201,7 @@ const onTelegramLink = (data: any) => {
                 <div class="text-xs text-gray-400">Установите или поменяйте пароль для вашего аккаунта</div>
             </div>
             <div class="flex flex-col gap-6 w-full mt-1">
-                <div class="w-full flex gap-8">
+                <div class="w-full flex flex-col gap-4 lg:gap-8 lg:flex-row">
                     <input v-show="store.client.hasPassword" type="password" v-model="passwordForm.oldPassword"
                         placeholder="Старый пароль" class="input input-bordered w-full">
                     <input type="password" v-model="passwordForm.newPassword" placeholder="Новый пароль"

@@ -183,7 +183,8 @@ watch(route, async (newRoute) => {
             </NuxtLink>
         </div>
         <div v-if="buyouts.length">
-            <transition-group class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4" tag="ul" name="fade">
+            <transition-group class="cards grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" tag="ul"
+                name="fade">
                 <BuyoutCard @unarchive="unarchiveBuyout" @archive="archiveBuyout" :place="buyouts.length - index"
                     @open-modal="openModal" @remove="removeBuyout" :index="index" v-for="(buyout, index) of buyouts"
                     :key="buyout.uuid" :info="buyout"></BuyoutCard>
