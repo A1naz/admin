@@ -69,39 +69,6 @@ const uploadToS3 = async (event: Event, index: number) => {
     console.log(form.photos)
     loadingIndex.value = null
 }
-const uploadPhoto = async (e: Event, index: number) => {
-    loadingIndex.value = index
-    const file = (e.target! as HTMLInputElement).files![0]
-    const formData = new FormData()
-    formData.append('file', file)
-    const { base64 } = useBase64(file)
-    const { data, error } = await useFetch('/api/upload',
-        {
-            method: 'POST',
-            headers,
-            body: formData
-        })
-    if (error.value) {
-        if (error.value.statusCode === 413) {
-            notify({
-                title: 'Что-то пошло не так',
-                text: 'Фото слишком большое',
-                type: 'error',
-                duration: 3000
-            })
-            return
-        }
-        notify({
-            title: 'Что-то пошло не так',
-            text: 'Не удалось загрузить фото',
-            type: 'error',
-            duration: 3000
-        })
-    }
-    if (data.value) {
-        form.photos[index] = data.value?.url!
-    }
-}
 const clearForm = async () => {
     form.date = new Date()
     form.text = ''

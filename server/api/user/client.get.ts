@@ -12,13 +12,13 @@ export default eventHandler(async (event) => {
 	if (!user) {
 		return sendRedirect(event, "/auth", 302);
 	}
-
 	console.log("sending client");
 	const client = {
 		email: user.email,
 		username: user.email === user.username ? undefined : user.username,
 		uuid: user.uuid,
 		telegram: user.telegram || undefined,
+		balance: user.balance,
 		firstName: user.firstName,
 		lastName: user.lastName,
 		hasPassword: user.password ? true : false,

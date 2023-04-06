@@ -52,7 +52,7 @@ export default eventHandler(async (event) => {
 	const user = new User({
 		email,
 		password: hash,
-		username: email,
+		username: email.split("@")[0],
 		roles: ["user"],
 		uuid: uuid(),
 	});

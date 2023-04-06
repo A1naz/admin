@@ -44,6 +44,7 @@
 		"daisyui": "^2.51.3",
 		"dayjs": "^1.11.7",
 		"jsonwebtoken": "^9.0.0",
+		"maska": "^2.1.7",
 		"mongodb": "^5.1.0",
 		"mongoose": "^7.0.1",
 		"next-auth": "^4.20.1",
@@ -53,6 +54,7 @@
 		"unstorage": "^1.4.0",
 		"uuidv4": "^6.2.13",
 		"validator": "^13.9.0",
+		"vue-currency-input": "^3.0.4",
 		"vue-yandex-maps": "^1.0.8"
 	}
 }

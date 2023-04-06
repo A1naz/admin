@@ -27,6 +27,7 @@ export default NuxtAuthHandler({
 				token.email = user ? (user as any).email || "" : "";
 				token.uuid = user ? (user as any).uuid || "" : "";
 				token.username = user ? (user as any).username || "" : "";
+				token.balance = user ? (user as any).balance || 0 : 0;
 			}
 			return Promise.resolve(token);
 		},
@@ -35,6 +36,7 @@ export default NuxtAuthHandler({
 			(session as any).email = token.email;
 			(session as any).uuid = token.uuid;
 			(session as any).username = token.username;
+			(session as any).balance = token.balance;
 			const found = await User.findOne({ uuid: token.uuid });
 			if (!found) {
 				return Promise.reject(new Error("User not found"));

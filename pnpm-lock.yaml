@@ -31,6 +31,7 @@ specifiers:
   daisyui: ^2.51.3
   dayjs: ^1.11.7
   jsonwebtoken: ^9.0.0
+  maska: ^2.1.7
   mongodb: ^5.1.0
   mongoose: ^7.0.1
   next-auth: ^4.20.1
@@ -44,6 +45,7 @@ specifiers:
   unstorage: ^1.4.0
   uuidv4: ^6.2.13
   validator: ^13.9.0
+  vue-currency-input: ^3.0.4
   vue-yandex-maps: ^1.0.8
 
 dependencies:
@@ -63,6 +65,7 @@ dependencies:
   daisyui: 2.51.3_gbtt6ss3tbiz4yjtvdr6fbrj44
   dayjs: 1.11.7
   jsonwebtoken: 9.0.0
+  maska: 2.1.7
   mongodb: 5.1.0
   mongoose: 7.0.1
   next-auth: 4.20.1_nqfews3zxntugbnfuqgpde23my
@@ -72,6 +75,7 @@ dependencies:
   unstorage: 1.4.0
   uuidv4: 6.2.13
   validator: 13.9.0
+  vue-currency-input: 3.0.4_vue@3.2.47
   vue-yandex-maps: 1.0.8
 
 devDependencies:
@@ -9424,6 +9428,10 @@ packages:
       object-visit: 1.0.1
     dev: false
 
+  /maska/2.1.7:
+    resolution: {integrity: sha512-WMQzwCgFN2lQf8opJwHwdik7YQ1F8IggGEPdky6qyaaKaE9fUCc8wfbx0U4SfnFiPTsE3/5PzI0Qka4xTBczrw==}
+    dev: false
+
   /mdn-data/2.0.14:
     resolution: {integrity: sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==}
 
@@ -12986,6 +12994,14 @@ packages:
     resolution: {integrity: sha512-jfFfTlXV7Xp2LxqcdRnBslFLb4C/DBvecTgpUYcDpMd75u326svTmEqa8YX5d1t7Mh9jODKdt8y+/z+8Pegh3g==}
     dependencies:
       ufo: 1.1.1
+
+  /vue-currency-input/3.0.4_vue@3.2.47:
+    resolution: {integrity: sha512-t6rPAGR60aLf4s24cROwh2pDKZ/38rqUVcvt7xiZVZfPKGwZaZccEX7DPEFH6autrL+me0n7RrwiQYinyj4ZMg==}
+    peerDependencies:
+      vue: ^2.7 || ^3.0.0
+    dependencies:
+      vue: 3.2.47
+    dev: false
 
   /vue-demi/0.13.11_vue@3.2.47:
     resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}

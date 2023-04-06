@@ -270,13 +270,12 @@ onMounted(async () => {
             </div>
         </div>
         <ClientOnly>
-            <div v-if="width < 1024" class="products-card grid grid-cols-1 gap-4 md:grid-cols-2 lg:hidden mt-4">
+            <div v-if="width < 1500" class="products-card grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
                 <BuyoutCreateCard :loading="!pickpoints?.length" @point-modal-open="pointModalOpen" @remove="removeProduct"
                     @change-sex="onSexChange" @change-size="onSizeChange" :product="product" :index="index"
                     v-for="(product, index) in products" :key="index" />
             </div>
-            <div v-else
-                class="products-table hidden lg:block scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
+            <div v-else class="products-table scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
 
                 <table class="table table-compact w-full mt-4">
                     <!-- head -->

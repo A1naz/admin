@@ -7,6 +7,7 @@ const route = useRoute()
 const themes = ["cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula", "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter"]
 const numberFormat = new Intl.NumberFormat()
 const { status, data, signIn, signOut } = useSession()
+const currency = useCurrency()
 const name = useRuntimeConfig().NAME
 const currentPath = ref(useRoute().path)
 const clicks = ref(0)
@@ -102,20 +103,29 @@ const breadcrumbs = computed(() => getBreadcrumbs())
 
         </div>
         <div class="card m-4 mx-4 bg-neutral-focus text-neutral-content">
-          <div class="card-body p-4">
-            <div class="flex justify-between items-center ">
-              <div class="text-sm">
-                {{ store.client?.username ? store.client.username : data?.user?.email }}
-                <button></button>
+          <div class="card-body gap-4 p-4">
+            <div>
+              <div class="flex justify-between items-start">
+                <div class="">
+                  <div class="font-bold">
+                    {{ store.client?.username ? store.client.username : store.client.telegram ? store.client.telegram :
+                      store.client.email.split('@')[0] }}
+                  </div>
+                  <div class="balance text-xs text-gray-400">Баланс: {{ currency.format(store.client.balance) }}
+                  </div>
+
+                </div>
+                <NuxtLink :class="{
+                  'bg-neutral-focus': route.path !== '/profile',
+                }" to="/profile" class="btn btn-circle btn-sm hover:bg-neutral">
+                  <IconCSS name="fluent:person-24-filled" size="24" />
+                </NuxtLink>
 
               </div>
-              <NuxtLink :class="{
-                'bg-neutral-focus': route.path !== '/profile',
-              }" to="/profile" class="btn btn-circle btn-sm hover:bg-neutral">
-                <IconCSS name="fluent:person-24-filled" size="24" />
-              </NuxtLink>
-
             </div>
+            <div><label for="payment-modal" class="btn btn-block btn-sm btn-neutral hover:bg-neutral">
+                Пополнить
+              </label></div>
           </div>
         </div>
         <SidebarItem title="Выкупы" icon="fluent:payment-24-filled" href="/buyouts"></SidebarItem>
@@ -150,6 +160,7 @@ const breadcrumbs = computed(() => getBreadcrumbs())
       </ul>
 
     </div>
+    <PaymentModal></PaymentModal>
   </div>
 </template>
 

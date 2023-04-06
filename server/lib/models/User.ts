@@ -9,6 +9,7 @@ const UserSchema = new Schema({
 	roles: [{ type: String, ref: "Role" }],
 	emailConfirmed: { type: Boolean, default: false },
 	telegram: { type: String, required: false },
+	balance: { type: Number, default: 0, required: true },
 	registrationDate: { type: Date, default: Date.now },
 });
 

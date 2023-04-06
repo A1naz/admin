@@ -58,7 +58,7 @@ const onSexChange = (event: Event) => {
             </div>
             <div class="flex justify-between items-center mt-2">
                 <span>Даты выкупов: </span>
-                <DateRangePicker :startDate="startDate" v-model="product.dateRange" />
+                <BuyoutDateRangePicker :startDate="startDate" v-model="product.dateRange" />
             </div>
             <div class="flex justify-between items-center">
                 <span>Пол:</span>
@@ -89,14 +89,14 @@ const onSexChange = (event: Event) => {
             <div class="divider"></div>
 
 
-            <div class="flex gap-4">
+            <div class="flex gap-4 items-center">
                 <div class="flex items-center flex-none flex-0 flex-shrink-0 h-full" style="width: 130px;">
                     <img style="object-fit: fill" class="rounded-xl h-full" width="130" height="204"
                         :src="product?.image || '/logo/logocolor.svg'" />
                 </div>
                 <div class="flex flex-col truncate">
-                    <div class="mb-2">
-                        <div class="text-sm truncate">{{ product.name }}</div>
+                    <div class="mb-2 truncate">
+                        <p class="text-sm truncate">{{ product.name }}</p>
                         <a :href="`https://www.wildberries.ru/catalog/${product.article}/detail.aspx`" target="_blank"
                             class="text-sm text-secondary link link-hover">
                             {{ product.article }}
@@ -123,7 +123,7 @@ const onSexChange = (event: Event) => {
                     </div>
                     <div>
                         <span class="text-sm text-gray-500">Размер: </span>
-                        <div class="w-20 xl:w-full flex items-center m-1">
+                        <div class="flex items-center m-1">
                             <select @change="onSizeChange" v-if="product.sizes.length"
                                 class="select select-sm select-bordered w-full">
                                 <option v-for="size in product.sizes" :selected="product.selectedSize === size" :key="size"

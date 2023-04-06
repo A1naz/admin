@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { useMainStore } from '@/stores/main'
+import { useNotification } from '@kyvg/vue3-notification';
+const { notify } = useNotification()
 const colorMode = useColorMode()
 
 const { status, data } = useSession()
@@ -8,7 +10,6 @@ const store = useMainStore()
 onMounted(async () => {
   console.log(status.value)
   store.theme = document.documentElement.getAttribute('data-theme') === 'dracula' ? 'dracula' : 'light'
-
 })
 if (status.value === 'authenticated') {
   await store.getClient()

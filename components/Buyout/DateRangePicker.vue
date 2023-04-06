@@ -13,6 +13,7 @@ const props = defineProps({
         type: Date
     }
 })
+const { width } = useWindowSize()
 const emit = defineEmits(['update:modelValue'])
 const date = ref(props.modelValue)
 const store = useMainStore()
@@ -42,9 +43,9 @@ const handleDate = (modelData: any) => {
 </script>
 <template>
     <div>
-        <VueDatePicker :teleport="true" class="absolute" @update:model-value="handleDate" v-model="date" ref="dp"
-            :min-date="startDate" :prevent-min-max-navigation="true" :dark="colorMode.value === 'dark'" locale="ru" range
-            cancelText="" select-text="Сохранить">
+        <VueDatePicker position="left" :teleport-center="width < 1024" :teleport="true" @update:model-value="handleDate"
+            v-model="date" ref="dp" :min-date="startDate" :prevent-min-max-navigation="true"
+            :dark="colorMode.value === 'dark'" locale="ru" range cancelText="" select-text="Сохранить">
             <template #trigger>
                 <button :class="{
                     'btn-outline': date[0] && date[1],
