@@ -2,7 +2,7 @@ import { getServerSession } from "#auth";
 import { User } from "~~/server/lib/models/User";
 import MailService from "~~/server/lib/mailService.js";
 import bcrypt from "bcrypt";
-import { uuid } from "uuidv4";
+import { v4 as uuid } from "uuid";
 import validator from "validator";
 function hasWhiteSpace(s: string) {
 	return s.indexOf(" ") >= 0 || !/^[a-zA-Z0-9_-]{4,14}$/.test(s);

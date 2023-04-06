@@ -41,7 +41,7 @@ const checkForLink = async () => {
     if (data.value?.status === 'wait') {
         setTimeout(() => {
             checkForLink()
-        }, 100)
+        }, 1000)
 
     }
     if (data.value?.status === 'ok') {

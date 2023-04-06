@@ -1,7 +1,7 @@
 import { Buyout } from "@/server/lib/models/Buyout";
 import { getServerSession } from "#auth";
 import { User } from "~~/server/lib/models/User";
-import { uuid } from "uuidv4";
+import { v4 as uuid } from "uuid";
 type Item = {
 	image: string;
 	name: string;

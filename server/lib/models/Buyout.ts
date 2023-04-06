@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { uuid } from "uuidv4";
+import { v4 as uuid } from "uuid";
 const BuyoutSchema = new Schema({
 	searchQuery: { type: String, required: true, text: true },
 	sizeparam: { type: String, required: true, text: true },

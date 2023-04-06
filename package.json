@@ -20,6 +20,7 @@
 		"@types/jsonwebtoken": "^9.0.1",
 		"@types/nodemailer": "^6.4.7",
 		"@types/qrcode": "^1.5.0",
+		"@types/uuid": "^9.0.1",
 		"@vite-pwa/nuxt": "^0.0.7",
 		"@yandex/ymaps3-types": "^0.0.5",
 		"nuxt": "^3.2.3",
@@ -52,7 +53,7 @@
 		"nuxt-route-meta": "^3.0.1",
 		"qrcode": "^1.5.1",
 		"unstorage": "^1.4.0",
-		"uuidv4": "^6.2.13",
+		"uuid": "^9.0.0",
 		"validator": "^13.9.0",
 		"vue-currency-input": "^3.0.4",
 		"vue-yandex-maps": "^1.0.8"

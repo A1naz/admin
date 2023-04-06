@@ -7,7 +7,7 @@ import { checkSignature } from "~~/server/lib/telegram/mod";
 import bcrypt from "bcrypt";
 import { User } from "~/server/lib/models/User";
 import clientPromise from "~/server/lib/mongodb";
-import { uuid } from "uuidv4";
+import { v4 as uuid } from "uuid";
 
 const runtimeConfig = useRuntimeConfig();
 export default NuxtAuthHandler({
