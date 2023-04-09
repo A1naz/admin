@@ -20,7 +20,6 @@ function updateMonth(event: InputEvent, updateMonthYear: UpdateMonthYear, year: 
 }
 function handleDate(modelData: any) {
   date.value = modelData
-  console.log(date.value)
   emit('update:modelValue', modelData)
 }
 </script>
@@ -28,7 +27,7 @@ function handleDate(modelData: any) {
 <template>
   <ClientOnly>
     <VueDatePicker
-      ref="dp" v-model="date" teleport-center :teleport="true" :min-date="startDate"
+      v-model="date" teleport-center :teleport="true" :min-date="startDate"
       :prevent-min-max-navigation="true" :dark="colorMode.value === 'dark'" locale="ru" cancel-text=""
       select-text="Сохранить" @update:model-value="handleDate"
     >
@@ -57,6 +56,7 @@ function handleDate(modelData: any) {
           month,
           year,
           months,
+          // eslint-disable-next-line vue/no-unused-vars
           years,
           updateMonthYear,
           handleMonthYearChange,

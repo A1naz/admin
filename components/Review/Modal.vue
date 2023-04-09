@@ -12,7 +12,11 @@ const props = defineProps({
     required: true,
   },
 })
+
 const emit = defineEmits(['close', 'publish'])
+
+const { notify } = useNotification()
+
 const { $dayjs } = useNuxtApp()
 const { upload, getPublicUrl, remove } = useS3Object()
 
@@ -55,7 +59,6 @@ async function uploadToS3(event: Event, index: number) {
     url: null,
   })
   if (error.value) {
-    console.log(error.value.message)
     notify({
       title: 'Что-то пошло не так',
       text: 'Не удалось загрузить фото',
@@ -66,7 +69,6 @@ async function uploadToS3(event: Event, index: number) {
   if (data.value)
     form.photos[index] = { url: data.value[0].url, public: getPublicUrl(data.value[0].url) }
 
-  console.log(form.photos)
   loadingIndex.value = null
 }
 async function clearForm() {
@@ -111,7 +113,6 @@ async function clearForm() {
     public: '',
   }]
 }
-const { notify } = useNotification()
 
 const headers = useRequestHeaders(['cookie']) as HeadersInit
 async function publishReview() {
@@ -172,11 +173,9 @@ async function removePhoto(index: number) {
 
 watch(() => props.uuid, (uuid) => {
   clearForm()
-  console.log(uuid)
 })
 onMounted(() => {
   clearForm()
-  console.log(props.uuid)
 })
 </script>
 
@@ -262,7 +261,7 @@ onMounted(() => {
               <div
                 class="flex gap-2 items-center overflow-x-scroll flex-nowrap basis-32 pb-4 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin scrollbar-rounded-[12px]"
               >
-                <div v-for="(photo, index) of form.photos">
+                <div v-for="(photo, index) of form.photos" :key="index">
                   <div
                     class="border border-base-300 relative text-primary hover:text-primary-focus cursor-pointer w-32 h-32 hover:bg-base-200 rounded-lg flex-none"
                   >

@@ -20,7 +20,7 @@ const props = defineProps({
         <h3 class="text-lg font-bold mb-2">QR-Код для получения</h3>
 
         <div class="w-full flex flex-col justify-center items-center">
-          <img ref="qrCode" class="rounded-lg" height="250" :alt="code.toString()" width="250" :src="`${src}`">
+          <img class="rounded-lg" height="250" :alt="code.toString()" width="250" :src="`${src}`">
         </div>
 
       </label>

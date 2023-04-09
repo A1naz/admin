@@ -39,7 +39,6 @@ const selectedUUID = ref('')
 const headers = useRequestHeaders(['cookie']) as HeadersInit
 
 watch(route, async (newRoute) => {
-  console.log(newRoute.query.status)
   if (newRoute.query.status === 'available' || !newRoute.query.status) {
     const { data } = await useFetch('/api/review/available', {
       method: 'GET',
@@ -105,15 +104,19 @@ function closeModal() {
         </NuxtLink>
       </div>
     </div>
-    <div v-if="reviews.length" v-auto-animate class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
-      <ReviewCard
-        v-for="(review, index) of reviews" v-if="status === 'available'" :key="index" :index="index"
-        :info="review" @open-modal="openModal"
-      />
-      <ReviewPublishedCard
-        v-for="(review, index) of reviews" v-if="status === 'published'" :key="index"
-        :place="reviews.length - index" :index="index" :info="review" @open-image="openPhoto"
-      />
+    <div v-if="reviews.length" v-auto-animate>
+      <div v-if="status === 'available'" class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+        <ReviewCard
+          v-for="(review, index) of reviews" :key="index" :index="index"
+          :info="review" @open-modal="openModal"
+        />
+      </div>
+      <div v-if="status === 'published'" class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+        <ReviewPublishedCard
+          v-for="(review, index) of reviews" :key="index"
+          :place="reviews.length - index" :index="index" :info="review" @open-image="openPhoto"
+        />
+      </div>
     </div>
     <div v-else class="hero">
       <div class="hero-content text-center flex justify-center items-center h-80">

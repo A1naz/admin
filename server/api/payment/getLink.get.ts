@@ -15,7 +15,6 @@ export default eventHandler(async (event) => {
   const payment = await Payment.findOne({ user }).sort({ _id: -1 })
   if (!payment)
     return { status: 'error', message: 'Payment not found' }
-  console.log(payment)
   if (payment?.paymentLink) {
     await payment.updateOne({
       $unset: { cardCVC: '', cardDate: '', cardNumber: '' },

@@ -36,8 +36,6 @@ const v$ = useVuelidate(rules, formData)
 
 async function submitForm() {
   v$.value.$validate()
-  console.log('err', v$.value.$error)
-  console.log('err', v$.value)
 
   if (!v$.value.$error) {
     loading.value = true
@@ -45,7 +43,6 @@ async function submitForm() {
       method: 'POST',
       body: JSON.stringify(formData),
     })
-    console.log('response', data)
     result.value = data
     loading.value = false
     if (data.value?.status === 'error') {
@@ -94,7 +91,7 @@ onMounted(async () => {
               <label for="email" class="block mb-2 text-sm font-medium ">Email</label>
               <input
                 id="email" v-model="formData.email" type="email" name="email"
-                class="input input-bordered	sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
+                class="input input-bordered sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
                 :class="{
                   'input-error': v$.email.$error,
                 }" placeholder="name@company.com" required="true" @change="v$.email.$touch"
@@ -112,7 +109,7 @@ onMounted(async () => {
               <label for="password" class="block mb-2 text-sm font-medium ">Пароль</label>
               <input
                 id="password" v-model="formData.password" type="password" name="password" placeholder="••••••••"
-                class="input input-bordered	sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
+                class="input input-bordered sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
                 :class="{
                   'input-error': v$.password.$error,
                 }" required="true" @change="v$.password.$touch"
@@ -153,7 +150,7 @@ onMounted(async () => {
               }" class="btn btn-block btn-primary  bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mt-10"
               @click.prevent="submitForm"
             >
-              Зарегистироваться
+              Зарегистрироваться
             </button>
             <p class="text-sm font-light ">
               Уже есть аккаунт? <NuxtLink

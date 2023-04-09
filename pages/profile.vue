@@ -1,3 +1,4 @@
+<!-- eslint-disable eqeqeq -->
 <script setup lang="ts">
 definePageMeta({
   layout: 'app',
@@ -38,13 +39,11 @@ function updateInitital() {
   initialForm.username = store.client.username
 }
 onMounted(async () => {
-  console.log(store.client)
   updateInitital()
   form.firstName = store.client.firstName
   form.lastName = store.client.lastName
   form.email = store.client.email
   form.username = store.client.username
-  console.log(store.client.firstName)
 })
 const headers = useRequestHeaders(['cookie']) as HeadersInit
 const disabledSaveButton = computed(() => {
@@ -123,7 +122,6 @@ async function unlinkTelegram() {
   await store.getClient()
 }
 function onTelegramLink(data: any) {
-  console.log(data)
   if (data.status === 'ok') {
     alert.show = true
     alert.message = 'Telegram успешно привязан'

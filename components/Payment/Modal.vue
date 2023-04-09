@@ -28,7 +28,6 @@ async function checkForLink() {
     immediate: true,
   })
   if (error.value) {
-    console.log(error)
     loading.value = false
     notify({
       title: 'Ошибка',
@@ -43,7 +42,7 @@ async function checkForLink() {
     }, 1000)
   }
   if (data.value?.status === 'ok') {
-    url.value = data.value?.url!
+    url.value = data.value?.url
     loading.value = false
     window.open(url.value, '_blank')
   }
@@ -59,7 +58,6 @@ async function pay() {
     },
   })
   if (error.value) {
-    console.log(error)
     notify({
       title: 'Ошибка',
       text: 'Произошла ошибка при создании платежа',

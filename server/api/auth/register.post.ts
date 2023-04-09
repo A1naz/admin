@@ -26,7 +26,7 @@ export default eventHandler(async (event) => {
     return {
       status: 'error',
       error:
-				'Пароль не должен содержать пробелов, и состоять только из английских букв и цифр.',
+        'Пароль не должен содержать пробелов, и состоять только из английских букв и цифр.',
     }
   }
   if (password.length < 6 || password.length > 14) {
@@ -62,7 +62,6 @@ export default eventHandler(async (event) => {
     await MailService.sendActivationMail(user.email, link)
   }
   catch (error) {
-    console.log(error)
     return { status: 'error', error: 'Ошибка отправки письма.' }
   }
 

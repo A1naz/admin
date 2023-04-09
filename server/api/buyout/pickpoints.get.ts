@@ -40,28 +40,7 @@ export default eventHandler(async (event) => {
       body: JSON.stringify(ids),
     },
   )
-  // const features = points.map((point: any, index: number) => {
-  // 	const infoPoint = info.value[point.id];
-  // 	return {
-  // 		type: "Feature",
-  // 		id: point.id,
-  // 		geometry: {
-  // 			type: "Point",
-  // 			coordinates: point.coordinates,
-  // 		},
-  // 		properties: {
-  // 			data: {
-  // 				workTime: infoPoint.workTime,
-  // 				address: infoPoint.address,
-  // 			},
-  // 		},
-  // 	};
-  // });
-  // const format = {
-  // 	type: "FeatureCollection",
-  // 	features,
-  // };
-  const collection = points.map((point: any, index: number) => {
+  const collection = points.map((point: any) => {
     const infoPoint = info.value[point.id]
     return {
       lt: point.coordinates[0],
@@ -71,10 +50,6 @@ export default eventHandler(async (event) => {
     }
   })
 
-  const format = {
-    type: 'FeatureCollection',
-    features: collection,
-  }
   const cache = {
     updated: new Date(),
     points: collection,

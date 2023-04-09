@@ -15,10 +15,10 @@ export default eventHandler(async (event) => {
   }
 
   const data: any = await $fetch(
-		`https://wbx-content-v2.wbstatic.net/ru/${article}.json`,
-		{
-		  method: 'GET',
-		},
+    `https://wbx-content-v2.wbstatic.net/ru/${article}.json`,
+    {
+      method: 'GET',
+    },
   )
   const imt_id = data?.imt_id
   if (!imt_id) {

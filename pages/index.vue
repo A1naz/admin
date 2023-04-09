@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 const { signIn } = useSession()
 definePageMeta({ auth: false })
-
-const name = useRuntimeConfig().NAME
 </script>
 
 <template>

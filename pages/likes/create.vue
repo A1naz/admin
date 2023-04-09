@@ -7,6 +7,7 @@ definePageMeta({
   title: 'Добавить лайки',
 })
 const { notify } = useNotification()
+const changedReviews = ref([]) as any
 
 const route = useRoute()
 const router = useRouter()
@@ -42,18 +43,14 @@ async function getProductReviews() {
     })
     return
   }
-  console.log(data.value)
   reviews.value = data.value
 }
-const changedReviews = ref([]) as any
 function addLike(id: string) {
-  console.log(id)
-
   changedReviews.value.find((review: any) => review.id === id)
     ? changedReviews.value = changedReviews.value.map((review: any) => {
-      if (review.id === id) {
+      if (review.id === id)
         review.likes++
-      }
+
       return review
     })
     : changedReviews.value.push({
@@ -63,15 +60,13 @@ function addLike(id: string) {
     })
 }
 function removeLike(id: string) {
-  console.log(id)
-
   const review = changedReviews.value.find((review: any) => review.id === id)
   if (review) {
     if (review.likes > 1) {
       changedReviews.value = changedReviews.value.map((review: any) => {
-        if (review.id === id) {
+        if (review.id === id)
           review.likes--
-        }
+
         return review
       })
     }
@@ -81,9 +76,9 @@ function removeLike(id: string) {
       }
       else {
         changedReviews.value = changedReviews.value.map((review: any) => {
-          if (review.id === id) {
+          if (review.id === id)
             review.likes--
-          }
+
           return review
         })
       }
@@ -91,13 +86,11 @@ function removeLike(id: string) {
   }
 }
 function addDislike(id: string) {
-  console.log(id)
-
   changedReviews.value.find((review: any) => review.id === id)
     ? changedReviews.value = changedReviews.value.map((review: any) => {
-      if (review.id === id) {
+      if (review.id === id)
         review.dislikes++
-      }
+
       return review
     })
     : changedReviews.value.push({
@@ -107,14 +100,12 @@ function addDislike(id: string) {
     })
 }
 function removeDislike(id: string) {
-  console.log(id)
   const review = changedReviews.value.find((review: any) => review.id === id)
   if (review) {
     if (review.dislikes > 1) {
       changedReviews.value = changedReviews.value.map((review: any) => {
-        if (review.id === id) {
+        if (review.id === id)
           review.dislikes--
-        }
         return review
       })
     }
@@ -124,9 +115,8 @@ function removeDislike(id: string) {
       }
       else {
         changedReviews.value = changedReviews.value.map((review: any) => {
-          if (review.id === id) {
+          if (review.id === id)
             review.dislikes--
-          }
           return review
         })
       }
@@ -144,9 +134,6 @@ function getAddedLikes() {
   })
   return addedLikes
 }
-watch(changedReviews, (val) => {
-  console.log(val)
-})
 </script>
 
 <template>
@@ -188,7 +175,7 @@ watch(changedReviews, (val) => {
           @remove-like="removeLike"
         />
       </transition-group>
-      <div ref="target" class="p-2 w-full col-span-1" />
+      <div class="p-2 w-full col-span-1" />
     </div>
     <Teleport to="body">
       <Transition name="fade">
@@ -209,7 +196,7 @@ watch(changedReviews, (val) => {
             </p>
           </div>
           <div class="save ml-auto">
-            <button class="btn btn-primary btn-sm " @click="">
+            <button class="btn btn-primary btn-sm ">
               Сохранить
             </button>
           </div>

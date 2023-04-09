@@ -17,13 +17,11 @@ const bot_login = useRuntimeConfig().BOT_LOGIN
 const store = useMainStore()
 const { signIn } = useSession()
 async function onTelegramAuth(user: any) {
-  console.log('user-----', user)
   const { error, data } = await useFetch('/api/user/linkTelegram', {
     method: 'POST',
     body: JSON.stringify(user),
   })
   if (error.value) {
-    console.log(error)
     emit('callback', { status: 'error', error: error.value })
   }
   else {
@@ -37,8 +35,7 @@ const telegram = ref()
 
 function login() {
   const telegramLogin = bot_login
-  console.log('telegramLogin', telegramLogin)
-  // @ts-expect-error
+  // @ts-expect-error global telegram on window
   window.Telegram.Login.auth(
     { bot_id, request_access: true },
     (data: any) => {
@@ -66,7 +63,7 @@ onMounted(() => {
   // }
 
   if (props.mode === 'callback') {
-    // @ts-expect-error
+    // @ts-expect-error global window telegram
     window.onTelegramAuth = onTelegramAuth
     script.setAttribute('data-onauth', 'window.onTelegramAuth(user)')
   }

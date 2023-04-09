@@ -18,7 +18,7 @@ export default eventHandler(async (event) => {
 
   if (
     found?.orderPaymentStatus !== 'Не оплачен'
-		|| found?.servicePaymentStatus !== 'Не оплачен'
+    || found?.servicePaymentStatus !== 'Не оплачен'
   ) {
     throw createError({
       statusCode: 400,
@@ -34,7 +34,6 @@ export default eventHandler(async (event) => {
   }
 
   const deleted = await Buyout.deleteOne({ uuid: body.uuid })
-  console.log(deleted)
   if (deleted) {
     return {
       status: 'ok',

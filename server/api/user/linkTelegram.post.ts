@@ -32,7 +32,6 @@ export default eventHandler(async (event) => {
   user.telegram = body.username
   await user.save()
 
-  console.log('session', session)
   return {
     status: 'ok',
   }

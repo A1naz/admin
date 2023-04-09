@@ -75,9 +75,7 @@ onMounted(async () => {
   if (route.query?.uuid) {
     const uuid = route.query?.uuid
     if (buyouts.value) {
-      console.log(buyouts.value)
       const index = buyouts.value!.findIndex((buyout: any) => buyout.uuid === uuid)
-      console.log(index)
       if (index !== -1) {
         openModal(index)
       }
@@ -89,8 +87,6 @@ onMounted(async () => {
           },
           headers: useRequestHeaders(['cookie']) as HeadersInit,
         })
-        if (error.value)
-          console.log(error.value)
 
         if (data.value) {
           buyouts.value = [data.value, ...buyouts.value]
@@ -126,7 +122,6 @@ watch(targetIsVisible, async (isVisible) => {
 watch(route, async (newRoute) => {
   skip.value = 50
   end.value = false
-  console.log(newRoute)
   const { data } = await useFetch('/api/buyout/get', {
     method: 'GET',
     query: {

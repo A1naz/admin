@@ -92,8 +92,6 @@ async function addProduct() {
 function onSizeChange(event: Event, index: number) {
   const target = event.target as HTMLInputElement
   products.value[index].selectedSize = Number(target.value)
-
-  console.log(products.value)
 }
 
 function onSexChange(event: Event, index: number) {
@@ -475,7 +473,7 @@ onMounted(async () => {
                       class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
                     >✕</label>
                     <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
-                    <label v-for="(value, key) of products[index].rules" class="label cursor-pointer">
+                    <label v-for="(value, key) of products[index].rules" :key="key" class="label cursor-pointer">
                       <span class="label-text text-lg">Правило {{ key }}</span>
                       <input
                         type="checkbox" class="checkbox checkbox-primary"

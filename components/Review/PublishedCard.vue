@@ -21,7 +21,6 @@ const { $dayjs } = useNuxtApp()
 const currency = useCurrency()
 const router = useRouter()
 onMounted(() => {
-  console.log(props.info.rating)
 })
 const getStatus = computed(() => {
   switch (props.info.status) {
@@ -126,7 +125,7 @@ const getStatus = computed(() => {
           <div
             class="flex gap-2 items-center overflow-x-auto flex-nowrap basis-32 pb-4 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin scrollbar-rounded-[12px]"
           >
-            <div v-for="(photo, index) of info.images">
+            <div v-for="(photo, index) of info.images" :key="index">
               <label v-if="photo" for="reviewImageModal">
                 <div
                   class="border border-base-300 relative text-primary hover:text-primary-focus cursor-pointer w-32 h-32 hover:bg-base-200 rounded-lg flex-none"

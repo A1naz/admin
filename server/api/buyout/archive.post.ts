@@ -17,7 +17,7 @@ export default eventHandler(async (event) => {
 
   if (
     found?.orderPaymentStatus !== 'Не оплачен'
-		|| found?.servicePaymentStatus !== 'Не оплачен'
+    || found?.servicePaymentStatus !== 'Не оплачен'
   ) {
     throw createError({
       statusCode: 400,

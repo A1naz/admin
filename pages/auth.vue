@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-use-before-define -->
 <script lang="ts" setup>
 import { useVuelidate } from '@vuelidate/core'
 import { email, helpers, minLength, required } from '@vuelidate/validators'
@@ -38,7 +39,6 @@ async function login() {
     setTimeout(() => {
       alert.value = false
     }, 3000)
-    console.log(error)
   }
   else {
     // No error, continue with the sign in, e.g., by following the returned redirect:
@@ -49,7 +49,6 @@ async function login() {
 }
 onMounted(async () => {
   const params = useRoute().query
-  console.log(params)
   if (params?.emailConfirmed) {
     alertText.value = 'Email успешно подтвержден!'
     setTimeout(() => {

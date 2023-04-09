@@ -1,11 +1,11 @@
-// @ts-nocheck
+/* eslint-disable no-console */
 import nodemailer from 'nodemailer'
 
 const config = useRuntimeConfig()
 const { smtpHost, smtpPort, smtpUser, smtpPass, privateKey } = config
-console.log('smtpHost', smtpHost)
 const alias = 'support@topvtop.com'
 class MailService {
+  tranporter: nodemailer.Transporter
   constructor() {
     this.tranporter = nodemailer.createTransport({
       host: smtpHost,
@@ -23,7 +23,7 @@ class MailService {
     })
   }
 
-  async sendActivationMail(to, link) {
+  async sendActivationMail(to: string | undefined, link: string) {
     await this.tranporter
       .sendMail({
         from: alias,
@@ -42,7 +42,7 @@ class MailService {
       })
   }
 
-  async sendChangePasswordMail(to, link, username) {
+  async sendChangePasswordMail(to: string | undefined, link: string, username: string) {
     await this.tranporter
       .sendMail({
         from: alias,
@@ -52,7 +52,7 @@ class MailService {
         html: `
                 <div>
                     <h1>Привет, ${username}!</h1>
-					<h2>Вы собираетесь сменить пароль! Если это сделали не вы, то проигнорируйте это сообщение.</h2>
+                    <h2>Вы собираетесь сменить пароль! Если это сделали не вы, то проигнорируйте это сообщение.</h2>
                     <h2>Для подтверждения смены пароля на перейдите по ссылке</h2>
                     <a href="${link}">Ссылка</a>
                 </div>

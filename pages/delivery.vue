@@ -23,7 +23,6 @@ const modalInfo = reactive({
 })
 const modal = ref(false)
 function openModal(code: number, src: string) {
-  console.log(code, src)
   modalInfo.src = src
   modalInfo.code = code
   modal.value = true
@@ -48,7 +47,6 @@ const { data } = await useFetch('/api/delivery/get', {
 })
 onMounted(async () => {
   deliveries.value = data.value
-  console.log(data.value)
 })
 watch(targetIsVisible, async (isVisible) => {
   if (isVisible) {
@@ -74,7 +72,6 @@ watch(targetIsVisible, async (isVisible) => {
 watch(route, async (newRoute) => {
   skip.value = 50
   end.value = false
-  console.log(newRoute)
   const { data } = await useFetch('/api/delivery/get', {
     method: 'GET',
     query: {

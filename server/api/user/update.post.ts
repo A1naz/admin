@@ -44,10 +44,10 @@ export default eventHandler(async (event) => {
       message: 'Email уже занят',
     })
   }
-  user.username = body.username
-  user.email = body.email
-  user.firstName = body.firstName
-  user.lastName = body.lastName
+  user.username = username
+  user.email = email
+  user.firstName = firstName
+  user.lastName = lastName
   await user.save()
   return {
     status: 'ok',

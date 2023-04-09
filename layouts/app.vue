@@ -30,7 +30,7 @@ function getBreadcrumbs() {
 
   const pathArray = route.path.split('/')
   pathArray.shift()
-  const breadcrumbs = pathArray.reduce((breadcrumbArray: any, path, idx) => {
+  const breadcrumbs = pathArray.reduce((breadcrumbArray: any, path: string, idx: number) => {
     const currPath = breadcrumbArray[idx - 1]
       ? `${breadcrumbArray[idx - 1].to}/${path}`
       : `/${path}`
@@ -46,9 +46,7 @@ function getBreadcrumbs() {
 }
 
 onMounted(() => {
-  console.log(route.meta)
   theme.value = localStorage.getItem('theme') || 'light'
-  console.log(theme.value)
 })
 const breadcrumbs = computed(() => getBreadcrumbs())
 </script>
@@ -75,14 +73,14 @@ const breadcrumbs = computed(() => getBreadcrumbs())
 
       <!-- Page content here -->
       <div class="px-6 py-2 lg:p-6 block">
-        <div v-if="route.path != '/profile'" class="breadcrumbs p-0 lg:text-sm">
+        <div v-if="route.path !== '/profile'" class="breadcrumbs p-0 lg:text-sm">
           <ul>
             <li>
               <a>
                 <img src="/icons/wb.svg" alt="" srcset="">
               </a>
             </li>
-            <li v-for="crumb of breadcrumbs">
+            <li v-for="(crumb, index) of breadcrumbs" :key="index">
               <NuxtLink :to="crumb.to">
                 {{ crumb.title }}
               </NuxtLink>

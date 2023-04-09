@@ -11,7 +11,6 @@ export default eventHandler(async (event) => {
   if (!user)
     return sendRedirect(event, '/auth', 302)
 
-  console.log('sending client')
   const client = {
     email: user.email,
     username: user.email === user.username ? undefined : user.username,
@@ -22,7 +21,6 @@ export default eventHandler(async (event) => {
     lastName: user.lastName,
     hasPassword: !!user.password,
   }
-  console.log(client)
   return {
     client,
     status: 'ok',

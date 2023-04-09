@@ -23,7 +23,7 @@ export default eventHandler(async (event) => {
     return {
       status: 'error',
       error:
-				'Пароль не должен содержать пробелов, и состоять только из английских букв и цифр.',
+        'Пароль не должен содержать пробелов, и состоять только из английских букв и цифр.',
     }
   }
   if (newPassword.length < 6 || newPassword.length > 14) {

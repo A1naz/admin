@@ -17,7 +17,6 @@ export const useMainStore = defineStore('main', {
       const { data } = await useFetch('/api/user/client', {
         headers: useRequestHeaders(['cookie']) as HeadersInit,
       })
-      console.log(data.value)
       const client = data.value?.client
       this.setClient(client as object)
     },

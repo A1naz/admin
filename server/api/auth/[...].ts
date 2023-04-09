@@ -19,10 +19,10 @@ export default NuxtAuthHandler({
     jwt: async ({ token, user }) => {
       const isSignIn = !!user
       if (isSignIn) {
-        token.email = user ? (user as any).email || '' : ''
-        token.uuid = user ? (user as any).uuid || '' : ''
-        token.username = user ? (user as any).username || '' : ''
-        token.balance = user ? (user as any).balance || 0 : 0
+        token.email = user ? (user as any)?.email : ''
+        token.uuid = user ? (user as any)?.uuid : ''
+        token.username = user ? (user as any)?.username : ''
+        token.balance = user ? (user as any)?.balance : 0
       }
       return Promise.resolve(token)
     },
@@ -54,10 +54,8 @@ export default NuxtAuthHandler({
 
         const valid = checkSignature(runtimeConfig.BOT_TOKEN, user)
 
-        if (!valid) {
-          console.log('invalid signature')
+        if (!valid)
           throw new Error('invalid signature')
-        }
 
         const foundUser = await User.findOne({ telegram: user.username })
         if (foundUser) {

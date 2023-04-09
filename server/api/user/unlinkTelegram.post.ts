@@ -3,8 +3,6 @@ import { getServerSession } from '#auth'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const runtimeConfig = useRuntimeConfig()
-  const body = await readBody(event)
   if (!session)
     return sendRedirect(event, '/auth', 302)
 
