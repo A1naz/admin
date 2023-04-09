@@ -1,9 +1,9 @@
-import { SchemaType } from "mongoose";
-import { Schema, model } from "mongoose";
-const UploadSchema = new Schema({
-	type: { type: String, required: true },
-	filename: { type: String, required: true },
-	data: { type: Schema.Types.Buffer, required: true },
-});
+import { Schema, model } from 'mongoose'
 
-export const Upload = model("Upload", UploadSchema);
+const UploadSchema = new Schema({
+  type: { type: String, required: true },
+  filename: { type: String, required: true },
+  data: { type: Schema.Types.Buffer, required: true },
+})
+
+export const Upload = model('Upload', UploadSchema)

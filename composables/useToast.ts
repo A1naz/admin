@@ -1,4 +1,4 @@
-export const useToast = (alert: Ref<boolean>) => {
+export function useToast(alert: Ref<boolean>) {
   const { isPending, start, stop } = useTimeoutFn(() => {
     alert.value = false
   }, 3000)

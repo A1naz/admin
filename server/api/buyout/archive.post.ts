@@ -1,33 +1,32 @@
-import { User } from "@/server/lib/models/User";
-import { getServerSession } from "#auth";
-import { Buyout } from "@/server/lib/models/Buyout";
-import fs from "fs";
+import { User } from '@/server/lib/models/User'
+import { getServerSession } from '#auth'
+import { Buyout } from '@/server/lib/models/Buyout'
+
 export default eventHandler(async (event) => {
-	const session = (await getServerSession(event)) as any;
-	const body = await readBody(event);
-	if (!session) {
-		return sendRedirect(event, "/auth", 302);
-	}
-	const user = await User.findOne({ uuid: session.uuid });
+  const session = (await getServerSession(event)) as any
+  const body = await readBody(event)
+  if (!session)
+    return sendRedirect(event, '/auth', 302)
 
-	if (!user) {
-		return sendRedirect(event, "/auth", 302);
-	}
+  const user = await User.findOne({ uuid: session.uuid })
 
-	const found = await Buyout.findOne({ uuid: body.uuid });
+  if (!user)
+    return sendRedirect(event, '/auth', 302)
 
-	if (
-		found?.orderPaymentStatus !== "Не оплачен" ||
-		found?.servicePaymentStatus !== "Не оплачен"
-	) {
-		throw createError({
-			statusCode: 400,
-			message: "Нельзя архивировать выкуп, который оплачен",
-		});
-	}
-	found.status = "archived";
-	await found.save();
-	return {
-		status: "ok",
-	};
-});
+  const found = await Buyout.findOne({ uuid: body.uuid })
+
+  if (
+    found?.orderPaymentStatus !== 'Не оплачен'
+		|| found?.servicePaymentStatus !== 'Не оплачен'
+  ) {
+    throw createError({
+      statusCode: 400,
+      message: 'Нельзя архивировать выкуп, который оплачен',
+    })
+  }
+  found.status = 'archived'
+  await found.save()
+  return {
+    status: 'ok',
+  }
+})

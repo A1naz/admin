@@ -1,4 +1,4 @@
-import { createHash, createHmac } from 'crypto'
+import { createHash, createHmac } from 'node:crypto'
 
 export function sha256(payload: string) {
   return createHash('sha256').update(payload).digest()

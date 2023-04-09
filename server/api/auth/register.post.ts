@@ -1,70 +1,71 @@
-import { getServerSession } from "#auth";
-import { User } from "~~/server/lib/models/User";
-import MailService from "~~/server/lib/mailService.js";
-import bcrypt from "bcrypt";
-import { v4 as uuid } from "uuid";
-import validator from "validator";
+import bcrypt from 'bcrypt'
+import { v4 as uuid } from 'uuid'
+import validator from 'validator'
+import { getServerSession } from '#auth'
+import { User } from '~~/server/lib/models/User'
+import MailService from '~~/server/lib/mailService.js'
+
 function hasWhiteSpace(s: string) {
-	return s.indexOf(" ") >= 0 || !/^[a-zA-Z0-9_-]{4,14}$/.test(s);
+  return s.includes(' ') || !/^[a-zA-Z0-9_-]{4,14}$/.test(s)
 }
 export default eventHandler(async (event) => {
-	const body = await readBody(event);
+  const body = await readBody(event)
 
-	const { email, password } = body;
+  const { email, password } = body
 
-	if (!email || !password) {
-		return { status: "error", error: "missing email or password" };
-	}
-	if (!validator.isEmail(email)) {
-		return {
-			status: "error",
-			error: "Некорректный email.",
-		};
-	}
-	if (hasWhiteSpace(password)) {
-		return {
-			status: "error",
-			error:
-				"Пароль не должен содержать пробелов, и состоять только из английских букв и цифр.",
-		};
-	}
-	if (password.length < 6 || password.length > 14) {
-		return {
-			status: "error",
-			error: "Пароль должен быть от 6 до 14 символов.",
-		};
-	}
-	const session = await getServerSession(event);
-	if (session) {
-		return { status: "error", error: "Вы уже авторизованы." };
-	}
+  if (!email || !password)
+    return { status: 'error', error: 'missing email or password' }
 
-	const candidate = await User.findOne({ email });
-	if (candidate) {
-		return {
-			status: "error",
-			error: "Пользователь с таким email уже существует.",
-		};
-	}
+  if (!validator.isEmail(email)) {
+    return {
+      status: 'error',
+      error: 'Некорректный email.',
+    }
+  }
+  if (hasWhiteSpace(password)) {
+    return {
+      status: 'error',
+      error:
+				'Пароль не должен содержать пробелов, и состоять только из английских букв и цифр.',
+    }
+  }
+  if (password.length < 6 || password.length > 14) {
+    return {
+      status: 'error',
+      error: 'Пароль должен быть от 6 до 14 символов.',
+    }
+  }
+  const session = await getServerSession(event)
+  if (session)
+    return { status: 'error', error: 'Вы уже авторизованы.' }
 
-	const hash = bcrypt.hashSync(password, 7);
+  const candidate = await User.findOne({ email })
+  if (candidate) {
+    return {
+      status: 'error',
+      error: 'Пользователь с таким email уже существует.',
+    }
+  }
 
-	const user = new User({
-		email,
-		password: hash,
-		username: email.split("@")[0],
-		roles: ["user"],
-		uuid: uuid(),
-	});
-	const url = useRuntimeConfig().PUBLIC_SITE_URL;
-	const link = `${url}/api/auth/activate?uuid=${user.uuid}`;
-	try {
-		await MailService.sendActivationMail(user.email, link);
-	} catch (error) {
-		console.log(error);
-		return { status: "error", error: "Ошибка отправки письма." };
-	}
+  const hash = bcrypt.hashSync(password, 7)
 
-	await user.save();
-	return { status: "ok" };
-});
+  const user = new User({
+    email,
+    password: hash,
+    username: email.split('@')[0],
+    roles: ['user'],
+    uuid: uuid(),
+  })
+  const url = useRuntimeConfig().PUBLIC_SITE_URL
+  const link = `${url}/api/auth/activate?uuid=${user.uuid}`
+  try {
+    await MailService.sendActivationMail(user.email, link)
+  }
+  catch (error) {
+    console.log(error)
+    return { status: 'error', error: 'Ошибка отправки письма.' }
+  }
+
+  await user.save()
+  return { status: 'ok' }
+})

@@ -16,12 +16,16 @@ watchEffect(() => {
 <template>
   <li>
     <NuxtLink :to="props.href" class="mx-4 rounded-lg">
-      <Icon :class="{
-        'opacity-70': !currentPath.includes(props.href),
-        'text-primary': currentPath.includes(props.href)
-      }" :name="icon" size="24"></Icon><span :class="{
-  'opacity-70': !currentPath.includes(props.href),
-}" class="">{{ title }}</span>
+      <Icon
+        :class="{
+          'opacity-70': !currentPath.includes(props.href),
+          'text-primary': currentPath.includes(props.href),
+        }" :name="icon" size="24"
+      /><span
+        :class="{
+          'opacity-70': !currentPath.includes(props.href),
+        }" class=""
+      >{{ title }}</span>
     </NuxtLink>
   </li>
 </template>

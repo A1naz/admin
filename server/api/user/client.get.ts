@@ -1,31 +1,30 @@
-import { User } from "@/server/lib/models/User";
-import { getServerSession } from "#auth";
-import { Buyout } from "@/server/lib/models/Buyout";
-import { Delivery } from "@/server/lib/models/Delivery";
-export default eventHandler(async (event) => {
-	const session = (await getServerSession(event)) as any;
+import { User } from '@/server/lib/models/User'
+import { getServerSession } from '#auth'
 
-	if (!session) {
-		return sendRedirect(event, "/auth", 302);
-	}
-	const user = await User.findOne({ uuid: session.uuid });
-	if (!user) {
-		return sendRedirect(event, "/auth", 302);
-	}
-	console.log("sending client");
-	const client = {
-		email: user.email,
-		username: user.email === user.username ? undefined : user.username,
-		uuid: user.uuid,
-		telegram: user.telegram || undefined,
-		balance: user.balance,
-		firstName: user.firstName,
-		lastName: user.lastName,
-		hasPassword: user.password ? true : false,
-	};
-	console.log(client);
-	return {
-		client,
-		status: "ok",
-	};
-});
+export default eventHandler(async (event) => {
+  const session = (await getServerSession(event)) as any
+
+  if (!session)
+    return sendRedirect(event, '/auth', 302)
+
+  const user = await User.findOne({ uuid: session.uuid })
+  if (!user)
+    return sendRedirect(event, '/auth', 302)
+
+  console.log('sending client')
+  const client = {
+    email: user.email,
+    username: user.email === user.username ? undefined : user.username,
+    uuid: user.uuid,
+    telegram: user.telegram || undefined,
+    balance: user.balance,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    hasPassword: !!user.password,
+  }
+  console.log(client)
+  return {
+    client,
+    status: 'ok',
+  }
+})

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
+import { useNotification } from '@kyvg/vue3-notification'
 import { useMainStore } from '@/stores/main'
-import { useNotification } from '@kyvg/vue3-notification';
+
 const { notify } = useNotification()
 const colorMode = useColorMode()
 
@@ -8,13 +9,12 @@ const { status, data } = useSession()
 
 const store = useMainStore()
 onMounted(async () => {
-  console.log(status.value)
   store.theme = document.documentElement.getAttribute('data-theme') === 'dracula' ? 'dracula' : 'light'
 })
-if (status.value === 'authenticated') {
+if (status.value === 'authenticated')
   await store.getClient()
-}
 </script>
+
 <template>
   <div>
     <notifications position="bottom right">
@@ -31,12 +31,11 @@ if (status.value === 'authenticated') {
     </notifications>
     <NuxtLayout>
       <NuxtLoadingIndicator :color="colorMode.value === 'light' ? '#570df8' : '#ff79c6'" /> <!-- here -->
-      <NuxtPage>
-      </NuxtPage>
+      <NuxtPage />
     </NuxtLayout>
-
   </div>
 </template>
+
 <style lang="css">
 @import '~~/assets/style/datepicker.css';
 
@@ -120,7 +119,6 @@ input[type=number] {
   opacity: 0;
   filter: blur(0.5rem);
 }
-
 
 .heading {
   @apply text-xl font-bold mt-1

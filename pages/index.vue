@@ -3,9 +3,6 @@ const { signIn } = useSession()
 definePageMeta({ auth: false })
 
 const name = useRuntimeConfig().NAME
-
-
-
 </script>
 
 <template>
@@ -25,9 +22,7 @@ const name = useRuntimeConfig().NAME
         </div>
       </div>
     </div>
-
   </section>
 </template>
 
 <style scoped></style>
-
