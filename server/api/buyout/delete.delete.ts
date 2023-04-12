@@ -15,14 +15,10 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const found = await Buyout.findOne({ uuid: body.uuid })
-
-  if (
-    found?.orderPaymentStatus !== 'Не оплачен'
-    || found?.servicePaymentStatus !== 'Не оплачен'
-  ) {
+  if (!found) {
     throw createError({
-      statusCode: 400,
-      message: 'Нельзя удалить заказ, который оплачен',
+      statusCode: 404,
+      message: 'Выкуп не найден',
     })
   }
   const delivery = await Delivery.findOne({ idbuyout: found._id })

@@ -15,7 +15,7 @@ const emit = defineEmits(['callback'])
 const bot_id = useRuntimeConfig().BOT_ID
 const bot_login = useRuntimeConfig().BOT_LOGIN
 const store = useMainStore()
-const { signIn } = useSession()
+const { signIn } = useAuth()
 async function onTelegramAuth(user: any) {
   const { error, data } = await useFetch('/api/user/linkTelegram', {
     method: 'POST',

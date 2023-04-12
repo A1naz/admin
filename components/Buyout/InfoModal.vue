@@ -44,7 +44,7 @@ const getGender = computed(() => {
 <template>
   <Teleport to="body">
     <div
-      id="buyoutInfoModal" ref="modal" :class="{
+      id="buyoutInfoModal" :class="{
         'modal-open': state,
       }" class="modal"
     >
@@ -54,9 +54,11 @@ const getGender = computed(() => {
           <div class="text-xl font-bold">
             Информация о выкупе № {{ info.place }}
           </div>
-          <span class="text-xs text-gray-500">#{{ info.uuid }}</span>
+          <div class="text-xs text-gray-500">
+            #{{ info.uuid }}
+          </div>
 
-          <div class="flex flex-col gap-2 justify-center">
+          <div class="flex flex-col gap-2 mt-2 justify-center">
             <div class="flex justify-between">
               <span
                 :class="{
@@ -67,14 +69,6 @@ const getGender = computed(() => {
               >{{ getStatus }}</span>
               <span class="text-sm text-gray-500">{{ $dayjs(info.createdAt).format('D MMMM HH:mm')
               }}</span>
-            </div>
-            <div class="flex justify-between items-center flex-wrap">
-              <span class="text-gray-500 text-sm">Статус оплаты заказа:</span>
-              <span class="text-sm">{{ info.orderPaymentStatus }}</span>
-            </div>
-            <div class="flex justify-between items-center flex-wrap">
-              <span class="text-gray-500 text-sm">Статус оплаты сервиса:</span>
-              <span class="text-sm">{{ info.servicePaymentStatus }}</span>
             </div>
             <div class="flex justify-between items-center flex-wrap">
               <span class="text-gray-500 text-sm">Поисковый запрос:</span>

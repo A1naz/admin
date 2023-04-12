@@ -15,13 +15,12 @@ export default eventHandler(async (event) => {
   const payment = await Payment.findOne({ user }).sort({ _id: -1 })
   if (!payment)
     return { status: 'error', message: 'Payment not found' }
-  if (payment.details.url) {
-    const data = {
+  if (payment.details.transferCard && payment.details.transferSum) {
+    return {
       status: 'ok',
-      url: payment.details.url,
+      transferCard: payment.details.transferCard,
+      transferSum: payment.details.transferSum,
     }
-    const deleted = await Payment.deleteOne({ _id: payment })
-    return data
   }
   else {
     return { status: 'wait' }

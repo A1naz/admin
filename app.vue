@@ -5,14 +5,22 @@ import { useMainStore } from '@/stores/main'
 const { notify } = useNotification()
 const colorMode = useColorMode()
 
-const { status, data } = useSession()
+const { status, data } = useAuth()
 
 const store = useMainStore()
 onMounted(async () => {
   store.theme = document.documentElement.getAttribute('data-theme') === 'dracula' ? 'dracula' : 'light'
 })
+const { pending, data: client, error, refresh } = useLazyAsyncData('client', () => $fetch('/api/user/client'))
+useIntervalFn(() => {
+  refresh()
+}, 1000 * 60)
 if (status.value === 'authenticated')
   await store.getClient()
+
+watch(client, (newClient) => {
+  store.setClient(newClient?.client as object)
+})
 </script>
 
 <template>

@@ -48,8 +48,6 @@ export default eventHandler(async (event) => {
       quantity: product.quantity,
       gender: product.sex,
       status: 'active',
-      orderPaymentStatus: 'Не оплачен',
-      servicePaymentStatus: 'Не оплачен',
       user,
       rules,
       product: {

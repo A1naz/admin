@@ -3,7 +3,7 @@ import { useVuelidate } from '@vuelidate/core'
 import { email, helpers, minLength, required, sameAs } from '@vuelidate/validators'
 
 definePageMeta({ auth: false })
-const { status } = useSession()
+const { status } = useAuth()
 const alert = ref(false)
 const alertText = ref('')
 const alertType = ref('success')

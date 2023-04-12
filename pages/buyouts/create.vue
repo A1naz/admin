@@ -464,25 +464,6 @@ onMounted(async () => {
                   </div>
                 </div>
               </td>
-              <Teleport to="body">
-                <input :id="`modal${index}`" type="checkbox" class="modal-toggle">
-                <label :for="`modal${index}`" class="modal modal-bottom sm:modal-middle">
-                  <label for="" class="modal-box relative">
-                    <label
-                      :for="`modal${index}`"
-                      class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                    >✕</label>
-                    <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
-                    <label v-for="(value, key) of products[index].rules" :key="key" class="label cursor-pointer">
-                      <span class="label-text text-lg">Правило {{ key }}</span>
-                      <input
-                        type="checkbox" class="checkbox checkbox-primary"
-                        @change="onRuleChange($event, index, key)"
-                      >
-                    </label>
-                  </label>
-                </label>
-              </Teleport>
             </tr>
           </tbody>
           <!-- foot -->
@@ -510,6 +491,28 @@ onMounted(async () => {
                             выкупы` : `Создать выкуп` }}
       </button>
     </div>
+
+    <Teleport to="body">
+      <div v-for="(product, index) of products" :key="index">
+        <input :id="`modal${index}`" type="checkbox" class="modal-toggle">
+        <label :for="`modal${index}`" class="modal modal-bottom sm:modal-middle">
+          <label for="" class="modal-box relative">
+            <label
+              :for="`modal${index}`"
+              class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            >✕</label>
+            <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
+            <label v-for="(value, key) of products[index].rules" :key="key" class="label cursor-pointer">
+              <span class="label-text text-lg">Правило {{ key }}</span>
+              <input
+                type="checkbox" class="checkbox checkbox-primary"
+                @change="onRuleChange($event, index, key)"
+              >
+            </label>
+          </label>
+        </label>
+      </div>
+    </Teleport>
   </div>
 </template>
 

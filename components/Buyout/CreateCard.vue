@@ -59,11 +59,11 @@ function onSexChange(event: Event) {
       </div>
       <div class="flex justify-between items-center mt-2">
         <span>Даты выкупов: </span>
-        <BuyoutDateRangePicker v-model="product.dateRange" :start-date="startDate" />
+        <BuyoutDateRangePicker v-model="product.dateRange" class="w-32" :start-date="startDate" />
       </div>
       <div class="flex justify-between items-center">
         <span>Пол:</span>
-        <select class="select select-sm select-bordered w-22 appearance-none" @change="onSexChange">
+        <select class="select select-sm select-bordered w-32 appearance-none" @change="onSexChange">
           <option value="none">
             Нет
           </option>
@@ -75,7 +75,15 @@ function onSexChange(event: Event) {
           </option>
         </select>
       </div>
-
+      <div class="flex justify-between items-center">
+        <span>Правила:</span>
+        <label
+          :for="`modal${index}`" :class="{
+            'btn-outline': product.rules,
+          }" class="btn btn-primary btn-sm normal-case w-32"
+        >{{ 'Настроить' }}
+        </label>
+      </div>
       <div class="flex justify-between items-center mt-2">
         <div v-auto-animate class="w-full flex flex-col items-start justify-center gap-1">
           <div class="flex justify-between gap-2 items-center w-full truncate">
@@ -96,10 +104,12 @@ function onSexChange(event: Event) {
           </button>
         </div>
       </div>
+
       <input
         v-model="product.searchQuery" type="text" placeholder="Поисковый запрос"
         class="input input-bordered input-sm w-full mt-2"
       >
+
       <div class="divider" />
 
       <div class="flex gap-4 items-center">

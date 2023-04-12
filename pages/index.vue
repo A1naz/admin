@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const { signIn } = useSession()
+const { signIn } = useAuth()
 definePageMeta({ auth: false })
 </script>
 

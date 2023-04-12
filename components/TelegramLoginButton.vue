@@ -13,7 +13,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['callback'])
 const store = useMainStore()
-const { signIn } = useSession()
+const { signIn } = useAuth()
 const bot_id = useRuntimeConfig().BOT_ID
 const bot_login = useRuntimeConfig().BOT_LOGIN
 

@@ -12,6 +12,7 @@ const modal = ref(false)
 const selectedBuyout = ref({})
 const selectedIndex = ref(-1)
 const store = useMainStore()
+const currency = useCurrency()
 const selectedPlace = ref(-1)
 function openModal(index: number) {
   selectedIndex.value = index
@@ -96,7 +97,28 @@ onMounted(async () => {
     }
   }
 })
-
+const buyoutsSum = computed(() => {
+  if (!buyouts.value.length)
+    return null
+  return buyouts.value.reduce((acc: number, val: any) => acc + (val.product.price * val.quantity), 0)
+})
+const activeBuyouts = computed(() => {
+  if (!buyouts.value.length)
+    return 0
+  return buyouts.value.filter((buyout: any) => buyout.status === 'active')
+})
+const availableBuyouts = computed(() => {
+  if (!buyouts.value.length)
+    return null
+  let balance = store.client.balance
+  let result = 0
+  activeBuyouts.value.forEach((buyout: any) => {
+    balance -= buyout.product.price * buyout.quantity
+    if (balance >= 0)
+      result++
+  })
+  return result
+})
 watch(targetIsVisible, async (isVisible) => {
   if (isVisible) {
     if (end.value)
@@ -142,7 +164,8 @@ watch(route, async (newRoute) => {
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
       Здесь формируются и оплачиваются выкупы на Wildberries. Для добавления нажмите на кнопку "Добавить выкупы".
     </p>
-    <div class="flex justify-between mb-8 mt-6 items-center">
+
+    <div class="flex justify-between mb-8 items-center mt-6">
       <div class="hidden lg:block">
         <NuxtLink
           to="/buyouts" :class="{
@@ -193,6 +216,14 @@ watch(route, async (newRoute) => {
       </NuxtLink>
     </div>
     <div v-if="buyouts.length">
+      <div v-show="route.query.status === 'active'" class="px-2">
+        <p v-if="availableBuyouts">
+          Баланса хватит на {{ availableBuyouts }} выкупов из {{ activeBuyouts.length }}
+        </p>
+        <p v-else>
+          Недостаточно средств для выкупа, пополните баланс.
+        </p>
+      </div>
       <transition-group
         class="cards grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" tag="ul"
         name="fade"

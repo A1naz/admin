@@ -10,22 +10,7 @@ const BuyoutSchema = new Schema({
   point: { type: String, required: true, text: true },
   dateStart: { type: Date, required: true },
   dateEnd: { type: Date, required: true },
-  orderPaymentDate: { type: Date },
   product: { type: Object, required: true },
-  orderPaymentStatus: {
-    type: String,
-    required: true,
-  },
-  orderPaymentLink: { type: String, required: false },
-  servicePaymentDate: { type: Date },
-  servicePaymentStatus: {
-    type: String,
-    required: true,
-  },
-  servicePaymentLink: {
-    type: String,
-    required: false,
-  },
   rules: { type: Array, required: true },
   status: { type: String, required: true, text: true },
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },

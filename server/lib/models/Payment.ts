@@ -5,10 +5,16 @@ const PaymentSchema = new Schema({
   amount: { type: Number, required: true },
   date: { type: Date, required: true, default: new Date() },
   status: { type: String, required: true },
-  cardNumber: { type: String, required: true },
-  cardDate: { type: String, required: true },
-  cardCVC: { type: String, required: true },
-  paymentLink: { type: String, required: false, default: null },
+  details: {
+    type: Object,
+    required: false,
+    default: {
+      url: null,
+      transferCard: null,
+      transferSum: null,
+    },
+  },
+  type: { type: Number, required: true },
 })
 
 export const Payment = model('Payment', PaymentSchema)

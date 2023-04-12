@@ -1,26 +1,81 @@
 <script setup lang="ts">
-import { vMaska } from 'maska'
 import { useNotification } from '@kyvg/vue3-notification'
-import { useMemory } from '@vueuse/core'
 
-function size(v: number) {
-  const kb = v / 1024 / 1024
-  return `${kb.toFixed(2)} MB`
-}
-const paymentCard = ref(null) as Ref<HTMLDivElement | null>
-const { isSupported, memory } = useMemory()
-const currency = useCurrency()
 const url = ref('')
 const paymentForm = reactive({
   paymentSum: 1000,
-  cardNumber: '',
-  cardDate: '',
-  cardCvc: '',
+  paymentType: 'fast' as 'transfer' | 'fast',
 })
 const closePaymentModal = ref(null) as Ref<HTMLLabelElement | null>
 const { notify } = useNotification()
 const router = useRouter()
+const details = ref(null) as any
 const loading = ref(false)
+const currency = useCurrency()
+const store = useMainStore()
+const transferStatus = ref(null) as Ref<null | string>
+function cancelTransfer() {
+  details.value = null
+}
+function cancelPayment() {
+  url.value = ''
+}
+async function checkForDetails() {
+  loading.value = true
+  const { data, error, refresh } = await useFetch('/api/payment/getDetails', {
+    method: 'GET',
+    immediate: true,
+  })
+  if (error.value) {
+    loading.value = false
+    notify({
+      title: 'Ошибка',
+      text: 'Произошла ошибка при получении деталей для оплаты',
+      type: 'error',
+    })
+    return
+  }
+  if (data.value?.status === 'wait') {
+    setTimeout(() => {
+      checkForDetails()
+    }, 1000)
+  }
+  if (data.value?.status === 'ok') {
+    details.value = { transferCard: data.value.transferCard, transferSum: data.value.transferSum }
+    loading.value = false
+    checkTransferStatus()
+  }
+}
+async function checkTransferStatus() {
+  if (!details.value)
+    return
+  const { data, error } = await useFetch('/api/payment/checkStatus', {
+    method: 'GET',
+  })
+  if (error.value) {
+    notify({
+      type: 'error',
+      title: 'Что-то пошло не так',
+    })
+    setTimeout(() => {
+      checkTransferStatus()
+    }, 1000)
+  }
+  if (data.value?.status === 'success') {
+    notify({
+      type: 'success',
+      title: 'Оплата прошла успешно',
+    })
+    await store.getClient()
+    details.value = null
+    closePaymentModal.value?.click()
+  }
+  else {
+    setTimeout(() => {
+      checkTransferStatus()
+    }, 1000)
+  }
+}
 async function checkForLink() {
   loading.value = true
   const { data, error, refresh } = await useFetch('/api/payment/getLink', {
@@ -42,7 +97,7 @@ async function checkForLink() {
     }, 1000)
   }
   if (data.value?.status === 'ok') {
-    url.value = data.value?.url
+    url.value = data.value?.url as string
     loading.value = false
     window.open(url.value, '_blank')
   }
@@ -52,9 +107,7 @@ async function pay() {
     method: 'POST',
     body: {
       amount: paymentForm.paymentSum,
-      cardNumber: paymentForm.cardNumber,
-      cardDate: paymentForm.cardDate,
-      cardCVC: paymentForm.cardCvc,
+      paymentType: paymentForm.paymentType,
     },
   })
   if (error.value) {
@@ -65,8 +118,12 @@ async function pay() {
     })
     return
   }
-  if (data.value?.status === 'ok')
-    checkForLink()
+  if (data.value?.status === 'ok') {
+    if (data.value.type === 'transfer')
+      checkForDetails()
+    else if (data.value.type === 'fast')
+      checkForLink()
+  }
 }
 </script>
 
@@ -82,51 +139,32 @@ async function pay() {
         <h3 class="text-xl font-bold mb-2">Пополнить баланс</h3>
 
         <div>
-          <div class="w-full flex flex-col gap-4 justify-center items-start" action="">
+          <div class="w-full flex flex-col gap-6 justify-center items-start" action="">
             <div class="sum w-full">
               <h3 class="text-lg mb-2">Сумма к пополнению</h3>
               <PaymentInput v-model="paymentForm.paymentSum" />
             </div>
-            <div
-              ref="paymentCard"
-              class="paymentCard flex flex-col gap-2 items-center justify-center mt-2 bg-neutral-focus p-6 rounded-lg shadow-xl"
-            >
-              <div class="cardNumber w-full">
-                <h3 class="text-lg mb-2 text-neutral-content">Номер карты</h3>
-                <input
-                  v-model="paymentForm.cardNumber"
-                  v-maska placeholder="0000 0000 0000 0000"
-                  class="input w-full text-neutral-content bg-neutral" data-maska="#### #### #### ####" type="text"
-                >
-              </div>
-              <div class="cardInfo w-full flex justify-between gap-4">
-                <div>
-                  <h3 class="text-lg mb-2 text-neutral-content">Дата</h3>
-                  <input
-                    v-model="paymentForm.cardDate" v-maska placeholder="ММ/ГГ"
-                    class="input w-full text-neutral-content bg-neutral" data-maska="##/##" type="text"
-                  >
-                </div>
-                <div>
-                  <h3 class="text-lg mb-2 text-neutral-content">CVC/CVV</h3>
-                  <input
-                    v-model="paymentForm.cardCvc" v-maska
-                    placeholder="123" class="input w-full text-neutral-content bg-neutral" type="password" data-maska="###"
-                  >
-                </div>
-              </div>
-
+            <div class="btn-group btn-group-vertical w-full">
+              <button
+                class="btn" :class="{
+                  'btn-active': paymentForm.paymentType === 'fast',
+                }" @click="paymentForm.paymentType = 'fast'"
+              >Быстро (3% комиссия)</button>
+              <button
+                class="btn" :class="{
+                  'btn-active': paymentForm.paymentType === 'transfer',
+                }" @click="paymentForm.paymentType = 'transfer'"
+              >Перевод (без комиссии)</button>
             </div>
             <div v-show="url" class="truncate">
-              <div>Ссылка для оплаты:</div>
-              <a :href="url" target="_blank" class="link link-hover link-primary truncate">{{ url }}</a>
+              <a :href="url" target="_blank" class="link link-hover link-primary truncate">Нажмите сюда, если ссылка не открылась</a>
             </div>
 
           </div>
 
         </div>
         <div class="modal-action justify-between">
-          <label for="payment-modal" class="btn btn-ghost">Отмена</label>
+          <label for="payment-modal" class="btn btn-ghost" @click="cancelPayment">Отмена</label>
 
           <button class="btn btn-primary" @click="pay">Оплатить</button>
         </div>
@@ -141,29 +179,36 @@ async function pay() {
         <h2 class="text-center opacity-100 text-white text-xl font-semibold">
           Загрузка...
         </h2>
-        <p class="w-1/3 opacity-100 text-white text-center">
+        <p v-if="paymentForm.paymentType === 'fast'" class="w-1/3 opacity-100 text-white text-center">
           Создается ссылка для оплаты, пожалуйста не
           закрывайте
           эту страницу
         </p>
-        <div v-if="isSupported && memory" class="items-end justify-end inline-grid grid-cols-2 gap-x-4 gap-y-2">
-          <template v-if="memory">
-            <div opacity="50">
-              Used
-            </div>
-            <div>{{ size(memory.usedJSHeapSize) }}</div>
-            <div opacity="50">
-              Allocated
-            </div>
-            <div>{{ size(memory.totalJSHeapSize) }}</div>
-            <div opacity="50">
-              Limit
-            </div>
-            <div>{{ size(memory.jsHeapSizeLimit) }}</div>
-          </template>
-        </div>
-        <div v-else>
-          Your browser does not support performance memory API
+        <p v-else class="w-1/3 opacity-100 text-white text-center">
+          Идет получение данных для перевода, пожалуйста не
+          закрывайте
+          эту страницу
+        </p>
+      </div>
+    </div>
+    <div v-if="details?.transferCard && details?.transferSum">
+      <input id="transfer-modal" type="checkbox" class="modal-toggle">
+      <div class="modal modal-bottom sm:modal-middle modal-open">
+        <div class="modal-box relative">
+          <label for="transfer-modal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2" @click="cancelTransfer">✕</label>
+          <h3 class="font-bold text-lg">
+            Данные для перевода
+          </h3>
+          <p class="py-4">
+            Пожалуйста пополните кошелек юмани, любым удобным вам способом:
+          </p>
+          <p>
+            {{ details.transferCard }}
+          </p>
+          <p class="py-4">
+            Сумма для пополнения:
+          </p>
+          <p>{{ details.transferSum }} ₽</p>
         </div>
       </div>
     </div>

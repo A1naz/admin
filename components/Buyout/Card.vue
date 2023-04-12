@@ -117,7 +117,7 @@ const getStatus = computed(() => {
 <template>
   <li>
     <div class="buyout-card card bg-base-200 shadow-lg">
-      <div class="card-body flex-shrink-0 flex flex-col justify-start p-4 relative">
+      <div class="card-body flex-shrink-0 flex flex-col justify-start gap-4 p-4 relative">
         <div class="dropdown dropdown-end absolute right-2 top-2">
           <label tabindex="0" class="btn btn-sm btn-square btn-ghost">
             <Icon name="ph:dots-three-outline-vertical-fill" size="18" />
@@ -138,7 +138,7 @@ const getStatus = computed(() => {
                 <Icon name="material-symbols:unarchive" />Убрать из архива
               </a>
             </li>
-            <li v-if="info.orderPaymentStatus === 'Не оплачен' && info.servicePaymentStatus === 'Не оплачен'">
+            <li>
               <a
                 @click="deleteBuyOut"
               >
@@ -152,28 +152,21 @@ const getStatus = computed(() => {
           <h2 class="card-title">
             Выкуп №{{ info.place }}
           </h2>
-          <span class="text-xs text-gray-500 truncate">#{{ info.uuid }}</span>
+          <div class="text-xs text-gray-500 truncate">
+            #{{ info.uuid }}
+          </div>
+          <div class="flex justify-between mt-2">
+            <span
+              :class="{
+                'text-green-600': info.status === 'active',
+                'text-error': info.status === 'completed',
+                'text-warning': info.status === 'archived',
+              }"
+            >{{ getStatus }}</span>
+            <span class="text-sm text-gray-500">{{ $dayjs(info.createdAt).format('D MMMM HH:mm')
+            }}</span>
+          </div>
         </div>
-        <div class="flex justify-between">
-          <span
-            :class="{
-              'text-green-600': info.status === 'active',
-              'text-error': info.status === 'completed',
-              'text-warning': info.status === 'archived',
-            }"
-          >{{ getStatus }}</span>
-          <span class="text-sm text-gray-500">{{ $dayjs(info.createdAt).format('D MMMM HH:mm')
-          }}</span>
-        </div>
-        <div class="flex justify-between items-center">
-          <span class="text-gray-500 text-sm">Статус оплаты заказа:</span>
-          <span class="text-sm">{{ info.orderPaymentStatus }}</span>
-        </div>
-        <div class="flex justify-between items-center">
-          <span class="text-gray-500 text-sm">Статус оплаты сервиса:</span>
-          <span class="text-sm">{{ info.servicePaymentStatus }}</span>
-        </div>
-        <div class="divider" />
 
         <div class="flex gap-4">
           <div class="flex-none" style="width: 100px; height: 150px;">
@@ -210,8 +203,7 @@ const getStatus = computed(() => {
             </div>
           </div>
         </div>
-        <div class="divider" />
-        <button class="btn" @click="$emit('openModal', index)">
+        <button class="btn mt-2" @click="$emit('openModal', index)">
           Открыть
         </button>
       </div>

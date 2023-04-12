@@ -12,23 +12,30 @@ export default eventHandler(async (event) => {
   if (!user)
     return sendRedirect(event, '/auth', 302)
 
-  const body = await readBody(event)
-  if (body.amount > 50000) {
+  const { amount, paymentType } = await readBody(event)
+  if (!paymentType) {
+    throw createError({
+      statusCode: 400,
+      message: 'paymentType is missing',
+    })
+  }
+  if (amount > 50000) {
     throw createError({
       statusCode: 400,
       message: 'Сумма платежа не может превышать 50 000 рублей',
     })
   }
+  const details = paymentType === 'fast' ? { url: null } : paymentType === 'transfer' ? { transferCard: null, transferSum: null } : undefined
   const payment = new Payment({
     user,
-    amount: body.amount,
+    amount,
+    details,
     status: 'created',
-    cardNumber: body.cardNumber,
-    cardDate: body.cardDate,
-    cardCVC: body.cardCVC,
+    type: paymentType === 'fast' ? 0 : paymentType === 'transfer' ? 1 : undefined,
   })
   await payment.save()
   return {
+    type: paymentType,
     status: 'ok',
   }
 })
