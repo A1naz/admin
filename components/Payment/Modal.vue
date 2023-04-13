@@ -21,8 +21,13 @@ function cancelPayment() {
   url.value = ''
 }
 async function checkForDetails() {
+  interface response {
+    status: string
+    transferCard: string | null
+    transferSum: string | number | null
+  }
   loading.value = true
-  const { data, error, refresh } = await useFetch('/api/payment/getDetails', {
+  const { data, error, refresh } = await useFetch<response>('/api/payment/getDetails', {
     method: 'GET',
     immediate: true,
   })
@@ -43,13 +48,16 @@ async function checkForDetails() {
   if (data.value?.status === 'ok') {
     details.value = { transferCard: data.value.transferCard, transferSum: data.value.transferSum }
     loading.value = false
-    checkTransferStatus()
+    checkPaymentStatus()
   }
 }
-async function checkTransferStatus() {
-  if (!details.value)
+async function checkPaymentStatus() {
+  interface response {
+    status: string
+  }
+  if (!details.value && !url.value)
     return
-  const { data, error } = await useFetch('/api/payment/checkStatus', {
+  const { data, error } = await useFetch<response>('/api/payment/checkStatus', {
     method: 'GET',
   })
   if (error.value) {
@@ -58,8 +66,8 @@ async function checkTransferStatus() {
       title: 'Что-то пошло не так',
     })
     setTimeout(() => {
-      checkTransferStatus()
-    }, 1000)
+      checkPaymentStatus()
+    }, 3000)
   }
   if (data.value?.status === 'success') {
     notify({
@@ -72,13 +80,17 @@ async function checkTransferStatus() {
   }
   else {
     setTimeout(() => {
-      checkTransferStatus()
-    }, 1000)
+      checkPaymentStatus()
+    }, 3000)
   }
 }
 async function checkForLink() {
+  interface response {
+    status: string
+    url: null | string
+  }
   loading.value = true
-  const { data, error, refresh } = await useFetch('/api/payment/getLink', {
+  const { data, error, refresh } = await useFetch<response>('/api/payment/getLink', {
     method: 'GET',
     immediate: true,
   })
@@ -99,6 +111,7 @@ async function checkForLink() {
   if (data.value?.status === 'ok') {
     url.value = data.value?.url as string
     loading.value = false
+    checkPaymentStatus()
     window.open(url.value, '_blank')
   }
 }
@@ -118,12 +131,15 @@ async function pay() {
     })
     return
   }
-  if (data.value?.status === 'ok') {
-    if (data.value.type === 'transfer')
+  if ((data.value as any)?.status === 'ok') {
+    if ((data.value as any).type === 'transfer')
       checkForDetails()
-    else if (data.value.type === 'fast')
+    else if ((data.value as any).type === 'fast')
       checkForLink()
   }
+}
+function openUrl() {
+  window.open(url.value, '_blank')
 }
 </script>
 
@@ -171,7 +187,7 @@ async function pay() {
       </label>
       <div
         v-if="loading"
-        class="fixed z-[999999] top-0 left-0 right-0 bottom-0 w-full h-screen overflow-hidden bg-gray-700 opacity-80 flex flex-col items-center justify-center"
+        class="fixed z-[999999] top-0 left-0 right-0 bottom-0 w-full h-screen overflow-hidden bg-gray-700 bg-opacity-70 flex flex-col items-center justify-center"
       >
         <div class="ease-linear rounded-full mb-4">
           <Icon name="mdi:loading" class="h-20 w-20 animate-spin text-white" />
@@ -180,12 +196,12 @@ async function pay() {
           Загрузка...
         </h2>
         <p v-if="paymentForm.paymentType === 'fast'" class="w-1/3 opacity-100 text-white text-center">
-          Создается ссылка для оплаты, пожалуйста не
+          Создается ссылка для оплаты, <br> пожалуйста не
           закрывайте
           эту страницу
         </p>
         <p v-else class="w-1/3 opacity-100 text-white text-center">
-          Идет получение данных для перевода, пожалуйста не
+          Идет получение данных для перевода, <br> пожалуйста не
           закрывайте
           эту страницу
         </p>
@@ -199,16 +215,21 @@ async function pay() {
           <h3 class="font-bold text-lg">
             Данные для перевода
           </h3>
-          <p class="py-4">
-            Пожалуйста пополните кошелек юмани, любым удобным вам способом:
+          <p class=" text-sm text-primary animate-pulse">
+            Ожидаем платеж...
           </p>
-          <p>
+          <p class="py-4">
+            Пожалуйста пополните кошелек Юмани, любым удобным вам способом:
+          </p>
+          <p class="font-bold text-lg text-center">
             {{ details.transferCard }}
           </p>
           <p class="py-4">
             Сумма для пополнения:
           </p>
-          <p>{{ details.transferSum }} ₽</p>
+          <p class="font-bold text-lg text-center">
+            {{ details.transferSum }} ₽
+          </p>
         </div>
       </div>
     </div>

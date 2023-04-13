@@ -119,6 +119,20 @@ const availableBuyouts = computed(() => {
   })
   return result
 })
+const formatAvailable = computed(() => {
+  if (!availableBuyouts.value)
+    return ''
+  const str = availableBuyouts.value.toString()
+  const lastNumber = Number(str[str.length - 1])
+  if (Number(str) > 10 && Number(str) < 20)
+    return 'выкупов'
+  if (lastNumber === 1)
+    return 'выкуп'
+  if (lastNumber > 1 && lastNumber < 5)
+    return 'выкупа'
+  else
+    return 'выкупов'
+})
 watch(targetIsVisible, async (isVisible) => {
   if (isVisible) {
     if (end.value)
@@ -165,7 +179,7 @@ watch(route, async (newRoute) => {
       Здесь формируются и оплачиваются выкупы на Wildberries. Для добавления нажмите на кнопку "Добавить выкупы".
     </p>
 
-    <div class="flex justify-between mb-8 items-center mt-6">
+    <div class="flex justify-between mb-4 items-center mt-6">
       <div class="hidden lg:block">
         <NuxtLink
           to="/buyouts" :class="{
@@ -216,14 +230,25 @@ watch(route, async (newRoute) => {
       </NuxtLink>
     </div>
     <div v-if="buyouts.length">
-      <div v-show="route.query.status === 'active'" class="px-2">
-        <p v-if="availableBuyouts">
-          Баланса хватит на {{ availableBuyouts }} выкупов из {{ activeBuyouts.length }}
-        </p>
-        <p v-else>
-          Недостаточно средств для выкупа, пополните баланс.
-        </p>
-      </div>
+      <ClientOnly>
+        <div v-if="route.query.status === 'active' || !route.query.status" class="flex justify-center py-2 rounded-lg px-2 mb-2 bg-base-100 border border-base-200">
+          <p
+            v-if="availableBuyouts" :class="{
+              'text-success': availableBuyouts === activeBuyouts.length,
+            }" class="text-sm"
+          >
+            {{ availableBuyouts === activeBuyouts.length ? 'Баланса хватит на все выкупы' : `Баланса хватит на ${availableBuyouts} ${formatAvailable} из ${activeBuyouts.length}` }}
+          </p>
+          <p v-if="availableBuyouts === 0 && activeBuyouts" class="text-center text-warning text-sm">
+            Недостаточно средств для совершения выкупа, пополните баланс.
+          </p>
+        </div>
+        <div v-else class="px-2 py-2 mb-2">
+          <p class="text-transparent">
+            something
+          </p>
+        </div>
+      </ClientOnly>
       <transition-group
         class="cards grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" tag="ul"
         name="fade"

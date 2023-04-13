@@ -20,7 +20,6 @@ export default eventHandler(async (event) => {
       status: 'ok',
       url: payment.details.url,
     }
-    const deleted = await Payment.deleteOne({ _id: payment })
     return data
   }
   else {

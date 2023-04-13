@@ -1,6 +1,7 @@
 import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { Buyout } from '@/server/lib/models/Buyout'
+import { Delivery } from '~~/server/lib/models/Delivery'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -14,14 +15,17 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const found = await Buyout.findOne({ uuid: body.uuid })
-
-  if (
-    found?.orderPaymentStatus !== 'Не оплачен'
-    || found?.servicePaymentStatus !== 'Не оплачен'
-  ) {
+  if (!found) {
+    throw createError({
+      statusCode: 404,
+      message: 'not found',
+    })
+  }
+  const delivery = await Delivery.findOne({ idbuyout: found })
+  if (delivery) {
     throw createError({
       statusCode: 400,
-      message: 'Нельзя архивировать выкуп, который оплачен',
+      message: 'Нелья архивировать выкуп, который уже оплачен',
     })
   }
   found.status = 'archived'
