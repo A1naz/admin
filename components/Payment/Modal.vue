@@ -19,6 +19,7 @@ function cancelTransfer() {
 }
 function cancelPayment() {
   url.value = ''
+  details.value = null
 }
 async function checkForDetails() {
   interface response {
@@ -149,8 +150,9 @@ function openUrl() {
     <div class="modal">
       <label class="modal-box">
         <label
-          ref="closePaymentModal" for="payment-modal"
-          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          ref="closePaymentModal"
+          for="payment-modal" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          @click="cancelPayment"
         >✕</label>
         <h3 class="text-xl font-bold mb-2">Пополнить баланс</h3>
 
@@ -172,9 +174,6 @@ function openUrl() {
                 }" @click="paymentForm.paymentType = 'transfer'"
               >Перевод (без комиссии)</button>
             </div>
-            <div v-show="url" class="truncate">
-              <a :href="url" target="_blank" class="link link-hover link-primary truncate">Нажмите сюда, если ссылка не открылась</a>
-            </div>
 
           </div>
 
@@ -187,7 +186,7 @@ function openUrl() {
       </label>
       <div
         v-if="loading"
-        class="fixed z-[999999] top-0 left-0 right-0 bottom-0 w-full h-screen overflow-hidden bg-gray-700 bg-opacity-70 flex flex-col items-center justify-center"
+        class="fixed z-[999999] top-0 left-0 right-0 bottom-0 w-full h-screen overflow-hidden bg-gray-700 bg-opacity-80 flex flex-col items-center justify-center"
       >
         <div class="ease-linear rounded-full mb-4">
           <Icon name="mdi:loading" class="h-20 w-20 animate-spin text-white" />
@@ -205,6 +204,26 @@ function openUrl() {
           закрывайте
           эту страницу
         </p>
+      </div>
+    </div>
+    <div v-if="url">
+      <input id="fastPayment-modal" type="checkbox" class="modal-toggle">
+      <div class="modal modal-bottom sm:modal-middle modal-open">
+        <div class="modal-box relative">
+          <label for="fastPayment-modal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2" @click="cancelPayment">✕</label>
+          <h3 class="font-bold text-lg">
+            Быстрое пополнение
+          </h3>
+          <p class=" text-sm text-primary animate-pulse">
+            Ожидаем платеж...
+          </p>
+          <p class="py-4">
+            Перейдите по ссылке для оплаты. Не закрывайте это окно до завершения платежа.
+          </p>
+          <button class="btn btn-primary btn-block" @click="openUrl">
+            Перейти к оплате
+          </button>
+        </div>
       </div>
     </div>
     <div v-if="details?.transferCard && details?.transferSum">
