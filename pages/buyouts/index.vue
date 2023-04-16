@@ -97,18 +97,15 @@ onMounted(async () => {
     }
   }
 })
-const buyoutsSum = computed(() => {
+
+const activeBuyouts = computedEager(() => {
   if (!buyouts.value.length)
-    return null
-  return buyouts.value.reduce((acc: number, val: any) => acc + (val.product.price * val.quantity), 0)
+    return []
+  const result = buyouts.value.filter((buyout: any) => buyout.status === 'active')
+  return result
 })
-const activeBuyouts = computed(() => {
-  if (!buyouts.value.length)
-    return 0
-  return buyouts.value.filter((buyout: any) => buyout.status === 'active')
-})
-const availableBuyouts = computed(() => {
-  if (!buyouts.value.length)
+const availableBuyouts = computedEager(() => {
+  if (!activeBuyouts.value.length)
     return null
   let balance = store.client.balance
   let result = 0
@@ -119,7 +116,7 @@ const availableBuyouts = computed(() => {
   })
   return result
 })
-const formatAvailable = computed(() => {
+const formatAvailable = computedEager(() => {
   if (!availableBuyouts.value)
     return ''
   const str = availableBuyouts.value.toString()
@@ -146,15 +143,14 @@ watch(targetIsVisible, async (isVisible) => {
       },
       headers: useRequestHeaders(['cookie']) as HeadersInit,
     })
-    if (data.value!.length === 0) {
+    if ((data.value as any).length === 0) {
       end.value = true
       return
     }
-    buyouts.value = [...buyouts.value, ...data.value!]
+    buyouts.value = [...buyouts.value, ...(data.value as any)]
     skip.value += 50
   }
 })
-
 watch(route, async (newRoute) => {
   skip.value = 50
   end.value = false
@@ -231,7 +227,7 @@ watch(route, async (newRoute) => {
     </div>
     <div v-if="buyouts.length">
       <ClientOnly>
-        <div v-if="route.query.status === 'active' || !route.query.status" class="flex justify-center py-2 rounded-lg px-2 mb-2 bg-base-100 border border-base-200">
+        <div v-if="route.query.status === 'active' || !route.query.status && activeBuyouts.length > 0" class="flex justify-center py-2 rounded-lg px-2 mb-2 bg-base-100 border border-base-200">
           <p
             v-if="availableBuyouts" :class="{
               'text-success': availableBuyouts === activeBuyouts.length,
@@ -239,15 +235,11 @@ watch(route, async (newRoute) => {
           >
             {{ availableBuyouts === activeBuyouts.length ? 'Баланса хватит на все выкупы' : `Баланса хватит на ${availableBuyouts} ${formatAvailable} из ${activeBuyouts.length}` }}
           </p>
-          <p v-if="availableBuyouts === 0 && activeBuyouts" class="text-center text-warning text-sm">
+          <p v-if="availableBuyouts === 0 && activeBuyouts.length > 0" class="text-center text-warning text-sm">
             Недостаточно средств для совершения выкупа, пополните баланс.
           </p>
         </div>
-        <div v-else class="px-2 py-2 mb-2">
-          <p class="text-transparent">
-            something
-          </p>
-        </div>
+        <div v-else class="px-2 py-4 mb-2" />
       </ClientOnly>
       <transition-group
         class="cards grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" tag="ul"

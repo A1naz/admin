@@ -73,11 +73,11 @@ const breadcrumbs = computed(() => getBreadcrumbs())
 
       <!-- Page content here -->
       <div class="px-6 py-2 lg:p-6 block">
-        <div v-if="route.path !== '/profile'" class="breadcrumbs p-0 lg:text-sm">
+        <div v-if="route.path !== '/profile' && route.path !== '/paymenthistory'" class="breadcrumbs p-0 lg:text-sm">
           <ul>
             <li>
-              <a>
-                <img src="/icons/wb.svg" alt="" srcset="">
+              <a href="#">
+                <nuxt-img src="/icons/wb.svg" alt="" srcset="" />
               </a>
             </li>
             <li v-for="(crumb, index) of breadcrumbs" :key="index">
@@ -132,6 +132,7 @@ const breadcrumbs = computed(() => getBreadcrumbs())
         <SidebarItem title="Лайки на отзывы" icon="fluent:thumb-like-24-filled" href="/likes" />
 
         <li />
+        <SidebarItem icon="fluent:history-24-filled" title="История платежей" href="/paymenthistory" />
         <li class="mt-auto w-full no-animation hover:bg-base-200">
           <div class="w-full no-animation hover:bg-base-200 hover:cursor-default p-0">
             <div class="flex justify-between w-full items-center p-0 m-0">

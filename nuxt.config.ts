@@ -1,6 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+const baseUrl = '/'
+
 export default defineNuxtConfig({
   app: {
+    baseURL: baseUrl,
     head: {
       title: process.env.NAME,
       link: [{ rel: 'icon', href: '/favicon.svg' }],
@@ -60,6 +63,12 @@ export default defineNuxtConfig({
     '@vite-pwa/nuxt',
     '@bg-dev/nuxt-s3',
   ],
+  css: [
+    'primevue/resources/primevue.css',
+    'primeicons/primeicons.css',
+    // 'primevue/resources/themes/tailwind-light/theme.css',
+    // 'primevue/resources/themes/soho-dark/theme.css',
+  ],
   s3: {
     client: {
       credentials: {
@@ -77,6 +86,9 @@ export default defineNuxtConfig({
         maxWidthOrHeight: 1920,
       },
     },
+  },
+  build: {
+    transpile: ['nuxt', 'primevue'],
   },
   pwa: {
     registerType: 'autoUpdate',

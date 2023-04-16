@@ -40,15 +40,24 @@ export default eventHandler(async (event) => {
       method: 'GET',
     },
   )
-  const sizes = data?.sizes_table?.values
-    ? data?.sizes_table?.values.map((size: any) => size.tech_size)
-    : []
   const priceData = JSON.parse(rawData)
+
+  const sizesRaw = data?.sizes_table?.values
+    ? data?.sizes_table?.values.map((size: any) => size.tech_size)
+    : priceData?.data?.products[0]?.sizes.map((size: any) => size.origName)
+
+  const sizes = sizesRaw[0] === '0' ? [] : sizesRaw
   const product = priceData?.data?.products.find(
     (item: any) => item.id === Number(params.article),
   )
   const priceRaw = product?.salePriceU.toString()
   let instock = false
+  if (!product) {
+    return createError({
+      statusCode: 400,
+      message: 'Не удалось получить данные о товаре',
+    })
+  }
   product.sizes.forEach((size: any) => {
     if (size.stocks.length > 0)
       instock = true

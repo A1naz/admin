@@ -8,9 +8,6 @@ const colorMode = useColorMode()
 const { status, data } = useAuth()
 
 const store = useMainStore()
-onMounted(async () => {
-  store.theme = document.documentElement.getAttribute('data-theme') === 'dracula' ? 'dracula' : 'light'
-})
 const { pending, data: client, error, refresh } = useLazyAsyncData('client', () => $fetch('/api/user/client'))
 useIntervalFn(() => {
   refresh()
@@ -38,7 +35,7 @@ watch(client, (newClient) => {
       </template>
     </notifications>
     <NuxtLayout>
-      <NuxtLoadingIndicator :color="colorMode.value === 'light' ? '#570df8' : '#ff79c6'" /> <!-- here -->
+      <NuxtLoadingIndicator :color="colorMode.value === 'light' ? '#570df8' : '#ff79c6'" />
       <NuxtPage />
     </NuxtLayout>
   </div>
