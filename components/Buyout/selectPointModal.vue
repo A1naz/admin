@@ -50,8 +50,26 @@ onMounted(async () => {
   const searchControl = new ymaps.control.SearchControl({
     options: {
       provider: 'yandex#map',
-      noPlacemark: true,
+      noPlacemark: false,
     },
+  })
+  searchControl.events.add('resultselect', (event: any) => {
+    if (!event.get('skip') && searchControl.getResultsCount()) {
+      const geoObjectsArray = searchControl.getResultsArray()
+      geoObjectsArray.forEach(
+        (marker: any) => {
+          marker.options.set({
+            hasBalloon: false,
+            preset: 'islands#violetDotIconWithCaption',
+            iconOffset: [0, -25],
+
+          })
+          marker.properties.set({
+            iconCaption: marker.properties._data.name,
+          })
+        },
+      )
+    }
   })
   myMap.controls.add(searchControl)
   myMap.setBounds(originalBounds.value)
@@ -92,7 +110,9 @@ onMounted(async () => {
           iconColor: '#8d297f',
           iconLayout: 'default#image',
           iconImageHref: '/img/pin-map.svg',
-          iconImageSize: [30, 30],
+          iconimageoffset: [-5, -38],
+          iconImageSize: [32, 32],
+          iconOffset: [0, 0],
           iconShadow: true,
         },
       }
