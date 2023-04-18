@@ -67,6 +67,7 @@ export default eventHandler(async (event) => {
       },
       likes: likes || 0,
       dislikes: dislikes || 0,
+      rank: feedback.rank,
     }
   })
   // await new Promise((resolve) => setTimeout(resolve, 1000));

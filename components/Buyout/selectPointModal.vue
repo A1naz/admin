@@ -22,8 +22,7 @@ function handleSelect(address: string) {
   emit('callback', address)
   closeModal()
 }
-const presetIcon = 'islands#violetDotIconWithCaption'
-const presetCluster = 'islands#invertedVioletClusterIcons'
+const presetCluster = 'islands#violetClusterIcons'
 
 const originalBounds = ref([
   [55.72435065000997, 37.421310551334145],
@@ -45,8 +44,16 @@ onMounted(async () => {
   const myMap = new ymaps.Map('ymap', {
     center: [55.76, 37.64],
     zoom: 7,
+    controls: [],
   })
   map.value = myMap
+  const searchControl = new ymaps.control.SearchControl({
+    options: {
+      provider: 'yandex#map',
+      noPlacemark: true,
+    },
+  })
+  myMap.controls.add(searchControl)
   myMap.setBounds(originalBounds.value)
   const objectManager = new ymaps.ObjectManager({
     // Включаем кластеризацию.
@@ -62,7 +69,7 @@ onMounted(async () => {
     preset: presetCluster,
     hintContentLayout: ymaps.templateLayoutFactory.createClass('Группа объектов'),
   })
-  objectManager.objects.options.set('preset', presetIcon)
+  const iconLayout = ymaps.templateLayoutFactory.createClass('<div>$[properties.iconContent]</div>')
   const collection = {
     type: 'FeatureCollection',
     features: props.pickpoints.map((point: any, index: number) => {
@@ -72,12 +79,21 @@ onMounted(async () => {
         geometry: {
           type: 'Point',
           coordinates: [point.lt, point.lg],
+          radius: 1000,
         },
         properties: {
+          iconContent: 'WB',
           data: {
             a: point.a,
             w: point.w,
           },
+        },
+        options: {
+          iconColor: '#8d297f',
+          iconLayout: 'default#image',
+          iconImageHref: '/img/pin-map.svg',
+          iconImageSize: [30, 30],
+          iconShadow: true,
         },
       }
     }),
@@ -93,7 +109,7 @@ onMounted(async () => {
     const obj = objectManager.objects.getById(objectId)
 
     const myBalloonContentLayout = ymaps.templateLayoutFactory.createClass(
-      `<div class="card">
+      `<div class="card rounded-lg">
           <div>
             <div class="text-lg font-semibold">Пункт выдачи Wildberries</div>
             <div class="text-sm">${obj.properties.data.a}</div>
@@ -108,12 +124,10 @@ onMounted(async () => {
           this._element.querySelector('.selectPoint').addEventListener('click', this.select)
         },
         clear() {
-          console.log(this)
           this._element.querySelector('.selectPoint').removeEventListener('click', this.select)
           myBalloonContentLayout.superclass.clear.call(this)
         },
         select: () => {
-          console.log('click')
           handleSelect(obj.properties.data.a)
         },
       },
@@ -129,7 +143,6 @@ onMounted(async () => {
   objectManager.objects.events.add('balloonopen', (e: any) => {
     const objectId = e.get('objectId')
     const geoObject = objectManager.objects.getById(objectId)
-    console.log(geoObject)
   })
   loading.value = false
 })
@@ -138,7 +151,7 @@ onMounted(async () => {
 <template>
   <Teleport to="body">
     <div
-      id="selectPointModal" ref="modal" class="modal" :class="{
+      id="selectPointModal" class="modal" :class="{
         'modal-open': props.state,
       }"
     >

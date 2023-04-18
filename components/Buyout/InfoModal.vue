@@ -80,7 +80,11 @@ const getGender = computed(() => {
             </div>
             <div class="flex justify-between items-center flex-wrap">
               <span class="text-gray-500 text-sm">Адрес:</span>
-              <span class="text-sm truncate w-60 justify-end text-end">{{ info.point }}</span>
+              <a
+                target="_blank" class="text-sm text-secondary link link-hover truncate "
+                :href="`https://yandex.ru/maps/?mode=search&text=${info.point}`"
+              > {{ info.point }}
+              </a>
             </div>
             <div class="flex justify-between items-center flex-wrap">
               <span class="text-gray-500 text-sm">Правила:</span>

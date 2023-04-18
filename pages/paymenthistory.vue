@@ -27,7 +27,7 @@ history.value = data.value
       Здесь можно увидеть движение вашего баланса
     </p>
     <div class="flex justify-end mb-8 mt-6 items-center" />
-    <DataTable class="bg-base-200" :value="history" removable-sort>
+    <DataTable sort-field="dataoperation" :sort-order="-1" class="bg-base-200" :value="history" removable-sort>
       <Column field="summ" sortable header="Сумма">
         <template #body="{ data }">
           {{ currency.format(data.summ) }}
@@ -56,5 +56,11 @@ history.value = data.value
 }
 .p-datatable-table {
   @apply table table-zebra rounded-lg
+}
+.p-column-header-content {
+  @apply flex gap-2
+}
+.p-sortable-column {
+
 }
 </style>

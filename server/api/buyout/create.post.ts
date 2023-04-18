@@ -31,7 +31,7 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const body = await readBody(event)
-  const all = await Buyout.countDocuments({ user })
+  const last = await Buyout.findOne({ user }).sort({ _id: -1 })
   const products: Item[] = body
 
   for await (const product of products) {
@@ -57,7 +57,7 @@ export default eventHandler(async (event) => {
         image: product.image,
       },
       uuid: uuid(),
-      place: all + 1,
+      place: last ? last.place + 1 : 1,
     })
     await buyout.save()
   }

@@ -71,7 +71,7 @@ async function addProduct() {
     })
   }
 
-  const product = data.value?.product as unknown as Item
+  const product = (data.value as any).product as unknown as Item
   products.value.push(reactive({
     image: product.image,
     name: product.name,
@@ -427,11 +427,12 @@ onMounted(async () => {
                   >
                 </div>
               </td>
-              <td>
-                <div v-auto-animate class="w-full flex flex-col items-start justify-center gap-1">
-                  <div v-if="product.adress" class="text-xs mb-1 truncate w-40">
-                    <span>{{ product.adress
-                    }}</span>
+              <td class="break-all">
+                <div v-auto-animate class="w-full flex flex-col items-start justify-center gap-1 flex-wrap overflow-hidden">
+                  <div v-if="product.adress" class="text-xs mb-1 h-10 w-40 break-all">
+                    <p class="break-all whitespace-normal">
+                      {{ product.adress }}
+                    </p>
                   </div>
                   <button
                     :disabled="!pickpoints" :class="{

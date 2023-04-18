@@ -11,20 +11,15 @@ const changedReviews = ref([]) as any
 
 const route = useRoute()
 const router = useRouter()
-function selectSorting(e: any) {
-  router.push({
-    query: {
-      sortBy: e.target.value,
-    },
-  })
-}
 const reviews = ref([]) as any
+const sortBy = ref('date')
 const article = ref('')
+const savedArticle = ref('')
 const loading = ref(false)
 async function getProductReviews() {
   loading.value = true
   changedReviews.value = []
-  reviews.value = []
+  savedArticle.value = article.value
   const { data, error } = await useFetch('/api/likes/productReviews', {
     method: 'GET',
     headers: useRequestHeaders(['cookie']) as HeadersInit,
@@ -43,9 +38,20 @@ async function getProductReviews() {
     })
     return
   }
-  reviews.value = data.value
+  const initial = (data.value as any).map((review: any) => {
+    review.addLikes = 0
+    review.addDislikes = 0
+    return review
+  }) as any[]
+  reviews.value = initial
+  sortReviews()
 }
 function addLike(id: string) {
+  reviews.value.map((review: any) => {
+    if (review.id === id)
+      review.addLikes++
+    return review
+  })
   changedReviews.value.find((review: any) => review.id === id)
     ? changedReviews.value = changedReviews.value.map((review: any) => {
       if (review.id === id)
@@ -60,6 +66,11 @@ function addLike(id: string) {
     })
 }
 function removeLike(id: string) {
+  reviews.value.map((review: any) => {
+    if (review.id === id)
+      review.addLikes--
+    return review
+  })
   const review = changedReviews.value.find((review: any) => review.id === id)
   if (review) {
     if (review.likes > 1) {
@@ -86,6 +97,11 @@ function removeLike(id: string) {
   }
 }
 function addDislike(id: string) {
+  reviews.value.map((review: any) => {
+    if (review.id === id)
+      review.addDislikes++
+    return review
+  })
   changedReviews.value.find((review: any) => review.id === id)
     ? changedReviews.value = changedReviews.value.map((review: any) => {
       if (review.id === id)
@@ -100,6 +116,11 @@ function addDislike(id: string) {
     })
 }
 function removeDislike(id: string) {
+  reviews.value.map((review: any) => {
+    if (review.id === id)
+      review.addDislikes--
+    return review
+  })
   const review = changedReviews.value.find((review: any) => review.id === id)
   if (review) {
     if (review.dislikes > 1) {
@@ -123,6 +144,19 @@ function removeDislike(id: string) {
     }
   }
 }
+function selectSorting(e: any) {
+  sortBy.value = e.target.value
+  router.push({
+    query: {
+      sortBy: e.target.value,
+    },
+  })
+}
+async function cancel() {
+  changedReviews.value = []
+  article.value = savedArticle.value
+  getProductReviews()
+}
 function getAddedLikes() {
   const addedLikes = changedReviews.value.reduce((acc: any, review: any) => {
     acc.likes += review.likes
@@ -134,6 +168,28 @@ function getAddedLikes() {
   })
   return addedLikes
 }
+function sortReviews() {
+  const val = sortBy.value
+  if (val === 'date') {
+    reviews.value = reviews.value.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  }
+  else if (val === 'rating') {
+    reviews.value = reviews.value.sort((a: any, b: any) => {
+      if (b.rating > a.rating)
+        return 1
+      else if (b.rating < a.rating)
+        return -1
+      else return 0
+    })
+  }
+  else if (val === 'rank') {
+    reviews.value = reviews.value.sort((a: any, b: any) => b.rank - a.rank)
+  }
+}
+watch(route, (route) => {
+  sortBy.value = route.query.sortBy as string
+  sortReviews()
+})
 </script>
 
 <template>
@@ -167,21 +223,21 @@ function getAddedLikes() {
         </button>
       </div>
     </div>
-    <div v-if="reviews.length">
-      <transition-group class="cards grid grid-cols-1 lg:grid-cols-2 gap-4" tag="ul" name="fade">
-        <LikesReviewCard
-          v-for="(review, index) of reviews" :key="review.id" :index="index"
-          :info="review" @add-like="addLike" @remove-dislike="removeDislike" @add-dislike="addDislike"
-          @remove-like="removeLike"
-        />
-      </transition-group>
+    <div v-if="reviews.length" class="cards grid grid-cols-1 lg:grid-cols-2 gap-4 mb-12">
+      <LikesReviewCard
+        v-for="(review, index) of reviews" :key="review.id" :index="index"
+        :add-likes="review.addLikes"
+        :add-dislikes="review.addDislikes"
+        :info="review" @add-like="addLike" @remove-dislike="removeDislike" @add-dislike="addDislike"
+        @remove-like="removeLike"
+      />
       <div class="p-2 w-full col-span-1" />
     </div>
     <Teleport to="body">
       <Transition name="fade">
         <div
           v-show="changedReviews.length"
-          class="save fixed py-4 px-8 z-[9999] w-full bottom-0 bg-neutral flex flex-wrap items-center justify-between gap-2"
+          class="save fixed py-4 px-8 z-[9999] w-full bottom-0 bg-neutral-focus flex flex-wrap items-center justify-between gap-2"
         >
           <div class="info flex items-center gap-4">
             <p class="text-xs font-bold text-neutral-content lg:text-sm">
@@ -195,8 +251,11 @@ function getAddedLikes() {
               }}
             </p>
           </div>
-          <div class="save ml-auto">
-            <button class="btn btn-primary btn-sm ">
+          <div class="save ml-auto flex gap-2">
+            <button class="btn btn-ghost text-neutral-content btn-sm" @click="cancel">
+              Отмена
+            </button>
+            <button class="btn btn-primary btn-sm">
               Сохранить
             </button>
           </div>

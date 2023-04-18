@@ -15,7 +15,7 @@ export default eventHandler(async (event) => {
     const now = new Date()
     const diff = now.getTime() - new Date(parsed.updated).getTime()
     await storage.setItem('points', parsed)
-    if (diff < 1000 * 60 * 60)
+    if (diff < 1000 * 60 * 10)
       return sendStream(event, fs.createReadStream('points.json'))
   }
   const data: any = await $fetch(

@@ -34,9 +34,29 @@ type UpdateMonthYear = (month: number, year: number) => void
 function updateMonth(event: InputEvent, updateMonthYear: UpdateMonthYear, year: number) {
   updateMonthYear(+(event.target as HTMLSelectElement).value, year)
 }
+const hoursArray = computed(() => {
+  const arr = []
+  for (let i = 0; i < 24; i++)
+    arr.push({ text: i < 10 ? `0${i}` : i, value: i })
+
+  return arr
+})
+
+const minutesArray = computed(() => {
+  const arr = []
+  for (let i = 0; i < 60; i++)
+    arr.push({ text: i < 10 ? `0${i}` : i, value: i })
+
+  return arr
+})
 function handleDate(modelData: any) {
-  date.value = modelData
-  console.log(date.value)
+  const first = modelData[0] as Date
+  const second = modelData[1] as Date
+  if (second.getHours() < first.getHours())
+    second.setHours(first.getHours())
+  if (second.getMinutes() < first.getMinutes())
+    second.setMinutes(first.getMinutes())
+  date.value = [first, second]
   emit('update:modelValue', modelData)
 }
 </script>
@@ -44,7 +64,7 @@ function handleDate(modelData: any) {
 <template>
   <div>
     <VueDatePicker
-      ref="dp" v-model="date" position="left" :teleport-center="width < 1024"
+      v-model="date" position="left" :teleport-center="width < 1024"
       :teleport="true" :min-date="startDate" :prevent-min-max-navigation="true" :dark="colorMode.value === 'dark'"
       locale="ru" range cancel-text="" select-text="Сохранить" @update:model-value="handleDate"
     >
@@ -81,7 +101,6 @@ function handleDate(modelData: any) {
           month,
           year,
           months,
-          years,
           updateMonthYear,
           handleMonthYearChange,
         }"
@@ -106,8 +125,18 @@ function handleDate(modelData: any) {
           </span>
         </div>
       </template>
+      <template #clock-icon>
+        <div class="flex justify-center items-center gap-2">
+          <Icon name="fluent:clock-24-regular" />
+          <div class="text-base-content">
+            Указать время
+          </div>
+        </div>
+      </template>
     </VueDatePicker>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>
