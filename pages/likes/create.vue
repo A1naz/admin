@@ -7,11 +7,11 @@ definePageMeta({
   title: 'Добавить лайки',
 })
 const { notify } = useNotification()
-const changedReviews = ref([]) as any
+const changedReviews = ref<any>([])
 
 const route = useRoute()
 const router = useRouter()
-const reviews = ref([]) as any
+const reviews = ref<any>([])
 const sortBy = ref('date')
 const article = ref('')
 const savedArticle = ref('')
@@ -24,7 +24,7 @@ async function getProductReviews() {
     method: 'GET',
     headers: useRequestHeaders(['cookie']) as HeadersInit,
     query: {
-      article: article.value,
+      article: savedArticle.value,
       limit: 50,
       sortBy: route.query.sortBy || 'date',
     },
@@ -152,6 +152,31 @@ function selectSorting(e: any) {
     },
   })
 }
+async function save() {
+  const { data, error } = await useFetch('/api/likes/create', {
+    method: 'POST',
+    body: {
+      article: savedArticle.value,
+      reviews: changedReviews.value,
+    },
+  })
+  if (error.value) {
+    notify({
+      type: 'error',
+      title: 'Ошибка',
+      text: error.value.message,
+    })
+    return
+  }
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Успешно',
+    })
+    return router.push('/likes')
+  }
+}
+
 async function cancel() {
   changedReviews.value = []
   article.value = savedArticle.value
@@ -255,7 +280,7 @@ watch(route, (route) => {
             <button class="btn btn-ghost text-neutral-content btn-sm" @click="cancel">
               Отмена
             </button>
-            <button class="btn btn-primary btn-sm">
+            <button class="btn btn-primary btn-sm" @click="save">
               Сохранить
             </button>
           </div>

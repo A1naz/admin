@@ -4,9 +4,23 @@ definePageMeta({
   auth: true,
   title: 'Лайки на отзывы',
 })
+const { $dayjs } = useNuxtApp()
 const route = useRoute()
 const router = useRouter()
 const review_likes = ref([]) as any
+const { data, error } = await useFetch('/api/likes/get')
+review_likes.value = data.value
+function getStatus(status: string) {
+  if (status === 'created')
+    return 'Создан'
+  else if (status === 'work')
+    return 'В работе'
+  else if (status === 'completed')
+    return 'Завершен'
+}
+onMounted(() => {
+  review_likes.value = data.value
+})
 </script>
 
 <template>
@@ -24,8 +38,55 @@ const review_likes = ref([]) as any
       </NuxtLink>
     </div>
     <div v-if="review_likes.length">
-      <transition-group class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4" tag="ul" name="fade" />
-      <div class="p-2 w-full col-span-1" />
+      <DataTable class="bg-base-200" :value="review_likes">
+        <Column field="place" header="№" />
+        <Column field="image" header="Фото">
+          <template #body="{ data }">
+            <nuxt-img width="32" class="rounded-lg object-contain" :src="data.image" />
+          </template>
+        </Column>
+        <Column field="article" header="Артикул">
+          <template #body="{ data }">
+            <a
+              :href="`https://www.wildberries.ru/catalog/${data.article}/detail.aspx`" target="_blank"
+              class="text-secondary link link-hover"
+            >
+              {{ data.article }}
+            </a>
+          </template>
+        </Column>
+        <Column field="likes" header="Лайки" />
+        <Column field="dislikes" header="Дизлайки" />
+        <Column field="status" header="Статус">
+          <template #body="{ data }">
+            <div
+              :class="{
+                'text-warning': data.status === 'created' || data.status === 'work',
+                'text-success': data.status === 'completed',
+              }"
+            >
+              {{ getStatus(data.status) }}
+            </div>
+          </template>
+        </Column>
+        <Column field="createdDate" header="Дата создания">
+          <template #body="{ data }">
+            <div>
+              {{ $dayjs(data.createdDate).format('D MMMM HH:mm') }}
+            </div>
+          </template>
+        </Column>
+        <Column field="endedDate" header="Дата завершения">
+          <template #body="{ data }">
+            <div v-if="data.endedDate">
+              {{ $dayjs(data.endedDate).format('D MMMM HH:mm') }}
+            </div>
+            <div v-else>
+              Нет
+            </div>
+          </template>
+        </Column>
+      </DataTable>
     </div>
 
     <div v-else class="hero">

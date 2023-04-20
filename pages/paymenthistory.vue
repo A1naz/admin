@@ -60,7 +60,7 @@ history.value = data.value
 .p-column-header-content {
   @apply flex gap-2
 }
-.p-sortable-column {
-
+.p-column-header-content {
+  @apply normal-case text-base
 }
 </style>
