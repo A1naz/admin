@@ -65,9 +65,9 @@ async function updatePassword() {
     body: JSON.stringify(passwordForm),
     headers,
   })
-  if (data.value?.status === 'error') {
+  if ((data.value as any)?.status === 'error') {
     alert.show = true
-    alert.message = data.value.error!
+    alert.message = (data.value as any).error!
     alert.type = 'error'
   }
   else {
@@ -206,7 +206,7 @@ function onTelegramLink(data: any) {
       class="profile-options mt-20 flex flex-col justify-center items-center gap-6 lg:gap-32 lg:pr-12 lg:flex-row lg:justify-between lg:items-start"
     >
       <div class="self-start description-container lg:basis-1/3">
-        <div class="heading">
+        <div class="heading relative">
           Пароль
         </div>
         <div class="text-xs text-gray-400">
@@ -220,8 +220,11 @@ function onTelegramLink(data: any) {
             placeholder="Старый пароль" class="input input-bordered w-full"
           >
           <input
-            v-model="passwordForm.newPassword" type="password" placeholder="Новый пароль"
-            class="input input-bordered w-full"
+            v-model="passwordForm.newPassword"
+            :class="{
+              'input-primary': !store.client.hasPassword,
+            }" type="password" placeholder="Новый пароль"
+            class="input  input-bordered w-full"
           >
         </div>
 

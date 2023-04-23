@@ -44,6 +44,8 @@ module.exports = {
       {
         dark: {
           ...require('daisyui/src/colors/themes')['[data-theme=dracula]'],
+          'primary-content': '#ffffff',
+          'neutral-content': '#ffffff',
           '--btn-text-case': 'normalcase',
         },
       },

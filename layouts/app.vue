@@ -113,7 +113,7 @@ const breadcrumbs = computed(() => getBreadcrumbs())
                 <NuxtLink
                   :class="{
                     'bg-neutral-focus': route.path !== '/profile',
-                  }" to="/profile" class="btn btn-circle btn-sm hover:bg-neutral"
+                  }" to="/profile" class="btn btn-sm btn-circle hover:bg-neutral relative"
                 >
                   <IconCSS name="fluent:person-24-filled" size="24" />
                 </NuxtLink>
@@ -126,12 +126,21 @@ const breadcrumbs = computed(() => getBreadcrumbs())
             </div>
           </div>
         </div>
+        <h3 class="opacity-60 text-sm p-3 px-8 uppercase">
+          Продвижение товаров
+        </h3>
         <SidebarItem title="Выкупы" icon="fluent:payment-24-filled" href="/buyouts" />
         <SidebarItem title="Доставки" icon="fluent:box-24-filled" href="/delivery" />
         <SidebarItem title="Отзывы" icon="fluent:comment-24-filled" href="/reviews" />
+        <h3 class="opacity-60 text-sm p-3 px-8 uppercase">
+          Улучшение репутации
+        </h3>
         <SidebarItem title="Лайки на отзывы" icon="fluent:thumb-like-24-filled" href="/likes" />
+        <SidebarItem title="Лайки на товар / бренд" icon="fluent:heart-24-filled" href="/productlikes" />
 
-        <li />
+        <h3 class="opacity-60 text-sm p-3 px-8 uppercase">
+          Дополнительно
+        </h3>
         <SidebarItem icon="fluent:history-24-filled" title="История платежей" href="/paymenthistory" />
         <li class="mt-auto w-full no-animation hover:bg-base-200">
           <div class="w-full no-animation hover:bg-base-200 hover:cursor-default p-0">
