@@ -8,6 +8,8 @@ export default defineNuxtConfig({
       title: process.env.NAME,
       link: [{ rel: 'icon', href: '/favicon.svg' }],
     },
+    pageTransition: { name: 'page', mode: 'out-in' },
+
   },
   colorMode: {
     preference: 'system', // default theme
