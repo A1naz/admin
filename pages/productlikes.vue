@@ -12,6 +12,7 @@ const amount = ref(0)
 const loadingUrl = ref(false)
 const url = ref('')
 const period = ref('3h')
+const { width, height } = useWindowSize()
 const productData = ref<any>(null)
 const urlError = ref(false)
 async function getProductLikes() {
@@ -208,7 +209,7 @@ onMounted(() => {
       </div>
     </div>
     <div v-if="product_likes.length">
-      <DataTable class="bg-base-200" :value="product_likes">
+      <DataTable v-if="width > 1024" class="bg-base-200 hidden lg:block" :value="product_likes">
         <Column field="place" header="№" />
         <Column field="image" header="Фото">
           <template #body="{ data }">
@@ -262,6 +263,84 @@ onMounted(() => {
           </template>
         </Column>
       </DataTable>
+      <ul v-else class="w-full lg:hidden">
+        <li v-for="(item, index) in product_likes" :key="index" class="pb-3 sm:pb-4">
+          <div tabindex="0" class=" relative collapse collapse-arrow bg-base-200 rounded-box">
+            <div class="collapse-title font-medium ">
+              <div class="text-gray-400 right-3 date text-start text-xs pb-2">
+                <div>
+                  {{ $dayjs(item.createdDate).format('D MMMM HH:mm') }}
+                </div>
+              </div>
+              <div class="flex gap-6 items-center w-full">
+                <div class="flex gap-4 items-start flex-wrap">
+                  <div class="image">
+                    <nuxt-img width="32" class="rounded-lg object-contain" :src="item.image" />
+                  </div>
+                  <div class="article flex flex-col gap-0.5">
+                    <div class="text-xs">
+                      Ссылка
+                    </div>
+                    <a
+                      :href="item.url" target="_blank"
+                      class="text-secondary link link-hover text-sm truncate w-48"
+                    >
+                      {{ item.name }}
+                    </a>
+                  </div>
+                  <div class="status flex flex-col gap-0.5">
+                    <div class="text-xs">
+                      Статус
+                    </div>
+                    <div
+                      class="text-sm"
+                      :class="{
+                        'text-warning': item.status === 'created' || item.status === 'work',
+                        'text-success': item.status === 'completed',
+                      }"
+                    >
+                      <div>
+                        {{ getStatus(item.status) }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="status flex flex-col gap-0.5">
+                    <div class="text-xs">
+                      Количество
+                    </div>
+                    <div class="text-sm">
+                      {{ item.amount }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="collapse-content flex gap-4">
+              <div class="flex flex-col">
+                <dt class="mb-1 text-gray-500 text-sm  dark:text-gray-400">
+                  Тип
+                </dt>
+                <dd class="font-semibold text-sm">
+                  <div>{{ item.type === 'brand' ? 'Бренд' : 'Товар' }}</div>
+                </dd>
+              </div>
+              <div class="flex flex-col">
+                <dt class="mb-1 text-gray-500 text-sm  dark:text-gray-400">
+                  Дата завершения
+                </dt>
+                <dd class="font-semibold text-sm">
+                  <div v-if="item.endedDate">
+                    {{ $dayjs(item.endedDate).format('D MMMM HH:mm') }}
+                  </div>
+                  <div v-else>
+                    Нет
+                  </div>
+                </dd>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
 
     <div v-else class="hero">

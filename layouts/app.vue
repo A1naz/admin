@@ -4,16 +4,10 @@ const colorMode = useColorMode()
 
 const theme = ref('light')
 const route = useRoute()
-const themes = ['cupcake', 'bumblebee', 'emerald', 'corporate', 'synthwave', 'retro', 'cyberpunk', 'valentine', 'halloween', 'garden', 'forest', 'aqua', 'lofi', 'pastel', 'fantasy', 'wireframe', 'black', 'luxury', 'dracula', 'cmyk', 'autumn', 'business', 'acid', 'lemonade', 'night', 'coffee', 'winter']
-const numberFormat = new Intl.NumberFormat()
 const { status, data, signIn, signOut } = useAuth()
 const currency = useCurrency()
 const pageContent = ref()
-
-const name = useRuntimeConfig().public.NAME
-const currentPath = ref(useRoute().path)
-const clicks = ref(0)
-const timer: NodeJS.Timeout | null = null
+const lightMode = ref(colorMode.value === 'dark')
 function changeTheme() {
   if (colorMode.value === 'light')
     colorMode.preference = 'dark'
@@ -158,8 +152,17 @@ const breadcrumbs = computed(() => getBreadcrumbs())
                   Выйти
                 </span>
               </div>
-              <label class="btn btn-ghost btn-square z-10 w-[20%]" @click="changeTheme">
-                <Icon name="fluent:dark-theme-24-filled" size="24" />
+              <label class="btn btn-ghost btn-square z-10 w-[20%] swap swap-rotate">
+
+                <!-- this hidden checkbox controls the state -->
+                <input v-model="lightMode" type="checkbox" @click="changeTheme">
+
+                <!-- sun icon -->
+                <Icon class="swap-on fill-current w-6 h-6" name="fluent:weather-sunny-24-filled" />
+
+                <!-- moon icon -->
+                <Icon class="swap-off fill-current w-6 h-6" name="fluent:weather-moon-24-regular" />
+
               </label>
             </div>
           </div>

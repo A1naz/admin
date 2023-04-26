@@ -40,7 +40,7 @@ watch(() => props.state, (newState) => {
             info.uuid }}</label>
         </div>
       </div>
-      <div class="flex justify-between flex-wrap">
+      <div class="flex justify-between flex-wrap gap-2 items-center">
         <div class="text-sm">
           <span class="text-gray-400">Статус: </span> <span>
             {{ info.currentstatus }}

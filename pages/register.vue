@@ -63,11 +63,6 @@ async function submitForm() {
     loading.value = false
   }
 }
-
-onMounted(async () => {
-  if (status.value === 'authenticated')
-    return navigateTo('/app', { external: true })
-})
 </script>
 
 <template>

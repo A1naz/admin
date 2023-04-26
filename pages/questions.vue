@@ -7,7 +7,7 @@ definePageMeta({
   title: 'Вопросы',
 })
 const { $dayjs } = useNuxtApp()
-const product_likes = ref([]) as any
+const questions = ref([]) as any
 const amount = ref(0)
 const now = useNow()
 const publishDate = ref(now.value)
@@ -15,12 +15,13 @@ const loadingUrl = ref(false)
 const questionText = ref('')
 const article = ref('')
 const sex = ref('male')
+const { width, height } = useWindowSize()
 const productData = ref<any>(null)
 const urlError = ref(false)
 async function getQuestions() {
   const { data, error } = await useFetch('/api/questions/get', { method: 'GET' })
   if (data.value)
-    product_likes.value = data.value
+    questions.value = data.value
   if (error.value)
     notify({ type: 'error', title: 'Не удалось получить лайки', text: error.value.message })
 }
@@ -197,63 +198,125 @@ onMounted(() => {
       </div>
     </div>
 
-    <div v-if="product_likes.length">
-      <DataTable class="bg-base-200" :value="product_likes">
-        <Column field="place" header="№" />
-        <Column field="image" header="Фото">
-          <template #body="{ data }">
-            <nuxt-img class="rounded-lg object-contain h-8" :src="data.image" />
-          </template>
-        </Column>
-        <Column field="article" header="Артикул">
-          <template #body="{ data }">
-            <a
-              :href="`https://www.wildberries.ru/catalog/${data.article}/detail.aspx`" target="_blank"
-              class="text-sm text-secondary link link-hover"
-            >
-              {{ data.article }}
-            </a>
-          </template>
-        </Column>
-        <Column field="gender" header="Пол">
-          <template #body="{ data }">
-            <div>{{ data.gender === 'male' ? 'М' : 'Ж' }}</div>
-          </template>
-        </Column>
-        <Column field="text" header="Вопрос" />
+    <div v-if="questions.length">
+      <ClientOnly>
+        <DataTable v-if="width > 1024" class="bg-base-200 hidden lg:block" :value="questions">
+          <Column field="place" header="№" />
+          <Column field="image" header="Фото">
+            <template #body="{ data }">
+              <nuxt-img class="rounded-lg object-contain h-8" width="32" :src="data.image" />
+            </template>
+          </Column>
+          <Column field="article" header="Артикул">
+            <template #body="{ data }">
+              <a
+                :href="`https://www.wildberries.ru/catalog/${data.article}/detail.aspx`" target="_blank"
+                class="text-sm text-secondary link link-hover"
+              >
+                {{ data.article }}
+              </a>
+            </template>
+          </Column>
+          <Column field="gender" header="Пол">
+            <template #body="{ data }">
+              <div>{{ data.gender === 'male' ? 'М' : 'Ж' }}</div>
+            </template>
+          </Column>
+          <Column field="text" header="Вопрос">
+            <template #body="{ data }">
+              <p class="max-w-xs truncate">
+                {{ data.text }}
+              </p>
+            </template>
+          </Column>
 
-        <Column field="status" header="Статус">
-          <template #body="{ data }">
-            <div
-              :class="{
-                'text-warning': data.status === 'created' || data.status === 'work',
-                'text-success': data.status === 'completed',
-              }"
-            >
-              {{ getStatus(data.status) }}
+          <Column field="status" header="Статус">
+            <template #body="{ data }">
+              <div
+                :class="{
+                  'text-warning': data.status === 'created' || data.status === 'work',
+                  'text-success': data.status === 'completed',
+                }"
+              >
+                {{ getStatus(data.status) }}
+              </div>
+            </template>
+          </Column>
+          <Column field="createdDate" header="Дата создания">
+            <template #body="{ data }">
+              <div>
+                {{ $dayjs(data.createdDate).format('D MMMM HH:mm') }}
+              </div>
+            </template>
+          </Column>
+          <Column field="publishDate" header="Дата публикации">
+            <template #body="{ data }">
+              <div v-if="data.publishDate">
+                {{ $dayjs(data.publishDate).format('D MMMM HH:mm') }}
+              </div>
+              <div v-else>
+                Нет
+              </div>
+            </template>
+          </Column>
+        </DataTable>
+        <div v-else class="cards grid grid-cols-1 gap-4 lg:hidden">
+          <div v-for="(item, index) in questions" :key="index" class="card card-compact bg-base-100 shadow-xl">
+            <div class="card-body">
+              <div class="flex gap-4">
+                <div class="image">
+                  <nuxt-img width="32" class="rounded-lg object-contain" :src="item.image" />
+                </div>
+                <div class="article flex flex-col gap-0.5">
+                  <div class="text-xs">
+                    Артикул
+                  </div>
+                  <a
+                    :href="`https://www.wildberries.ru/catalog/${item.article}/detail.aspx`" target="_blank"
+                    class="text-secondary link link-hover text-sm"
+                  >
+                    {{ item.article }}
+                  </a>
+                </div>
+                <div class="status flex flex-col gap-0.5">
+                  <div class="text-xs">
+                    Статус
+                  </div>
+                  <div
+                    class="text-sm"
+                    :class="{
+                      'text-warning': item.status === 'created' || item.status === 'work',
+                      'text-success': item.status === 'completed',
+                    }"
+                  >
+                    <div>
+                      {{ getStatus(item.status) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="date ml-auto text-xs text-end">
+                  {{ $dayjs(item.createdDate).format('D MMMM HH:mm') }}
+                </div>
+              </div>
+
+              <div class="flex">
+                <div class="article flex flex-col gap-0.5">
+                  <p class="p-2 bg-base-200 mt-2 rounded-lg max-h-20 overflow-auto">
+                    {{ item.text }}
+                  </p>
+                </div>
+              </div>
+              <div class="card-actions justify-start mt-2">
+                <div>Дата публикации:</div>
+                <div>
+                  {{ $dayjs(item.publishDate).format('D MMMM HH:mm') }}
+                </div>
+              </div>
             </div>
-          </template>
-        </Column>
-        <Column field="createdDate" header="Дата создания">
-          <template #body="{ data }">
-            <div>
-              {{ $dayjs(data.createdDate).format('D MMMM HH:mm') }}
-            </div>
-          </template>
-        </Column>
-        <Column field="publishDate" header="Дата публикации">
-          <template #body="{ data }">
-            <div v-if="data.publishDate">
-              {{ $dayjs(data.publishDate).format('D MMMM HH:mm') }}
-            </div>
-            <div v-else>
-              Нет
-            </div>
-          </template>
-        </Column>
-      </DataTable>
+          </div>
+        </div>
+      </ClientOnly>
     </div>
-
     <div v-else class="hero">
       <div class="hero-content text-center flex justify-center items-center h-80">
         <div class="max-w-md">
