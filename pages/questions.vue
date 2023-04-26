@@ -40,6 +40,8 @@ async function create() {
     return notify({ type: 'error', title: 'Что-то пошло не так', text: error.value.message })
   if (data.value) {
     notify({ type: 'success', title: 'Упешно' })
+    removeProduct()
+    publishDate.value = now.value
     getQuestions()
   }
 }
