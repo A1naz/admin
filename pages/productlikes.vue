@@ -133,13 +133,14 @@ onMounted(() => {
             <div class="input-sm rounded-lg w-24 text-center bg-base-100 ">
               {{ amount }}
             </div>
-            <div
+            <button
+              :disabled="amount >= 1000"
               :class="{
                 'btn-disabled': !productData,
               }" class="absolute right-0 btn btn-ghost btn-sm btn-square" @click="amount += 10"
             >
               <IconCSS size="16" name="ic:round-plus" />
-            </div>
+            </button>
           </div>
         </div>
         <div>

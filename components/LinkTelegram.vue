@@ -12,8 +12,8 @@ const props = defineProps({
   },
 })
 const emit = defineEmits(['callback'])
-const bot_id = useRuntimeConfig().BOT_ID
-const bot_login = useRuntimeConfig().BOT_LOGIN
+const bot_id = useRuntimeConfig().public.BOT_ID
+const bot_login = useRuntimeConfig().public.BOT_LOGIN
 const store = useMainStore()
 const { signIn } = useAuth()
 async function onTelegramAuth(user: any) {

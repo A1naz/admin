@@ -204,6 +204,8 @@ onMounted(() => {
               v-model="form.text" class="textarea w-full textarea-md bg-base-200"
               placeholder="Например, хороший телефон"
             />
+            <label class="label py-0"> <span class="label-text-alt" />
+              <span class="label-text-alt">От до 10 до 1000 символов</span></label>
           </div>
 
           <div>
@@ -284,7 +286,7 @@ onMounted(() => {
                       </div>
                       <input
                         :ref="`fileInput${index}`" type="file"
-                        class="hidden" @change="(e) => uploadToS3(e, index)"
+                        class="hidden" @change="(e: Event) => uploadToS3(e, index)"
                       >
                       <IconCSS
                         v-show="loadingIndex !== index"

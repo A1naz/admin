@@ -6,10 +6,15 @@ const props = defineProps({
     required: true,
     type: Date,
   },
+  size: {
+    type: String,
+    default: 'small',
+  },
 })
 const emit = defineEmits(['update:modelValue'])
 const colorMode = useColorMode()
 const { $dayjs } = useNuxtApp()
+const { width, height } = useWindowSize()
 const startDate = ref(new Date())
 const date = ref(props.modelValue)
 const store = useMainStore()
@@ -27,16 +32,23 @@ function handleDate(modelData: any) {
 <template>
   <ClientOnly>
     <VueDatePicker
-      v-model="date" teleport-center :teleport="true" :min-date="startDate"
+      v-model="date" :teleport-center="width < 1280" :teleport="true" :min-date="startDate"
       :prevent-min-max-navigation="true" :dark="colorMode.value === 'dark'" locale="ru" cancel-text=""
       select-text="Сохранить" @update:model-value="handleDate"
     >
       <template #trigger>
-        <button class="btn btn-primary btn-sm normal-case w-full">
-          {{
-            date ? 'Изменить' : 'Выбрать'
-          }}
-        </button>
+        <div class="flex w-full justify-end">
+          <button
+            :class="{
+              'btn-sm': size === 'small',
+              'btn-md': size === 'medium',
+            }" class="btn btn-primary normal-case w-30"
+          >
+            {{
+              date ? 'Изменить' : 'Выбрать'
+            }}
+          </button>
+        </div>
       </template>
       <template #action-row="{ internalModelValue, selectDate }">
         <div class="action-row flex flex-col justify-center gap-2 w-full">

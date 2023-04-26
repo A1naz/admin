@@ -8,7 +8,9 @@ const themes = ['cupcake', 'bumblebee', 'emerald', 'corporate', 'synthwave', 're
 const numberFormat = new Intl.NumberFormat()
 const { status, data, signIn, signOut } = useAuth()
 const currency = useCurrency()
-const name = useRuntimeConfig().NAME
+const pageContent = ref()
+
+const name = useRuntimeConfig().public.NAME
 const currentPath = ref(useRoute().path)
 const clicks = ref(0)
 const timer: NodeJS.Timeout | null = null
@@ -48,12 +50,13 @@ function getBreadcrumbs() {
 onMounted(() => {
   theme.value = localStorage.getItem('theme') || 'light'
 })
+
 const breadcrumbs = computed(() => getBreadcrumbs())
 </script>
 
 <template>
   <div class="drawer drawer-mobile">
-    <input id="my-drawer" v-model="store.drawerOpened" type="checkbox" class="drawer-toggle lg:">
+    <input id="my-drawer" v-model="store.drawerOpened" type="checkbox" class="drawer-toggle">
     <div class="drawer-content scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
       <div class="w-full navbar bg-base-100 lg:hidden">
         <div class="flex-none">
@@ -72,7 +75,7 @@ const breadcrumbs = computed(() => getBreadcrumbs())
       </div>
 
       <!-- Page content here -->
-      <div class="px-6 py-2 lg:p-6 block">
+      <div ref="pageContent" class="px-6 py-2 lg:p-6 block">
         <div v-if="route.path !== '/profile' && route.path !== '/paymenthistory'" class="breadcrumbs p-0 lg:text-sm">
           <ul>
             <li>
@@ -126,19 +129,20 @@ const breadcrumbs = computed(() => getBreadcrumbs())
             </div>
           </div>
         </div>
-        <h3 class="opacity-60 text-sm p-3 px-8 uppercase">
+        <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
           Продвижение товаров
         </h3>
         <SidebarItem title="Выкупы" icon="fluent:payment-24-filled" href="/buyouts" />
         <SidebarItem title="Доставки" icon="fluent:box-24-filled" href="/delivery" />
         <SidebarItem title="Отзывы" icon="fluent:comment-24-filled" href="/reviews" />
-        <h3 class="opacity-60 text-sm p-3 px-8 uppercase">
+        <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
           Улучшение репутации
         </h3>
         <SidebarItem title="Лайки на отзывы" icon="fluent:thumb-like-24-filled" href="/likes" />
         <SidebarItem title="Лайки на товар / бренд" icon="fluent:heart-24-filled" href="/productlikes" />
+        <SidebarItem title="Вопросы" icon="fluent:chat-bubbles-question-24-filled" href="/questions" />
 
-        <h3 class="opacity-60 text-sm p-3 px-8 uppercase">
+        <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
           Дополнительно
         </h3>
         <SidebarItem icon="fluent:history-24-filled" title="История платежей" href="/paymenthistory" />

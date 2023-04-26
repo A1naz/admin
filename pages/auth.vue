@@ -9,7 +9,7 @@ const store = useMainStore()
 definePageMeta({ auth: false })
 
 const { status, data, signIn, signOut } = useAuth()
-const name = useRuntimeConfig().NAME
+const name = useRuntimeConfig().public.NAME
 const alert = ref(false)
 const alertText = ref('')
 const alertType = ref('success')

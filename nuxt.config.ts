@@ -3,10 +3,15 @@ const baseUrl = '/'
 
 export default defineNuxtConfig({
   app: {
+
     baseURL: baseUrl,
     head: {
+      viewport: 'width=device-width,initial-scale=1',
       title: process.env.NAME,
       link: [{ rel: 'icon', href: '/favicon.svg' }],
+      meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'TOPVTOP - сервис продвижения Wildberries' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }],
     },
     pageTransition: { name: 'page', mode: 'out-in' },
 
@@ -64,6 +69,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@vite-pwa/nuxt',
     '@bg-dev/nuxt-s3',
+    '@nuxtjs/fontaine',
   ],
   css: [
     'primevue/resources/primevue.css',
@@ -119,5 +125,6 @@ export default defineNuxtConfig({
   },
   security: {
     headers: false,
+    xssValidator: false,
   },
 })

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useNotification } from '@kyvg/vue3-notification'
+import { SwipeDirection } from '@vueuse/core'
 import { useMainStore } from '@/stores/main'
 
 const { notify } = useNotification()
@@ -15,13 +16,25 @@ useIntervalFn(() => {
 if (status.value === 'authenticated')
   await store.getClient()
 
+const app = ref()
+
+const { isSwiping, direction, coordsStart } = useSwipe(app, {
+  threshold: 50,
+})
+
+watch(isSwiping, (val) => {
+  if (!val)
+    return
+  if (direction.value === SwipeDirection.RIGHT && coordsStart.x < app.value.offsetWidth / 2)
+    store.drawerOpened = true
+})
 watch(client, (newClient) => {
   store.setClient(newClient?.client as object)
 })
 </script>
 
 <template>
-  <div>
+  <div ref="app">
     <notifications position="bottom right">
       <template #body="props">
         <div style="padding: 1rem">

@@ -14,11 +14,10 @@ const props = defineProps({
 const emit = defineEmits(['callback'])
 const store = useMainStore()
 const { signIn } = useAuth()
-const bot_id = useRuntimeConfig().BOT_ID
-const bot_login = useRuntimeConfig().BOT_LOGIN
+const bot_id = useRuntimeConfig().public.BOT_ID
+const bot_login = useRuntimeConfig().public.BOT_LOGIN
 
 async function onTelegramAuth(user: any) {
-  console.log('user-----', user)
   const { error, url } = await signIn('telegram-login', { ...user, redirect: false })
 
   if (error) {
@@ -26,7 +25,6 @@ async function onTelegramAuth(user: any) {
   }
   else {
     // No error, continue with the sign in, e.g., by following the returned redirect:
-    console.log('authed', url)
     store.getClient()
     return navigateTo('/buyouts', { external: true })
   }
@@ -35,8 +33,7 @@ const telegram = ref()
 
 function login() {
   const telegramLogin = bot_login
-  console.log('telegramLogin', telegramLogin)
-  // @ts-expect-error
+  // @ts-expect-error window global var
   window.Telegram.Login.auth(
     { bot_id, request_access: true },
     (data: any) => {

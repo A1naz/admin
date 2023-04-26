@@ -66,5 +66,5 @@ export default eventHandler(async (event) => {
   }
 
   await user.save()
-  return { status: 'ok' }
+  return { status: 'ok', error: null }
 })

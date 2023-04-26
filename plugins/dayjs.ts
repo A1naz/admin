@@ -1,9 +1,18 @@
 import dayjs from 'dayjs'
-import Calendar from 'dayjs/plugin/calendar' // import plugin
-import relativeTime from 'dayjs/plugin/relativeTime' // import plugin
+import Calendar from 'dayjs/plugin/calendar'
+
+// import plugin
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+// import plugin
 import updateLocale from 'dayjs/plugin/updateLocale' // import plugin
 import 'dayjs/locale/ru'
 
+declare module '#app' {
+  interface NuxtApp {
+    $dayjs: typeof dayjs
+  }
+}
 export default defineNuxtPlugin(() => {
   dayjs.extend(Calendar)
   dayjs.extend(relativeTime)

@@ -7,7 +7,6 @@ const { status } = useAuth()
 const alert = ref(false)
 const alertText = ref('')
 const alertType = ref('success')
-const name = useRuntimeConfig().NAME
 const result = ref()
 const formData = reactive({
   email: '',
@@ -45,10 +44,10 @@ async function submitForm() {
     })
     result.value = data
     loading.value = false
-    if (data.value?.status === 'error') {
+    if (data.value!.status === 'error') {
       alert.value = true
       alertType.value = 'error'
-      alertText.value = data.value.error as string
+      alertText.value = data.value!.error as string
       useTimeoutFn(() => {
         alert.value = false
       }, 3000)

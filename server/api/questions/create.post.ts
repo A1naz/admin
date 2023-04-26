@@ -1,6 +1,6 @@
 import { getServerSession } from '#auth'
 import { User } from '@/server/lib/models/User'
-import { ProductLike } from '@/server/lib/models/ProductLike'
+import { Question } from '~/server/lib/models/Question'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -12,22 +12,22 @@ export default eventHandler(async (event) => {
   if (!user)
     return sendRedirect(event, '/auth', 302)
 
-  const { url, amount, period, productData } = await readBody(event)
-  if (amount > 1000 || amount <= 0) {
+  const { productData, article, publishDate, gender, questionText } = await readBody(event)
+  const { image } = productData
+
+  if (questionText.length < 10 || questionText.length > 1000) {
     throw createError({
       statusCode: 400,
-      message: 'Не больше 1000 лайков за один заказ',
+      message: 'Текст вопроса должен быть длиннее 10 символов и меньше 1000',
     })
   }
-  const { type, image, name } = productData
-  const created = new ProductLike({
+  const created = new Question({
     user,
-    url,
-    amount,
-    period,
-    type,
+    article,
+    publishDate,
+    gender,
+    text: questionText,
     image,
-    name,
   })
   await created.save()
   return {
