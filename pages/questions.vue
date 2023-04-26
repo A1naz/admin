@@ -14,7 +14,7 @@ const publishDate = ref(now.value)
 const loadingUrl = ref(false)
 const questionText = ref('')
 const article = ref('')
-const sex = ref('3h')
+const sex = ref('male')
 const productData = ref<any>(null)
 const urlError = ref(false)
 async function getQuestions() {

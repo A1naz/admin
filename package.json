@@ -50,7 +50,7 @@
     "@nuxtjs/color-mode": "^3.2.0",
     "@nuxtjs/fontaine": "^0.2.5",
     "@nuxtjs/tailwindcss": "^6.4.1",
-    "@sidebase/nuxt-auth": "0.5.0-rc.0",
+    "@sidebase/nuxt-auth": "0.5.0",
     "@types/bcrypt": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/nodemailer": "^6.4.7",

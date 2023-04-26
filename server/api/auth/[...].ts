@@ -97,19 +97,17 @@ export default NuxtAuthHandler({
 
       async authorize(credentials: any) {
         const { email, password } = credentials
-
         if (!email || !password)
           return null
 
         const user = await User.findOne({ email })
-
         if (!user)
           throw new Error('User not found')
 
         if (!user.password)
           throw new Error('Password not set')
 
-        const isValid = bcrypt.compare(password, user.password)
+        const isValid = await bcrypt.compare(password, user.password)
 
         if (!isValid)
           throw new Error('Invalid password')
