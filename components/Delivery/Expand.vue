@@ -30,33 +30,37 @@ watch(() => props.state, (newState) => {
   <div class="collapse collapse-arrow border border-base-200 bg-base-100 rounded-box overflow-visible">
     <input v-model="opened" type="checkbox">
     <div class="collapse-title relative text-xl font-medium">
-      <div class="flex justify-between flex-wrap">
-        <span> Доставка №{{ info.place }}
-        </span>
-        <div class="tooltip z-10" data-tip="Перейти к выкупу" @click="openBuyout">
-          <label
-            class="text-[0.6rem] link link-hover sm:text-[0.8rem] lg:text-xs text-gray-500 hover:text-primary z-10 truncate"
-          >#{{
-            info.uuid }}</label>
-        </div>
-      </div>
-      <div class="flex justify-between flex-wrap gap-2 items-center">
-        <div class="text-sm">
-          <span class="text-gray-400">Статус: </span> <span>
-            {{ info.currentstatus }}
-          </span>
-        </div>
+      <div class="flex gap-4">
+        <nuxt-img
+          fit="fill" :class="{
+            'opacity-0': opened,
+          }" :src="info.productimage" width="36"
+          class="rounded-lg transition-opacity ease-in-out duration-200 hidden lg:block"
+        />
+        <div class="w-full">
+          <div class="flex justify-between flex-wrap">
+            <span> Доставка №{{ info.place }}
+            </span>
+            <div class="tooltip z-10" data-tip="Перейти к выкупу" @click="openBuyout">
+              <label
+                class="text-[0.6rem] link link-hover sm:text-[0.8rem] lg:text-xs text-gray-500 hover:text-primary z-10 truncate"
+              >#{{
+                info.uuid }}</label>
+            </div>
+          </div>
+          <div class="flex justify-between flex-wrap gap-2 items-center">
+            <div class="text-sm">
+              <span class="text-gray-400">Статус: </span> <span>
+                {{ info.currentstatus }}
+              </span>
+            </div>
 
-        <div class="mt-2 lg:m-0 text-xs">
-          Обновлено {{ $dayjs(info.updatedAt).format('D MMMM HH:mm') }}
+            <div class="mt-2 lg:m-0 text-xs">
+              Обновлено {{ $dayjs(info.updatedAt).format('D MMMM HH:mm') }}
+            </div>
+          </div>
         </div>
       </div>
-      <nuxt-img
-        fit="fill" :class="{
-          'opacity-0': opened,
-        }" :src="info.productimage" width="36"
-        class="absolute top-4 left-[25%] rounded-lg transition-opacity ease-in-out duration-200 hidden lg:block"
-      />
     </div>
     <div class="collapse-content">
       <div class="product flex gap-4 lg:gap-8 items-center flex-wrap overflow-visible">

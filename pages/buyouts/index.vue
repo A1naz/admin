@@ -226,31 +226,26 @@ watch(route, async (newRoute) => {
       </NuxtLink>
     </div>
     <div v-if="buyouts.length">
-      <ClientOnly>
-        <div v-if="route.query.status === 'active' || !route.query.status && activeBuyouts.length > 0" class="flex justify-center py-2 rounded-lg px-2 mb-2 bg-base-100 border border-base-200">
-          <p
-            v-if="availableBuyouts" :class="{
-              'text-success': availableBuyouts === activeBuyouts.length,
-            }" class="text-sm"
-          >
-            {{ availableBuyouts === activeBuyouts.length ? 'Баланса хватит на все выкупы' : `Баланса хватит на ${availableBuyouts} ${formatAvailable} из ${activeBuyouts.length}` }}
-          </p>
-          <p v-if="availableBuyouts === 0 && activeBuyouts.length > 0" class="text-center text-warning text-sm">
-            Недостаточно средств для совершения выкупа, пополните баланс.
-          </p>
-        </div>
-        <div v-else class="px-2 py-4 mb-2" />
-      </ClientOnly>
-      <transition-group
-        class="cards grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" tag="ul"
-        name="fade"
-      >
+      <div v-if="route.query.status === 'active' || !route.query.status && activeBuyouts.length > 0" class="flex justify-center py-2 rounded-lg px-2 mb-2 bg-base-100 border border-base-200">
+        <p
+          v-if="availableBuyouts" :class="{
+            'text-success': availableBuyouts === activeBuyouts.length,
+          }" class="text-sm"
+        >
+          {{ availableBuyouts === activeBuyouts.length ? 'Баланса хватит на все выкупы' : `Баланса хватит на ${availableBuyouts} ${formatAvailable} из ${activeBuyouts.length}` }}
+        </p>
+        <p v-if="availableBuyouts === 0 && activeBuyouts.length > 0" class="text-center text-warning text-sm">
+          Недостаточно средств для совершения выкупа, пополните баланс.
+        </p>
+      </div>
+      <div v-else class="px-2 py-4 mb-2" />
+      <TransitionSlide group class="cards grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         <BuyoutCard
           v-for="(buyout, index) of buyouts" :key="buyout.uuid" :place="buyouts.length - index"
           :index="index" :info="buyout" @unarchive="unarchiveBuyout" @archive="archiveBuyout"
           @open-modal="openModal" @remove="removeBuyout"
         />
-      </transition-group>
+      </TransitionSlide>
       <div ref="target" class="p-2 w-full col-span-1" />
     </div>
 

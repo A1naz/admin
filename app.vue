@@ -49,6 +49,10 @@ watch(client, (newClient) => {
     </notifications>
     <NuxtLayout>
       <NuxtLoadingIndicator :color="colorMode.value === 'light' ? '#570df8' : '#ff79c6'" />
+      <SeoKit />
+      <OgImageScreenshot />
+      <!-- b. Generate saotir images for every page (uses the default template) -->
+      <OgImageStatic />
       <NuxtPage />
     </NuxtLayout>
   </div>

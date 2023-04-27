@@ -9,6 +9,7 @@ export default defineNuxtConfig({
       viewport: 'width=device-width,initial-scale=1',
       title: process.env.NAME,
       link: [{ rel: 'icon', href: '/favicon.svg' }],
+      titleTemplate: '%pageTitle %titleSeparator %siteName',
       meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'TOPVTOP - сервис продвижения Wildberries' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }],
@@ -70,13 +71,34 @@ export default defineNuxtConfig({
     '@vite-pwa/nuxt',
     '@bg-dev/nuxt-s3',
     '@nuxtjs/fontaine',
+    'nuxt-delay-hydration',
+    '@sfxcode/nuxt-primevue',
+    '@nuxtjs/robots',
+    '@nuxtjs/html-validator',
+    'nuxt-purgecss',
+    '@morev/vue-transitions/nuxt',
   ],
   css: [
     'primevue/resources/primevue.css',
     'primeicons/primeicons.css',
+    '@vuepic/vue-datepicker/dist/main.css',
+    '@sfxcode/formkit-primevue/dist/sass/formkit-prime-inputs.scss',
+    '@sfxcode/formkit-primevue/dist/sass/formkit-primevue.scss',
     // 'primevue/resources/themes/tailwind-light/theme.css',
     // 'primevue/resources/themes/soho-dark/theme.css',
   ],
+  purgecss: {
+    enabled: false, // Always enable purgecss
+    safelist: ['collapse'], // Add my-class token to the safelist (e.g. .my-class)
+  },
+  extends: [
+    'nuxt-seo-kit',
+  ],
+  delayHydration: {
+    // enables nuxt-delay-hydration in dev mode for testing
+    mode: 'mount',
+    debug: process.env.NODE_ENV === 'development',
+  },
   s3: {
     client: {
       credentials: {
@@ -98,6 +120,11 @@ export default defineNuxtConfig({
   build: {
     transpile: ['nuxt', 'primevue'],
   },
+  primevue: {
+    components: {
+      include: ['DataTable', 'Column'],
+    },
+  },
   pwa: {
     registerType: 'autoUpdate',
     devOptions: {
@@ -109,10 +136,16 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      NAME: process.env.NAME,
+      siteName: process.env.NAME,
       BOT_ID: process.env.BOT_ID,
+      siteUrl: process.env.PUBLIC_SITE_URL,
+      siteDescription: 'Сервис для продвижения Wildberries.',
+      language: 'ru',
+      trailingSlash: true,
+      titleSeparator: '|',
       BOT_LOGIN: process.env.BOT_LOGIN,
     },
+    indexable: true,
     MONGODB_URI: process.env.MONGODB_URI,
     SECRET: process.env.SECRET,
     smtpHost: process.env.smtpHost,
