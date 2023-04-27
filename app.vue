@@ -3,6 +3,8 @@ import { useNotification } from '@kyvg/vue3-notification'
 import { SwipeDirection } from '@vueuse/core'
 import { useMainStore } from '@/stores/main'
 
+const { isModalVisible, toggle, toggleBubbleVisibility, popoutChatWindow } = useChatWoot()
+
 const { notify } = useNotification()
 const colorMode = useColorMode()
 
