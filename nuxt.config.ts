@@ -117,6 +117,10 @@ export default defineNuxtConfig({
       },
     },
   },
+  localtunnel: {
+    port: 8080,
+
+  },
   build: {
     transpile: ['nuxt', 'primevue'],
   },
