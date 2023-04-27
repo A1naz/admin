@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   },
   vue: {},
   auth: {
-    origin: process.env.PUBLIC_SITE_URL,
+    origin: process.env.PUBLIC_SITE_URL || 'https://app.topvtop.pro',
     enableGlobalAppMiddleware: true,
     defaultProvider: 'credentials',
   },
