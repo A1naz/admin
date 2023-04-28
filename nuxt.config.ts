@@ -18,11 +18,10 @@ export default defineNuxtConfig({
 
   },
   colorMode: {
-    preference: 'system', // default theme
-    dataValue: 'theme', // activate data-theme in <html> tag
+    preference: 'system',
+    dataValue: 'theme',
     classSuffix: '',
   },
-  vue: {},
   auth: {
     origin: process.env.PUBLIC_SITE_URL || 'https://app.topvtop.pro',
     enableGlobalAppMiddleware: true,
@@ -77,7 +76,6 @@ export default defineNuxtConfig({
     '@nuxtjs/html-validator',
     'nuxt-purgecss',
     '@morev/vue-transitions/nuxt',
-    '@productdevbook/chatwoot',
   ],
   css: [
     'primevue/resources/primevue.css',
@@ -85,26 +83,10 @@ export default defineNuxtConfig({
     '@vuepic/vue-datepicker/dist/main.css',
     '@sfxcode/formkit-primevue/dist/sass/formkit-prime-inputs.scss',
     '@sfxcode/formkit-primevue/dist/sass/formkit-primevue.scss',
-    // 'primevue/resources/themes/tailwind-light/theme.css',
-    // 'primevue/resources/themes/soho-dark/theme.css',
   ],
-  chatwoot: {
-    init: {
-      websiteToken: 'RiQ5d1jsXrBZJaQqad7uiaX7',
-      baseUrl: 'https://chatwoot-web.topvtop.pro',
-    },
-    settings: {
-      locale: 'ru',
-      position: 'right',
-      launcherTitle: 'Нужна помощь?',
-      // ... and more settings
-    },
-    // If this is loaded you can make it true, https://github.com/nuxt-modules/partytown
-    partytown: false,
-  },
   purgecss: {
-    enabled: false, // Always enable purgecss
-    safelist: ['collapse'], // Add my-class token to the safelist (e.g. .my-class)
+    enabled: false,
+    safelist: ['collapse'],
   },
   extends: [
     'nuxt-seo-kit',
@@ -131,10 +113,6 @@ export default defineNuxtConfig({
         maxWidthOrHeight: 1920,
       },
     },
-  },
-  localtunnel: {
-    port: 8080,
-
   },
   build: {
     transpile: ['nuxt', 'primevue'],

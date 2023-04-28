@@ -16,7 +16,6 @@
     "@next-auth/mongodb-adapter": "^1.1.1",
     "@nuxtus/nuxt-localtunnel": "^1.0.1",
     "@pinia/nuxt": "^0.4.7",
-    "@productdevbook/chatwoot": "^1.1.0",
     "@tailwindcss/typography": "^0.5.9",
     "@types/validator": "^13.7.13",
     "@vuelidate/core": "^2.0.0",

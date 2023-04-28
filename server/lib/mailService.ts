@@ -5,9 +5,10 @@ const config = useRuntimeConfig()
 const { smtpHost, smtpPort, smtpUser, smtpPass, privateKey } = config
 const alias = 'support@topvtop.com'
 class MailService {
-  tranporter: nodemailer.Transporter
+  transporter: nodemailer.Transporter
   constructor() {
-    this.tranporter = nodemailer.createTransport({
+    this.transporter = nodemailer.createTransport({
+      service: 'Mail.ru',
       host: smtpHost,
       port: smtpPort,
       secure: false,
@@ -24,7 +25,7 @@ class MailService {
   }
 
   async sendActivationMail(to: string | undefined, link: string) {
-    await this.tranporter
+    await this.transporter
       .sendMail({
         from: alias,
         to,
@@ -43,7 +44,7 @@ class MailService {
   }
 
   async sendChangePasswordMail(to: string | undefined, link: string, username: string) {
-    await this.tranporter
+    await this.transporter
       .sendMail({
         from: alias,
         to,

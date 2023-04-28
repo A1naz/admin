@@ -19,9 +19,6 @@ dependencies:
   '@pinia/nuxt':
     specifier: ^0.4.7
     version: 0.4.9(rollup@2.79.1)(typescript@5.0.4)(vue@3.2.47)
-  '@productdevbook/chatwoot':
-    specifier: ^1.1.0
-    version: 1.1.0(rollup@2.79.1)(vue@3.2.47)
   '@tailwindcss/typography':
     specifier: ^0.5.9
     version: 0.5.9(tailwindcss@3.3.1)
@@ -3720,19 +3717,6 @@ packages:
   /@polka/url@1.0.0-next.21:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: true
-
-  /@productdevbook/chatwoot@1.1.0(rollup@2.79.1)(vue@3.2.47):
-    resolution: {integrity: sha512-CiEOY20r6IFWggUj5iiOxTxQHkAmmrFf8WefaMZWxfQg4uhn3vcNnPzSRnh8b2hmqd+LIrUjjehF++4UosjVCQ==}
-    peerDependencies:
-      vue: ^3.2.47
-    dependencies:
-      '@nuxt/kit': 3.4.2(rollup@2.79.1)
-      defu: 6.1.2
-      vue: 3.2.47
-    transitivePeerDependencies:
-      - rollup
-      - supports-color
-    dev: false
 
   /@rollup/plugin-alias@5.0.0(rollup@3.21.0):
     resolution: {integrity: sha512-l9hY5chSCjuFRPsnRm16twWBiSApl2uYFLsepQYwtBuAxNMQ/1dJqADld40P0Jkqm65GRTLy/AC6hnpVebtLsA==}

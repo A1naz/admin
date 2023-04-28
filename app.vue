@@ -3,8 +3,6 @@ import { useNotification } from '@kyvg/vue3-notification'
 import { SwipeDirection } from '@vueuse/core'
 import { useMainStore } from '@/stores/main'
 
-const { isModalVisible, toggle, toggleBubbleVisibility, popoutChatWindow } = useChatWoot()
-
 const { notify } = useNotification()
 const colorMode = useColorMode()
 
@@ -55,7 +53,7 @@ watch(client, (newClient) => {
       <OgImageScreenshot />
       <!-- b. Generate saotir images for every page (uses the default template) -->
       <OgImageStatic />
-      <NuxtPage />
+      <NuxtPage :key="$route.fullPath" />
     </NuxtLayout>
   </div>
 </template>

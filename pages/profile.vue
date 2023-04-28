@@ -40,10 +40,6 @@ function updateInitital() {
 }
 onMounted(async () => {
   updateInitital()
-  form.firstName = store.client.firstName
-  form.lastName = store.client.lastName
-  form.email = store.client.email
-  form.username = store.client.username
 })
 const headers = useRequestHeaders(['cookie']) as HeadersInit
 const disabledSaveButton = computed(() => {
@@ -86,7 +82,7 @@ async function update() {
 
   const { data, error } = await useFetch('/api/user/update', {
     method: 'POST',
-    body: JSON.stringify(form),
+    body: form,
     headers,
   })
   if (error.value) {
