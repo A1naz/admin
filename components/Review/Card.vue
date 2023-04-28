@@ -17,12 +17,12 @@ const emit = defineEmits(['openModal'])
   <div
     class="card card-compact shadow-md transition duration-300 ease-in-out border-[2.5px] border-transparent hover:shadow-xl"
   >
-    <figure>
+    <figure class="rounded-lg">
       <a
-        class="w-full h-100" :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`"
+        class="w-full h-72" :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`"
         target="_blank"
       >
-        <nuxt-img fit="fill" class="w-full h-100" :src="info.productimage" /> </a>
+        <nuxt-img fit="contain" class="w-full h-72 object-contain rounded-lg" :src="info.productimage" /> </a>
     </figure>
     <div class="card-body overflow-hidden">
       <div class="truncate">

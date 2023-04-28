@@ -158,7 +158,7 @@ const breadcrumbs = computed(() => getBreadcrumbs())
                 <input v-model="lightMode" type="checkbox" @click="changeTheme">
 
                 <!-- sun icon -->
-                <Icon class="swap-on fill-current w-6 h-6" name="fluent:weather-sunny-24-filled" />
+                <Icon class="swap-on fill-current w-6 h-6" name="fluent:weather-sunny-24-regular" />
 
                 <!-- moon icon -->
                 <Icon class="swap-off fill-current w-6 h-6" name="fluent:weather-moon-24-regular" />
