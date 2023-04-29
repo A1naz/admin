@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia'
-// main is the name of the store. It is unique across your application
-// and will appear in devtools
+
 export const useMainStore = defineStore('main', {
-  // a function that returns a fresh state
   state: () => ({
     client: {} as any,
     theme: 'light',
@@ -23,9 +21,6 @@ export const useMainStore = defineStore('main', {
 
     setClient(client: object) {
       this.client = client
-    },
-    reset() {
-      // `this` is the store instance
     },
   },
 })

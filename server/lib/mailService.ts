@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import nodemailer from 'nodemailer'
 
 const config = useRuntimeConfig()
@@ -8,7 +7,6 @@ class MailService {
   transporter: nodemailer.Transporter
   constructor() {
     this.transporter = nodemailer.createTransport({
-      service: 'Mail.ru',
       host: smtpHost,
       port: smtpPort,
       secure: false,
@@ -25,7 +23,7 @@ class MailService {
   }
 
   async sendActivationMail(to: string | undefined, link: string) {
-    await this.transporter
+    const result = await this.transporter
       .sendMail({
         from: alias,
         to,
@@ -38,13 +36,11 @@ class MailService {
                 </div>
             `,
       })
-      .then((info) => {
-        console.log(info)
-      })
+    return result
   }
 
   async sendChangePasswordMail(to: string | undefined, link: string, username: string) {
-    await this.transporter
+    const result = this.transporter
       .sendMail({
         from: alias,
         to,
@@ -59,9 +55,7 @@ class MailService {
                 </div>
             `,
       })
-      .then((info) => {
-        console.log(info)
-      })
+    return result
   }
 }
 

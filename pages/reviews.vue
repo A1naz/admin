@@ -5,7 +5,6 @@ definePageMeta({
   title: 'Отзывы',
 })
 const route = useRoute()
-const store = useMainStore()
 const reviews = ref([]) as any
 const router = useRouter()
 const status = ref(route.query?.status || 'available')
@@ -36,7 +35,6 @@ if (status.value === 'published') {
 onMounted(async () => {
 })
 const selectedUUID = ref('')
-const headers = useRequestHeaders(['cookie']) as HeadersInit
 
 watch(route, async (newRoute) => {
   if (newRoute.query.status === 'available' || !newRoute.query.status) {

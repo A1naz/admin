@@ -62,6 +62,7 @@ export default eventHandler(async (event) => {
     await MailService.sendActivationMail(user.email, link)
   }
   catch (error) {
+    console.log(error)
     return { status: 'error', error: 'Ошибка отправки письма.' }
   }
 

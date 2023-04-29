@@ -3,7 +3,6 @@ import { useVuelidate } from '@vuelidate/core'
 import { email, helpers, minLength, required, sameAs } from '@vuelidate/validators'
 
 definePageMeta({ auth: false })
-const { status } = useAuth()
 const alert = ref(false)
 const alertText = ref('')
 const alertType = ref('success')
@@ -38,7 +37,7 @@ async function submitForm() {
 
   if (!v$.value.$error) {
     loading.value = true
-    const { pending, data } = await useFetch('/api/auth/register', {
+    const { data } = await useFetch('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(formData),
     })

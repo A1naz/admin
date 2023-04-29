@@ -36,9 +36,9 @@ const v$ = useVuelidate(rules, formData)
 
 async function submitForm() {
   v$.value.$validate()
-  const { error, data } = await useFetch('/api/user/changePassword/send', {
+  const { error } = await useFetch('/api/user/changePassword/send', {
     method: 'POST',
-    body: JSON.stringify(formData),
+    body: formData,
   })
 
   if (error.value) {
