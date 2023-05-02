@@ -52,7 +52,12 @@ const store = useMainStore()
 const article = ref('')
 const products = ref<Item[]>([])
 const loading = ref(false)
-const startDate = useNow()
+const now = useNow()
+const startDate = new Date(now.value)
+const endDate = new Date(now.value)
+startDate.setHours(9, 0)
+endDate.setDate(startDate.getDate() + 7)
+endDate.setHours(20, 0)
 async function addProduct() {
   if (article.value === '')
     return
@@ -80,10 +85,10 @@ async function addProduct() {
     quantity: 1,
     sex: 'Нет',
     sizes: product?.sizes,
-    dateRange: [startDate.value, null],
+    dateRange: [startDate, endDate],
     adress: '',
     searchQuery: '',
-    selectedSize: product?.sizes[0],
+    selectedSize: product.sizes[0] ?? 'none',
     priceText: product.priceText,
     rules: defaultRules,
   }))
@@ -91,7 +96,7 @@ async function addProduct() {
 
 function onSizeChange(event: Event, index: number) {
   const target = event.target as HTMLInputElement
-  products.value[index].selectedSize = Number(target.value)
+  products.value[index].selectedSize = target.value
 }
 
 function onSexChange(event: Event, index: number) {
@@ -237,7 +242,7 @@ onMounted(async () => {
       const product = {
         ...data.value,
         rules: defaultRules,
-        dateRange: [startDate.value, null],
+        dateRange: [startDate, endDate],
       }
       products.value.push(product as any)
     }

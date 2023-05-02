@@ -3,6 +3,9 @@ definePageMeta({
   layout: 'app',
   auth: true,
   title: 'Выкупы',
+  middleware(to, from) {
+    to.meta.pageTransition = !to.query.status
+  },
 })
 
 const route = useRoute()
@@ -178,28 +181,28 @@ watch(route, async (newRoute) => {
     <div class="flex justify-between mb-4 items-center mt-6">
       <div class="hidden lg:block">
         <NuxtLink
-          to="/buyouts" :class="{
+          to="/buyouts" :external="false" :class="{
             'btn-active': route.query.status === undefined,
           }" class="btn btn-ghost btn-sm normal-case font-medium"
         >
           Все выкупы
         </NuxtLink>
         <NuxtLink
-          to="/buyouts?status=active" :class="{
+          to="/buyouts?status=active" :external="false" :class="{
             'btn-active': route.query.status === 'active',
           }" class="btn btn-ghost btn-sm normal-case font-medium"
         >
           Активные
         </NuxtLink>
         <NuxtLink
-          to="/buyouts?status=completed" :class="{
+          to="/buyouts?status=completed" :external="false" :class="{
             'btn-active': route.query.status === 'completed',
           }" class="btn btn-ghost btn-sm normal-case font-medium"
         >
           Завершенные
         </NuxtLink>
         <NuxtLink
-          to="/buyouts?status=archived" :class="{
+          to="/buyouts?status=archived" :external="false" :class="{
             'btn-active': route.query.status === 'archived',
           }" class="btn btn-ghost btn-sm normal-case font-medium"
         >

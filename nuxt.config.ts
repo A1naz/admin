@@ -14,8 +14,6 @@ export default defineNuxtConfig({
         { name: 'description', content: 'TOPVTOP - сервис продвижения Wildberries' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }],
     },
-    pageTransition: { name: 'page', mode: 'out-in' },
-
   },
   colorMode: {
     preference: 'system',
@@ -44,18 +42,6 @@ export default defineNuxtConfig({
 
   nitro: {
     compressPublicAssets: true,
-    storage: {
-      db: {
-        driver: 'mongodb',
-        connectionString: process.env.MONGODB_URI,
-      },
-    },
-    devStorage: {
-      db: {
-        driver: 'mongodb',
-        connectionString: process.env.MONGODB_URI,
-      },
-    },
     plugins: ['~/server/index.ts'],
   },
   modules: [
