@@ -3,9 +3,6 @@ definePageMeta({
   layout: 'app',
   auth: true,
   title: 'Выкупы',
-  middleware(to, from) {
-    to.meta.pageTransition = !to.query.status
-  },
 })
 
 const route = useRoute()
@@ -15,7 +12,6 @@ const modal = ref(false)
 const selectedBuyout = ref({})
 const selectedIndex = ref(-1)
 const store = useMainStore()
-const currency = useCurrency()
 const selectedPlace = ref(-1)
 function openModal(index: number) {
   selectedIndex.value = index
@@ -41,6 +37,8 @@ const { data } = await useFetch('/api/buyout/get', {
   },
   headers: useRequestHeaders(['cookie']) as HeadersInit,
 })
+buyouts.value = data.value
+
 function removeBuyout(uuid: string) {
   buyouts.value = buyouts.value.filter((buyout: any) => buyout.uuid !== uuid)
 }
@@ -75,7 +73,6 @@ function selectStatus(e: Event) {
   })
 }
 onMounted(async () => {
-  buyouts.value = data.value
   if (route.query?.uuid) {
     const uuid = route.query?.uuid
     if (buyouts.value) {

@@ -85,7 +85,7 @@ function onSexChange(event: Event) {
         </label>
       </div>
       <div class="flex justify-between items-center mt-2">
-        <div v-auto-animate class="w-full flex flex-col items-start justify-center gap-1">
+        <div class="w-full flex flex-col items-start justify-center gap-1">
           <div class="flex justify-between gap-2 items-center w-full truncate">
             <span>Адрес:</span>
             <div v-if="product.adress" class="text-xs truncate">

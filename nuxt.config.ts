@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 const baseUrl = '/'
-
+const description = 'Сервис для продвижения Wildberries.'
 export default defineNuxtConfig({
   app: {
 
@@ -60,7 +60,6 @@ export default defineNuxtConfig({
     '@sfxcode/nuxt-primevue',
     '@nuxtjs/robots',
     '@nuxtjs/html-validator',
-    'nuxt-purgecss',
     '@morev/vue-transitions/nuxt',
   ],
   css: [
@@ -70,10 +69,6 @@ export default defineNuxtConfig({
     '@sfxcode/formkit-primevue/dist/sass/formkit-prime-inputs.scss',
     '@sfxcode/formkit-primevue/dist/sass/formkit-primevue.scss',
   ],
-  purgecss: {
-    enabled: false,
-    safelist: ['collapse'],
-  },
   extends: [
     'nuxt-seo-kit',
   ],
@@ -113,6 +108,12 @@ export default defineNuxtConfig({
     devOptions: {
       enabled: false,
     },
+    manifest: {
+      name: process.env.NAME,
+      short_name: process.env.NAME,
+      theme_color: '#4f46e5',
+      description,
+    },
   },
   imports: {
     dirs: ['./stores'],
@@ -122,7 +123,7 @@ export default defineNuxtConfig({
       siteName: process.env.NAME,
       BOT_ID: process.env.BOT_ID,
       siteUrl: process.env.PUBLIC_SITE_URL,
-      siteDescription: 'Сервис для продвижения Wildberries.',
+      siteDescription: description,
       language: 'ru',
       trailingSlash: true,
       titleSeparator: '|',

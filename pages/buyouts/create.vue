@@ -323,7 +323,7 @@ onMounted(async () => {
             />
           </thead>
 
-          <tbody v-auto-animate>
+          <tbody>
             <tr v-for="(product, index) in products" :key="product.article">
               <td>
                 {{ index + 1 }}
@@ -433,7 +433,7 @@ onMounted(async () => {
                 </div>
               </td>
               <td class="break-all">
-                <div v-auto-animate class="w-full flex flex-col items-start justify-center gap-1 flex-wrap overflow-hidden">
+                <div class="w-full flex flex-col items-start justify-center gap-1 flex-wrap overflow-hidden">
                   <div v-if="product.adress" class="text-xs mb-1 h-10 w-40 break-all">
                     <p class="break-all whitespace-normal">
                       {{ product.adress }}

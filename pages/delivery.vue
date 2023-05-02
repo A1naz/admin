@@ -113,13 +113,13 @@ watch(route, async (newRoute) => {
       </div>
     </div>
 
-    <div v-if="deliveries?.length" class="grid grid-cols-1 gap-3">
-      <transition-group name="fade">
+    <div v-if="deliveries?.length">
+      <TransitionSlide group class="grid grid-cols-1 gap-3">
         <DeliveryExpand
           v-for="(delivery, index) of deliveries" :key="index" :state="openAll"
           :info="delivery" @open-modal="openModal"
         />
-      </transition-group>
+      </TransitionSlide>
       <div ref="target" class="flex justify-center items-center" />
       <DeliveryQrModal v-if="modal" :code="modalInfo.code" :src="modalInfo.src" />
     </div>
