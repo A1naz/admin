@@ -7,7 +7,7 @@ const QuestionSchema = new Schema({
   text: { type: String, required: true },
   image: { type: String },
   gender: { type: String },
-  createdDate: { type: Date, default: new Date() },
+  createdDate: { type: Date, default: new Date(Date.now()) },
   publishDate: { type: Date, required: true },
 })
 

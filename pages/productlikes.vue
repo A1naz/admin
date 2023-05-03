@@ -304,7 +304,7 @@ onMounted(() => {
                       </div>
                     </div>
                   </div>
-                  <div class="status flex flex-col gap-0.5">
+                  <div class="flex flex-col gap-0.5">
                     <div class="text-xs">
                       Количество
                     </div>

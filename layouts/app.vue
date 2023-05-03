@@ -135,6 +135,7 @@ const breadcrumbs = computed(() => getBreadcrumbs())
         <SidebarItem title="Лайки на отзывы" icon="fluent:thumb-like-24-filled" href="/likes" />
         <SidebarItem title="Лайки на товар / бренд" icon="fluent:heart-24-filled" href="/productlikes" />
         <SidebarItem title="Вопросы" icon="fluent:chat-bubbles-question-24-filled" href="/questions" />
+        <SidebarItem href="/cart" title="Корзина" icon="fluent:cart-24-filled" />
 
         <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
           Дополнительно
