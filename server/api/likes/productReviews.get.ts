@@ -21,26 +21,32 @@ export default eventHandler(async (event) => {
     },
   )
   const imt_id = data?.imt_id
+  console.log(imt_id)
   if (!imt_id) {
     throw createError({
       statusCode: 404,
       message: 'Не удалось получить информацию по товару',
     })
   }
-  const feedbackData: any = await $fetch(
-    'https://feedbacks.wildberries.ru/api/v1/summary/full',
+  const urlData: any = await $fetch(
+    `https://feedback-bt.wildberries.ru/feedback/api/v1/host?imt=${imt_id}`,
     {
-      method: 'POST',
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: {
-        imtId: imt_id,
-        take: 30,
-        skip: 0,
+        devicename: 'Android, SM-G988N(z3qksx)',
       },
     },
   )
+  const url = urlData[0]
+  const feedbackData: any = await $fetch(url, {
+    method: 'GET',
+    headers: {
+      'Connection': 'Keep-Alive',
+      'Accept-Encoding': 'gzip',
+      'User-Agent': 'okhttp/4.10.0',
+    },
+  })
+  console.log(feedbackData)
   if (!feedbackData?.feedbacks) {
     throw createError({
       statusCode: 404,

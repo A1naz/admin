@@ -105,10 +105,15 @@ watch(route, async (newRoute) => {
           Завершенные
         </option>
       </select>
-      <div class="flex items-center">
+      <div class="flex gap-4 items-center">
         <div class="flex items-center">
           <input id="openAll" v-model="openAll" type="checkbox" class="checkbox checkbox-primary checkbox-sm">
           <label for="openAll" class="cursor-pointer select-none ml-2">Развернуть все</label>
+        </div>
+        <div class="export">
+          <div class="btn btn-sm btn-primary">
+            Экспорт
+          </div>
         </div>
       </div>
     </div>

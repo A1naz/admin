@@ -38,6 +38,11 @@ async function getProductReviews() {
     })
     return
   }
+  if (!data.value.length) {
+    notify({
+      title: 'Отзывы не найдены',
+    })
+  }
   const initial = (data.value as any).map((review: any) => {
     review.addLikes = 0
     review.addDislikes = 0
