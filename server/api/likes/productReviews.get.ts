@@ -21,7 +21,6 @@ export default eventHandler(async (event) => {
     },
   )
   const imt_id = data?.imt_id
-  console.log(imt_id)
   if (!imt_id) {
     throw createError({
       statusCode: 404,
@@ -46,7 +45,6 @@ export default eventHandler(async (event) => {
       'User-Agent': 'okhttp/4.10.0',
     },
   })
-  console.log(feedbackData)
   if (!feedbackData?.feedbacks) {
     throw createError({
       statusCode: 404,

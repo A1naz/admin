@@ -97,6 +97,9 @@ dependencies:
   vue-yandex-maps:
     specifier: ^1.0.8
     version: 1.0.9
+  xlsx:
+    specifier: https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz
+    version: '@cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz'
 
 devDependencies:
   '@antfu/eslint-config':
@@ -14733,3 +14736,11 @@ packages:
   /zod@3.21.4:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: true
+
+  '@cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz':
+    resolution: {tarball: https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz}
+    name: xlsx
+    version: 0.19.3
+    engines: {node: '>=0.8'}
+    hasBin: true
+    dev: false

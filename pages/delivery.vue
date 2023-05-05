@@ -37,7 +37,7 @@ const { stop } = useIntersectionObserver(
 )
 const skip = ref(50)
 const end = ref(false)
-const { data } = await useFetch('/api/delivery/get', {
+const { data, error } = await useFetch('/api/delivery/get', {
   method: 'GET',
   query: {
     status: route.query?.status || 'all',
@@ -45,9 +45,23 @@ const { data } = await useFetch('/api/delivery/get', {
   },
   headers: useRequestHeaders(['cookie']) as HeadersInit,
 })
+
+async function exportXLS() {
+  const { data } = await useFetch('/api/delivery/export', {
+    responseType: 'blob',
+  })
+  const fileURL = window.URL.createObjectURL(new Blob([data.value]))
+  const fileLink = document.createElement('a')
+  fileLink.href = fileURL
+  fileLink.setAttribute('download', 'deliveries.xlsx')
+  document.body.appendChild(fileLink)
+  fileLink.click()
+}
+
 onMounted(async () => {
   deliveries.value = data.value
 })
+
 watch(targetIsVisible, async (isVisible) => {
   if (isVisible) {
     if (end.value)
@@ -69,6 +83,7 @@ watch(targetIsVisible, async (isVisible) => {
     skip.value += 50
   }
 })
+
 watch(route, async (newRoute) => {
   skip.value = 50
   end.value = false
@@ -111,9 +126,9 @@ watch(route, async (newRoute) => {
           <label for="openAll" class="cursor-pointer select-none ml-2">Развернуть все</label>
         </div>
         <div class="export">
-          <div class="btn btn-sm btn-primary">
+          <button class="btn btn-sm btn-primary" @click="exportXLS">
             Экспорт
-          </div>
+          </button>
         </div>
       </div>
     </div>

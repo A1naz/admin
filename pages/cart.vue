@@ -59,7 +59,6 @@ async function getProductInfo() {
   })
   if ((data.value as any).product) {
     productData.value = (data.value as any).product
-    console.log(productData.value)
     urlError.value = false
   }
   if (error.value)

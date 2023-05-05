@@ -41,7 +41,8 @@
     "uuid": "^9.0.0",
     "validator": "^13.9.0",
     "vue-currency-input": "^3.0.4",
-    "vue-yandex-maps": "^1.0.8"
+    "vue-yandex-maps": "^1.0.8",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.38.4",
