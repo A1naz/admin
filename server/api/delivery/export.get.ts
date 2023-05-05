@@ -26,8 +26,12 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const deliveries = await Delivery.find({ user }).sort({ _id: -1 })
-  if (!deliveries.length)
-    return { status: null }
+  if (!deliveries.length) {
+    throw createError({
+      statusCode: 400,
+      message: 'Нет доставок для экспорта',
+    })
+  }
   const format = await Promise.all(
     deliveries.map(async (delivery) => {
       const buyout = await Buyout.findOne({ _id: delivery.idbuyout })

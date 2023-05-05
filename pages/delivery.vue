@@ -125,7 +125,7 @@ watch(route, async (newRoute) => {
           <input id="openAll" v-model="openAll" type="checkbox" class="checkbox checkbox-primary checkbox-sm">
           <label for="openAll" class="cursor-pointer select-none ml-2">Развернуть все</label>
         </div>
-        <div class="export">
+        <div v-if="deliveries.length" class="export">
           <button class="btn btn-sm btn-primary" @click="exportXLS">
             Экспорт
           </button>
