@@ -61,6 +61,7 @@ export default defineNuxtConfig({
     '@nuxtjs/robots',
     '@nuxtjs/html-validator',
     '@morev/vue-transitions/nuxt',
+    '@sidebase/nuxt-pdf',
   ],
   css: [
     'primevue/resources/primevue.css',

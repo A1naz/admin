@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { exportToPDF } from '#imports'
+
 definePageMeta({
-  layout: 'app',
   auth: true,
-  title: 'Доставки',
+  title: 'Экспорт',
 })
+const pdfSection = ref<HTMLElement | undefined>(undefined)
+
 const openAll = ref(false)
 const route = useRoute()
 const router = useRouter()
@@ -87,12 +90,8 @@ watch(targetIsVisible, async (isVisible) => {
 watch(route, async (newRoute) => {
   skip.value = 50
   end.value = false
-  const { data } = await useFetch('/api/delivery/get', {
+  const { data } = await useFetch('/api/delivery/getReady', {
     method: 'GET',
-    query: {
-      status: newRoute?.query?.status || 'all',
-      limit: 50,
-    },
     headers: useRequestHeaders(['cookie']) as HeadersInit,
   })
   deliveries.value = data.value
@@ -101,57 +100,43 @@ watch(route, async (newRoute) => {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mt-1">
-      Доставки
-    </h1>
-    <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
-      В этом разделе можно отследить статусы выкупов после оплаты. Статус "Доставлен" означает, что товар можно
-      забирать из пункта выдачи.
-    </p>
-    <div class="flex justify-between mb-8 mt-6 items-center">
-      <select class="select select-bordered select-sm" @change="selectStatus">
-        <option value="all" :selected="route.query.status === undefined">
-          Все доставки
-        </option>
-        <option value="active" :selected="route.query.status === 'active'">
-          Активные
-        </option>
-        <option value="completed" :selected="route.query.status === 'completed'">
-          Завершенные
-        </option>
-      </select>
-      <div class="flex gap-4 items-center">
-        <div class="flex items-center">
-          <input id="openAll" v-model="openAll" type="checkbox" class="checkbox checkbox-primary checkbox-sm">
-          <label for="openAll" class="cursor-pointer select-none ml-2">Развернуть все</label>
-        </div>
-        <div v-if="deliveries.length" class="export">
-          <button class="btn btn-sm btn-primary" @click="exportXLS">
-            Экспорт
-          </button>
+    <ClientOnly>
+      <div class="flex">
+        <button class="btn btn-sm" @click="exportToPDF('my-pdf-file.pdf', pdfSection)">
+          Export
+        </button>
+      </div>
+      <div v-if="deliveries?.length" ref="pdfSection">
+        <h1 class="text-3xl font-bold text-center p-2 bg-purple-700 text-white">
+          Готовы к выдаче
+        </h1>
+        <div class="cards grid grid-cols-4 gap-4 p-4">
+          <div v-for="(delivery, index) of deliveries" :key="index" class="card rounded-none shadow-xl">
+            <figure><img class="p-8" :src="delivery.receiptcodeqr" :alt="delivery.receiptcode"></figure>
+            <div class="card-body">
+              <h2 class="card-title text-center">
+                {{ delivery.productname }}
+              </h2>
+              <p>If a dog chews shoes whose shoes does he choose?</p>
+              <div class="card-actions justify-end">
+                <button class="btn btn-primary">
+                  Buy Now
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div v-if="deliveries?.length">
-      <TransitionSlide group class="grid grid-cols-1 gap-3">
-        <DeliveryExpand
-          v-for="(delivery, index) of deliveries" :key="index" :state="openAll"
-          :info="delivery" @open-modal="openModal"
-        />
-      </TransitionSlide>
-      <div ref="target" class="flex justify-center items-center" />
-      <DeliveryQrModal v-if="modal" :code="modalInfo.code" :src="modalInfo.src" />
-    </div>
-    <div v-else class="hero">
-      <div class="hero-content text-center flex justify-center items-center h-80">
-        <div class="max-w-md">
-          <h1 class="text-3xl font-bold">
-            Здесь ничего нет <Icon name="fluent-emoji:thinking-face" />
-          </h1>
+      <div v-else class="hero">
+        <div class="hero-content text-center flex justify-center items-center h-80">
+          <div class="max-w-md">
+            <h1 class="text-3xl font-bold">
+              Здесь ничего нет <Icon name="fluent-emoji:thinking-face" />
+            </h1>
+          </div>
         </div>
       </div>
-    </div>
+    </ClientOnly>
   </div>
 </template>
 

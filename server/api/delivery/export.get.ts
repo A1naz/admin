@@ -24,7 +24,7 @@ export default eventHandler(async (event) => {
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
     return sendRedirect(event, '/auth', 302)
-
+  const { type } = getQuery(event)
   const deliveries = await Delivery.find({ user }).sort({ _id: -1 })
   if (!deliveries.length) {
     throw createError({

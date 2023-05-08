@@ -23,16 +23,16 @@ async function deleteBuyOut() {
   emit('remove', props.index)
 }
 function onSizeChange(event: Event) {
-  emit('changeSize', {
-    index: props.index,
+  emit('changeSize',
     event,
-  })
+    props.index,
+  )
 }
 function onSexChange(event: Event) {
-  emit('changeSex', {
-    index: props.index,
+  emit('changeSex',
     event,
-  })
+    props.index,
+  )
 }
 </script>
 
