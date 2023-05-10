@@ -112,9 +112,9 @@ watch(route, async (newRoute) => {
     <ClientOnly>
       <div class="flex">
         <button
-          class="btn btn-sm" @click="exportToFile"
+          class="btn m-2" @click="exportToFile"
         >
-          Export
+          Скачать PDF
         </button>
       </div>
       <div v-if="deliveries" ref="pdfSection">
