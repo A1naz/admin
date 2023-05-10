@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { exportToPDF } from '#imports'
-
 definePageMeta({
   auth: true,
   title: 'Экспорт',
 })
-const pdfSection = ref<HTMLElement | undefined>(undefined)
 
+const pdfSection = ref<HTMLElement>()
+const { $dayjs, $html2pdf } = useNuxtApp()
 const openAll = ref(false)
 const route = useRoute()
+const currency = useCurrency()
+const font = ref()
 const router = useRouter()
 const deliveries = ref([]) as any
 function selectStatus(e: Event) {
@@ -24,6 +25,26 @@ const modalInfo = reactive({
   src: '',
   code: 0,
 })
+function exportToFile() {
+  $html2pdf(pdfSection.value, {
+    margin: 0.2,
+    filename: 'delivery.pdf',
+    pagebreak: { after: '.deliveryCards' },
+    image: {
+      type: 'jpeg',
+      quality: 2,
+    },
+    html2canvas: {
+      scale: 2,
+      letterRendering: true,
+    },
+    jsPDF: {
+      unit: 'in',
+      format: 'a3',
+      orientation: 'l',
+    },
+  })
+}
 const modal = ref(false)
 function openModal(code: number, src: string) {
   modalInfo.src = src
@@ -40,29 +61,17 @@ const { stop } = useIntersectionObserver(
 )
 const skip = ref(50)
 const end = ref(false)
-const { data, error } = await useFetch('/api/delivery/get', {
+const { data, error } = await useFetch('/api/delivery/getReady', {
   method: 'GET',
-  query: {
-    status: route.query?.status || 'all',
-    limit: 50,
-  },
   headers: useRequestHeaders(['cookie']) as HeadersInit,
 })
 
-async function exportXLS() {
-  const { data } = await useFetch('/api/delivery/export', {
-    responseType: 'blob',
-  })
-  const fileURL = window.URL.createObjectURL(new Blob([data.value]))
-  const fileLink = document.createElement('a')
-  fileLink.href = fileURL
-  fileLink.setAttribute('download', 'deliveries.xlsx')
-  document.body.appendChild(fileLink)
-  fileLink.click()
-}
-
 onMounted(async () => {
   deliveries.value = data.value
+  const response = await $fetch('/Roboto-Regular.ttf', {
+    responseType: 'arrayBuffer',
+  }) as ArrayBuffer
+  font.value = response
 })
 
 watch(targetIsVisible, async (isVisible) => {
@@ -102,26 +111,53 @@ watch(route, async (newRoute) => {
   <div>
     <ClientOnly>
       <div class="flex">
-        <button class="btn btn-sm" @click="exportToPDF('my-pdf-file.pdf', pdfSection)">
+        <button
+          class="btn btn-sm" @click="exportToFile"
+        >
           Export
         </button>
       </div>
-      <div v-if="deliveries?.length" ref="pdfSection">
-        <h1 class="text-3xl font-bold text-center p-2 bg-purple-700 text-white">
+      <div v-if="deliveries" ref="pdfSection">
+        <h1 class="text-3xl font-bold text-center p-4 bg-purple-700 text-white">
           Готовы к выдаче
         </h1>
-        <div class="cards grid grid-cols-4 gap-4 p-4">
-          <div v-for="(delivery, index) of deliveries" :key="index" class="card rounded-none shadow-xl">
-            <figure><img class="p-8" :src="delivery.receiptcodeqr" :alt="delivery.receiptcode"></figure>
-            <div class="card-body">
-              <h2 class="card-title text-center">
-                {{ delivery.productname }}
-              </h2>
-              <p>If a dog chews shoes whose shoes does he choose?</p>
-              <div class="card-actions justify-end">
-                <button class="btn btn-primary">
-                  Buy Now
-                </button>
+        <div v-for="(point, index) of Object.keys(deliveries)" :key="index" class="point">
+          <h1 class="text-center bg-purple-600 p-4 text-white text-2xl font-bold">
+            {{ point }}
+          </h1>
+          <div class="deliveryCards grid grid-cols-3 gap-4 p-4">
+            <div v-for="(delivery, index) of deliveries[point]" :key="index" class="card rounded-none shadow-xl border border-primary">
+              <figure><img class="p-4 object-contain h-58" :src="delivery.receiptcodeqr" :alt="delivery.receiptcode"></figure>
+              <div class="card-body">
+                <h2 class="card-title text-center">
+                  {{ delivery.productname }}
+                </h2>
+                <div class="info grid grid-cols-2 gap-4 mt-4 justify-center text-center">
+                  <div>
+                    {{ currency.format(delivery.pricebuy) }}
+                  </div>
+                  <div>
+                    {{ $dayjs(delivery.updatedAt).format('D.MM.YYYY') }}
+                  </div>
+                  <div>Артикул</div>
+                  <div>{{ delivery.article }}</div>
+                  <div>Размер</div>
+                  <div>{{ delivery.size }}</div>
+                  <div>Получатель</div>
+                  <div>{{ delivery.recipient }}</div>
+                  <div>Телефон</div>
+                  <div>{{ delivery.recipientphone }}</div>
+                  <div class="font-bold text-lg">
+                    Код получения
+                  </div>
+                  <div class="font-bold text-lg">
+                    {{ delivery.receiptcode }}
+                  </div>
+                </div>
+                <div class="text-center mt-4 text-sm">
+                  <div>ID выкупа</div>
+                  <div>#{{ delivery.uuid }}</div>
+                </div>
               </div>
             </div>
           </div>

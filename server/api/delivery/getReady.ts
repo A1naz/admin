@@ -52,5 +52,12 @@ export default eventHandler(async (event) => {
       }
     }),
   )
-  return format
+  const points = {} as any
+  format.forEach((item) => {
+    if (points[item!.point])
+      points[item!.point].push(item)
+    else
+      points[item!.point] = [item]
+  })
+  return points
 })
