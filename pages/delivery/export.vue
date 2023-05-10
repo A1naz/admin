@@ -2,10 +2,12 @@
 definePageMeta({
   auth: true,
   title: 'Экспорт',
+  colorMode: 'light',
 })
 
 const pdfSection = ref<HTMLElement>()
-const { $dayjs, $html2pdf } = useNuxtApp()
+const { $dayjs } = useNuxtApp()
+const { $html2pdf } = useNuxtApp()
 const openAll = ref(false)
 const route = useRoute()
 const currency = useCurrency()
@@ -29,7 +31,7 @@ function exportToFile() {
   $html2pdf(pdfSection.value, {
     margin: 0.2,
     filename: 'delivery.pdf',
-    pagebreak: { after: '.deliveryCards' },
+    pagebreak: { mode: 'avoid-all' },
     image: {
       type: 'jpeg',
       quality: 2,
@@ -125,7 +127,7 @@ watch(route, async (newRoute) => {
           <h1 class="text-center bg-purple-600 p-4 text-white text-2xl font-bold">
             {{ point }}
           </h1>
-          <div class="deliveryCards grid grid-cols-3 gap-4 p-4">
+          <div class="deliveryCards grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
             <div v-for="(delivery, index) of deliveries[point]" :key="index" class="card rounded-none shadow-xl border border-primary">
               <figure><img class="p-4 object-contain h-58" :src="delivery.receiptcodeqr" :alt="delivery.receiptcode"></figure>
               <div class="card-body">
@@ -156,7 +158,7 @@ watch(route, async (newRoute) => {
                 </div>
                 <div class="text-center mt-4 text-sm">
                   <div>ID выкупа</div>
-                  <div>#{{ delivery.uuid }}</div>
+                  <a class="link" :href="`/buyouts?uuid=${delivery.uuid}`">#{{ delivery.uuid }}</a>
                 </div>
               </div>
             </div>
