@@ -52,7 +52,7 @@ export default eventHandler(async (event) => {
       }
     }),
   )
-  const filtered = format.filter(item => item!.currentstatus === 'Готов к выдаче')
+  const filtered = format.filter(item => item!.currentstatus === 'Готов к выдаче' || item!.currentstatus === 'Готов к получению')
   const points = {} as any
   filtered.forEach((item) => {
     if (points[item!.point])
