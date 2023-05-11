@@ -9,6 +9,8 @@ const pdfSection = ref<HTMLElement>()
 const { $dayjs } = useNuxtApp()
 const { $html2pdf } = useNuxtApp()
 const openAll = ref(false)
+const progress = ref(0)
+const max = ref(100)
 const route = useRoute()
 const currency = useCurrency()
 const font = ref()
@@ -27,25 +29,44 @@ const modalInfo = reactive({
   src: '',
   code: 0,
 })
-function exportToFile() {
-  $html2pdf(pdfSection.value, {
+async function exportToFile() {
+  progress.value = 0
+  const options = {
     margin: 0.2,
     filename: 'delivery.pdf',
-    pagebreak: { mode: 'avoid-all' },
+    pagebreak: { after: '.deliveryCards' },
     image: {
       type: 'jpeg',
-      quality: 2,
+      quality: 1,
     },
     html2canvas: {
-      scale: 2,
+      dpi: 192,
       letterRendering: true,
     },
     jsPDF: {
       unit: 'in',
-      format: 'a3',
+      format: 'a4',
       orientation: 'l',
     },
-  })
+  }
+  const pages = Array.from(pdfSection.value!.querySelectorAll('div[aria-label^="pdf-page-"]'))
+  max.value = pages.length - 1
+  let worker = $html2pdf()
+    .set(options)
+    .from(pages[0])
+  worker = worker.toPdf()
+  if (pages.length > 1) {
+    pages.slice(1).forEach((page, index) => {
+      worker = worker.get('pdf').then((pdf: any) => {
+        progress.value += 1
+        pdf.addPage()
+      }).from(page)
+        .toContainer()
+        .toCanvas()
+        .toPdf()
+    })
+  }
+  return worker.save()
 }
 const modal = ref(false)
 function openModal(code: number, src: string) {
@@ -112,9 +133,10 @@ watch(route, async (newRoute) => {
 <template>
   <div>
     <ClientOnly>
+      <progress class="progress progress-primary w-full fixed" :value="progress" :max="max" />
       <div class="flex">
         <button
-          class="btn m-2" @click="exportToFile"
+          class="btn m-2 mt-4" @click="exportToFile"
         >
           Скачать PDF
         </button>
@@ -123,18 +145,18 @@ watch(route, async (newRoute) => {
         <h1 class="text-3xl font-bold text-center p-4 bg-purple-700 text-white">
           Готовы к выдаче
         </h1>
-        <div v-for="(point, index) of Object.keys(deliveries)" :key="index" class="point">
+        <div v-for="(point, index) of Object.keys(deliveries)" :key="index" :aria-label="`pdf-page-${index + 1}`" class="point">
           <h1 class="text-center bg-purple-600 p-4 text-white text-2xl font-bold">
             {{ point }}
           </h1>
-          <div class="deliveryCards grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+          <div class="deliveryCards grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
             <div v-for="(delivery, index) of deliveries[point]" :key="index" class="card rounded-none shadow-xl border border-primary">
-              <figure><img class="p-4 object-contain h-58" :src="delivery.receiptcodeqr" :alt="delivery.receiptcode"></figure>
-              <div class="card-body">
+              <figure><img class="p-4 object-contain h-56" :src="delivery.receiptcodeqr" :alt="delivery.receiptcode"></figure>
+              <div class="card-body p-0">
                 <h2 class="card-title text-center">
                   {{ delivery.productname }}
                 </h2>
-                <div class="info grid grid-cols-2 gap-4 mt-4 justify-center text-center">
+                <div class="info grid grid-cols-2 gap-2 mt-4 justify-center text-center">
                   <div>
                     {{ currency.format(delivery.pricebuy) }}
                   </div>
@@ -149,14 +171,14 @@ watch(route, async (newRoute) => {
                   <div>{{ delivery.recipient }}</div>
                   <div>Телефон</div>
                   <div>{{ delivery.recipientphone }}</div>
-                  <div class="font-bold text-lg">
+                  <div class="font-bold">
                     Код получения
                   </div>
                   <div class="font-bold text-lg">
                     {{ delivery.receiptcode }}
                   </div>
                 </div>
-                <div class="text-center mt-4 text-sm">
+                <div class="text-center my-4 text-sm">
                   <div>ID выкупа</div>
                   <a class="link" :href="`/buyouts?uuid=${delivery.uuid}`">#{{ delivery.uuid }}</a>
                 </div>

@@ -18,8 +18,6 @@ const props = defineProps({
 })
 const emit = defineEmits(['callback', 'remove', 'openModal', 'openImage'])
 const { $dayjs } = useNuxtApp()
-const currency = useCurrency()
-const router = useRouter()
 onMounted(() => {
 })
 const getStatus = computed(() => {
