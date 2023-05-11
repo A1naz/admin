@@ -47,7 +47,7 @@ const getStatus = computed(() => {
 
             'bg-green-600': info.status === 'working' || info.status === 'published',
             'bg-warning': info.status === 'waiting' || info.status === 'created',
-          }" class="text-primary-content p-2 px-8 rounded-lg text-center"
+          }" class="text-black p-2 px-8 rounded-lg text-center"
         >{{ getStatus }}</span>
       </div>
 

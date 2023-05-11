@@ -22,7 +22,6 @@ function findImage(article: number) {
 }
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-
   if (!session)
     return sendRedirect(event, '/auth', 302)
 
@@ -69,7 +68,7 @@ export default eventHandler(async (event) => {
   const sizes = data?.sizes_table?.values
     ? data?.sizes_table?.values.map((size: any) => size.tech_size)
     : []
-  const priceData = JSON.parse(rawData)
+  const priceData = rawData
   const product = priceData?.data?.products.find(
     (item: any) => item.id === Number(article),
   )

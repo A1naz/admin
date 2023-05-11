@@ -44,7 +44,7 @@ export default eventHandler(async (event) => {
       method: 'GET',
     },
     )
-    const priceData = JSON.parse(rawData)
+    const priceData = rawData
 
     const product = priceData?.data?.products.find(
       (item: any) => item.id === Number(article),
