@@ -9,6 +9,7 @@ const pdfSection = ref<HTMLElement>()
 const { $dayjs } = useNuxtApp()
 const { $html2pdf } = useNuxtApp()
 const openAll = ref(false)
+const { width, height } = useWindowSize()
 const progress = ref(0)
 const max = ref(100)
 const route = useRoute()
@@ -32,19 +33,20 @@ const modalInfo = reactive({
 async function exportToFile() {
   progress.value = 0
   const options = {
-    margin: 0.2,
+    margin: 0,
     filename: 'delivery.pdf',
-    pagebreak: { after: '.deliveryCards' },
     image: {
-      type: 'jpeg',
-      quality: 1,
+      type: 'webp',
     },
     html2canvas: {
-      dpi: 192,
+      scale: 2,
       letterRendering: true,
+      windowWidth: 1920,
+      windowHeight: 1080,
     },
     jsPDF: {
-      unit: 'in',
+      unit: 'px',
+      hotfixes: ['px_scaling'],
       format: 'a4',
       orientation: 'l',
     },
@@ -145,13 +147,13 @@ watch(route, async (newRoute) => {
         <h1 class="text-3xl font-bold text-center p-4 bg-purple-700 text-white">
           Готовы к выдаче
         </h1>
-        <div v-for="(point, index) of Object.keys(deliveries)" :key="index" :aria-label="`pdf-page-${index + 1}`" class="point">
-          <h1 class="text-center bg-purple-600 p-4 text-white text-2xl font-bold">
+        <div v-for="(point, index) of Object.keys(deliveries)" :key="index" :aria-label="`pdf-page-${index + 1}`" class="point relative">
+          <h1 class="text-center text-2xl font-bold absolute top-1 w-full">
             {{ point }}
           </h1>
-          <div class="deliveryCards grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-            <div v-for="(delivery, index) of deliveries[point]" :key="index" class="card rounded-none shadow-xl border border-primary">
-              <figure><img class="p-4 object-contain h-56" :src="delivery.receiptcodeqr" :alt="delivery.receiptcode"></figure>
+          <div class="deliveryCards grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 px-2">
+            <div v-for="(delivery, index) of deliveries[point]" :key="index" class="card h-[703px] rounded-none shadow-xl border border-primary mt-[65px] mb-[25px] mx-2">
+              <figure><nuxt-img class="p-4 object-contain h-72" :src="delivery.receiptcodeqr" :alt="delivery.receiptcode" /></figure>
               <div class="card-body p-0">
                 <h2 class="card-title text-center">
                   {{ delivery.productname }}
