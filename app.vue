@@ -3,6 +3,11 @@ import { useNotification } from '@kyvg/vue3-notification'
 import { SwipeDirection } from '@vueuse/core'
 import { useMainStore } from '@/stores/main'
 
+useHead({
+  script: [{
+    src: 'https://cdn-ru.bitrix24.ru/b25122566/crm/site_button/loader_3_bd3spe.js', defer: true,
+  }],
+})
 const { notify } = useNotification()
 const colorMode = useColorMode()
 

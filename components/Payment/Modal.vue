@@ -145,114 +145,116 @@ function openUrl() {
 </script>
 
 <template>
-  <Teleport to="body">
-    <input id="payment-modal" type="checkbox" class="modal-toggle">
-    <div class="modal">
-      <label class="modal-box">
-        <label
-          ref="closePaymentModal"
-          for="payment-modal" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          @click="cancelPayment"
-        >✕</label>
-        <h3 class="text-xl font-bold mb-2">Пополнить баланс</h3>
+  <ClientOnly>
+    <Teleport to="body">
+      <input id="payment-modal" type="checkbox" class="modal-toggle">
+      <div class="modal">
+        <label class="modal-box">
+          <label
+            ref="closePaymentModal"
+            for="payment-modal" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            @click="cancelPayment"
+          >✕</label>
+          <h3 class="text-xl font-bold mb-2">Пополнить баланс</h3>
 
-        <div>
-          <div class="w-full flex flex-col gap-6 justify-center items-start" action="">
-            <div class="sum w-full">
-              <h3 class="text-lg mb-2">Сумма к пополнению</h3>
-              <PaymentInput v-model="paymentForm.paymentSum" />
-            </div>
-            <div class="btn-group btn-group-vertical w-full">
-              <button
-                class="btn" :class="{
-                  'btn-active': paymentForm.paymentType === 'fast',
-                }" @click="paymentForm.paymentType = 'fast'"
-              >Быстро (3% комиссия)</button>
-              <button
-                class="btn" :class="{
-                  'btn-active': paymentForm.paymentType === 'transfer',
-                }" @click="paymentForm.paymentType = 'transfer'"
-              >Перевод (без комиссии)</button>
+          <div>
+            <div class="w-full flex flex-col gap-6 justify-center items-start" action="">
+              <div class="sum w-full">
+                <h3 class="text-lg mb-2">Сумма к пополнению</h3>
+                <PaymentInput v-model="paymentForm.paymentSum" />
+              </div>
+              <div class="btn-group btn-group-vertical w-full">
+                <button
+                  class="btn" :class="{
+                    'btn-active': paymentForm.paymentType === 'fast',
+                  }" @click="paymentForm.paymentType = 'fast'"
+                >Быстро (3% комиссия)</button>
+                <button
+                  class="btn" :class="{
+                    'btn-active': paymentForm.paymentType === 'transfer',
+                  }" @click="paymentForm.paymentType = 'transfer'"
+                >Перевод (без комиссии)</button>
+              </div>
+
             </div>
 
           </div>
+          <div class="modal-action justify-between">
+            <label for="payment-modal" class="btn btn-ghost" @click="cancelPayment">Отмена</label>
 
-        </div>
-        <div class="modal-action justify-between">
-          <label for="payment-modal" class="btn btn-ghost" @click="cancelPayment">Отмена</label>
-
-          <button class="btn btn-primary" @click="pay">Оплатить</button>
-        </div>
-      </label>
-      <div
-        v-if="loading"
-        class="fixed z-[999999] top-0 left-0 right-0 bottom-0 w-full h-screen overflow-hidden bg-gray-700 bg-opacity-80 flex flex-col items-center justify-center"
-      >
-        <div class="ease-linear rounded-full mb-4">
-          <Icon name="mdi:loading" class="h-20 w-20 animate-spin text-white" />
-        </div>
-        <h2 class="text-center opacity-100 text-white text-xl font-semibold">
-          Загрузка...
-        </h2>
-        <p v-if="paymentForm.paymentType === 'fast'" class="w-1/3 opacity-100 text-white text-center">
-          Создается ссылка для оплаты, <br> пожалуйста не
-          закрывайте
-          эту страницу
-        </p>
-        <p v-else class="w-1/3 opacity-100 text-white text-center">
-          Идет получение данных для перевода, <br> пожалуйста не
-          закрывайте
-          эту страницу
-        </p>
-      </div>
-    </div>
-    <div v-if="url">
-      <input id="fastPayment-modal" type="checkbox" class="modal-toggle">
-      <div class="modal modal-bottom sm:modal-middle modal-open">
-        <div class="modal-box relative">
-          <label for="fastPayment-modal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2" @click="cancelPayment">✕</label>
-          <h3 class="font-bold text-lg">
-            Быстрое пополнение
-          </h3>
-          <p class=" text-sm text-primary animate-pulse">
-            Ожидаем платеж...
+            <button class="btn btn-primary" @click="pay">Оплатить</button>
+          </div>
+        </label>
+        <div
+          v-if="loading"
+          class="fixed z-[999999] top-0 left-0 right-0 bottom-0 w-full h-screen overflow-hidden bg-gray-700 bg-opacity-80 flex flex-col items-center justify-center"
+        >
+          <div class="ease-linear rounded-full mb-4">
+            <Icon name="mdi:loading" class="h-20 w-20 animate-spin text-white" />
+          </div>
+          <h2 class="text-center opacity-100 text-white text-xl font-semibold">
+            Загрузка...
+          </h2>
+          <p v-if="paymentForm.paymentType === 'fast'" class="w-1/3 opacity-100 text-white text-center">
+            Создается ссылка для оплаты, <br> пожалуйста не
+            закрывайте
+            эту страницу
           </p>
-          <p class="py-4">
-            Перейдите по ссылке для оплаты. Не закрывайте это окно до завершения платежа.
-          </p>
-          <button class="btn btn-primary btn-block" @click="openUrl">
-            Перейти к оплате
-          </button>
-        </div>
-      </div>
-    </div>
-    <div v-if="details?.transferCard && details?.transferSum">
-      <input id="transfer-modal" type="checkbox" class="modal-toggle">
-      <div class="modal modal-bottom sm:modal-middle modal-open">
-        <div class="modal-box relative">
-          <label for="transfer-modal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2" @click="cancelTransfer">✕</label>
-          <h3 class="font-bold text-lg">
-            Данные для перевода
-          </h3>
-          <p class=" text-sm text-primary animate-pulse">
-            Ожидаем платеж...
-          </p>
-          <p class="py-4">
-            Пожалуйста пополните кошелек Юмани, любым удобным вам способом:
-          </p>
-          <p class="font-bold text-lg text-center">
-            {{ details.transferCard }}
-          </p>
-          <p class="py-4">
-            Сумма для пополнения:
-          </p>
-          <p class="font-bold text-lg text-center">
-            {{ details.transferSum }} ₽
+          <p v-else class="w-1/3 opacity-100 text-white text-center">
+            Идет получение данных для перевода, <br> пожалуйста не
+            закрывайте
+            эту страницу
           </p>
         </div>
       </div>
-    </div>
-  </Teleport>
+      <div v-if="url">
+        <input id="fastPayment-modal" type="checkbox" class="modal-toggle">
+        <div class="modal modal-bottom sm:modal-middle modal-open">
+          <div class="modal-box relative">
+            <label for="fastPayment-modal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2" @click="cancelPayment">✕</label>
+            <h3 class="font-bold text-lg">
+              Быстрое пополнение
+            </h3>
+            <p class=" text-sm text-primary animate-pulse">
+              Ожидаем платеж...
+            </p>
+            <p class="py-4">
+              Перейдите по ссылке для оплаты. Не закрывайте это окно до завершения платежа.
+            </p>
+            <button class="btn btn-primary btn-block" @click="openUrl">
+              Перейти к оплате
+            </button>
+          </div>
+        </div>
+      </div>
+      <div v-if="details?.transferCard && details?.transferSum">
+        <input id="transfer-modal" type="checkbox" class="modal-toggle">
+        <div class="modal modal-bottom sm:modal-middle modal-open">
+          <div class="modal-box relative">
+            <label for="transfer-modal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2" @click="cancelTransfer">✕</label>
+            <h3 class="font-bold text-lg">
+              Данные для перевода
+            </h3>
+            <p class=" text-sm text-primary animate-pulse">
+              Ожидаем платеж...
+            </p>
+            <p class="py-4">
+              Пожалуйста пополните кошелек Юмани, любым удобным вам способом:
+            </p>
+            <p class="font-bold text-lg text-center">
+              {{ details.transferCard }}
+            </p>
+            <p class="py-4">
+              Сумма для пополнения:
+            </p>
+            <p class="font-bold text-lg text-center">
+              {{ details.transferSum }} ₽
+            </p>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+  </ClientOnly>
 </template>
 
 <style scoped></style>
