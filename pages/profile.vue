@@ -72,7 +72,7 @@ async function updatePassword() {
   }
   else {
     alert.show = true
-    alert.message = 'Пароль успешно изменен'
+    alert.message = 'Подтверждение смены пароля было отправлено на ваш email.'
     alert.type = 'success'
   }
   start()

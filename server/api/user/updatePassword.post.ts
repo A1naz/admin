@@ -1,12 +1,15 @@
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
+import mailService from '@/server/lib/mailService'
 
 function hasWhiteSpace(s: string) {
   return s.includes(' ') || !/^[a-zA-Z0-9_-]{6,16}$/.test(s)
 }
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
+  const runtimeConfig = useRuntimeConfig()
 
   if (!session)
     return sendRedirect(event, '/auth', 302)
@@ -46,7 +49,21 @@ export default eventHandler(async (event) => {
     user.password = bcrypt.hashSync(newPassword, 7)
   }
 
-  await user.save()
+  const token = jwt.sign(
+    { email: user.email, id: user.id, password: newPassword },
+    runtimeConfig.SECRET,
+    {
+      expiresIn: '10m',
+    },
+  )
+
+  const url = `${runtimeConfig.PUBLIC_SITE_URL}/api/user/changePassword/${token}`
+
+  await mailService.sendChangePasswordMail(
+    user.email,
+    url,
+    user.firstName || user.username,
+  )
   return {
     status: 'ok',
   }

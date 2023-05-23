@@ -39,6 +39,23 @@ class MailService {
     return result
   }
 
+  async sendUnlinkTelgramMail(to: string | undefined, link: string) {
+    const result = await this.transporter
+      .sendMail({
+        from: alias,
+        to,
+        subject: 'Подтверждение отвязки telegram на TOPVTOP',
+        text: '',
+        html: `
+                <div>
+                    <h1>Для отвязки телеграма перейдите по ссылке</h1>
+                    <a href="${link}">${link}</a>
+                </div>
+            `,
+      })
+    return result
+  }
+
   async sendChangePasswordMail(to: string | undefined, link: string, username: string) {
     const result = this.transporter
       .sendMail({

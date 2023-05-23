@@ -1,9 +1,7 @@
-import jwt from 'jsonwebtoken'
 import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 
 export default eventHandler(async (event) => {
-  const runtimeConfig = useRuntimeConfig()
   const session = (await getServerSession(event)) as any
   if (!session)
     return sendRedirect(event, '/auth', 302)
@@ -18,16 +16,7 @@ export default eventHandler(async (event) => {
       message: 'Привяжите email, чтобы отвязать Telegram',
     })
   }
-  const token = jwt.sign(
-    { username: user.username, telegram: user.telegram },
-    runtimeConfig.SECRET,
-    {
-      expiresIn: '10m',
-    },
-  )
-  user.telegram = undefined
-  // const url = `${runtimeConfig.PUBLIC_SITE_URL}/api/user/changePassword/${token}`
-  // mailService.sendUnlinkTelgramMail(user.email, url)
+  
   await user.save()
   return {
     status: 'ok',

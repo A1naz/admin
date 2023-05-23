@@ -113,7 +113,7 @@ async function checkForLink() {
     url.value = data.value?.url as string
     loading.value = false
     checkPaymentStatus()
-    window.open(url.value, '_blank')
+    openUrl()
   }
 }
 async function pay() {
@@ -140,7 +140,7 @@ async function pay() {
   }
 }
 function openUrl() {
-  window.open(url.value, '_blank')
+  window.open(url.value, '_blank', 'noreferrer,noopener')
 }
 </script>
 
