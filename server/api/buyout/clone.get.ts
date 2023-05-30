@@ -109,7 +109,7 @@ export default eventHandler(async (event) => {
     priceText: (priceText as string) || '',
     quantity: buyout.quantity,
     sex: buyout.gender,
-    searchQuery: buyout.searchQuery,
+    searchQuery: buyout.searchQuery.split(', '),
     adress: buyout.point,
     dateRange: [buyout.dateStart, buyout.dateEnd],
     selectedSize: buyout.sizeparam,

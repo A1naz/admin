@@ -104,11 +104,33 @@ function onSexChange(event: Event) {
           </button>
         </div>
       </div>
-
-      <input
-        v-model="product.searchQuery" type="text" placeholder="Поисковый запрос"
-        class="input input-bordered input-sm w-full mt-2"
-      >
+      <div>
+        <div class="w-full flex flex-col gap-2">
+          <div
+            v-for="(query, index) of product.searchQuery"
+            :key="index" class="relative flex items-center flex-grow-0 w-full"
+          >
+            <input
+              v-model="product.searchQuery[index]" type="text" placeholder="Поисковый запрос"
+              class="input input-bordered input-sm w-full pr-8"
+            >
+            <div
+              v-if="index === 0"
+              class="absolute right-0 btn btn-ghost btn-sm btn-square"
+              @click="product.searchQuery.push('')"
+            >
+              <IconCSS size="16" name="ic:round-plus" />
+            </div>
+            <div
+              v-if="index !== 0"
+              class="absolute right-0 btn btn-ghost btn-sm btn-square"
+              @click="product.searchQuery.splice(index, 1)"
+            >
+              <IconCSS size="16" name="material-symbols:close" />
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="divider" />
 

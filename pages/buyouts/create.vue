@@ -26,7 +26,7 @@ interface Item {
   quantity: number
   sizes: number[] | string[]
   sex: string
-  searchQuery: string
+  searchQuery: string[]
   adress: string
   dateRange: [Date | null, Date | null]
   selectedSize: number | string
@@ -87,7 +87,7 @@ async function addProduct() {
     sizes: product?.sizes,
     dateRange: [startDate, endDate],
     adress: '',
-    searchQuery: '',
+    searchQuery: [''],
     selectedSize: product.sizes[0] ?? 'none',
     priceText: product.priceText,
     rules: defaultRules,
@@ -145,7 +145,7 @@ async function createBuyout() {
       valid = false
       errorMsg = 'Не у всех товаров указаны даты выкупов'
     }
-    if (!item.searchQuery) {
+    if (!item.searchQuery[0]) {
       valid = false
       errorMsg = 'Не у всех товаров указан поисковый запрос'
     }
@@ -305,7 +305,7 @@ onMounted(async () => {
                 Пол
               </th>
               <th>
-                Поисковый запрос
+                Поисковые запросы
               </th>
               <th class="min-w-40">
                 Адрес
@@ -425,14 +425,30 @@ onMounted(async () => {
                 </div>
               </td>
               <td>
-                <div class="w-full">
-                  <input
-                    v-model="product.searchQuery" type="text" placeholder="Ввести"
-                    class="input input-bordered input-sm w-full"
+                <div class="w-full flex flex-col gap-2">
+                  <div
+                    v-for="(query, index) of product.searchQuery"
+                    :key="index" class="relative flex items-center flex-grow-0 w-full"
                   >
-                  <label class="label">
-                    <span class="label-text-alt">Новый запрос через запятую</span>
-                  </label>
+                    <input
+                      v-model="product.searchQuery[index]" type="text" placeholder="Поисковый запрос"
+                      class="input input-bordered input-sm w-full pr-8"
+                    >
+                    <div
+                      v-if="index === 0"
+                      class="absolute right-0 btn btn-ghost btn-sm btn-square"
+                      @click="product.searchQuery.push('')"
+                    >
+                      <IconCSS size="16" name="ic:round-plus" />
+                    </div>
+                    <div
+                      v-if="index !== 0"
+                      class="absolute right-0 btn btn-ghost btn-sm btn-square"
+                      @click="product.searchQuery.splice(index, 1)"
+                    >
+                      <IconCSS size="16" name="material-symbols:close" />
+                    </div>
+                  </div>
                 </div>
               </td>
               <td class="break-all">

@@ -12,7 +12,7 @@ interface Item {
   quantity: number
   sizes: number[] | string[]
   sex: string
-  searchQuery: string
+  searchQuery: string[]
   adress: string
   dateRange: [Date, Date]
   selectedSize: number | string
@@ -37,10 +37,9 @@ export default eventHandler(async (event) => {
     const rules = Object.keys(product.rules).filter(
       key => product.rules[key],
     )
-    const searchQueries = product.searchQuery.replaceAll(', ', ',').split(',')
     const buyout = new Buyout({
       article: product.article,
-      searchQuery: searchQueries.join(', '),
+      searchQuery: product.searchQuery.join(', '),
       point: product.adress,
       dateStart: product.dateRange[0],
       dateEnd: product.dateRange[1],
