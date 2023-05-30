@@ -33,14 +33,14 @@ export default eventHandler(async (event) => {
   const body = await readBody(event)
   const last = await Buyout.findOne({ user }).sort({ _id: -1 })
   const products: Item[] = body
-
   for await (const product of products) {
     const rules = Object.keys(product.rules).filter(
       key => product.rules[key],
     )
+    const searchQueries = product.searchQuery.replaceAll(', ', ',').split(',')
     const buyout = new Buyout({
       article: product.article,
-      searchQuery: product.searchQuery,
+      searchQuery: searchQueries.join(', '),
       point: product.adress,
       dateStart: product.dateRange[0],
       dateEnd: product.dateRange[1],

@@ -430,6 +430,9 @@ onMounted(async () => {
                     v-model="product.searchQuery" type="text" placeholder="Ввести"
                     class="input input-bordered input-sm w-full"
                   >
+                  <label class="label">
+                    <span class="label-text-alt">Новый запрос через запятую</span>
+                  </label>
                 </div>
               </td>
               <td class="break-all">

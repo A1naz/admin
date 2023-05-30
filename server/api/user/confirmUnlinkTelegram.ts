@@ -16,7 +16,6 @@ export default eventHandler(async (event) => {
       message: 'Привяжите email, чтобы отвязать Telegram',
     })
   }
-  
   await user.save()
   return {
     status: 'ok',

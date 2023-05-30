@@ -168,15 +168,9 @@ function onTelegramLink(data: any) {
           <input v-model="form.lastName" placeholder="Фамилия" class="input input-bordered w-full">
         </div>
 
-        <div class="email flex flex-col gap-8 lg:flex-row">
-          <input v-model="form.username" type="text" placeholder="Никнейм" class="input input-bordered w-full">
-          <input
-            v-model="form.email" type="text" placeholder="Почта (email)"
-            class="input input-bordered w-full"
-          >
-        </div>
-        <div class="flex flex-col w-full gap-4 justify-between xl:flex-row">
-          <div class="tg w-full justify-between flex gap-2 lg:gap-4 xl:w-1/2">
+        <div class="flex flex-col w-full gap-8 lg:flex-row">
+          <input v-model="form.username" type="text" placeholder="Никнейм" class="input input-bordered w-full lg:w-1/2">
+          <div class="tg w-full justify-between flex gap-2 lg:gap-4 lg:w-1/2">
             <div class="relative flex justify-end w-full items-center flex-grow-0">
               <input
                 :value="store.client?.telegram ? `@${store.client.telegram}` : ''" placeholder="Telegram"
@@ -185,14 +179,20 @@ function onTelegramLink(data: any) {
               <Icon class="absolute mr-4" size="24" name="logos:telegram" />
             </div>
 
-            <LinkTelegram v-if="!store.client.telegram" class="lg:mr-4" @callback="onTelegramLink" />
+            <LinkTelegram v-if="!store.client.telegram" @callback="onTelegramLink" />
             <button
-              v-if="store.client.telegram" class="btn btn-primary xl:mr-4"
+              v-if="store.client.telegram" class="btn btn-primary"
               @click="unlinkTelegram"
             >
               Отвязать
             </button>
           </div>
+        </div>
+        <input
+          v-model="form.email" type="text" placeholder="Почта (email)"
+          class="input input-bordered w-full"
+        >
+        <div class="flex w-full gap-4 justify-end">
           <button
             :disabled="disabledSaveButton" class="btn btn-primary  lg:w-40 mr-0 self-end"
             @click="update"
