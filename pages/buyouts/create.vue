@@ -16,7 +16,12 @@ definePageMeta({
   title: 'Добавить выкупы',
 })
 const selectPointModal = ref() as Ref<HTMLElement>
-
+interface Rule {
+  id: number
+  description: string
+  category: number
+  relies?: number
+}
 interface Item {
   image: string
   name: string
@@ -30,23 +35,25 @@ interface Item {
   adress: string
   dateRange: [Date | null, Date | null]
   selectedSize: number | string
-  rules: {
-    [key: number]: boolean
-  }
+  rules: Rule[]
 }
 
-const defaultRules = {
-  1: false,
-  2: false,
-  3: false,
-  4: false,
-  5: false,
-  6: false,
-  7: false,
-  8: false,
-  9: false,
-  10: false,
-}
+const defaultRules: Rule[] = [{ id: 1, description: 'Добавление 1 артикула конкурентов в корзину во время выкупа', category: 1 },
+  { id: 2, description: 'Добавление 2 артикулов конкурентов в корзину во время выкупа', category: 1 },
+  { id: 3, description: 'Добавление 3 артикулов конкурентов в корзину во время выкупа', category: 1 },
+  { id: 4, description: 'Находиться в карточке товара не менее 30 секунд, изучать карточку', category: 2 },
+  { id: 5, description: 'Не выкупать если товар не найден в поисковой выдаче (не выкупать по прямой ссылке)', category: 3 },
+  { id: 6, description: 'Выкупать только по будням, не выкупать в выходные дни', category: 4 },
+  { id: 7, description: 'Выкупать только в выходные дни, не выкупать по будням', category: 4 },
+  { id: 8, description: 'Выкупать только с рекламы, если реклама не найдена - не выкупать', category: 5 },
+  { id: 9, description: 'Выкупать с рекламы, если реклама не найдена - выкупать с поиска', category: 6 },
+  { id: 10, description: 'Использовать сортировку в поиске - по популярности', category: 7, relies: 8 },
+  { id: 11, description: 'Использовать сортировку в поиске - по возрастанию цены', category: 7, relies: 8 },
+  { id: 12, description: 'Использовать сортировку в поиске - по убыванию цены', category: 7, relies: 8 },
+  { id: 13, description: 'Использовать сортировку в поиске - по новинкам', category: 7, relies: 8 },
+  { id: 14, description: 'Использовать сортировку в поиске - сначала выгодные', category: 7, relies: 8 },
+
+]
 const route = useRoute()
 const store = useMainStore()
 const article = ref('')
@@ -90,7 +97,7 @@ async function addProduct() {
     searchQuery: [''],
     selectedSize: product.sizes[0] ?? 'none',
     priceText: product.priceText,
-    rules: defaultRules,
+    rules: [],
   }))
 }
 
@@ -106,7 +113,12 @@ function onSexChange(event: Event, index: number) {
 
 function onRuleChange(event: Event, index: number, rule: number) {
   const target = event.target as HTMLInputElement
-  products.value[index].rules[rule] = target.checked
+  const rules = products.value[index].rules
+  const finded = defaultRules.find(item => item.id === rule)
+  if (target.checked)
+    rules.push(finded!)
+  else
+    rules.splice(rules.indexOf(finded!))
 }
 function removeProduct(index: number) {
   products.value.splice(index, 1)
@@ -241,13 +253,16 @@ onMounted(async () => {
     if (data.value) {
       const product = {
         ...data.value,
-        rules: defaultRules,
+        rules: [''],
         dateRange: [startDate, endDate],
       }
       products.value.push(product as any)
     }
     loading.value = false
   }
+})
+const disabledRule = computed(() => {
+
 })
 </script>
 
@@ -533,13 +548,16 @@ onMounted(async () => {
               class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
             >✕</label>
             <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
-            <label v-for="(value, key) of products[index].rules" :key="key" class="label cursor-pointer">
-              <span class="label-text text-lg">Правило {{ key }}</span>
-              <input
-                type="checkbox" class="checkbox checkbox-primary"
-                @change="onRuleChange($event, index, key)"
-              >
-            </label>
+            <div v-for="(rule) of defaultRules" :key="rule.id" class="">
+              <div class="label cursor-pointer flex gap-4 items-start">
+                <span class="label-text">{{ rule.id }}. {{ rule.description }}</span>
+                <input
+                  :disabled="!!product.rules.find(item => item.category === rule.category && item.id !== rule.id) || !!product.rules.find(item => item.id === rule?.relies)"
+                  type="checkbox" class="checkbox checkbox-primary"
+                  @change="onRuleChange($event, index, rule.id)"
+                >
+              </div>
+            </div>
           </label>
         </label>
       </div>
