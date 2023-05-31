@@ -3,6 +3,12 @@ import { Buyout } from '@/server/lib/models/Buyout'
 import { getServerSession } from '#auth'
 import { User } from '~~/server/lib/models/User'
 
+interface Rule {
+  id: number
+  description: string
+  category: number
+  relies?: number
+}
 interface Item {
   image: string
   name: string
@@ -16,9 +22,7 @@ interface Item {
   adress: string
   dateRange: [Date, Date]
   selectedSize: number | string
-  rules: {
-    [key: number | string]: boolean
-  }
+  rules: Rule[]
 }
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -34,9 +38,7 @@ export default eventHandler(async (event) => {
   const last = await Buyout.findOne({ user }).sort({ _id: -1 })
   const products: Item[] = body
   for await (const product of products) {
-    const rules = Object.keys(product.rules).filter(
-      key => product.rules[key],
-    )
+    const rules = product.rules.map(rule => rule.id)
     const buyout = new Buyout({
       article: product.article,
       searchQuery: product.searchQuery.join(', '),

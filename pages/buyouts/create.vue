@@ -46,12 +46,12 @@ const defaultRules: Rule[] = [{ id: 1, description: 'Добавление 1 ар
   { id: 6, description: 'Выкупать только по будням, не выкупать в выходные дни', category: 4 },
   { id: 7, description: 'Выкупать только в выходные дни, не выкупать по будням', category: 4 },
   { id: 8, description: 'Выкупать только с рекламы, если реклама не найдена - не выкупать', category: 5 },
-  { id: 9, description: 'Выкупать с рекламы, если реклама не найдена - выкупать с поиска', category: 6 },
-  { id: 10, description: 'Использовать сортировку в поиске - по популярности', category: 7, relies: 8 },
-  { id: 11, description: 'Использовать сортировку в поиске - по возрастанию цены', category: 7, relies: 8 },
-  { id: 12, description: 'Использовать сортировку в поиске - по убыванию цены', category: 7, relies: 8 },
-  { id: 13, description: 'Использовать сортировку в поиске - по новинкам', category: 7, relies: 8 },
-  { id: 14, description: 'Использовать сортировку в поиске - сначала выгодные', category: 7, relies: 8 },
+  { id: 9, description: 'Выкупать с рекламы, если реклама не найдена - выкупать с поиска', category: 5 },
+  { id: 10, description: 'Использовать сортировку в поиске - по популярности', category: 6, relies: 8 },
+  { id: 11, description: 'Использовать сортировку в поиске - по возрастанию цены', category: 6, relies: 8 },
+  { id: 12, description: 'Использовать сортировку в поиске - по убыванию цены', category: 6, relies: 8 },
+  { id: 13, description: 'Использовать сортировку в поиске - по новинкам', category: 6, relies: 8 },
+  { id: 14, description: 'Использовать сортировку в поиске - сначала выгодные', category: 6, relies: 8 },
 
 ]
 const route = useRoute()
@@ -115,10 +115,14 @@ function onRuleChange(event: Event, index: number, rule: number) {
   const target = event.target as HTMLInputElement
   const rules = products.value[index].rules
   const finded = defaultRules.find(item => item.id === rule)
-  if (target.checked)
-    rules.push(finded!)
-  else
-    rules.splice(rules.indexOf(finded!))
+  if (!finded)
+    return console.log('error: no rule found')
+  if (target.checked) {
+    if (finded.id === 8)
+      products.value[index].rules = rules.filter(item => item.id < 10)
+    products.value[index].rules.push(finded)
+  }
+  else { rules.splice(rules.indexOf(finded)) }
 }
 function removeProduct(index: number) {
   products.value.splice(index, 1)
@@ -253,16 +257,13 @@ onMounted(async () => {
     if (data.value) {
       const product = {
         ...data.value,
-        rules: [''],
+        rules: [],
         dateRange: [startDate, endDate],
       }
       products.value.push(product as any)
     }
     loading.value = false
   }
-})
-const disabledRule = computed(() => {
-
 })
 </script>
 
@@ -554,6 +555,7 @@ const disabledRule = computed(() => {
                 <input
                   :disabled="!!product.rules.find(item => item.category === rule.category && item.id !== rule.id) || !!product.rules.find(item => item.id === rule?.relies)"
                   type="checkbox" class="checkbox checkbox-primary"
+                  :checked="product.rules.indexOf(rule) > -1"
                   @change="onRuleChange($event, index, rule.id)"
                 >
               </div>
