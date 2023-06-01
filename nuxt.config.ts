@@ -140,6 +140,10 @@ export default defineNuxtConfig({
     privateKey: process.env.privateKey,
     PUBLIC_SITE_URL: process.env.PUBLIC_SITE_URL,
     BOT_TOKEN: process.env.BOT_TOKEN,
+    fkSecret1: process.env.fkSecret1,
+    fkSecret2: process.env.fkSecret2,
+    fkApiKey: process.env.fkApiKey,
+    fkID: process.env.fkID,
   },
   security: {
     headers: false,

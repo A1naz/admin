@@ -1,0 +1,58 @@
+import crypto from 'node:crypto'
+
+export default function (params: { [x: string]: string | number | boolean; oa?: any; m?: any; o?: any; currency?: any; s?: any }, world: any) {
+  if (!params || !world || typeof params !== 'object')
+    throw new Error('Missing params and secret world')
+
+  const result: any = {}
+  const params_arr = []
+  let url = 'https://pay.freekassa.ru/?'
+
+  params = JSON.parse(JSON.stringify(params))
+
+  if (params.oa)
+    params.oa = parseFloat(params.oa).toString()
+
+  if (params.m && params.oa && params.o && params.currency) {
+    params_arr.push(params.m)
+    params_arr.push(params.oa)
+    params_arr.push(world)
+    params_arr.push(params.currency)
+    params_arr.push(params.o)
+  }
+  else if (
+    params.MERCHANT_ID
+    && params.AMOUNT
+    && params.MERCHANT_ORDER_ID
+    && params.MERCHANT_ORDER_ID
+  ) {
+    params_arr.push(params.MERCHANT_ID)
+    params_arr.push(params.AMOUNT)
+    params_arr.push(world)
+    params_arr.push(params.MERCHANT_ORDER_ID)
+    return {
+      signature: crypto
+        .createHash('md5')
+        .update(params_arr.join(':'))
+        .digest('hex'),
+    }
+  }
+  else {
+    throw new Error('Required parameters are not specified')
+  }
+
+  result.signature = crypto
+    .createHash('md5')
+    .update(params_arr.join(':'))
+    .digest('hex')
+
+  params.s = result.signature
+
+  Object.keys(params).forEach((p) => {
+    url += `${p}=${encodeURIComponent(params[p])}&`
+  })
+
+  result.url = url
+
+  return result
+}

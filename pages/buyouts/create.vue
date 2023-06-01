@@ -52,7 +52,7 @@ const defaultRules: Rule[] = [{ id: 1, description: 'Добавление 1 ар
   { id: 12, description: 'Использовать сортировку в поиске - по убыванию цены', category: 6, relies: 8 },
   { id: 13, description: 'Использовать сортировку в поиске - по новинкам', category: 6, relies: 8 },
   { id: 14, description: 'Использовать сортировку в поиске - сначала выгодные', category: 6, relies: 8 },
-
+  { id: 15, description: 'Использовать сортировку в поиске - по рейтингу', category: 6, relies: 8 },
 ]
 const route = useRoute()
 const store = useMainStore()
@@ -116,7 +116,7 @@ function onRuleChange(event: Event, index: number, rule: number) {
   const rules = products.value[index].rules
   const finded = defaultRules.find(item => item.id === rule)
   if (!finded)
-    return console.log('error: no rule found')
+    return
   if (target.checked) {
     if (finded.id === 8)
       products.value[index].rules = rules.filter(item => item.id < 10)

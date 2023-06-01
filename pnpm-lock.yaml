@@ -49,6 +49,9 @@ dependencies:
   dayjs:
     specifier: ^1.11.7
     version: 1.11.7
+  freekassa-node:
+    specifier: ^2.0.0
+    version: 2.0.0
   html2pdf.js:
     specifier: ^0.10.1
     version: 0.10.1
@@ -58,6 +61,9 @@ dependencies:
   maska:
     specifier: ^2.1.7
     version: 2.1.8
+  md5:
+    specifier: ^2.3.0
+    version: 2.3.0
   mongodb:
     specifier: ^5.1.0
     version: 5.3.0
@@ -5796,6 +5802,10 @@ packages:
   /chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
 
+  /charenc@0.0.2:
+    resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
+    dev: false
+
   /cheerio-select@2.1.0:
     resolution: {integrity: sha512-9v9kG0LvzrlcungtnJtpGNxY+fzECQKhK4EGJX2vByejiMX84MFNQw4UxPJl3bFbTMw+Dfs37XaIkCwTZfLh4g==}
     dependencies:
@@ -6185,6 +6195,10 @@ packages:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  /crypt@0.0.2:
+    resolution: {integrity: sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==}
+    dev: false
 
   /crypto-random-string@2.0.0:
     resolution: {integrity: sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==}
@@ -7752,6 +7766,10 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       map-cache: 0.2.2
+    dev: false
+
+  /freekassa-node@2.0.0:
+    resolution: {integrity: sha512-Q4p80Y6JQurWxi5ozDsz3KIxh3SH4tuaP9LdwYj71ncswZ5RlRG/MTOJd51XPACbH/78XKaVyJm+N9wBkJwFqA==}
     dev: false
 
   /fresh@0.5.2:
@@ -10026,6 +10044,14 @@ packages:
 
   /maska@2.1.8:
     resolution: {integrity: sha512-UGhHVHUCrUQExDDdKJLWXOXYV5c7WOAKiEjeSlaptDcF34AoHdvB1083en4WGQoa4xyUnkeGvN7mjxqefw6uKw==}
+    dev: false
+
+  /md5@2.3.0:
+    resolution: {integrity: sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==}
+    dependencies:
+      charenc: 0.0.2
+      crypt: 0.0.2
+      is-buffer: 1.1.6
     dev: false
 
   /mdast-util-from-markdown@0.8.5:

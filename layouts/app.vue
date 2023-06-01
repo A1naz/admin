@@ -46,6 +46,7 @@ onMounted(() => {
 })
 
 const breadcrumbs = computed(() => getBreadcrumbs())
+const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path === '/paymenthistory' || route.path === '/reports'))
 </script>
 
 <template>
@@ -70,7 +71,7 @@ const breadcrumbs = computed(() => getBreadcrumbs())
 
       <!-- Page content here -->
       <div ref="pageContent" class="px-6 py-2 lg:p-6 block">
-        <div v-if="route.path !== '/profile' && route.path !== '/paymenthistory'" class="breadcrumbs p-0 lg:text-sm">
+        <div v-if="noBreadcrumbs" class="breadcrumbs p-0 lg:text-sm">
           <ul>
             <li>
               <a href="#">
@@ -135,12 +136,14 @@ const breadcrumbs = computed(() => getBreadcrumbs())
         <SidebarItem title="Лайки на отзывы" icon="fluent:thumb-like-24-filled" href="/likes" />
         <SidebarItem title="Лайки на товар / бренд" icon="fluent:heart-24-filled" href="/productlikes" />
         <SidebarItem title="Вопросы" icon="fluent:chat-bubbles-question-24-filled" href="/questions" />
-        <SidebarItem href="/cart" title="Корзина" icon="fluent:cart-24-filled" />
+        <SidebarItem title="Корзина" icon="fluent:cart-24-filled" href="/cart" />
 
         <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
           Дополнительно
         </h3>
         <SidebarItem icon="fluent:history-24-filled" title="История платежей" href="/paymenthistory" />
+        <SidebarItem icon="fluent:document-bullet-list-24-filled" title="Отчеты по выкупам" href="/reports" />
+
         <li class="mt-auto w-full no-animation hover:bg-base-200">
           <div class="w-full no-animation hover:bg-base-200 hover:cursor-default p-0">
             <div class="flex justify-between w-full items-center p-0 m-0">

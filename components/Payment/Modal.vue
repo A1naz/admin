@@ -139,6 +139,28 @@ async function pay() {
       checkForLink()
   }
 }
+
+async function fkCreateBill() {
+  if (!paymentForm.paymentSum)
+    return
+  const { data, error } = await useFetch('/api/payment/createBill', {
+    method: 'POST',
+    body: {
+      amount: paymentForm.paymentSum,
+    },
+  })
+  if (error.value) {
+    notify({
+      title: 'Ошибка',
+      text: 'Произошла ошибка при создании платежа',
+      type: 'error',
+    })
+  }
+  if (data.value && data.value.payUrl)
+    url.value = data.value.payUrl
+  openUrl()
+}
+
 function openUrl() {
   window.open(url.value, '_blank', 'noreferrer,noopener')
 }
@@ -163,7 +185,7 @@ function openUrl() {
                 <h3 class="text-lg mb-2">Сумма к пополнению</h3>
                 <PaymentInput v-model="paymentForm.paymentSum" />
               </div>
-              <div class="btn-group btn-group-vertical w-full">
+              <!-- <div class="btn-group btn-group-vertical w-full">
                 <button
                   class="btn" :class="{
                     'btn-active': paymentForm.paymentType === 'fast',
@@ -174,7 +196,7 @@ function openUrl() {
                     'btn-active': paymentForm.paymentType === 'transfer',
                   }" @click="paymentForm.paymentType = 'transfer'"
                 >Перевод (без комиссии)</button>
-              </div>
+              </div> -->
 
             </div>
 
@@ -182,7 +204,7 @@ function openUrl() {
           <div class="modal-action justify-between">
             <label for="payment-modal" class="btn btn-ghost" @click="cancelPayment">Отмена</label>
 
-            <button class="btn btn-primary" @click="pay">Оплатить</button>
+            <button class="btn btn-primary" @click="fkCreateBill">Оплатить</button>
           </div>
         </label>
         <div
