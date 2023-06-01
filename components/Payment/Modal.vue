@@ -156,9 +156,10 @@ async function fkCreateBill() {
       type: 'error',
     })
   }
-  if (data.value && data.value.payUrl)
+  if (data.value && data.value.payUrl) {
     url.value = data.value.payUrl
-  openUrl()
+    openUrl()
+  }
 }
 
 function openUrl() {
