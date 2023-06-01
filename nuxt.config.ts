@@ -75,7 +75,7 @@ export default defineNuxtConfig({
   ],
   delayHydration: {
     // enables nuxt-delay-hydration in dev mode for testing
-    mode: 'mount',
+    mode: 'init',
     debug: process.env.NODE_ENV === 'development',
   },
   s3: {

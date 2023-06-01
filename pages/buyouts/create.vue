@@ -541,31 +541,29 @@ onMounted(async () => {
       </button>
     </div>
 
-    <Teleport to="body">
-      <div v-for="(product, index) of products" :key="index">
-        <input :id="`modal${index}`" type="checkbox" class="modal-toggle">
-        <label :for="`modal${index}`" class="modal modal-bottom sm:modal-middle">
-          <label for="" class="modal-box relative">
-            <label
-              :for="`modal${index}`"
-              class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-            >✕</label>
-            <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
-            <div v-for="(rule) of defaultRules" :key="rule.id" class="">
-              <div class="label cursor-pointer flex gap-4 items-start">
-                <span class="label-text">{{ rule.id }}. {{ rule.description }}</span>
-                <input
-                  :disabled="!!product.rules.find(item => item.category === rule.category && item.id !== rule.id) || !!product.rules.find(item => item.id === rule?.relies)"
-                  type="checkbox" class="checkbox checkbox-primary"
-                  :checked="product.rules.indexOf(rule) > -1"
-                  @change="onRuleChange($event, index, rule.id)"
-                >
-              </div>
+    <div v-for="(product, index) of products" :key="index">
+      <input :id="`modal${index}`" type="checkbox" class="modal-toggle">
+      <label :for="`modal${index}`" class="modal modal-bottom sm:modal-middle">
+        <label for="" class="modal-box relative">
+          <label
+            :for="`modal${index}`"
+            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >✕</label>
+          <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
+          <div v-for="(rule) of defaultRules" :key="rule.id" class="">
+            <div class="label cursor-pointer flex gap-4 items-start">
+              <span class="label-text">{{ rule.id }}. {{ rule.description }}</span>
+              <input
+                :disabled="!!product.rules.find(item => item.category === rule.category && item.id !== rule.id) || !!product.rules.find(item => item.id === rule?.relies)"
+                type="checkbox" class="checkbox checkbox-primary"
+                :checked="product.rules.indexOf(rule) > -1"
+                @change="onRuleChange($event, index, rule.id)"
+              >
             </div>
-          </label>
+          </div>
         </label>
-      </div>
-    </Teleport>
+      </label>
+    </div>
   </div>
 </template>
 

@@ -169,28 +169,26 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div
-      id="selectPointModal" class="modal" :class="{
-        'modal-open': props.state,
-      }"
-    >
-      <div v-if="state" class="modal-box w-11/12 max-w-7xl overflow-y-hidden">
-        <div class="">
-          <a class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</a>
-          <div class="title mb-2">
-            Выберите ПВЗ
-          </div>
-          <div v-if="loading" class="loading flex justify-center items-center h-full">
-            <Icon class="animate-spin" size="60" name="mdi:loading" />
-          </div>
-          <div class="w-full h-full">
-            <div id="ymap" class="yandex-container" />
-          </div>
+  <div
+    id="selectPointModal" class="modal" :class="{
+      'modal-open': props.state,
+    }"
+  >
+    <div v-if="state" class="modal-box w-11/12 max-w-7xl overflow-y-hidden">
+      <div class="">
+        <a class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="closeModal">✕</a>
+        <div class="title mb-2">
+          Выберите ПВЗ
+        </div>
+        <div v-if="loading" class="loading flex justify-center items-center h-full">
+          <Icon class="animate-spin" size="60" name="mdi:loading" />
+        </div>
+        <div class="w-full h-full">
+          <div id="ymap" class="yandex-container" />
         </div>
       </div>
     </div>
-  </Teleport>
+  </div>
 </template>
 
 <style>

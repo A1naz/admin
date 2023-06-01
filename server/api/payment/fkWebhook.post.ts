@@ -11,7 +11,6 @@ export default eventHandler(async (event) => {
     return 'YES'
   }
   catch (e) {
-    console.log(e)
     return 'NO'
   }
 })

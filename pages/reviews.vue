@@ -131,16 +131,14 @@ function closeModal() {
     />
 
     <!-- Put this part before </body> tag -->
-    <Teleport to="body">
-      <input id="reviewImageModal" type="checkbox" class="modal-toggle">
+    <input id="reviewImageModal" type="checkbox" class="modal-toggle">
 
-      <label for="reviewImageModal" class="modal cursor-pointer">
-        <label for="" class="modal-box min-w-0 max-w-5xl p-0">
-          <label for="reviewImageModal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2">✕</label>
-          <nuxt-img v-if="openedPhoto" fit="contain" class="object-contain m-auto" :src="openedPhoto" />
-        </label>
+    <label for="reviewImageModal" class="modal cursor-pointer">
+      <label for="" class="modal-box min-w-0 max-w-5xl p-0">
+        <label for="reviewImageModal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2">✕</label>
+        <nuxt-img v-if="openedPhoto" fit="contain" class="object-contain m-auto" :src="openedPhoto" />
       </label>
-    </Teleport>
+    </label>
   </div>
 </template>
 
