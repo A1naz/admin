@@ -27,14 +27,12 @@ watch(() => props.state, (newState) => {
 </script>
 
 <template>
-  <div class="collapse collapse-arrow border border-base-200 bg-base-100 rounded-box z-0">
+  <div class="collapse collapse-arrow border border-base-100 bg-base-200 rounded-box z-0 overflow-visible">
     <input v-model="opened" type="checkbox">
     <div class="collapse-title relative text-xl font-medium">
       <div class="flex gap-4">
         <nuxt-img
-          fit="fill" :class="{
-            'opacity-0': opened,
-          }" :src="info.productimage" width="36"
+          fit="fill" :src="info.productimage" width="36"
           class="rounded-lg transition-opacity ease-in-out duration-200 hidden lg:block"
         />
         <div class="w-full">
@@ -42,7 +40,8 @@ watch(() => props.state, (newState) => {
             <span> Доставка №{{ info.place }}
             </span>
             <label
-              class="text-[0.6rem] link link-hover sm:text-[0.8rem] lg:text-xs text-gray-500 hover:text-primary truncate"
+              class="text-[0.6rem] link link-hover sm:text-[0.8rem] lg:text-xs text-gray-500 hover:text-primary truncate z-10"
+              @click="openBuyout"
             >#{{
               info.uuid }}</label>
           </div>
@@ -60,18 +59,8 @@ watch(() => props.state, (newState) => {
         </div>
       </div>
     </div>
-    <div class="collapse-content">
+    <div class="collapse-content overflow-visible">
       <div class="product flex gap-4 lg:gap-8 items-center flex-wrap overflow-visible">
-        <div class="dropdown dropdown-hover static">
-          <label tabindex="0"> <nuxt-img
-            width="24" class="rounded-lg" loading="lazy" fit="fill"
-            :src="info.productimage"
-          />
-          </label>
-          <ul tabindex="0" class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52">
-            <nuxt-img class="rounded-lg" loading="lazy" fit="fill" :src="info.productimage" />
-          </ul>
-        </div>
         <div>
           <div class="text-sm text-gray-500">
             Артикул

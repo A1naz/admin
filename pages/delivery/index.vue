@@ -143,7 +143,7 @@ watch(route, async (newRoute) => {
     </div>
     <div v-if="deliveries?.length">
       <TransitionSlide group tag="ul" class="flex flex-col gap-3">
-        <li v-for="(delivery, index) of deliveries" :key="index" class="overflow-visible">
+        <li v-for="(delivery, index) of deliveries" :key="index" class="overflow-visible z-0">
           <DeliveryExpand
             :state="openAll"
             :info="delivery" @open-modal="openModal"
