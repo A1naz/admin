@@ -36,6 +36,11 @@ ENV BOT_LOGIN=${BOT_LOGIN}
 ENV PORT=${PORT}
 ENV NUXT_HOST=${NUXT_HOST}
 ENV NUXT_PORT=${NUXT_PORT}
+ENV fkApiKey=${fkApiKey}
+ENV fkSecret1=${fkSecret1}
+ENV fkSecret2=${fkSecret2}
+ENV fkID=${fkID}
+
 
 RUN npm install -g pnpm
 RUN pnpm install
