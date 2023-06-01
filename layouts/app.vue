@@ -50,9 +50,9 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
 </script>
 
 <template>
-  <div class="drawer drawer-mobile">
-    <input id="my-drawer" v-model="store.drawerOpened" type="checkbox" class="drawer-toggle">
-    <div class="drawer-content scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
+  <div class="drawer lg:drawer-open z-10">
+    <input id="my-drawer" type="checkbox" class="drawer-toggle">
+    <div class="drawer-content w-full flex flex-col items-center scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
       <div class="w-full navbar bg-base-100 lg:hidden">
         <div class="flex-none">
           <label for="my-drawer" class="btn btn-square btn-ghost drawer-button">
@@ -70,7 +70,7 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
       </div>
 
       <!-- Page content here -->
-      <div ref="pageContent" class="px-6 py-2 lg:p-6 block">
+      <div ref="pageContent" class="px-6 py-2 lg:p-6 max-w-full w-full">
         <div v-if="noBreadcrumbs" class="breadcrumbs p-0 lg:text-sm">
           <ul>
             <li>
@@ -88,9 +88,9 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
         <slot />
       </div>
     </div>
-    <div class="drawer-side">
-      <label for="my-drawer" class="drawer-overlay rounded-xl lg:m-2" />
-      <ul class="menu w-72 bg-base-200 rounded-xl lg:m-2 text-base-content justify-start">
+    <div class="drawer-side ">
+      <label for="my-drawer" class="drawer-overlay" />
+      <ul class="menu w-72 h-full bg-base-200 text-base-content flex-nowrap">
         <!-- Sidebar content here -->
         <div class="hidden title w-full justify-center p-2 lg:flex">
           <Logo />
@@ -110,8 +110,8 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
                 </div>
                 <NuxtLink
                   :class="{
-                    'bg-neutral-focus': route.path !== '/profile',
-                  }" to="/profile" class="btn btn-sm btn-circle hover:bg-neutral relative"
+                    'bg-base-300': route.path === '/profile',
+                  }" to="/profile" class="btn btn-sm btn-circle relative"
                 >
                   <IconCSS name="fluent:person-24-filled" size="24" />
                 </NuxtLink>
@@ -144,8 +144,8 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
         <SidebarItem icon="fluent:history-24-filled" title="История платежей" href="/paymenthistory" />
         <SidebarItem icon="fluent:document-bullet-list-24-filled" title="Отчеты по выкупам" href="/reports" />
 
-        <li class="mt-auto w-full no-animation hover:bg-base-200">
-          <div class="w-full no-animation hover:bg-base-200 hover:cursor-default p-0">
+        <li class="mt-auto no-animation hover:bg-base-200">
+          <div class="w-full no-animation hover:bg-base-200 hover:cursor-default p-0 block">
             <div class="flex justify-between w-full items-center p-0 m-0">
               <div
                 class="btn btn-ghost gap-2 flex justify-center items-center normal-case w-[80%] hover:cursor-pointer rounded-lg p-0 m-0"

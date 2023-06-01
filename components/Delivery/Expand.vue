@@ -27,7 +27,7 @@ watch(() => props.state, (newState) => {
 </script>
 
 <template>
-  <div class="collapse collapse-arrow border border-base-200 bg-base-100 rounded-box overflow-visible">
+  <div class="collapse collapse-arrow border border-base-200 bg-base-100 rounded-box z-0">
     <input v-model="opened" type="checkbox">
     <div class="collapse-title relative text-xl font-medium">
       <div class="flex gap-4">
@@ -41,12 +41,10 @@ watch(() => props.state, (newState) => {
           <div class="flex justify-between flex-wrap">
             <span> Доставка №{{ info.place }}
             </span>
-            <div class="tooltip z-10" data-tip="Перейти к выкупу" @click="openBuyout">
-              <label
-                class="text-[0.6rem] link link-hover sm:text-[0.8rem] lg:text-xs text-gray-500 hover:text-primary z-10 truncate"
-              >#{{
-                info.uuid }}</label>
-            </div>
+            <label
+              class="text-[0.6rem] link link-hover sm:text-[0.8rem] lg:text-xs text-gray-500 hover:text-primary truncate"
+            >#{{
+              info.uuid }}</label>
           </div>
           <div class="flex justify-between flex-wrap gap-2 items-center">
             <div class="text-sm">
@@ -64,7 +62,7 @@ watch(() => props.state, (newState) => {
     </div>
     <div class="collapse-content">
       <div class="product flex gap-4 lg:gap-8 items-center flex-wrap overflow-visible">
-        <div class="dropdown dropdown-hover z-10 static">
+        <div class="dropdown dropdown-hover static">
           <label tabindex="0"> <nuxt-img
             width="24" class="rounded-lg" loading="lazy" fit="fill"
             :src="info.productimage"
@@ -130,10 +128,7 @@ watch(() => props.state, (newState) => {
         </div>
         <div v-if="info.receiptcodeqr">
           <label
-            for="qr-modal" class="btn btn-primary btn-sm flex gap-2" @click="emit('openModal',
-                                                                                  info.receiptcode,
-                                                                                  info.receiptcodeqr,
-            )"
+            for="qr-modal" class="btn btn-primary btn-sm flex gap-2" @click="emit('openModal', parseInt(info.receiptcode), info.receiptcodeqr)"
           >
             <Icon name="material-symbols:qr-code" size="24" /> <span>QR-код</span>
           </label>

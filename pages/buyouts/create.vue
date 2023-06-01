@@ -477,9 +477,11 @@ onMounted(async () => {
                   <button
                     :disabled="!pickpoints" :class="{
                       'btn-outline': product.adress,
-                      'loading': !pickpoints,
+                      'disabled': !pickpoints,
                     }" class="btn btn-primary btn-sm normal-case w-full" @click="pointModalOpen(index)"
                   >
+                    <span v-show="!pickpoints" class="loading loading-spinner" />
+
                     {{ product.adress
                       ? 'Изменить' : 'Добавить' }}
                   </button>

@@ -108,6 +108,7 @@ watch(route, async (newRoute) => {
       В этом разделе можно отследить статусы выкупов после оплаты. Статус "Доставлен" означает, что товар можно
       забирать из пункта выдачи.
     </p>
+
     <div class="flex justify-between mb-8 mt-6 items-center">
       <select class="select select-bordered select-sm" @change="selectStatus">
         <option value="all" :selected="route.query.status === undefined">
@@ -126,7 +127,7 @@ watch(route, async (newRoute) => {
           <label for="openAll" class="cursor-pointer select-none ml-2">Развернуть все</label>
         </div>
         <div v-if="deliveries.length" class="export">
-          <div class="dropdown dropdown-end">
+          <div class="dropdown dropdown-end z-10">
             <label tabindex="0" class="btn btn-sm btn-primary m-1">Экспорт</label>
             <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
               <li>
@@ -140,15 +141,16 @@ watch(route, async (newRoute) => {
         </div>
       </div>
     </div>
-
     <div v-if="deliveries?.length">
-      <TransitionSlide group class="grid grid-cols-1 gap-3">
-        <DeliveryExpand
-          v-for="(delivery, index) of deliveries" :key="index" :state="openAll"
-          :info="delivery" @open-modal="openModal"
-        />
+      <TransitionSlide group tag="ul" class="flex flex-col gap-3">
+        <li v-for="(delivery, index) of deliveries" :key="index" class="overflow-visible">
+          <DeliveryExpand
+            :state="openAll"
+            :info="delivery" @open-modal="openModal"
+          />
+        </li>
+        <div ref="target" class="flex justify-center items-center" />
       </TransitionSlide>
-      <div ref="target" class="flex justify-center items-center" />
       <DeliveryQrModal v-if="modal" :code="modalInfo.code" :src="modalInfo.src" />
     </div>
     <div v-else class="hero">
@@ -164,14 +166,5 @@ watch(route, async (newRoute) => {
 </template>
 
 <style scoped>
-.list-enter-active,
-.list-leave-active {
-    transition: all 0.5s ease-in-out;
-}
 
-.list-enter-from,
-.list-leave-to {
-    opacity: 0;
-    transform: translateY(30px);
-}
 </style>

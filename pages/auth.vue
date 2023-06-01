@@ -127,11 +127,11 @@ const v$ = useVuelidate(rules, formData)
               </NuxtLink>
             </div>
             <button
-              type="submit" :class="{
-                loading,
-              }" class="btn btn-primary w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              type="submit" class="btn btn-primary w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
               @click.prevent="login"
             >
+              <span v-show="loading" class="loading loading-spinner" />
+
               Войти
             </button>
 
