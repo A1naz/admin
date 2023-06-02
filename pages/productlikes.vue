@@ -110,11 +110,12 @@ onMounted(() => {
             >
             <button
               :class="{
-                'loading': loadingUrl,
                 'btn-disabled': !productData,
               }"
               class="btn btn-sm btn-ghost btn-circle bg-base-100" @click="removeProduct"
             >
+              <span v-show="loadingUrl" class="loading loading-spinner loading-xs p-2" />
+
               <!-- Insert a backspace svg -->
               <div v-if="!loadingUrl">
                 <IconCSS v-if="productData" class="w-6 h-6" name="fluent:backspace-24-regular" />

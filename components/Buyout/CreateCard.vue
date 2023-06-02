@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-mutating-props -->
 <script setup lang="ts">
 const props = defineProps({
   product: {
@@ -39,11 +40,11 @@ function onSexChange(event: Event) {
 <template>
   <div class="buyout-card card bg-base-200 shadow-lg">
     <div class="card-body flex-shrink-0 flex flex-col justify-start p-4 relative">
-      <div class="dropdown dropdown-end absolute right-2 top-2">
+      <div class="dropdown dropdown-end absolute right-2 top-2 z-10">
         <label tabindex="0" class="btn btn-sm btn-square btn-ghost">
           <Icon name="ph:dots-three-outline-vertical-fill" size="18" />
         </label>
-        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+        <ul tabindex="0" class="dropdown-content menu bg-base-200 p-2 shadow rounded-box w-52">
           <li>
             <a @click="deleteBuyOut">
               <Icon name="material-symbols:delete-outline" />Удалить

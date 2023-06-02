@@ -7,7 +7,7 @@ definePageMeta({
 const openAll = ref(false)
 const route = useRoute()
 const router = useRouter()
-const deliveries = ref([]) as any
+const reports = ref([]) as any
 function selectStatus(e: Event) {
   const target = e.target as HTMLSelectElement
   router.push({
@@ -37,17 +37,15 @@ const { stop } = useIntersectionObserver(
 )
 const skip = ref(50)
 const end = ref(false)
-const { data, error } = await useFetch('/api/delivery/get', {
+const { data, error } = await useFetch('/api/reports/get', {
   method: 'GET',
   query: {
-    status: route.query?.status || 'all',
-    limit: 50,
   },
   headers: useRequestHeaders(['cookie']) as HeadersInit,
 })
 
 onMounted(async () => {
-  deliveries.value = data.value
+  reports.value = data.value
 })
 </script>
 
@@ -68,13 +66,8 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div v-if="deliveries?.length">
-      <TransitionSlide group class="grid grid-cols-1 gap-3">
-        <DeliveryExpand
-          v-for="(delivery, index) of deliveries" :key="index" :state="openAll"
-          :info="delivery" @open-modal="openModal"
-        />
-      </TransitionSlide>
+    <div v-if="reports?.length">
+      <TransitionSlide group class="grid grid-cols-1 gap-3" />
     </div>
     <div v-else class="hero">
       <div class="hero-content text-center flex justify-center items-center h-80">
