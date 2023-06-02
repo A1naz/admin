@@ -118,11 +118,15 @@ function onRuleChange(event: Event, index: number, rule: number) {
   if (!finded)
     return
   if (target.checked) {
-    if (finded.id === 8)
-      products.value[index].rules = rules.filter(item => item.id < 10)
+    if (finded.id === 8) {
+      rules.forEach((rule, index) => {
+        if (rule.id >= 10)
+          rules.splice(index, 1)
+      })
+    }
     products.value[index].rules.push(finded)
   }
-  else { rules.splice(rules.indexOf(finded)) }
+  else { rules.splice(rules.indexOf(finded), 1) }
 }
 function removeProduct(index: number) {
   products.value.splice(index, 1)
