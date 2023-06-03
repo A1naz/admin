@@ -32,7 +32,7 @@ class MailService {
         html: `
                 <div>
                     <h1>Для активации аккаунта перейдите по ссылке</h1>
-                    <a href="${link}">${link}</a>
+                    <a href="${link}"><h2>Ссылка</h2></a>
                 </div>
             `,
       })
@@ -49,7 +49,7 @@ class MailService {
         html: `
                 <div>
                     <h1>Для отвязки телеграма перейдите по ссылке</h1>
-                    <a href="${link}">${link}</a>
+                    <a href="${link}"><h2>Ссылка</h2></a>
                 </div>
             `,
       })

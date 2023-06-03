@@ -182,18 +182,18 @@ function openUrl() {
             <h3 class="text-lg mb-2">Сумма к пополнению</h3>
             <PaymentInput v-model="paymentForm.paymentSum" />
           </div>
-          <!-- <div class="btn-group btn-group-vertical w-full">
-                <button
-                  class="btn" :class="{
-                    'btn-active': paymentForm.paymentType === 'fast',
-                  }" @click="paymentForm.paymentType = 'fast'"
-                >Быстро (3% комиссия)</button>
-                <button
-                  class="btn" :class="{
-                    'btn-active': paymentForm.paymentType === 'transfer',
-                  }" @click="paymentForm.paymentType = 'transfer'"
-                >Перевод (без комиссии)</button>
-              </div> -->
+          <div class="btn-group btn-group-vertical w-full">
+            <button
+              class="btn" :class="{
+                'btn-active': paymentForm.paymentType === 'fast',
+              }" @click="paymentForm.paymentType = 'fast'"
+            >Быстро (3% комиссия)</button>
+            <button
+              class="btn" :class="{
+                'btn-active': paymentForm.paymentType === 'transfer',
+              }" @click="paymentForm.paymentType = 'transfer'"
+            >Перевод (без комиссии)</button>
+          </div>
 
         </div>
 
@@ -201,7 +201,7 @@ function openUrl() {
       <div class="modal-action justify-between">
         <label for="payment-modal" class="btn btn-ghost" @click="cancelPayment">Отмена</label>
 
-        <button class="btn btn-primary" @click="fkCreateBill">Оплатить</button>
+        <button class="btn btn-primary" @click="pay">Оплатить</button>
       </div>
     </label>
     <div
