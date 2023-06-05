@@ -257,18 +257,30 @@ function openUrl() {
         <p class=" text-sm text-primary animate-pulse">
           Ожидаем платеж...
         </p>
-        <p class="py-4">
-          Пожалуйста пополните кошелек Юмани, любым удобным вам способом:
+
+        <p class="py-4 text-lg">
+          Номер кошелька:
         </p>
         <p class="font-bold text-lg text-center">
           {{ details.transferCard }}
         </p>
-        <p class="py-4">
+        <p class="py-4 text-lg">
           Сумма для пополнения:
         </p>
         <p class="font-bold text-lg text-center">
           {{ details.transferSum }} ₽
         </p>
+        <div class="mt-8 text-sm">
+          <p class="">
+            <span class="font-bold">
+              Внимание!
+            </span>
+            В данных платежа указан номер кошелька Юмани. Перевод необходимо совершать на указанный номер кошелька.
+          </p>
+          <p class="pt-2">
+            Сумма, изменяется для поиска и совершения безопасного платежа. Баланс необходимо пополнить именно на указанную сумму, иначе платёж не будет совершён.
+          </p>
+        </div>
       </div>
     </div>
   </div>
