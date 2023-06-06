@@ -14,6 +14,8 @@ const loading = ref(false)
 const currency = useCurrency()
 const store = useMainStore()
 const transferStatus = ref(null) as Ref<null | string>
+const timer = ref(900)
+const secondsLeft = ref(0)
 function cancelTransfer() {
   details.value = null
 }
@@ -21,6 +23,16 @@ function cancelPayment() {
   url.value = ''
   details.value = null
 }
+const { pause, resume, isActive } = useIntervalFn(() => {
+  timer.value -= 1
+  secondsLeft.value = timer.value - Math.floor(timer.value / 60) * 60
+  if (timer.value <= 0) {
+    details.value = null
+    closePaymentModal.value?.click()
+    pause()
+  }
+}, 1000)
+pause()
 async function checkForDetails() {
   interface response {
     status: string
@@ -46,10 +58,12 @@ async function checkForDetails() {
       checkForDetails()
     }, 1000)
   }
+
   if (data.value?.status === 'ok') {
     details.value = { transferCard: data.value.transferCard, transferSum: data.value.transferSum }
     loading.value = false
     checkPaymentStatus()
+    resume()
   }
 }
 async function checkPaymentStatus() {
@@ -75,6 +89,7 @@ async function checkPaymentStatus() {
       type: 'success',
       title: 'Оплата прошла успешно',
     })
+    pause()
     await store.getClient()
     details.value = null
     closePaymentModal.value?.click()
@@ -85,6 +100,7 @@ async function checkPaymentStatus() {
     }, 3000)
   }
 }
+
 async function checkForLink() {
   interface response {
     status: string
@@ -116,6 +132,7 @@ async function checkForLink() {
     openUrl()
   }
 }
+
 async function pay() {
   const { data, error } = await useFetch('/api/payment/create', {
     method: 'POST',
@@ -254,9 +271,14 @@ function openUrl() {
         <h3 class="font-bold text-lg">
           Данные для перевода
         </h3>
-        <p class=" text-sm text-primary animate-pulse">
-          Ожидаем платеж...
-        </p>
+        <div class="flex items-center gap-2">
+          <span class="text-primary">
+            {{ Math.floor(timer / 60) < 10 ? `0${Math.floor(timer / 60)}` : Math.floor(timer / 60) }}:{{ secondsLeft < 10 ? `0${secondsLeft}` : secondsLeft }}
+          </span>
+          <!-- <p class=" text-sm text-primary animate-pulse">
+            Ожидаем платеж...
+          </p> -->
+        </div>
 
         <p class="py-4 text-lg">
           Номер кошелька:
