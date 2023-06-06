@@ -27,7 +27,7 @@ const { pause, resume, isActive } = useIntervalFn(() => {
   timer.value -= 1
   secondsLeft.value = timer.value - Math.floor(timer.value / 60) * 60
   if (timer.value <= 0) {
-    details.value = null
+    cancelPayment()
     closePaymentModal.value?.click()
     pause()
   }
@@ -84,6 +84,7 @@ async function checkPaymentStatus() {
       checkPaymentStatus()
     }, 3000)
   }
+
   if (data.value?.status === 'success') {
     notify({
       type: 'success',
