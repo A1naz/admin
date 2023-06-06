@@ -37,7 +37,6 @@ const { data, error } = await useFetch('/api/reports/get', {
 
 onMounted(async () => {
   reports.value = data.value
-  console.log(reports.value)
 })
 </script>
 
@@ -60,7 +59,7 @@ onMounted(async () => {
 
     <div v-if="reports?.length">
       <TransitionSlide group class="grid grid-cols-1 gap-3">
-        <ReportExpand v-for="(item, index) in reports" :key="index" :info="item" />
+        <ReportExpand v-for="(item, index) in reports" :key="index" :state="openAll" :info="item" />
       </TransitionSlide>
     </div>
     <div v-else class="hero">
