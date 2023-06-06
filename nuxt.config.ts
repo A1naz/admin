@@ -59,7 +59,6 @@ export default defineNuxtConfig({
     'nuxt-delay-hydration',
     '@sfxcode/nuxt-primevue',
     '@nuxtjs/robots',
-    '@nuxtjs/html-validator',
     '@morev/vue-transitions/nuxt',
     '@sidebase/nuxt-pdf',
   ],

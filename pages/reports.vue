@@ -8,15 +8,6 @@ const openAll = ref(false)
 const route = useRoute()
 const router = useRouter()
 const reports = ref([]) as any
-function selectStatus(e: Event) {
-  const target = e.target as HTMLSelectElement
-  router.push({
-    path: '/delivery',
-    query: {
-      status: target.value,
-    },
-  })
-}
 const modalInfo = reactive({
   src: '',
   code: 0,
@@ -46,6 +37,7 @@ const { data, error } = await useFetch('/api/reports/get', {
 
 onMounted(async () => {
   reports.value = data.value
+  console.log(reports.value)
 })
 </script>
 
@@ -67,7 +59,9 @@ onMounted(async () => {
     </div>
 
     <div v-if="reports?.length">
-      <TransitionSlide group class="grid grid-cols-1 gap-3" />
+      <TransitionSlide group class="grid grid-cols-1 gap-3">
+        <ReportExpand v-for="(item, index) in reports" :key="index" :info="item" />
+      </TransitionSlide>
     </div>
     <div v-else class="hero">
       <div class="hero-content text-center flex justify-center items-center h-80">

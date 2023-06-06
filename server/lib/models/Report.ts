@@ -5,6 +5,7 @@ const ReportSchema = new Schema({
   date: { type: Date, required: true },
   card: { type: String, required: true },
   screenshots: { type: Array, requried: true },
+  buyout: { type: Schema.Types.ObjectId, required: true },
 })
 
 export const Report = model('Report', ReportSchema)
