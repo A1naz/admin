@@ -5,8 +5,6 @@ definePageMeta({
   title: 'Отчеты по выкупам',
 })
 const openAll = ref(false)
-const route = useRoute()
-const router = useRouter()
 const reports = ref([]) as any
 const modalInfo = reactive({
   src: '',
