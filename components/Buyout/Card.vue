@@ -162,8 +162,12 @@ const getStatus = computed(() => {
               'text-warning': info.status === 'archived',
             }"
           >{{ getStatus }}</span>
+
           <span class="text-sm text-gray-500">{{ $dayjs(info.createdAt).format('D MMMM HH:mm')
           }}</span>
+        </div>
+        <div v-show="info.status === 'active'" class="text-sm py-1 px-2  mt-2 bg-base-300 rounded-lg w-fit">
+          Выкуплено {{ info.completed }} шт.
         </div>
       </div>
 
