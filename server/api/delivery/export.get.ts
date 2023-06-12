@@ -45,7 +45,7 @@ export default eventHandler(async (event) => {
         point: delivery.point,
         recipient: delivery.recipient,
         recipientphone: replaced,
-        receiptcode: delivery.receiptcode ? delivery.receiptcode : undefined,
+        receiptcode: delivery.receiptcode ? delivery.receiptcode : '',
         currentstatus:
           delivery.statusdelivery[delivery.statusdelivery.length - 1].status,
         article: delivery.article.toString(),
