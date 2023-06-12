@@ -115,7 +115,7 @@ async function unlinkTelegram() {
   }
   else {
     alert.show = true
-    alert.message = 'Telegram успешно отвязан'
+    alert.message = 'Письмо для подтверждения было отправлено на указанный email'
     alert.type = 'success'
   }
   start()

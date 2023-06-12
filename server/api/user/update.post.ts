@@ -15,14 +15,14 @@ export default eventHandler(async (event) => {
   if (!validator.isEmail(email)) {
     throw createError({
       statusCode: 400,
-      message: 'Email is not valid',
+      message: 'Введите корректный email',
     })
   }
 
   if (!username || !/^[a-zA-Z0-9_-]{4,14}$/.test(username)) {
     throw createError({
       statusCode: 400,
-      message: 'Username must be between 4 and 14 characters',
+      message: 'Имя пользователя должно быть длиной от 4 до 14 символов',
     })
   }
   const user = await User.findOne({ uuid: session.uuid })
@@ -33,7 +33,7 @@ export default eventHandler(async (event) => {
   if (foundByUsername && foundByUsername.uuid !== user.uuid) {
     throw createError({
       statusCode: 400,
-      message: 'Username already taken',
+      message: 'Это имя имя пользователя уже занято',
     })
   }
 

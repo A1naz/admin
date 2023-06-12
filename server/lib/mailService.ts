@@ -44,7 +44,7 @@ class MailService {
       .sendMail({
         from: alias,
         to,
-        subject: 'Подтверждение отвязки telegram на TOPVTOP',
+        subject: 'Подтверждение отвязки Telegram на TOPVTOP',
         text: '',
         html: `
                 <div>
