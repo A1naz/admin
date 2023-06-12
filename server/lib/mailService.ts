@@ -4,21 +4,26 @@ const config = useRuntimeConfig()
 const { smtpHost, smtpPort, smtpUser, smtpPass, privateKey } = config
 const alias = 'support@topvtop.pro'
 const dkimKey = `-----BEGIN RSA PRIVATE KEY-----
-MIICXQIBAAKBgQCTvi251KPBHP9WoY8EetJSisyS3UazL+H9CSUVEB1rvQXItA8A
-hUstcJnHDVdiEnFGN9+f/vL1jlHZVGDnTFnZmO+o1aZhhKYBjVLdFsv+y/6WaO7a
-RHiyfrg0ELqs9Jcv8q88JjBytFtn1fXprMZyWyELeiRY+A8mmI6PWpz/AQIDAQAB
-AoGASieET+d4oa7qQhMo83iqJB/iejxyBfIcnaJ/aEkEW1UumAQ4G2zLxOzlYlFB
-8MmM7U+SAH44eCOM1WZSlQVvetLcF9v9FqIxDWg5iAJSPT9+iisUbtz2qUsXSlzv
-ZlJOmYKoUKMbJxOl0ulW6Lgk8sfDiQO/WHTFzEo/TI2e/fkCQQDCxmOFF/qZP+zz
-UWmokdXmPVKitsMRBip1p+SioFX6XrQb15h8P1zfBd7EdahazVeD7OXVpSgAEG79
-cEmRTOtfAkEAwi8aIuVz+/pjad706w7IdTh3HHICTTobENOAYXdBAHCFC0RiB7U0
-aaHA7DFW4qNdZESn1cX25Oz68L7OKTqRnwJAZi+NINN+vw4Bs3n/89dnIB8GDqXR
-20mf1xBZbFSwJuWumnjW4ECh6cP7ppiP1eurQWR1BExcmwQEJuTVQ+zWAwJBAI1x
-c89BZXeAjhNa9PmW3gsMYy6UGPsZvQdHl/bmv7FLRI3NdL56jj/3M6iX09rn9ioI
-HFyJg2qC99KOmWrMn68CQQCrMTEiIwMOG0v5/900CmCNGgkc0Du3Rlzl73rdH46h
-L2lWixJN/7Q4b6WLLGB9KJnCREX1tOIhiCMzFo6v5zT7
+MIICXQIBAAKBgQCdu4HtswyNnv/YnDSoWLQSjWALOVzzGtQIxZhG6Ke7TO77/ywi
+gEjxR6JIPDQb/AQ9cfoRtZad4WL2dHfu82KtMgzhc0CO1vY5bdEWveY/X0HGuGzG
+sZj1oUeVMe4AY9CA9FyBa/tHsRp0DPlyZBFerEhKgUFDuBvM7shMbrF3bQIDAQAB
+AoGASxREvTs733FugNGhsvw+ApKuw8jzOHhtsxsy55W4uUveea61eFqt3cNmOJIH
+j8Z+0iydhq5z2gS9kWhQ6jmJnv3D/S9L8CCtuAPLQVwirMlA9BUOOR78N16ed+kP
+a0uu5DJFDQZbrPpfZ7fI/EmfD2Fi2wGzS9CHEwXSwXQym4ECQQDQlOzzt8cXbQCL
+aC7H+1YrGAI23Bu2Hmnd9yXp+elXIfBcjCTVjrY68ej/4wetX48lMUabYptjwb2E
+KmLxVSQNAkEAwZc/JELf0iIR2bE8hlnJ8i1iRmCzJWLgKuWyhTQjbqYc+JtcrsZq
+9N70ixuvTmuvw91pNcox1HSN5zmtIbXo4QJAOuEPUm0aYl5+vNuX+RPV6yxH07ym
+he5n7CSMK1RErjgCZd2ZuD8k6dbH8xPfYu2KtvEGAW8AdlSGbvyYGY/zMQJBALRZ
+MMuZOWZLsxF42gfXkhj5SrqBz6Mer/OGtX7+iZvFSOwZ4Ig59N5W7r7Bddm63K29
+kQw5Z56jTqeAxdfH3kECQQCjCN6JxlOSzyuNUcrOek+QMYeKbvopznUnSdD/qk1m
+2WYMGlLcIaWuQ5OqzCxfYHkCBnGaD/Mr6tCDKnseVYAs
 -----END RSA PRIVATE KEY-----`
-
+const publicKey = `-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCdu4HtswyNnv/YnDSoWLQSjWAL
+OVzzGtQIxZhG6Ke7TO77/ywigEjxR6JIPDQb/AQ9cfoRtZad4WL2dHfu82KtMgzh
+c0CO1vY5bdEWveY/X0HGuGzGsZj1oUeVMe4AY9CA9FyBa/tHsRp0DPlyZBFerEhK
+gUFDuBvM7shMbrF3bQIDAQAB
+-----END PUBLIC KEY-----`
 class MailService {
   transporter: nodemailer.Transporter
   constructor() {
@@ -33,7 +38,7 @@ class MailService {
       },
       dkim: {
         domainName: 'topvtop.pro',
-        keySelector: 'dkim',
+        keySelector: 's1',
         privateKey: dkimKey,
       },
     })

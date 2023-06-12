@@ -2,7 +2,7 @@
 import { useVuelidate } from '@vuelidate/core'
 import { email, helpers, minLength, required, sameAs } from '@vuelidate/validators'
 
-definePageMeta({ auth: false })
+definePageMeta({ auth: false, title: 'Смена пароля' })
 const name = useRuntimeConfig().NAME
 
 const formData = reactive({
@@ -66,9 +66,8 @@ async function submitForm() {
       {{ alert.message }}
     </Toast>
     <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-      <NuxtLink to="/" class="flex items-center mb-6 text-2xl font-semibold ">
-        <Icon name="logos:nuxt-icon" size="32" />
-        {{ name }}
+      <NuxtLink to="/" class="flex items-center text-2xl font-semibold ">
+        <Logo />
       </NuxtLink>
       <div class="card w-full p-6 rounded-lg shadow-lg  md:mt-0 sm:max-w-md sm:p-8">
         <h2 class="mb-1 text-xl font-bold leading-tight tracking-tight  md:text-2xl ">
