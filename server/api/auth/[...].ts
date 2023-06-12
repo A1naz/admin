@@ -66,6 +66,7 @@ export default NuxtAuthHandler({
             uuid: user.id.toString(),
             telegram: user.username,
             username: user.username,
+            telegramUserId: user.id.toString(),
             roles: ['user'],
             firstName: user.first_name,
             lastName: user.last_name,

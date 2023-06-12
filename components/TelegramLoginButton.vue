@@ -61,7 +61,7 @@ onMounted(() => {
   // }
 
   if (props.mode === 'callback') {
-    // @ts-expect-error
+    // @ts-expect-error workaround
     window.onTelegramAuth = onTelegramAuth
     script.setAttribute('data-onauth', 'window.onTelegramAuth(user)')
   }

@@ -30,6 +30,7 @@ export default eventHandler(async (event) => {
   }
 
   user.telegram = body.username
+  user.telegramUserId = body.id
   await user.save()
 
   return {
