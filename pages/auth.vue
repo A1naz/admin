@@ -33,6 +33,7 @@ async function login() {
       alertType.value = 'warning'
     }
     else {
+      console.log(error)
       alertText.value = 'Неверный email или пароль'
     }
     alert.value = true

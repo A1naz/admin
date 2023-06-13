@@ -94,10 +94,13 @@ export default NuxtAuthHandler({
           label: 'Password',
           type: 'password',
         },
+        code: {
+          type: 'text',
+        },
       },
 
       async authorize(credentials: any) {
-        const { email, password } = credentials
+        const { email, password, code } = credentials
         if (!email || !password)
           return null
 
@@ -115,6 +118,8 @@ export default NuxtAuthHandler({
 
         if (!user.emailConfirmed)
           throw new Error('Email is not confirmed')
+        if (user.tg2fa && user.telegramUserId && !code)
+          throw new Error('2fa')
 
         return user
       },

@@ -11,23 +11,30 @@ const currentPath = ref(useRoute().path)
 watchEffect(() => {
   currentPath.value = route.path
 })
+const active = computed(() => {
+  return currentPath.value.includes(props.href)
+})
 </script>
 
 <template>
   <li>
-    <NuxtLink :to="props.href" class="mx-4 rounded-lg">
-      <Icon
-        :class="{
-          'opacity-70': !currentPath.includes(props.href),
-          'text-primary': currentPath.includes(props.href),
-        }" :name="icon" size="24"
+    <NuxtLink
+      :to="props.href" class="mx-4 rounded-lg active:bg-primary active:text-white"
+    >
+      <IconCSS
+        :color="active ? 'white' : 'black'"
+        :name="icon" size="24"
       /><span
         :class="{
-          'opacity-70': !currentPath.includes(props.href),
+          'opacity-100': !active,
         }" class=""
       >{{ title }}</span>
     </NuxtLink>
   </li>
 </template>
 
-<style scoped></style>
+<style scoped>
+.router-link-active {
+  @apply bg-primary text-white bg-opacity-90
+}
+</style>

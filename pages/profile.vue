@@ -7,7 +7,7 @@ definePageMeta({
 })
 
 const store = useMainStore()
-
+const wbApiKey = ref('')
 const form = reactive({
   firstName: '',
   lastName: '',
@@ -37,6 +37,7 @@ function updateInitital() {
   initialForm.lastName = store.client.lastName
   initialForm.email = store.client.email
   initialForm.username = store.client.username
+  wbApiKey.value = store.client.wbApiKey
 }
 onMounted(async () => {
   updateInitital()
@@ -54,6 +55,12 @@ const disabledChangePasswordButton = computed(() => {
     return passwordForm.oldPassword == '' || passwordForm.newPassword == ''
   else
     return passwordForm.newPassword == ''
+})
+const disabledSettingsButton = computed(() => {
+  if (store.client.wbApiKey === wbApiKey.value)
+    return true
+
+  return false
 })
 
 async function updatePassword() {
@@ -79,6 +86,31 @@ async function updatePassword() {
   passwordForm.oldPassword = ''
   passwordForm.newPassword = ''
   await store.getClient()
+}
+async function setApiKey() {
+  if (wbApiKey.value === store.client.wbApiKey)
+    return
+
+  const { data, error } = await useFetch('/api/user/setApiKey', {
+    method: 'POST',
+    body: {
+      wbApiKey: wbApiKey.value,
+    },
+    headers,
+  })
+  if (error.value) {
+    alert.show = true
+    alert.message = error.value?.data?.message
+    alert.type = 'error'
+  }
+  else {
+    alert.show = true
+    alert.message = 'API ключ изменен.'
+    alert.type = 'success'
+  }
+  start()
+  await store.getClient()
+  updateInitital()
 }
 async function update() {
   if (form.firstName == store.client.firstName && form.lastName == store.client.lastName && form.email == store.client.email && form.username == store.client.username)
@@ -150,9 +182,9 @@ function onTelegramLink(data: any) {
       </p>
     </div>
     <section
-      class="profile-options flex flex-col justify-center items-center gap-6 lg:gap-32 lg:pr-12 lg:flex-row lg:justify-between lg:items-start"
+      class="profile-options flex flex-col justify-center items-center gap-6 xl:gap-32 xl:pr-12 xl:flex-row xl:justify-between xl:items-start"
     >
-      <div class="self-start description-container lg:basis-1/3">
+      <div class="self-start description-container xl:basis-1/3">
         <div class="heading">
           Контактные данные
         </div>
@@ -168,9 +200,9 @@ function onTelegramLink(data: any) {
           <input v-model="form.lastName" placeholder="Фамилия" class="input input-bordered w-full">
         </div>
 
-        <div class="flex flex-col w-full gap-8 lg:flex-row">
-          <input v-model="form.username" type="text" placeholder="Никнейм" class="input input-bordered w-full lg:w-1/2">
-          <div class="tg w-full justify-between flex gap-2 lg:gap-4 lg:w-1/2">
+        <div class="flex flex-col w-full gap-8 xl:flex-row">
+          <input v-model="form.username" type="text" placeholder="Никнейм" class="input input-bordered w-full xl:w-1/2">
+          <div class="tg w-full justify-between flex gap-2 xl:gap-4 xl:w-1/2">
             <div class="relative flex justify-end w-full items-center flex-grow-0">
               <input
                 :value="store.client?.telegram ? `@${store.client.telegram}` : ''" placeholder="Telegram"
@@ -192,9 +224,10 @@ function onTelegramLink(data: any) {
           v-model="form.email" type="text" placeholder="Почта (email)"
           class="input input-bordered w-full"
         >
+
         <div class="flex w-full gap-4 justify-end">
           <button
-            :disabled="disabledSaveButton" class="btn btn-primary  lg:w-40 mr-0 self-end"
+            :disabled="disabledSaveButton" class="btn btn-primary  xl:w-40 mr-0 self-end"
             @click="update"
           >
             Сохранить
@@ -203,9 +236,9 @@ function onTelegramLink(data: any) {
       </div>
     </section>
     <section
-      class="profile-options mt-20 flex flex-col justify-center items-center gap-6 lg:gap-32 lg:pr-12 lg:flex-row lg:justify-between lg:items-start"
+      class="profile-options mt-20 flex flex-col justify-center items-center gap-6 xl:gap-32 xl:pr-12 xl:flex-row xl:justify-between xl:items-start"
     >
-      <div class="self-start description-container lg:basis-1/3">
+      <div class="self-start description-container xl:basis-1/3">
         <div class="heading relative">
           Пароль
         </div>
@@ -214,7 +247,7 @@ function onTelegramLink(data: any) {
         </div>
       </div>
       <div class="flex flex-col gap-6 w-full mt-1">
-        <div class="w-full flex flex-col gap-4 lg:gap-8 lg:flex-row">
+        <div class="w-full flex flex-col gap-4 xl:gap-8 xl:flex-row">
           <input
             v-show="store.client.hasPassword" v-model="passwordForm.oldPassword" type="password"
             placeholder="Старый пароль" class="input input-bordered w-full"
@@ -229,11 +262,36 @@ function onTelegramLink(data: any) {
         </div>
 
         <button
-          :disabled="disabledChangePasswordButton" class="btn btn-primary lg:w-40 mr-0 self-end"
+          :disabled="disabledChangePasswordButton" class="btn btn-primary xl:w-40 mr-0 self-end"
           @click="updatePassword"
         >
           {{ store.client.hasPassword ? 'Изменить'
             : 'Сохранить' }}
+        </button>
+      </div>
+    </section>
+    <section
+      class="profile-options mt-20 flex flex-col justify-center items-center gap-6 xl:gap-32 xl:pr-12 xl:flex-row xl:justify-between xl:items-start"
+    >
+      <div class="self-start description-container xl:basis-1/3">
+        <div class="heading relative">
+          Настройки
+        </div>
+        <div class="text-xs text-gray-400">
+          Введите ключ api для работы автоответчика
+        </div>
+      </div>
+      <div class="flex flex-col gap-6 w-full mt-1">
+        <input
+          v-model="wbApiKey" type="text" placeholder="Апи ключ Wildberries"
+          class="input input-bordered w-full"
+        >
+
+        <button
+          :disabled="disabledSettingsButton" class="btn btn-primary xl:w-40 mr-0 self-end"
+          @click="setApiKey"
+        >
+          Сохранить
         </button>
       </div>
     </section>
