@@ -22,11 +22,9 @@ export default eventHandler(async (event) => {
     },
   )
   const priceData = rawData
-
   const sizesRaw = data?.sizes_table?.values
     ? data?.sizes_table?.values.map((size: any) => size.tech_size)
     : priceData?.data?.products[0]?.sizes.map((size: any) => size.origName)
-
   const sizes = sizesRaw[0] === '0' ? [] : sizesRaw
   const product = priceData?.data?.products.find(
     (item: any) => item.id === Number(params.article),

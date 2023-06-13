@@ -35,9 +35,9 @@ watch(client, (newClient) => {
 
 <template>
   <div ref="app">
-    <notifications position="bottom right">
+    <notifications position="top right" :max="2" :close-on-click="true" :pause-on-hover="true">
       <template #body="props">
-        <div style="padding: 1rem">
+        <div style="padding: 1rem; z-index: 1000">
           <div class="notify-card">
             <p class="notify-title">
               {{ props.item.title }}

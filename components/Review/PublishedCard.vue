@@ -37,7 +37,7 @@ const getStatus = computed(() => {
 <template>
   <div class="buyout-card card bg-base-200 shadow-lg">
     <div class="card-body flex-shrink-0 flex flex-col justify-start p-4 relative">
-      <div class="flex justify-between item mb-2">
+      <div class="flex justify-between item mb-2 flex-wrap gap-4">
         <h2 class="card-title">
           Отзыв №{{ place }}
         </h2> <span
