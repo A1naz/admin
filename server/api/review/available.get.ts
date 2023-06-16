@@ -36,7 +36,7 @@ export default eventHandler(async (event) => {
         productname: buyout.product.name,
         productimage: buyout.product.image,
         updatedAt: delivery.updatedAt,
-        id: delivery._id
+        id: delivery._id,
       }
     }),
   )

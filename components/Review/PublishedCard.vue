@@ -30,6 +30,8 @@ const getStatus = computed(() => {
       return 'В работе'
     case 'published':
       return 'Опубликован'
+    case 'canceled':
+      return 'Отменен'
   }
 })
 </script>
@@ -45,6 +47,7 @@ const getStatus = computed(() => {
 
             'bg-green-600': info.status === 'working' || info.status === 'published',
             'bg-warning': info.status === 'waiting' || info.status === 'created',
+            'bg-error': info.status === 'canceled',
           }" class="text-black p-2 px-8 rounded-lg text-center"
         >{{ getStatus }}</span>
       </div>
