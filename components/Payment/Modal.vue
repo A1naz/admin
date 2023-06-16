@@ -15,6 +15,7 @@ const currency = useCurrency()
 const store = useMainStore()
 const transferStatus = ref(null) as Ref<null | string>
 const timer = ref(900)
+const alertOpened = ref(true)
 const secondsLeft = ref(0)
 function cancelTransfer() {
   details.value = null
@@ -22,6 +23,9 @@ function cancelTransfer() {
 function cancelPayment() {
   url.value = ''
   details.value = null
+}
+async function copyToClipboard(text: string) {
+  await navigator.clipboard.writeText(text)
 }
 const { pause, resume, isActive } = useIntervalFn(() => {
   timer.value -= 1
@@ -62,6 +66,8 @@ async function checkForDetails() {
   if (data.value?.status === 'ok') {
     details.value = { transferCard: data.value.transferCard, transferSum: data.value.transferSum }
     loading.value = false
+    timer.value = 900
+    alertOpened.value = true
     checkPaymentStatus()
     resume()
   }
@@ -135,6 +141,13 @@ async function checkForLink() {
 }
 
 async function pay() {
+  if (paymentForm.paymentSum > 20000 && paymentForm.paymentType === 'transfer') {
+    notify({
+      title: 'Что-то пошло не так',
+      text: 'Сумма для перевода не должна превышать 20000 руб.',
+    })
+    return
+  }
   const { data, error } = await useFetch('/api/payment/create', {
     method: 'POST',
     body: {
@@ -268,41 +281,59 @@ function openUrl() {
     <input id="transfer-modal" type="checkbox" class="modal-toggle">
     <div class="modal modal-bottom sm:modal-middle modal-open">
       <div class="modal-box relative">
-        <label for="transfer-modal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2" @click="cancelTransfer">✕</label>
-        <h3 class="font-bold text-lg">
-          Данные для перевода
-        </h3>
-        <div class="flex items-center gap-2">
-          <span class="text-primary">
-            {{ Math.floor(timer / 60) < 10 ? `0${Math.floor(timer / 60)}` : Math.floor(timer / 60) }}:{{ secondsLeft < 10 ? `0${secondsLeft}` : secondsLeft }}
-          </span>
+        <div v-if="!alertOpened" class="details-box">
+          <label for="transfer-modal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2" @click="cancelTransfer">✕</label>
+          <h3 class="font-bold text-lg">
+            Данные для перевода
+          </h3>
+          <div class="flex items-center gap-2 relative">
+            <span class="text-primary">
+              {{ Math.floor(timer / 60) < 10 ? `0${Math.floor(timer / 60)}` : Math.floor(timer / 60) }}:{{ secondsLeft < 10 ? `0${secondsLeft}` : secondsLeft }}
+            </span>
           <!-- <p class=" text-sm text-primary animate-pulse">
             Ожидаем платеж...
           </p> -->
-        </div>
+          </div>
 
-        <p class="py-4 text-lg">
-          Номер кошелька:
-        </p>
-        <p class="font-bold text-lg text-center">
-          {{ details.transferCard }}
-        </p>
-        <p class="py-4 text-lg">
-          Сумма для пополнения:
-        </p>
-        <p class="font-bold text-lg text-center">
-          {{ details.transferSum }} ₽
-        </p>
-        <div class="mt-8 text-sm">
+          <p class="py-4 text-lg">
+            Номер кошелька:
+          </p>
+          <div class="font-bold text-lg text-center bg-base-200 rounded-lg p-2">
+            <div class="tooltip hover:cursor-pointer hover:text-primary" data-tip="Нажмите чтобы скопировать" @click="copyToClipboard(details.transferCard)">
+              {{ details.transferCard }}
+            </div>
+          </div>
+          <p class="py-4 text-lg">
+            Сумма для пополнения:
+          </p>
+          <div class="font-bold text-lg text-center bg-base-200 rounded-lg p-2">
+            <div class="tooltip hover:cursor-pointer hover:text-primary" data-tip="Нажмите чтобы скопировать" @click="copyToClipboard(details.transferSum.toString())">
+              {{ details.transferSum }} ₽
+            </div>
+          </div>
+        </div>
+        <div v-if="alertOpened" class="mt-8 text-sm bg-base-200 p-2 rounded-lg">
+          <span class="font-bold text-red-500 text-lg text-center">
+            Внимание!
+          </span>
           <p class="">
-            <span class="font-bold">
-              Внимание!
-            </span>
             В данных платежа указан номер кошелька Юмани. Перевод необходимо совершать на указанный номер кошелька.
           </p>
           <p class="pt-2">
-            Сумма, изменяется для поиска и совершения безопасного платежа. Баланс необходимо пополнить именно на указанную сумму, иначе платёж не будет совершён.
+            Сумма, изменяется для поиска и совершения безопасного платежа, возможно, с 0% комиссией, в зависимости от вашего банка.
           </p>
+          <p class="pt-2">
+            Баланс необходимо пополнить именно на указанную сумму, иначе платёж не будет совершён.
+          </p>
+          <p class="pt-2">
+            Совершайте платежи через банковские переводы (Сбер, Альфа и другие 0%). Если совершите перевод с Юмани на кошелек, то Юмани возьмет % за перевод.
+          </p>
+          <p class="pt-2">
+            Максимальная сумма за 1 транзакцию 20 000 рублей.
+          </p>
+          <button class="btn btn-block btn-neutral py-2 my-2" @click="alertOpened = false">
+            С информацией ознакомился
+          </button>
         </div>
       </div>
     </div>
