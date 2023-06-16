@@ -145,11 +145,11 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
         <SidebarItem icon="fluent:history-24-filled" title="История платежей" href="/paymenthistory" />
         <SidebarItem icon="fluent:document-bullet-list-24-filled" title="Отчеты по выкупам" href="/reports" />
 
-        <li class="mt-auto no-animation hover:bg-base-200">
-          <div class="w-full no-animation hover:bg-base-200 hover:cursor-default p-0 block">
-            <div class="flex justify-between w-full items-center p-0 m-0">
+        <li class="mt-auto">
+          <div class="w-full  hover:cursor-default p-0 block">
+            <div class="join flex justify-between  w-full items-center p-0 m-0">
               <div
-                class="btn btn-ghost gap-2 flex justify-center items-center normal-case w-[80%] hover:cursor-pointer rounded-lg p-0 m-0"
+                class="join-item btn btn-ghost gap-2 flex justify-center items-center normal-case w-[80%] hover:cursor-pointer rounded-lg p-0 m-0"
                 @click="logout"
               >
                 <Icon name="fluent:sign-out-24-filled" size="24" />
@@ -157,7 +157,7 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
                   Выйти
                 </span>
               </div>
-              <label class="btn btn-ghost btn-square z-10 w-[20%] swap swap-rotate">
+              <label class="join-item btn btn-ghost btn-square z-10 w-[20%] swap swap-rotate">
 
                 <!-- this hidden checkbox controls the state -->
                 <input v-model="lightMode" type="checkbox" @click="changeTheme">
