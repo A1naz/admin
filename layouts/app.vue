@@ -137,6 +137,7 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
         <SidebarItem title="Лайки на товар / бренд" icon="fluent:heart-24-filled" href="/productlikes" />
         <SidebarItem title="Вопросы" icon="fluent:chat-bubbles-question-24-filled" href="/questions" />
         <SidebarItem title="Корзина" icon="fluent:cart-24-filled" href="/cart" />
+        <SidebarItem title="Автоответчик на отзывы" icon="fluent:phone-chat-24-filled" href="/autoanswer" />
 
         <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
           Дополнительно

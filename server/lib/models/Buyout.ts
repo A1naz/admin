@@ -1,19 +1,25 @@
 import { Schema, model } from 'mongoose'
+import { User } from './User'
 import { v4 as uuid } from 'uuid'
-
+const ProductSchema = new Schema({
+  name: {type: String, required: true},
+  price: {type: String, required: true},
+  priceText: {type: String, required: true},
+  image: {type: String, required: true}
+})
 const BuyoutSchema = new Schema({
   searchQuery: { type: String, required: true, text: true },
   sizeparam: { type: String, required: true, text: true },
-  quantity: { type: Number, required: true, text: true },
-  gender: { type: String, required: true, text: true },
+  quantity: { type: Number, required: true, text: true, max: 50 },
+  gender: { type: String, required: true, text: true, enum: [ 'Male', 'Female', 'Нет' ]},
   article: { type: Number, required: true, text: true },
   point: { type: String, required: true, text: true },
   dateStart: { type: Date, required: true },
   dateEnd: { type: Date, required: true },
-  product: { type: Object, required: true },
+  product: { type: ProductSchema, required: true },
   rules: { type: Array, required: true },
-  status: { type: String, required: true, text: true },
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  status: { type: String, required: true, text: true, enum: ['completed', 'created', 'archived', 'active'] },
+  user: { type: Schema.Types.ObjectId, ref: User, required: true },
   uuid: { type: String, default: uuid() },
   createdAt: { type: Date, default: Date.now },
   place: { type: Number, required: true },

@@ -64,13 +64,20 @@ watch(route, async (newRoute) => {
 function openPhoto(src: string) {
   openedPhoto.value = src
 }
+const selectedDelivery = ref('')
 const modalOpen = ref(false)
-function openModal(uuid: string) {
+
+function openModal(uuid: string, deliveryid: string) {
   selectedUUID.value = uuid
+  selectedDelivery.value = deliveryid
   modalOpen.value = true
 }
 function closeModal() {
   modalOpen.value = false
+}
+function goToPublished() {
+  closeModal()
+  router.push('/reviews?status=published')
 }
 </script>
 
@@ -126,7 +133,8 @@ function closeModal() {
       </div>
     </div>
     <ReviewModal
-      :state="modalOpen" :uuid="selectedUUID" @publish="router.push('/reviews?status=published')"
+    :deliveryid="selectedDelivery"
+      :state="modalOpen" :uuid="selectedUUID" @publish="goToPublished"
       @close="closeModal"
     />
 

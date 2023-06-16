@@ -39,7 +39,7 @@ const emit = defineEmits(['openModal'])
       <div class="card-actions">
         <label
           for="review-modal" class="btn btn-primary btn-block"
-          @click="$emit('openModal', info.buyoutuuid)"
+          @click="$emit('openModal', info.buyoutuuid, info.id)"
         >Оставить
           отзыв</label>
       </div>

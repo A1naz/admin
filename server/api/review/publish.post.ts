@@ -15,7 +15,7 @@ export default eventHandler(async (event) => {
   if (!user)
     return sendRedirect(event, '/auth', 302)
 
-  const { buyoutuuid, rating, text, photos, date } = body
+  const { buyoutuuid, deliveryid, rating, text, photos, date } = body
   if (text.length < 10 || text.length > 1000) {
     throw createError({
       statusCode: 400,
@@ -29,7 +29,7 @@ export default eventHandler(async (event) => {
       message: 'Выкуп не найден',
     })
   }
-  const delivery = await Delivery.findOne({ idbuyout: buyout._id })
+  const delivery = await Delivery.findOne({_id: deliveryid, idbuyout: buyout._id, reviewed: false })
   if (!delivery) {
     return createError({
       statusCode: 400,
@@ -52,7 +52,8 @@ export default eventHandler(async (event) => {
   })
   await review.save()
   delivery.reviewed = true
-  await delivery.save()
+  const saved = await delivery.save()
+  console.log(saved)
   return {
     message: 'Отзыв успешно добавлен',
   }

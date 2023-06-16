@@ -278,12 +278,12 @@ function onTelegramLink(data: any) {
           Настройки
         </div>
         <div class="text-xs text-gray-400">
-          Введите ключ api для работы автоответчика
+          Введите стандартный ключ api для работы автоответчика
         </div>
       </div>
       <div class="flex flex-col gap-6 w-full mt-1">
         <input
-          v-model="wbApiKey" type="text" placeholder="Апи ключ Wildberries"
+          v-model="wbApiKey" type="text" placeholder="Стандартный апи ключ Wildberries"
           class="input input-bordered w-full"
         >
 

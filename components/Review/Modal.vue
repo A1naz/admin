@@ -11,6 +11,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  deliveryid: {
+    type: String,
+    required: true,
+  }
 })
 
 const emit = defineEmits(['close', 'publish'])
@@ -120,6 +124,7 @@ async function publishReview() {
     method: 'POST',
     body: {
       ...form,
+      deliveryid: props.deliveryid,
       buyoutuuid: props.uuid,
     },
     headers,
