@@ -1,17 +1,18 @@
 import { Schema, model } from 'mongoose'
-import { User } from './User'
 import { v4 as uuid } from 'uuid'
+import { User } from './User'
+
 const ProductSchema = new Schema({
-  name: {type: String, required: true},
-  price: {type: String, required: true},
-  priceText: {type: String, required: true},
-  image: {type: String, required: true}
+  name: { type: String, required: true },
+  price: { type: String, required: true },
+  priceText: { type: String, required: true },
+  image: { type: String, required: true },
 })
 const BuyoutSchema = new Schema({
   searchQuery: { type: String, required: true, text: true },
   sizeparam: { type: String, required: true, text: true },
   quantity: { type: Number, required: true, text: true, max: 50 },
-  gender: { type: String, required: true, text: true, enum: [ 'Male', 'Female', 'Нет' ]},
+  gender: { type: String, required: true, text: true, enum: ['male', 'female', 'Нет'] },
   article: { type: Number, required: true, text: true },
   point: { type: String, required: true, text: true },
   dateStart: { type: Date, required: true },
