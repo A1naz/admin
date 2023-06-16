@@ -1,8 +1,8 @@
-import fs from 'node:fs'
 import { v4 as uuid } from 'uuid'
 import { Buyout } from '@/server/lib/models/Buyout'
 import { getServerSession } from '#auth'
 import { User } from '~~/server/lib/models/User'
+import getPickpoints from '~/server/lib/getPickpoints'
 
 interface Rule {
   id: number
@@ -40,11 +40,10 @@ export default eventHandler(async (event) => {
   const products: Item[] = body
   for await (const product of products) {
     const rules = product.rules.map(rule => rule.id)
-    // const pickpoints = JSON.parse(fs.readFileSync('points.json', 'utf8'))
-    // const points = pickpoints.points
-    // const foundPoint = points.find((p: { a: string }) => p.a === product.adress)
-    // if (!foundPoint)
-    //   throw createError('Выберите существующий пункт выдачи')
+    const points = (await getPickpoints()).points
+    const foundPoint = points.find((p: { a: string }) => p.a === product.adress)
+    if (!foundPoint)
+      throw createError('Выберите существующий пункт выдачи')
     const buyout = new Buyout({
       article: product.article,
       searchQuery: product.searchQuery.join(', '),

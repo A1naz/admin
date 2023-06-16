@@ -8,6 +8,7 @@ const currency = useCurrency()
 
 const { width, height } = useWindowSize()
 const { notify } = useNotification()
+const disabledCreateButton = ref(false)
 const dp = ref()
 const headers = useRequestHeaders(['cookie']) as HeadersInit
 definePageMeta({
@@ -181,10 +182,13 @@ async function createBuyout() {
     })
     return
   }
+  disabledCreateButton.value = true
   const { data, error } = await useFetch('/api/buyout/create', {
     method: 'POST',
     body: JSON.stringify(products.value),
   })
+  disabledCreateButton.value = false
+
   if (error.value) {
     notify({
       title: 'Что-то пошло не так',
@@ -539,7 +543,7 @@ onMounted(async () => {
           }}</span>
         </div>
       </div>
-      <button class="btn btn-primary btn-sm normal-case" @click="createBuyout">
+      <button class="btn btn-primary btn-sm normal-case" :disabled="disabledCreateButton" @click="createBuyout">
         {{ products.length > 1 ? `Создать
                             выкупы` : `Создать выкуп` }}
       </button>

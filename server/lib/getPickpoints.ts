@@ -1,19 +1,13 @@
 import fs from 'node:fs'
-import { getServerSession } from '#auth'
 
-export default eventHandler(async (event) => {
-  const session = (await getServerSession(event)) as any
-
-  if (!session)
-    return sendRedirect(event, '/auth', 302)
-
+export default async function () {
   if (fs.existsSync('points.json')) {
     const cached = fs.readFileSync('points.json', 'utf8')
     const parsed = JSON.parse(cached)
     const now = new Date()
     const diff = now.getTime() - new Date(parsed.updated).getTime()
     if (diff < 1000 * 60 * 10)
-      return sendStream(event, fs.createReadStream('points.json'))
+      return parsed
   }
   const data: any = await $fetch(
     'https://www.wildberries.ru/webapi/geo/saveprefereduserloc',
@@ -52,5 +46,5 @@ export default eventHandler(async (event) => {
     points: collection,
   }
   fs.writeFileSync('points.json', JSON.stringify(cache))
-  return sendStream(event, fs.createReadStream('points.json'))
-})
+  return cache
+}
