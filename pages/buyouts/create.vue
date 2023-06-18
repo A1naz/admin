@@ -64,7 +64,6 @@ const now = useNow()
 const startDate = new Date(now.value)
 const endDate = new Date(now.value)
 startDate.setHours(9, 0)
-endDate.setDate(startDate.getDate() + 7)
 endDate.setHours(20, 0)
 async function addProduct() {
   if (article.value === '')
@@ -510,12 +509,17 @@ onMounted(async () => {
               </td>
               <td>
                 <div class="w-full flex justify-between">
-                  <label
-                    :for="`modal${index}`" :class="{
-                      'btn-outline': product.rules,
-                    }" class="btn btn-primary btn-sm normal-case "
-                  >{{ 'Настроить' }}
-                  </label>
+                  <div>
+                    <div class="mb-2">
+                      {{ product.rules.map(rule => rule.id).join(', ') }}
+                    </div>
+                    <label
+                      :for="`modal${index}`" :class="{
+                        'btn-outline': product.rules,
+                      }" class="btn btn-primary btn-sm normal-case "
+                    >{{ 'Настроить' }}
+                    </label>
+                  </div>
                   <div class="ml-2 w-8 btn btn-ghost btn-sm btn-square" @click="removeProduct(index)">
                     <IconCSS name="material-symbols:close" size="20" />
                   </div>
