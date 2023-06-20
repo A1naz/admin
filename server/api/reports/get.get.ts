@@ -27,7 +27,7 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
   const format: historyItem[] = []
 
-  const history = await Report.find({ user })
+  const history = await Report.find({ user }).sort({ _id: -1 })
   for await (const item of history) {
     const buyout = await Buyout.findOne({ _id: item.buyout })
     if (!buyout)

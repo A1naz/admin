@@ -243,9 +243,9 @@ watch(route, (route) => {
           По полезности
         </option>
       </select>
-      <div class="relative flex justify-end items-center flex-grow-0 w-50">
+      <div class="relative flex justify-end items-center flex-grow-0 w-60">
         <input
-          v-model="article" type="number" placeholder="Артикул" class="input input-sm input-bordered w-full"
+          v-model="article" type="number" placeholder="Артикул" class="input input-primary input-sm input-bordered w-full"
           @keydown.enter="getProductReviews"
         >
         <button class="btn btn-ghost btn-sm absolute normal-case" @click="getProductReviews">

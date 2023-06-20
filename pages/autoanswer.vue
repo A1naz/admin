@@ -7,45 +7,68 @@ definePageMeta({
   title: 'Автоответчик на отзывы',
 })
 const { $dayjs } = useNuxtApp()
-const cartForm = reactive({
-  amount: 0,
-  period: '3h',
-  query: '',
+const form = reactive({
+  ratingFilterFrom: 1,
+  ratingFilterTo: 5,
+  text: '',
   article: '',
-  size: 'none',
+  product: '',
 })
+
 const carts = ref([]) as any
 const amount = ref(0)
 const now = useNow()
 const loadingUrl = ref(false)
-const period = ref('3h')
 const query = ref('')
 const article = ref('')
-const size = ref('none')
 const { width, height } = useWindowSize()
 const productData = ref<any>(null)
 const urlError = ref(false)
 
+async function createAutoAnswer() {
+  if (!productData.value)
+    return
+  form.product = productData.value
+  form.article = article.value
+  const { data, error } = await useFetch('/api/autoanswer/create', {
+    method: 'POST',
+    body: form,
+  })
+  if (data.value?.status === 'ok') {
+    notify({
+      title: 'Успешно',
+      text: 'Автоответчик успешно создан',
+    })
+  }
+  if (error.value) {
+    notify({
+      title: 'Что-то пошло не так',
+      text: error.value.message,
+    })
+  }
+}
 async function getProductInfo() {
+  if (!article.value)
+    return
   const { data, error } = await useFetch(`/api/product/${article.value}`, {
     method: 'GET',
   })
-  if ((data.value as any).product) {
+  if ((data.value as any)?.product) {
     productData.value = (data.value as any).product
     urlError.value = false
   }
   if (error.value)
     urlError.value = true
-
   loadingUrl.value = false
 }
 let timeout = null as NodeJS.Timeout | null
-
-function selectPeriod(event: any) {
-  period.value = event.target.value
-}
-function selectSize(event: any) {
-  size.value = event.target.value
+async function changeUrl() {
+  if (article.value === '')
+    return
+  loadingUrl.value = true
+  if (timeout)
+    clearTimeout(timeout)
+  timeout = setTimeout(getProductInfo, 2000)
 }
 function getStatus(status: string) {
   if (status === 'created')
@@ -68,7 +91,7 @@ onMounted(() => {
 <template>
   <div>
     <h1 class="text-2xl font-bold mt-1">
-      Вкладка в разработке  
+      Вкладка в разработке
     </h1>
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
       Добавьте апи ключ в настройках профиля и настройте автоотвечик
@@ -92,15 +115,13 @@ onMounted(() => {
                     'input-success': productData,
                   }"
                   :disabled="productData"
-                  tabindex="0" class="input input-sm w-full" placeholder="12312312" type="text" @input=""
+                  tabindex="0" class="input input-sm w-full" placeholder="12312312" type="text" @input="changeUrl"
                 >
                 <button
-                  :class="{
-                    'btn-disabled': !productData,
-                  }"
+                  :disabled="!productData"
                   class="btn btn-ghost btn-sm btn-circle bg-base-100" @click="removeProduct"
                 >
-                  <span v-show="loadingUrl" class="loading loading-spinner" />
+                  <span v-show="loadingUrl" class="loading loading-spinner loading-xs p-2" />
 
                   <!-- Insert a backspace svg -->
                   <div v-if="!loadingUrl">
@@ -109,77 +130,46 @@ onMounted(() => {
                 </button>
               </div>
             </div>
-            <div class="w-full lg:w-2/3">
-              <div>Ключевой запрос:</div>
-              <input v-model="query" :disabled="!productData" placeholder="Носки" type="text" class="input input-sm w-full bg-base-100 mt-2">
-            </div>
           </div>
-          <div class="mt-4 flex gap-6 items-start flex-wrap lg:flex-nowrap">
-            <div class="w-full lg:w-1/3">
-              <div>Размер:</div>
-              <select :disabled="!productData?.sizes.length" class="select select-sm w-full mt-2" @change="selectSize">
-                <option v-if="!productData?.sizes.length" value="none">
-                  Без размера
-                </option>
-                <option v-for="(size, index) of productData?.sizes" :key="index" :value="size">
-                  {{ size }}
-                </option>
-              </select>
-            </div>
-            <div class="w-full grid grid-cols-6 md:grid-cols-12 gap-4 lg:w-2/3">
-              <div class="col-span-2 md:col-span-2 w-full">
-                <div>Количество:</div>
-                <div class="relative flex items-center ml-auto mt-2">
-                  <button
-                    :disabled="amount <= 0" class="absolute left-0 btn btn-ghost btn-sm btn-square"
-                    @click="amount -= 10"
-                  >
-                    <IconCSS size="16" name="ic:round-minus" />
-                  </button>
-                  <div class="input-sm rounded-lg w-full text-center bg-base-100 ">
-                    {{ amount }}
-                  </div>
-                  <button
-                    :disabled="amount >= 1000"
-                    :class="{
-                      'btn-disabled': !productData,
-                    }" class="absolute right-0 btn btn-ghost btn-sm btn-square" @click="amount += 10"
-                  >
-                    <IconCSS size="16" name="ic:round-plus" />
-                  </button>
+          <div class="mt-4 flex gap-6 items-start flex-wrap justify-stretch flex-1 lg:flex-nowrap">
+            <div class="w-full lg:w-1/3 flex flex-col gap-4">
+              <div>Фильтр по оценке:</div>
+              <div>
+                <div class="flex justify-center items-center mt-2 gap-1">
+                  <span>От {{ form.ratingFilterFrom }} </span><Icon color="rgb(250 204 21)" size="20" name="fluent:star-24-filled" />
+                </div>
+                <input v-model="form.ratingFilterFrom" type="range" min="1" max="5" class="range range-sm range-primary" step="1">
+                <div class="w-full flex justify-between text-xs px-2">
+                  <span>1</span>
+                  <span>2</span>
+                  <span>3</span>
+                  <span>4</span>
+                  <span>5</span>
                 </div>
               </div>
-              <div class="col-span-4 md:col-span-10">
-                <div>Период выполнения:</div>
-                <select :disabled="!productData" class="select w-full select-sm mt-2" @change="selectPeriod">
-                  <option value="3h">
-                    3 часа
-                  </option>
-                  <option value="12h">
-                    12 часов
-                  </option>
-                  <option value="1day">
-                    1 день
-                  </option>
-                  <option value="3days">
-                    3 дня
-                  </option>
-                  <option value="7days">
-                    7 дней
-                  </option>
-                  <option value="14days">
-                    14 дней
-                  </option>
-                </select>
+              <div>
+                <div class="flex justify-center items-center mt-2 gap-1">
+                  <span>До {{ form.ratingFilterTo }} </span><Icon color="rgb(250 204 21)" size="20" name="fluent:star-20-filled" />
+                </div>
+                <input v-model="form.ratingFilterTo" type="range" min="1" max="5" class="range range-sm range-primary" step="1">
+                <div class="w-full flex justify-between text-xs px-2">
+                  <span>1</span>
+                  <span>2</span>
+                  <span>3</span>
+                  <span>4</span>
+                  <span>5</span>
+                </div>
               </div>
+            </div>
+            <div class="w-full self-stretch lg:w-2/3">
+              <textarea v-model="form.text" class="textarea w-full h-full" placeholder="Ответ" />
             </div>
           </div>
           <div class="w-full ml-auto self-start justify-start mt-2 lg:w-40">
             <button
-              :class="{
-                'btn-disabled': !productData || !query,
-              }" class="btn w-full btn-primary"
-              @click=""
+              :disabled="!productData || !form.text"
+              class="btn w-full btn-primary"
+              @click="createAutoAnswer"
             >
               Добавить
             </button>

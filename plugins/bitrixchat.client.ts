@@ -5,6 +5,7 @@ function inject(w: Window & typeof globalThis, d: Document, u: string) {
   s.async = true
   s.src = `${u}?${Date.now() / 60000 | 0}`
   const h = d.getElementsByTagName('script')[0]
+  h.type = 'text/partytown'
   h.parentNode!.insertBefore(s, h)
 }
 export default defineNuxtPlugin((nuxtApp) => {

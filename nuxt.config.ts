@@ -14,6 +14,7 @@ export default defineNuxtConfig({
         { name: 'description', content: 'TOPVTOP - сервис продвижения Wildberries' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }],
     },
+
   },
 
   colorMode: {
@@ -40,6 +41,9 @@ export default defineNuxtConfig({
       'basket-7.wb.ru',
     ],
   },
+  yandexMetrika: {
+    id: '94036055',
+  },
 
   nitro: {
     compressPublicAssets: true,
@@ -62,6 +66,8 @@ export default defineNuxtConfig({
     '@nuxtjs/robots',
     '@morev/vue-transitions/nuxt',
     '@sidebase/nuxt-pdf',
+    '@nuxtjs/partytown',
+    '@artmizu/yandex-metrika-nuxt',
   ],
   css: [
     'primevue/resources/primevue.css',

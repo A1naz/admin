@@ -54,6 +54,9 @@ async function create() {
   }
 }
 async function getProductInfo() {
+  if (!article.value)
+    return
+
   const { data, error } = await useFetch(`/api/product/${article.value}`, {
     method: 'GET',
   })
@@ -134,7 +137,7 @@ onMounted(() => {
                   }"
                   class="btn btn-ghost btn-sm btn-circle bg-base-100" @click="removeProduct"
                 >
-                  <span v-show="loadingUrl" class="loading loading-spinner" />
+                  <span v-show="loadingUrl" class="loading loading-spinner loading-xs p-2" />
 
                   <!-- Insert a backspace svg -->
                   <div v-if="!loadingUrl">
