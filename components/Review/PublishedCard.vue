@@ -135,7 +135,7 @@ const getStatus = computed(() => {
                   <div class="absolute inset-0">
                     <UseImage :src="photo">
                       <template #default>
-                        <nuxt-img :src="photo" class="w-full h-full object-contain rounded-lg" />
+                        <nuxt-img :src="photo" class="w-full h-full object-contain rounded-lg" loading="lazy" />
                       </template>
                       <template #loading>
                         <div class="absolute inset-0 flex items-center justify-center">

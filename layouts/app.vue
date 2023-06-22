@@ -75,7 +75,7 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
           <ul>
             <li>
               <a href="#">
-                <nuxt-img src="/icons/wb.svg" alt="" srcset="" />
+                <nuxt-img src="/icons/wb.svg" alt="" srcset="" loading="lazy" />
               </a>
             </li>
             <li v-for="(crumb, index) of breadcrumbs" :key="index">

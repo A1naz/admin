@@ -107,6 +107,7 @@ const getGender = computed(() => {
             <nuxt-img
               class="rounded-xl h-full" width="100" height="150"
               :src="info?.product?.image || '/logo/logocolor.svg'"
+              loading="lazy"
             />
           </div>
           <div class="flex flex-col truncate">

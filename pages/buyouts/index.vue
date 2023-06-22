@@ -63,6 +63,16 @@ function unarchiveBuyout(uuid: string) {
   if (route.query.status && route.query?.status !== 'active' && route.query?.status !== 'all')
     buyouts.value = buyouts.value.filter((buyout: any) => buyout.uuid !== uuid)
 }
+function unpauseBuyout(uuid: string) {
+  buyouts.value = buyouts.value.map((buyout: any) => {
+    if (buyout.uuid === uuid)
+      buyout.status = 'active'
+
+    return buyout
+  })
+  if (route.query.status && route.query?.status !== 'active' && route.query?.status !== 'all')
+    buyouts.value = buyouts.value.filter((buyout: any) => buyout.uuid !== uuid)
+}
 function selectStatus(e: Event) {
   const target = e.target as HTMLSelectElement
   router.push({
@@ -243,7 +253,7 @@ watch(route, async (newRoute) => {
         <BuyoutCard
           v-for="(buyout, index) of buyouts" :key="buyout.uuid" :place="buyouts.length - index"
           :index="index" :info="buyout" @unarchive="unarchiveBuyout" @archive="archiveBuyout"
-          @open-modal="openModal" @remove="removeBuyout"
+          @open-modal="openModal" @remove="removeBuyout" @unpause="unpauseBuyout"
         />
       </TransitionSlide>
       <div ref="target" class="p-2 w-full col-span-1" />

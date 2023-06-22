@@ -19,7 +19,7 @@ const BuyoutSchema = new Schema({
   dateEnd: { type: Date, required: true },
   product: { type: ProductSchema, required: true },
   rules: { type: Array, required: true },
-  status: { type: String, required: true, text: true, enum: ['completed', 'created', 'archived', 'active'] },
+  status: { type: String, required: true, text: true, enum: ['completed', 'created', 'archived', 'active', 'paused'] },
   user: { type: Schema.Types.ObjectId, ref: User, required: true },
   uuid: { type: String, default: uuid() },
   createdAt: { type: Date, default: Date.now },

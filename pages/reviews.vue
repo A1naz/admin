@@ -144,7 +144,7 @@ function goToPublished() {
     <label for="reviewImageModal" class="modal cursor-pointer">
       <label for="" class="modal-box min-w-0 max-w-5xl p-0">
         <label for="reviewImageModal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2">✕</label>
-        <nuxt-img v-if="openedPhoto" fit="contain" class="object-contain m-auto" :src="openedPhoto" />
+        <nuxt-img v-if="openedPhoto" fit="contain" class="object-contain m-auto" :src="openedPhoto" loading="lazy" />
       </label>
     </label>
   </div>

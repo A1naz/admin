@@ -223,7 +223,7 @@ onMounted(() => {
           </div>
           <div v-if="productData" class="productinfo mt-4">
             <div class="flex text gap-4 mt-2 items-start">
-              <nuxt-img width="48" class="rounded-lg object-contain w-12" :src="productData.image" />
+              <nuxt-img width="48" class="rounded-lg object-contain w-12" loading="lazy" :src="productData.image" />
               <div class="article">
                 <a
                   :href="`https://www.wildberries.ru/catalog/${productData.article}/detail.aspx`" target="_blank"
@@ -250,7 +250,7 @@ onMounted(() => {
           <Column field="place" header="№" />
           <Column field="image" header="Фото">
             <template #body="{ data }">
-              <nuxt-img class="rounded-lg object-contain h-8" width="32" :src="data.image" />
+              <nuxt-img class="rounded-lg object-contain h-8" width="32" :src="data.image" loading="lazy" />
             </template>
           </Column>
           <Column field="article" header="Артикул">
@@ -311,7 +311,7 @@ onMounted(() => {
             <div class="card-body">
               <div class="flex gap-4">
                 <div class="image">
-                  <nuxt-img width="32" class="rounded-lg object-contain" :src="item.image" />
+                  <nuxt-img width="32" class="rounded-lg object-contain" :src="item.image" loading="lazy" />
                 </div>
                 <div class="article flex flex-col gap-0.5">
                   <div class="text-xs">

@@ -33,6 +33,7 @@ watch(() => props.state, (newState) => {
       <div class="flex gap-4">
         <nuxt-img
           fit="fill" :src="info.buyout.image" width="36"
+          loading="lazy"
           class="rounded-lg transition-opacity ease-in-out duration-200 hidden lg:block"
         />
         <div class="w-full">
@@ -64,6 +65,7 @@ watch(() => props.state, (newState) => {
             <div v-for="(image, index) of info.screenshots" :key="index">
               <nuxt-img
                 v-if="image"
+                loading="lazy"
                 fit="contain" alt="screenshot" :src="image"
                 class="rounded-lg object-contain w-full lg:w-64"
               />

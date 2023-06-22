@@ -22,7 +22,7 @@ const emit = defineEmits(['openModal'])
         class="w-full h-72" :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`"
         target="_blank"
       >
-        <nuxt-img fit="contain" class="w-full h-72 object-contain rounded-lg" :src="info.productimage" /> </a>
+        <nuxt-img fit="contain" class="w-full h-72 object-contain rounded-lg" :src="info.productimage" loading="lazy" /> </a>
     </figure>
     <div class="card-body overflow-hidden">
       <div class="truncate">

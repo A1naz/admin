@@ -44,12 +44,34 @@ export default defineNuxtConfig({
   yandexMetrika: {
     id: '94036055',
   },
-
+  lazyLoad: {
+    // These are the default values
+    images: true,
+    videos: true,
+    audios: true,
+    iframes: true,
+    native: false,
+    directiveOnly: false,
+    
+    // Default image must be in the public folder
+    defaultImage: '/images/default-image.jpg',
+  
+    // To remove class set value to false
+    loadingClass: 'isLoading',
+    loadedClass: 'isLoaded',
+    appendClass: 'lazyLoad',
+    
+    observerConfig: {
+      // See IntersectionObserver documentation
+    }
+  },
+  
   nitro: {
     compressPublicAssets: true,
     plugins: ['~/server/index.ts'],
   },
   modules: [
+    'nuxt-lazy-load',
     '@nuxtjs/tailwindcss',
     '@nuxt/image-edge',
     '@pinia/nuxt',

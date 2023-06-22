@@ -12,7 +12,7 @@ const props = defineProps({
   },
 
 })
-const emit = defineEmits(['callback', 'remove', 'openModal', 'archive', 'unarchive'])
+const emit = defineEmits(['callback', 'remove', 'openModal', 'archive', 'unarchive', 'unpause'])
 const { $dayjs } = useNuxtApp()
 const currency = useCurrency()
 const router = useRouter()
@@ -48,6 +48,32 @@ async function deleteBuyOut() {
       duration: 3000,
     })
     emit('remove', props.info.uuid)
+  }
+}
+async function unpauseBuyout() {
+  const { data, error } = await useFetch('/api/buyout/unpause', {
+    method: 'POST',
+    body: JSON.stringify({
+      uuid: props.info.uuid,
+    }),
+    headers: useRequestHeaders(['cookie']) as HeadersInit,
+  })
+  if (error.value) {
+    notify({
+      title: 'Что-то пошло не так',
+      text: error.value?.data?.message,
+      type: 'error',
+      duration: 3000,
+    })
+  }
+  else {
+    notify({
+      title: 'Успешно',
+      text: 'Выкуп успешно возобновлен',
+      type: 'success',
+      duration: 3000,
+    })
+    emit('unpause', props.info.uuid)
   }
 }
 async function unarchiveBuyout() {
@@ -110,6 +136,8 @@ const getStatus = computed(() => {
       return 'Завершен'
     case 'archived':
       return 'В архиве'
+    case 'paused':
+      return 'Пауза'
   }
 })
 </script>
@@ -159,19 +187,26 @@ const getStatus = computed(() => {
             :class="{
               'text-green-600': info.status === 'active',
               'text-error': info.status === 'completed',
-              'text-warning': info.status === 'archived',
+              'text-warning': info.status === 'archived' || info.status === 'paused',
             }"
           >{{ getStatus }}</span>
 
           <span class="text-sm text-gray-500">{{ $dayjs(info.createdAt).format('D MMMM HH:mm')
           }}</span>
         </div>
-        <div
-          :class="{
-            'opacity-0': info.status !== 'active',
-          }" class="text-sm py-1 px-2  mt-2 bg-base-300 rounded-lg w-fit"
-        >
-          Выкуплено {{ info.completed }} шт.
+        <div class="flex justify-between gap-4 mt-2 items-center">
+          <div
+            :class="{
+              'opacity-0': info.status !== 'active' && info.status !== 'paused',
+            }" class="text-sm badge badge-lg badge-outline"
+          >
+            Выкуплено {{ info.completed }} шт.
+          </div>
+          <button
+            v-show="info.status === 'paused'" class="btn btn-sm btn-neutral" @click="unpauseBuyout"
+          >
+            Возобновить
+          </button>
         </div>
       </div>
 
@@ -180,6 +215,7 @@ const getStatus = computed(() => {
           <nuxt-img
             class="rounded-xl h-full" width="100" height="150"
             format="webp"
+            loading="lazy"
             :src="info?.product?.image || '/logo/logocolor.svg'"
           />
         </div>

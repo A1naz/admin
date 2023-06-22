@@ -298,6 +298,7 @@ onMounted(() => {
                         <nuxt-img
                           :src="photo.public" fit="contain"
                           class="w-full h-full object-contain rounded-lg"
+                          loading="lazy"
                         />
                       </template>
                       <template #loading>

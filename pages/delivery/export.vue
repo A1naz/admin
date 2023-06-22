@@ -35,11 +35,8 @@ async function exportToFile() {
   const options = {
     margin: 0,
     filename: 'delivery.pdf',
-    image: {
-      type: 'webp',
-    },
     html2canvas: {
-      scale: 2,
+      scale: 1.5,
       letterRendering: true,
       windowWidth: 1920,
       windowHeight: 1080,

@@ -43,7 +43,7 @@ onMounted(() => {
         <Column field="place" header="№" />
         <Column field="image" header="Фото">
           <template #body="{ data }">
-            <nuxt-img width="32" class="rounded-lg object-contain" :src="data.image" />
+            <nuxt-img width="32" class="rounded-lg object-contain" :src="data.image" loading="lazy" />
           </template>
         </Column>
         <Column field="article" header="Артикул">
@@ -95,7 +95,7 @@ onMounted(() => {
               <div class="flex gap-6 items-center w-full">
                 <div class="flex gap-4 items-start">
                   <div class="image">
-                    <nuxt-img width="32" class="rounded-lg object-contain" :src="item.image" />
+                    <nuxt-img width="32" class="rounded-lg object-contain" :src="item.image" loading="lazy" />
                   </div>
                   <div class="article flex flex-col gap-0.5">
                     <div class="text-xs">
