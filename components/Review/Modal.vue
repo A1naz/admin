@@ -14,7 +14,7 @@ const props = defineProps({
   deliveryid: {
     type: String,
     required: true,
-  }
+  },
 })
 
 const emit = defineEmits(['close', 'publish'])
@@ -81,24 +81,6 @@ async function clearForm() {
   form.rating = 5
   const photos = form.photos
 
-  for await (const [index, photo] of photos.entries()) {
-    loadingIndex.value = index
-    if (photo.url) {
-      const { data, error } = await remove({
-        url: photo.url,
-      })
-      if (error.value) {
-        notify({
-          title: 'Что-то пошло не так',
-          text: 'Не удалось удалить фото',
-          type: 'error',
-          duration: 3000,
-        })
-        return
-      }
-    }
-  }
-
   loadingIndex.value = null
   form.photos = [{
     url: '',
@@ -120,6 +102,18 @@ async function clearForm() {
 
 const headers = useRequestHeaders(['cookie']) as HeadersInit
 async function publishReview() {
+  const photos = form.photos
+  for await (const photo of photos) {
+    try {
+      const response = await $fetch(photo.url)
+    }
+    catch {
+      notify({
+        title: 'Что-то пошло не так',
+        text: 'Не удалось загрузить все фото, попробуйте еще раз',
+      })
+    }
+  }
   const { data, error } = await useFetch('/api/review/publish', {
     method: 'POST',
     body: {
