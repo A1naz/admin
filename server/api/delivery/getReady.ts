@@ -19,7 +19,7 @@ export default eventHandler(async (event) => {
     all.map(async (delivery) => {
       const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
       if (!buyout)
-        return
+        return null
       const place = all.findIndex(
         item => item._id.toString() === delivery._id.toString(),
       )
@@ -52,7 +52,12 @@ export default eventHandler(async (event) => {
       }
     }),
   )
-  const filtered = format.filter(item => item!.currentstatus === 'Готов к выдаче' || item!.currentstatus === 'Готов к получению')
+  const filtered = format.filter((item) => {
+    if (item)
+      return item!.currentstatus === 'Готов к выдаче' || item!.currentstatus === 'Готов к получению'
+    else
+      return false
+  })
   const points = {} as any
   filtered.forEach((item, index) => {
     if (points[item!.point])

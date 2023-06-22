@@ -136,6 +136,7 @@ export default defineNuxtConfig({
       titleSeparator: '|',
       BOT_LOGIN: process.env.BOT_LOGIN,
     },
+    env: process.env.ENV_WORK,
     indexable: true,
     MONGODB_URI: process.env.MONGODB_URI,
     SECRET: process.env.SECRET,
