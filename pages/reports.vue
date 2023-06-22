@@ -24,17 +24,40 @@ const { stop } = useIntersectionObserver(
     targetIsVisible.value = isIntersecting
   },
 )
-const skip = ref(50)
+const skip = ref(20)
 const end = ref(false)
+
 const { data, error } = await useFetch('/api/reports/get', {
   method: 'GET',
   query: {
+    skip: 0,
+    limit: 20,
   },
   headers: useRequestHeaders(['cookie']) as HeadersInit,
 })
 
 onMounted(async () => {
   reports.value = data.value
+})
+watch(targetIsVisible, async (isVisible) => {
+  if (isVisible) {
+    if (end.value)
+      return
+    const { data, error } = await useFetch('/api/reports/get', {
+      method: 'GET',
+      query: {
+        limit: 20,
+        skip: skip.value,
+      },
+      headers: useRequestHeaders(['cookie']) as HeadersInit,
+    })
+    if ((data.value as any)?.length === 0) {
+      end.value = true
+      return
+    }
+    reports.value = [...reports.value, ...data.value! as any]
+    skip.value += 20
+  }
 })
 </script>
 
@@ -58,6 +81,7 @@ onMounted(async () => {
     <div v-if="reports?.length">
       <TransitionSlide group class="grid grid-cols-1 gap-3">
         <ReportExpand v-for="(item, index) in reports" :key="index" :state="openAll" :info="item" />
+        <div ref="target" class="flex justify-center items-center" />
       </TransitionSlide>
     </div>
     <div v-else class="hero">

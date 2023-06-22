@@ -6,6 +6,16 @@ definePageMeta({
   auth: true,
   title: 'История платежей',
 })
+const target = ref(null)
+const targetIsVisible = ref(false)
+const { stop } = useIntersectionObserver(
+  target,
+  ([{ isIntersecting }], observerElement) => {
+    targetIsVisible.value = isIntersecting
+  },
+)
+const skip = ref(50)
+const end = ref(false)
 
 const PrimeVue = usePrimeVue()
 const { width, height } = useWindowSize()
@@ -14,8 +24,34 @@ const currency = useCurrency()
 const history = ref([]) as any
 const { data, error } = await useFetch('/api/paymenthistory/get', {
   method: 'GET',
+  query: {
+    skip: 0,
+    limit: 50,
+  },
+
 })
-history.value = data.value?.sort((a: any, b: any) => Date.parse(b.dataoperation) - Date.parse(a.dataoperation))
+history.value = data.value
+
+watch(targetIsVisible, async (isVisible) => {
+  if (isVisible) {
+    if (end.value)
+      return
+    const { data, error } = await useFetch('/api/paymenthistory/get', {
+      method: 'GET',
+      query: {
+        limit: 50,
+        skip: skip.value,
+      },
+      headers: useRequestHeaders(['cookie']) as HeadersInit,
+    })
+    if ((data.value as any)?.length === 0) {
+      end.value = true
+      return
+    }
+    history.value = [...history.value, ...data.value! as any]
+    skip.value += 50
+  }
+})
 </script>
 
 <template>
@@ -26,23 +62,26 @@ history.value = data.value?.sort((a: any, b: any) => Date.parse(b.dataoperation)
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm mb-6">
       Здесь можно увидеть движение вашего баланса
     </p>
-    <DataTable v-if="width > 1024" sort-field="dataoperation" :sort-order="-1" class="bg-base-200 hidden lg:block" :value="history" removable-sort>
-      <Column field="summ" sortable header="Сумма">
-        <template #body="{ data }">
-          {{ currency.format(data.summ) }}
-        </template>
-      </Column>
-      <Column field="typeoperations" sortable header="Тип операции" />
-      <Column field="basisoperation" sortable header="Основание операции" />
-      <Column field="dataoperation" sortable header="Дата">
-        <template #body="{ data }">
-          <div class="">
-            {{ $dayjs(data.dataoperation).format('D MMMM HH:mm') }}
-          </div>
-        </template>
-      </Column>
-      <Column field="comment" sortable header="Комментарий" />
-    </DataTable>
+    <div v-if="width > 1024">
+      <DataTable sort-field="dataoperation" :sort-order="-1" class="bg-base-200 hidden lg:block" :value="history" removable-sort>
+        <Column field="summ" sortable header="Сумма">
+          <template #body="{ data }">
+            {{ currency.format(data.summ) }}
+          </template>
+        </Column>
+        <Column field="typeoperations" sortable header="Тип операции" />
+        <Column field="basisoperation" sortable header="Основание операции" />
+        <Column field="dataoperation" sortable header="Дата">
+          <template #body="{ data }">
+            <div class="">
+              {{ $dayjs(data.dataoperation).format('D MMMM HH:mm') }}
+            </div>
+          </template>
+        </Column>
+        <Column field="comment" sortable header="Комментарий" />
+      </DataTable>
+      <div ref="target" class="flex justify-center items-center" />
+    </div>
     <ul v-else class="w-full lg:hidden">
       <li v-for="(item, index) in history" :key="index" class="pb-3 sm:pb-4">
         <div tabindex="0" class="collapse collapse-arrow bg-base-200 rounded-box">
@@ -74,6 +113,7 @@ history.value = data.value?.sort((a: any, b: any) => Date.parse(b.dataoperation)
           </div>
         </div>
       </li>
+      <div ref="target" class="flex justify-center items-center" />
     </ul>
   </div>
 </template>

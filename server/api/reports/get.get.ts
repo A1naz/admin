@@ -22,12 +22,13 @@ export default eventHandler(async (event) => {
   if (!session)
     return sendRedirect(event, '/auth', 302)
 
+  const { limit, skip } = getQuery(event)
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
     return sendRedirect(event, '/auth', 302)
   const format: historyItem[] = []
 
-  const history = await Report.find({ user }).sort({ _id: -1 })
+  const history = await Report.find({ user }).sort({ _id: -1 }).skip(skip as number).limit(limit as number)
   for await (const item of history) {
     const buyout = await Buyout.findOne({ _id: item.buyout })
     if (!buyout)

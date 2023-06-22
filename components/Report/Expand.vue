@@ -61,10 +61,13 @@ watch(() => props.state, (newState) => {
         <div class="screenshots flex flex-col gap-2">
           <span>Скриншоты:</span>
           <div class="images flex gap-6 flex-wrap max-w-full">
-            <nuxt-img
-              v-for="image of info.screenshots" :key="image" fit="contain" alt="screenshot" :src="image"
-              class="rounded-lg object-contain w-full lg:w-64"
-            />
+            <div v-for="(image, index) of info.screenshots" :key="index">
+              <nuxt-img
+                v-if="image"
+                fit="contain" alt="screenshot" :src="image"
+                class="rounded-lg object-contain w-full lg:w-64"
+              />
+            </div>
           </div>
         </div>
       </div>
