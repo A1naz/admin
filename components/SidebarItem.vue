@@ -19,7 +19,7 @@ const active = computed(() => {
 <template>
   <li>
     <NuxtLink
-      :to="props.href" class="mx-4 rounded-lg "
+      :to="props.href" class="mx-4 rounded-lg"
     >
       <IconCSS
         :color="active ? 'white' : 'black'"
@@ -35,6 +35,6 @@ const active = computed(() => {
 
 <style scoped>
 .router-link-active {
-  @apply bg-primary text-white bg-opacity-90 active:bg-primary active:text-white focus:bg-primary focus:text-white hover:bg-primary hover:text-white 
+  @apply bg-primary text-white bg-opacity-90 active:bg-primary active:text-white focus:bg-primary focus:text-white hover:bg-primary hover:text-white
 }
 </style>

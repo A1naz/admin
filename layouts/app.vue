@@ -145,7 +145,7 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
         <SidebarItem icon="fluent:history-24-filled" title="История платежей" href="/paymenthistory" />
         <SidebarItem icon="fluent:document-bullet-list-24-filled" title="Отчеты по выкупам" href="/reports" />
 
-        <li class="mt-auto">
+        <div class="mt-auto">
           <div class="w-full  hover:cursor-default p-0 block">
             <div class="join flex justify-between  w-full items-center p-0 m-0">
               <div
@@ -171,7 +171,7 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
               </label>
             </div>
           </div>
-        </li>
+        </div>
       </ul>
     </div>
     <PaymentModal />

@@ -30,6 +30,7 @@ export default eventHandler(async (event) => {
         return
       return {
         buyoutuuid: buyout.uuid,
+        sex: buyout.gender,
         article: delivery.article,
         pricebuy: delivery.pricebuy,
         size: buyout.sizeparam,

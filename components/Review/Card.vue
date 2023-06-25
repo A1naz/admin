@@ -11,6 +11,10 @@ const props = defineProps({
 
 })
 const emit = defineEmits(['openModal'])
+const router = useRouter()
+function openBuyout() {
+  router.push(`/buyouts?uuid=${props.info.buyoutuuid}`)
+}
 </script>
 
 <template>
@@ -29,12 +33,28 @@ const emit = defineEmits(['openModal'])
         <div class="card-title truncate mb-0 pb-0">
           <span class="truncate">{{ info.productname }}</span>
         </div>
-        <a
-          :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`" target="_blank"
-          class="text-sm text-secondary link link-hover"
-        >
-          {{ info.article }}
-        </a>
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-between gap-2 flex-wrap">
+            <a
+              :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`" target="_blank"
+              class="text-sm text-secondary link link-hover"
+            >
+              {{ info.article }}
+            </a>
+            <label
+              class="link link-hover text-sm text-gray-500 hover:text-primary truncate z-10"
+              @click="openBuyout"
+            >
+              Выкуп
+
+              #{{
+                info.buyoutuuid }}</label>
+          </div>
+          <div class="flex gap-2">
+            <div>Пол: {{ info.sex === 'female' ? 'Женский' : info.sex === 'male' ? 'Мужской' : 'Нет' }}</div>
+            <div>Размер: {{ info.size === 'none' ? 'Нет' : info.size }}</div>
+          </div>
+        </div>
       </div>
       <div class="card-actions">
         <label

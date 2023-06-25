@@ -213,17 +213,23 @@ function openUrl() {
             <h3 class="text-lg mb-2">Сумма к пополнению</h3>
             <PaymentInput v-model="paymentForm.paymentSum" />
           </div>
-          <div class="btn-group btn-group-vertical w-full">
-            <button
-              class="btn" :class="{
-                'btn-active': paymentForm.paymentType === 'fast',
-              }" @click="paymentForm.paymentType = 'fast'"
-            >Быстро (3% комиссия)</button>
-            <button
-              class="btn" :class="{
-                'btn-active': paymentForm.paymentType === 'transfer',
-              }" @click="paymentForm.paymentType = 'transfer'"
-            >Перевод (без комиссии)</button>
+          <div class="join join-vertical w-full">
+            <input
+              v-model="paymentForm.paymentType"
+              type="radio"
+              name="options"
+              value="fast"
+              aria-label="Быстро (3% комиссия)"
+              class="btn join-item"
+            >
+            <input
+              v-model="paymentForm.paymentType"
+              type="radio"
+              name="options"
+              value="transfer"
+              aria-label="Перевод (без комиссии)"
+              class="btn join-item"
+            >
           </div>
 
         </div>
