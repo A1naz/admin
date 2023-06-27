@@ -34,7 +34,7 @@ watch(() => props.state, (newState) => {
         <nuxt-img
           fit="fill" :src="info?.productimage" width="36"
           loading="lazy"
-          class="rounded-lg transition-opacity ease-in-out duration-200 hidden lg:block"
+          class="rounded-lg transition-opacity ease-in-out duration-200"
         />
         <div class="w-full">
           <div class="flex justify-between flex-wrap">
