@@ -6,7 +6,7 @@ export default eventHandler(async (event) => {
   if (!session)
     return sendRedirect(event, '/auth', 302)
 
-  const { article } = getQuery(event)
+  const { article, limit } = getQuery(event)
   if (!article) {
     return send(event, {
       status: 400,
@@ -51,7 +51,8 @@ export default eventHandler(async (event) => {
       message: 'Не удалось получить информацию по товару',
     })
   }
-  const feedbacks = feedbackData.feedbacks.map((feedback: any) => {
+  const limited = feedbackData.feedbacks.slice(0, parseInt(limit))
+  const feedbacks = limited.map((feedback: any) => {
     const likes = feedback?.feedbackHelpfulness?.filter(
       (help: any) => help.helpfulness === 'plus',
     ).length
