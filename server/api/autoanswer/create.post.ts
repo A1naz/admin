@@ -21,6 +21,12 @@ export default eventHandler(async (event) => {
       message: 'Некорректный запрос',
     })
   }
+  if (!user.wbApiKey) {
+    throw createError({
+      statusCode: 400,
+      message: 'Добавьте апи ключ Wildberries для работы автоответчика!',
+    })
+  }
 
   const image = findImage(Number(article))
   product.image = image

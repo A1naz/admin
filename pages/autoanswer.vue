@@ -14,7 +14,7 @@ const form = reactive({
   article: '',
   product: '',
 })
-
+const store = useMainStore()
 const autoanswers = ref([]) as any
 const amount = ref(0)
 const now = useNow()
@@ -122,6 +122,10 @@ onMounted(() => {
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
       Добавьте апи ключ в настройках профиля и настройте автоотвечик
     </p>
+    <div v-if="!store.client.wbApiKey" class="alert alert-warning my-2 ">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <span>Добавьте апи ключ в настройках профиля для работы Автоответчика</span>
+    </div>
     <div class="collapse collapse-plus bg-base-200 rounded-box mb-4 mt-6">
       <input type="checkbox">
 
