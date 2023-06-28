@@ -267,7 +267,7 @@ watch(route, (route) => {
       <Transition name="fade">
         <div
           v-show="changedReviews.length"
-          class="save fixed py-4 px-8 z-[9999] w-full bottom-0 bg-neutral-focus flex flex-wrap items-center justify-between gap-2"
+          class="save fixed py-4 px-8 z-[9999] inset-x-0 bottom-0 bg-neutral-focus flex flex-wrap items-center justify-between gap-2"
         >
           <div class="info flex items-center gap-4">
             <p class="text-xs font-bold text-neutral-content lg:text-sm">

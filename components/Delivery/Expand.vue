@@ -77,7 +77,9 @@ watch(() => props.state, (newState) => {
           <div class="text-sm text-gray-500 ">
             Название
           </div>
-          {{ info.productname }}
+          <p class="break-all">
+            {{ info.productname }}
+          </p>
         </div>
         <div>
           <div class="text-sm text-gray-500">
@@ -105,9 +107,12 @@ watch(() => props.state, (newState) => {
             Адрес:
           </div>
           <a
-            target="_blank" class="text-secondary link link-hover w-76 truncate "
+            target="_blank" class="text-secondary link link-hover w-76 truncate"
             :href="`https://yandex.ru/maps/?mode=search&text=${info.point}`"
-          > {{ info.point }}
+          >
+            <p class="break-all">
+              {{ info.point }}
+            </p>
           </a>
         </div>
         <div>

@@ -15,7 +15,7 @@ const form = reactive({
   product: '',
 })
 
-const carts = ref([]) as any
+const autoanswers = ref([]) as any
 const amount = ref(0)
 const now = useNow()
 const loadingUrl = ref(false)
@@ -24,6 +24,31 @@ const article = ref('')
 const { width, height } = useWindowSize()
 const productData = ref<any>(null)
 const urlError = ref(false)
+await getBots()
+async function getBots() {
+  const { data, error } = await useFetch('/api/autoanswer/get', { method: 'GET' })
+  if (data.value)
+    autoanswers.value = data.value
+}
+async function deleteBot(id: string) {
+  const { data, error } = await useFetch('/api/autoanswer/delete', {
+    method: 'POST',
+    body: {
+      id,
+    },
+  })
+  if (data.value) {
+    notify({
+      title: 'Автоответчик успешно удален',
+    })
+    getBots()
+  }
+  if (error.value) {
+    notify({
+      title: error.value.message,
+    })
+  }
+}
 
 async function createAutoAnswer() {
   if (!productData.value)
@@ -39,6 +64,7 @@ async function createAutoAnswer() {
       title: 'Успешно',
       text: 'Автоответчик успешно создан',
     })
+    getBots()
   }
   if (error.value) {
     notify({
@@ -197,129 +223,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <div v-if="carts.length">
-      <ClientOnly>
-        <DataTable v-if="width > 1024" class="bg-base-200 hidden lg:block" :value="carts">
-          <Column field="place" header="№" />
-          <Column field="image" header="Фото">
-            <template #body="{ data }">
-              <nuxt-img class="rounded-lg object-contain h-8" width="32" :src="data.image" loading="lazy" />
-            </template>
-          </Column>
-          <Column field="article" header="Артикул">
-            <template #body="{ data }">
-              <a
-                :href="`https://www.wildberries.ru/catalog/${data.article}/detail.aspx`" target="_blank"
-                class="text-sm text-secondary link link-hover"
-              >
-                {{ data.article }}
-              </a>
-            </template>
-          </Column>
-          <Column field="amount" header="Кол-во">
-            <template #body="{ data }">
-              <div>{{ data.amount }}</div>
-            </template>
-          </Column>
-          <Column field="query" header="Ключевой запрос">
-            <template #body="{ data }">
-              <p class="max-w-xs truncate">
-                {{ data.query }}
-              </p>
-            </template>
-          </Column>
-
-          <Column field="status" header="Статус">
-            <template #body="{ data }">
-              <div
-                :class="{
-                  'text-warning': data.status === 'created' || data.status === 'work',
-                  'text-success': data.status === 'completed',
-                }"
-              >
-                {{ getStatus(data.status) }}
-              </div>
-            </template>
-          </Column>
-          <Column field="createdDate" header="Дата создания">
-            <template #body="{ data }">
-              <div>
-                {{ $dayjs(data.createdDate).format('D MMMM HH:mm') }}
-              </div>
-            </template>
-          </Column>
-          <Column field="endedDate" header="Дата завершения">
-            <template #body="{ data }">
-              <div v-if="data.endedDate">
-                {{ $dayjs(data.endedDate).format('D MMMM HH:mm') }}
-              </div>
-              <div v-else>
-                Нет
-              </div>
-            </template>
-          </Column>
-        </DataTable>
-        <div v-else class="cards grid grid-cols-1 gap-4 lg:hidden">
-          <div v-for="(item, index) in carts" :key="index" class="card card-compact bg-base-200 border ">
-            <div class="card-body">
-              <div class="flex gap-4">
-                <div class="image">
-                  <nuxt-img width="32" class="rounded-lg object-contain" :src="item.image" loading="lazy" />
-                </div>
-                <div class="article flex flex-col gap-0.5">
-                  <div class="text-xs">
-                    Артикул
-                  </div>
-                  <a
-                    :href="`https://www.wildberries.ru/catalog/${item.article}/detail.aspx`" target="_blank"
-                    class="text-secondary link link-hover text-sm"
-                  >
-                    {{ item.article }}
-                  </a>
-                </div>
-                <div class="status flex flex-col gap-0.5">
-                  <div class="text-xs">
-                    Статус
-                  </div>
-                  <div
-                    class="text-sm"
-                    :class="{
-                      'text-warning': item.status === 'created' || item.status === 'work',
-                      'text-success': item.status === 'completed',
-                    }"
-                  >
-                    <div>
-                      {{ getStatus(item.status) }}
-                    </div>
-                  </div>
-                </div>
-                <div class="flex flex-col gap-0.5">
-                  <div class="text-xs">
-                    Количество
-                  </div>
-                  <div class="text-sm">
-                    {{ item.amount }}
-                  </div>
-                </div>
-                <div class="date ml-auto text-xs text-end">
-                  {{ $dayjs(item.createdDate).format('D MMMM HH:mm') }}
-                </div>
-              </div>
-              <div class="card-actions justify-start mt-2">
-                <div>Дата Завершения:</div>
-                <div>
-                  <div v-if="item.endedDate">
-                    {{ $dayjs(item.endedDate).format('D MMMM HH:mm') }}
-                  </div>
-                  <div v-else>
-                    Нет
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </ClientOnly>
+    <div v-if="autoanswers.length">
+      <div class="flex flex-wrap gap-2">
+        <AutoanswerCard v-for="(bot, index) of autoanswers" :key="index" :info="bot" @delete="deleteBot" />
+      </div>
     </div>
     <div v-else class="hero">
       <div class="hero-content text-center flex justify-center items-center h-80">
