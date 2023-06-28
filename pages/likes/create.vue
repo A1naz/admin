@@ -253,6 +253,33 @@ watch(route, (route) => {
         </button>
       </div>
     </div>
+    <Transition name="fade">
+      <div
+        v-show="changedReviews.length"
+        class="save rounded-lg lg:sticky py-4 px-8 z-[9999] inset-x-0 top-0 bg-neutral-focus flex flex-wrap items-center justify-between gap-2 mb-2"
+      >
+        <div class="info flex flex-col lg:flex-row items-center gap-4">
+          <p class="text-xs font-bold text-neutral-content lg:text-sm">
+            Всего отзывов: {{ changedReviews.length }}
+          </p>
+          <p class="text-xs text-neutral-content lg:text-sm font-bold">
+            Лайков: {{ getAddedLikes().likes }}
+          </p>
+          <p class="text-xs text-neutral-content lg:text-sm font-bold">
+            Дизлайков: {{ getAddedLikes().dislikes
+            }}
+          </p>
+        </div>
+        <div class="save ml-auto flex flex-col lg:flex-row gap-2">
+          <button class="btn btn-ghost text-neutral-content btn-sm" @click="cancel">
+            Отмена
+          </button>
+          <button class="btn btn-primary btn-sm" @click="save">
+            Сохранить
+          </button>
+        </div>
+      </div>
+    </Transition>
     <div v-if="reviews.length" class="cards grid grid-cols-1 lg:grid-cols-2 gap-4 mb-12">
       <LikesReviewCard
         v-for="(review, index) of reviews" :key="review.id" :index="index"
@@ -263,35 +290,6 @@ watch(route, (route) => {
       />
       <div class="p-2 w-full col-span-1" />
     </div>
-    <Teleport to="body">
-      <Transition name="fade">
-        <div
-          v-show="changedReviews.length"
-          class="save fixed py-4 px-8 z-[9999] inset-x-0 bottom-0 bg-neutral-focus flex flex-wrap items-center justify-between gap-2"
-        >
-          <div class="info flex items-center gap-4">
-            <p class="text-xs font-bold text-neutral-content lg:text-sm">
-              Всего отзывов: {{ changedReviews.length }}
-            </p>
-            <p class="text-xs text-neutral-content lg:text-sm font-bold">
-              Лайков: {{ getAddedLikes().likes }}
-            </p>
-            <p class="text-xs text-neutral-content lg:text-sm font-bold">
-              Дизлайков: {{ getAddedLikes().dislikes
-              }}
-            </p>
-          </div>
-          <div class="save ml-auto flex gap-2">
-            <button class="btn btn-ghost text-neutral-content btn-sm" @click="cancel">
-              Отмена
-            </button>
-            <button class="btn btn-primary btn-sm" @click="save">
-              Сохранить
-            </button>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
   </div>
 </template>
 
