@@ -14,10 +14,18 @@ const form = reactive({
   article: '',
   product: '',
 })
+const initial = {
+  ratingFilterFrom: 1,
+  ratingFilterTo: 5,
+  text: '',
+  article: '',
+  product: '',
+}
 const store = useMainStore()
 const autoanswers = ref([]) as any
 const amount = ref(0)
 const now = useNow()
+const loading = ref(false)
 const loadingUrl = ref(false)
 const query = ref('')
 const article = ref('')
@@ -55,22 +63,40 @@ async function createAutoAnswer() {
     return
   form.product = productData.value
   form.article = article.value
+  form.ratingFilterFrom = Number(form.ratingFilterFrom)
+  form.ratingFilterTo = Number(form.ratingFilterTo)
+
+  loading.value = true
   const { data, error } = await useFetch('/api/autoanswer/create', {
     method: 'POST',
     body: form,
   })
+  loading.value = false
+  if (error.value) {
+    if (error.value.data) {
+      notify({
+        title: 'Что-то пошло не так',
+        text: error.value.data.message,
+      })
+      return
+    }
+    notify({
+      title: 'Что-то пошло не так',
+      text: error.value.message,
+    })
+    return
+  }
   if (data.value?.status === 'ok') {
     notify({
       title: 'Успешно',
       text: 'Автоответчик успешно создан',
     })
-    getBots()
-  }
-  if (error.value) {
-    notify({
-      title: 'Что-то пошло не так',
-      text: error.value.message,
-    })
+    await getBots()
+    form.ratingFilterFrom = initial.ratingFilterFrom
+    form.ratingFilterTo = initial.ratingFilterTo
+    form.text = initial.text
+    form.article = initial.article
+    form.product = initial.product
   }
 }
 async function getProductInfo() {
@@ -197,7 +223,7 @@ onMounted(() => {
           </div>
           <div class="w-full ml-auto self-start justify-start mt-2 lg:w-40">
             <button
-              :disabled="!productData || !form.text"
+              :disabled="!productData || !form.text || loading"
               class="btn w-full btn-primary"
               @click="createAutoAnswer"
             >
