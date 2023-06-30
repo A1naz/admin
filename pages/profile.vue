@@ -281,12 +281,16 @@ function onTelegramLink(data: any) {
           Введите стандартный ключ api для работы автоответчика
         </div>
       </div>
-      <div class="flex flex-col gap-6 w-full mt-1">
-        <input
-          v-model="wbApiKey" type="text" placeholder="Стандартный апи ключ Wildberries"
-          class="input input-bordered w-full"
-        >
-
+      <div class="flex flex-col gap-6 w-full mt-1 relative">
+        <div class="flex gap-2">
+          <input
+            v-model="wbApiKey" :disabled="store.client.wbApiKey" type="text" placeholder="Стандартный апи ключ Wildberries"
+            class="input input-bordered input-primary w-full"
+          >
+          <button v-show="store.client.wbApiKey" class="btn btn-primary" @click="store.client.wbApiKey = null">
+            Изменить
+          </button>
+        </div>
         <button
           :disabled="disabledSettingsButton" class="btn btn-primary xl:w-40 mr-0 self-end"
           @click="setApiKey"

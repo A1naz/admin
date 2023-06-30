@@ -55,10 +55,9 @@ export default eventHandler(async (event) => {
   const format = await Promise.all(
     deliveries.map(async (delivery) => {
       const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
-      if (!buyout) {
-        console.log('no buyout')
+      if (!buyout)
         return null
-      }
+
       const place = all.findIndex(
         item => item._id.toString() === delivery._id.toString(),
       )

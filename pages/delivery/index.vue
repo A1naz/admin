@@ -45,7 +45,17 @@ const { data, error } = await useFetch('/api/delivery/get', {
   },
   headers: useRequestHeaders(['cookie']) as HeadersInit,
 })
-
+async function exportReadyXLS() {
+  const { data } = await useFetch('/api/delivery/exportReady', {
+    responseType: 'blob',
+  })
+  const fileURL = window.URL.createObjectURL(new Blob([data.value]))
+  const fileLink = document.createElement('a')
+  fileLink.href = fileURL
+  fileLink.setAttribute('download', 'deliveries.xlsx')
+  document.body.appendChild(fileLink)
+  fileLink.click()
+}
 async function exportXLS() {
   const { data } = await useFetch('/api/delivery/export', {
     responseType: 'blob',
@@ -132,10 +142,12 @@ watch(route, async (newRoute) => {
             <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
               <li>
                 <NuxtLink to="/delivery/export">
-                  Готовы к выдаче
+                  Готовы к выдаче PDF
                 </NuxtLink>
               </li>
-              <li><a @click="exportXLS">Общая таблица</a></li>
+              <li><a @click="exportReadyXLS">Готовы к выдаче Excel</a></li>
+
+              <li><a @click="exportXLS">Общая таблица Excel</a></li>
             </ul>
           </div>
         </div>
