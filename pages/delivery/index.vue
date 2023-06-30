@@ -49,7 +49,7 @@ async function exportReadyXLS() {
   const { data } = await useFetch('/api/delivery/exportReady', {
     responseType: 'blob',
   })
-  const fileURL = window.URL.createObjectURL(new Blob([data.value]))
+  const fileURL = window.URL.createObjectURL(new Blob([data.value as any]))
   const fileLink = document.createElement('a')
   fileLink.href = fileURL
   fileLink.setAttribute('download', 'deliveries.xlsx')
@@ -141,7 +141,7 @@ watch(route, async (newRoute) => {
             <label tabindex="0" class="btn btn-sm btn-primary m-1">Экспорт</label>
             <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
               <li>
-                <NuxtLink to="/delivery/export">
+                <NuxtLink target="blank" to="/delivery/export">
                   Готовы к выдаче PDF
                 </NuxtLink>
               </li>
