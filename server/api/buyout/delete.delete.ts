@@ -21,6 +21,12 @@ export default eventHandler(async (event) => {
       message: 'Выкуп не найден',
     })
   }
+  if (found.status === 'work'){
+    throw createError({
+      statusCode: 404,
+      message: 'Выкуп, принятый в работу удалить нельзя.',
+    })
+  }
   const delivery = await Delivery.findOne({ idbuyout: found._id })
   if (delivery) {
     throw createError({
@@ -29,6 +35,7 @@ export default eventHandler(async (event) => {
     })
   }
 
+  
   const deleted = await Buyout.deleteOne({ uuid: body.uuid })
   if (deleted) {
     return {

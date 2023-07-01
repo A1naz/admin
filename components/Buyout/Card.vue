@@ -132,6 +132,8 @@ const getStatus = computed(() => {
   switch (props.info.status) {
     case 'active':
       return 'Активный'
+    case 'work':
+      return 'В работе'
     case 'completed':
       return 'Завершен'
     case 'archived':
@@ -185,7 +187,7 @@ const getStatus = computed(() => {
         <div class="flex justify-between mt-2">
           <span
             :class="{
-              'text-green-600': info.status === 'active',
+              'text-green-600': info.status === 'active' || info.status === 'work',
               'text-error': info.status === 'completed',
               'text-warning': info.status === 'archived' || info.status === 'paused',
             }"
@@ -197,7 +199,7 @@ const getStatus = computed(() => {
         <div class="flex justify-between gap-4 mt-2 items-center">
           <div
             :class="{
-              'opacity-0': info.status !== 'active' && info.status !== 'paused',
+              'opacity-0': info.status !== 'active' && info.status !== 'paused' && info.status !== 'work',
             }" class="text-sm badge badge-lg badge-outline"
           >
             Выкуплено {{ info.completed }} шт.

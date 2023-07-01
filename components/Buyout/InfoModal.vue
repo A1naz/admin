@@ -22,10 +22,14 @@ const getStatus = computed(() => {
   switch (props.info.status) {
     case 'active':
       return 'Активный'
+    case 'work':
+      return 'В работе'
     case 'completed':
       return 'Завершен'
     case 'archived':
       return 'В архиве'
+    case 'paused':
+      return 'Пауза'
   }
 })
 
@@ -61,7 +65,7 @@ const getGender = computed(() => {
           <div class="flex justify-between">
             <span
               :class="{
-                'text-green-600': info.status === 'active',
+                'text-green-600': info.status === 'active' || info.status === 'work',
                 'text-error': info.status === 'completed',
                 'text-warning': info.status === 'archived',
               }"
