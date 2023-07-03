@@ -9,7 +9,10 @@ export default eventHandler(async (event) => {
 
   if (!session)
     return sendRedirect(event, '/auth', 302)
-
+  throw createError({
+    statusCode: 400,
+    message: 'Работы с отзывами временно приостановлена(+-3дня)',
+  })
   const body = await readBody(event)
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
@@ -29,7 +32,7 @@ export default eventHandler(async (event) => {
       message: 'Выкуп не найден',
     })
   }
-  const delivery = await Delivery.findOne({_id: deliveryid, idbuyout: buyout._id, reviewed: false })
+  const delivery = await Delivery.findOne({ _id: deliveryid, idbuyout: buyout._id, reviewed: false })
   if (!delivery) {
     return createError({
       statusCode: 400,

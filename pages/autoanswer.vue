@@ -120,7 +120,7 @@ async function changeUrl() {
   loadingUrl.value = true
   if (timeout)
     clearTimeout(timeout)
-  timeout = setTimeout(getProductInfo, 2000)
+  timeout = setTimeout(getProductInfo, 500)
 }
 function getStatus(status: string) {
   if (status === 'created')
