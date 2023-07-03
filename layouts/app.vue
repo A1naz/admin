@@ -129,7 +129,7 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
         </h3>
         <SidebarItem title="Выкупы" icon="fluent:payment-24-filled" href="/buyouts" />
         <SidebarItem title="Доставки" icon="fluent:box-24-filled" href="/delivery" />
-        <!-- <SidebarItem title="Отзывы" icon="fluent:comment-24-filled" href="/reviews" /> -->
+        <SidebarItem title="Отзывы" icon="fluent:comment-24-filled" href="/reviews" />
         <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
           Улучшение репутации
         </h3>

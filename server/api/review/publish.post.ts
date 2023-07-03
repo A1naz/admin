@@ -9,10 +9,6 @@ export default eventHandler(async (event) => {
 
   if (!session)
     return sendRedirect(event, '/auth', 302)
-  throw createError({
-    statusCode: 400,
-    message: 'Работы с отзывами временно приостановлена(+-3дня)',
-  })
   const body = await readBody(event)
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
