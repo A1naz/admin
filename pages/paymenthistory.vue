@@ -31,6 +31,23 @@ const { data, error } = await useFetch('/api/paymenthistory/get', {
 
 })
 history.value = data.value
+const exportDates = ref([])
+
+async function exportToXLS() {
+  const { data } = await useFetch('/api/paymenthistory/export', {
+    method: 'POST',
+    body: {
+      exportDates: exportDates.value,
+    },
+    responseType: 'blob',
+  })
+  const fileURL = window.URL.createObjectURL(new Blob([data.value as any]))
+  const fileLink = document.createElement('a')
+  fileLink.href = fileURL
+  fileLink.setAttribute('download', 'paymenthistory.xlsx')
+  document.body.appendChild(fileLink)
+  fileLink.click()
+}
 
 watch(targetIsVisible, async (isVisible) => {
   if (isVisible) {
@@ -62,6 +79,17 @@ watch(targetIsVisible, async (isVisible) => {
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm mb-6">
       Здесь можно увидеть движение вашего баланса
     </p>
+    <div class="flex justify-between mb-8 mt-6 items-center">
+      <div class="flex gap-4 items-center">
+        <div v-if="history.length" class="export">
+          <DateRangePicker v-model="exportDates" save-button="Экспорт в Excel" :start-date="new Date()" @select="exportToXLS">
+            <button class="btn btn-sm btn-primary">
+              Экспорт
+            </button>
+          </DateRangePicker>
+        </div>
+      </div>
+    </div>
     <div v-if="width > 1024">
       <DataTable sort-field="dataoperation" :sort-order="-1" class="bg-base-200 hidden lg:block" :value="history" removable-sort>
         <Column field="summ" sortable header="Сумма">
