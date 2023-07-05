@@ -15,12 +15,14 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const { buyoutuuid, deliveryid, rating, text, photos, date } = body
-  // if (text.length < 10 || text.length > 1000) {
-  //   throw createError({
-  //     statusCode: 400,
-  //     message: 'Текст отзыва должен быть длиннее 10 символов и не больше 1000',
-  //   })
-  // }
+  if (text) {
+    if (text.length < 10 || text.length > 1000) {
+      throw createError({
+        statusCode: 400,
+        message: 'Текст отзыва должен быть длиннее 10 символов и не больше 1000',
+      })
+    }
+  }
   const buyout = await Buyout.findOne({ uuid: buyoutuuid })
   if (!buyout) {
     return createError({
