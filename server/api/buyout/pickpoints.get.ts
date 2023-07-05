@@ -16,7 +16,7 @@ export default eventHandler(async (event) => {
       return sendStream(event, fs.createReadStream('points.json'))
   }
   const data: any = await $fetch(
-    'https://www.wildberries.ru/webapi/geo/saveprefereduserloc',
+    'https://www.wildberries.ru/webapi/spa/modules/pickups',
     {
       method: 'GET',
       headers: {
@@ -25,25 +25,12 @@ export default eventHandler(async (event) => {
     },
   )
   const points = data.value.pickups
-  const ids = points.map((point: any) => point.id)
-
-  const info: any = await $fetch(
-    'https://www.wildberries.ru/webapi/poo/byids',
-    {
-      method: 'POST',
-      headers: {
-        'x-requested-with': 'XMLHttpRequest',
-      },
-      body: JSON.stringify(ids),
-    },
-  )
   const collection = points.map((point: any) => {
-    const infoPoint = info.value[point.id]
     return {
       lt: point.coordinates[0],
       lg: point.coordinates[1],
-      w: infoPoint.workTime,
-      a: infoPoint.address,
+      w: point.workTime,
+      a: point.address,
     }
   })
 
