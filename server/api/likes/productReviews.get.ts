@@ -27,6 +27,7 @@ export default eventHandler(async (event) => {
       message: 'Не удалось получить информацию по товару',
     })
   }
+
   const urlData: any = await $fetch(
     `https://feedback-bt.wildberries.ru/feedback/api/v1/host?imt=${imt_id}`,
     {
@@ -51,7 +52,7 @@ export default eventHandler(async (event) => {
       message: 'Не удалось получить информацию по товару',
     })
   }
-  const limited = feedbackData.feedbacks.slice(0, parseInt(limit))
+  const limited = feedbackData.feedbacks.slice(0, parseInt(limit as string))
   const feedbacks = limited.map((feedback: any) => {
     const likes = feedback?.feedbackHelpfulness?.filter(
       (help: any) => help.helpfulness === 'plus',

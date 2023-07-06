@@ -6,11 +6,11 @@ export default async function () {
     const parsed = JSON.parse(cached)
     const now = new Date()
     const diff = now.getTime() - new Date(parsed.updated).getTime()
-    if (diff < 1000 * 60 * 10)
+    if (diff < 1000 * 60 * 60)
       return parsed
   }
   const data: any = await $fetch(
-    'https://www.wildberries.ru/webapi/geo/saveprefereduserloc',
+    'https://www.wildberries.ru/webapi/spa/modules/pickups',
     {
       method: 'GET',
       headers: {
@@ -19,25 +19,12 @@ export default async function () {
     },
   )
   const points = data.value.pickups
-  const ids = points.map((point: any) => point.id)
-
-  const info: any = await $fetch(
-    'https://www.wildberries.ru/webapi/poo/byids',
-    {
-      method: 'POST',
-      headers: {
-        'x-requested-with': 'XMLHttpRequest',
-      },
-      body: JSON.stringify(ids),
-    },
-  )
   const collection = points.map((point: any) => {
-    const infoPoint = info.value[point.id]
     return {
       lt: point.coordinates[0],
       lg: point.coordinates[1],
-      w: infoPoint.workTime,
-      a: infoPoint.address,
+      w: point.workTime,
+      a: point.address,
     }
   })
 

@@ -7,7 +7,6 @@ export default eventHandler(async (event) => {
 
   if (!session)
     return sendRedirect(event, '/auth', 302)
-
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
     return sendRedirect(event, '/auth', 302)

@@ -13,14 +13,14 @@ export default eventHandler(async (event) => {
   if (!user)
     return sendRedirect(event, '/auth', 302)
 
-  const found = await Buyout.findOne({ uuid: body.uuid })
+  const found = await Buyout.findOne({ user, uuid: body.uuid })
   if (!found) {
     throw createError({
       statusCode: 404,
       message: 'not found',
     })
   }
-  if (found.status === 'paused')
+  if (found.status === 'paused' || found.status === 'nofunds')
     found.status = 'active'
   await found.save()
   return {

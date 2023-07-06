@@ -140,6 +140,8 @@ const getStatus = computed(() => {
       return 'В архиве'
     case 'paused':
       return 'Пауза'
+    case 'nofunds':
+      return 'Недостаточно средств'
   }
 })
 </script>
@@ -188,7 +190,7 @@ const getStatus = computed(() => {
           <span
             :class="{
               'text-green-600': info.status === 'active' || info.status === 'work',
-              'text-error': info.status === 'completed',
+              'text-error': info.status === 'completed' || info.status === 'nofunds',
               'text-warning': info.status === 'archived' || info.status === 'paused',
             }"
           >{{ getStatus }}</span>
@@ -205,7 +207,7 @@ const getStatus = computed(() => {
             Выкуплено {{ info.completed }} шт.
           </div>
           <button
-            v-show="info.status === 'paused'" class="btn btn-sm btn-neutral" @click="unpauseBuyout"
+            v-show="info.status === 'paused' || info.status === 'nofunds'" class="btn btn-sm btn-neutral" @click="unpauseBuyout"
           >
             Возобновить
           </button>
