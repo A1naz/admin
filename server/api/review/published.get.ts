@@ -11,10 +11,14 @@ export default eventHandler(async (event) => {
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
     return sendRedirect(event, '/auth', 302)
-
-  const reviews = await Review.find({ user }).sort({ _id: -1 })
+  const { status } = getQuery(event)
+  let reviews: any = []
+  if (status === 'all')
+    reviews = await Review.find({ user }).sort({ _id: -1 })
+  if (status === 'nofunds')
+    reviews = await Review.find({ user, status: 'nofunds' }).sort({ _id: -1 })
   const format = await Promise.all(
-    reviews.map((review) => {
+    reviews.map((review: any) => {
       return {
         article: review.article,
         name: review.name,

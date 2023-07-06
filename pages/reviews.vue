@@ -55,6 +55,19 @@ watch(route, async (newRoute) => {
       headers: useRequestHeaders(['cookie']) as HeadersInit,
       query: {
         limit: 50,
+        status: 'all',
+      },
+    })
+    reviews.value = data.value
+    status.value = 'published'
+  }
+  if (newRoute.query.status === 'nofunds') {
+    const { data } = await useFetch('/api/review/published', {
+      method: 'GET',
+      headers: useRequestHeaders(['cookie']) as HeadersInit,
+      query: {
+        limit: 50,
+        status: 'nofunds',
       },
     })
     reviews.value = data.value
@@ -107,6 +120,13 @@ function goToPublished() {
         >
           Опубликованные
         </NuxtLink>
+        <NuxtLink
+          to="/reviews?status=nofunds" :class="{
+            'btn-active': route.query.status === 'nofunds',
+          }" class="btn btn-ghost btn-sm normal-case font-medium"
+        >
+          Недостаточно средств
+        </NuxtLink>
       </div>
     </div>
     <div v-if="reviews.length">
@@ -116,7 +136,7 @@ function goToPublished() {
           :info="review" @open-modal="openModal"
         />
       </div>
-      <div v-if="status === 'published'" class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+      <div v-if="status === 'published' || status === 'nofunds'" class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
         <ReviewPublishedCard
           v-for="(review, index) of reviews" :key="index"
           :place="reviews.length - index" :index="index" :info="review" @open-image="openPhoto"
@@ -133,7 +153,7 @@ function goToPublished() {
       </div>
     </div>
     <ReviewModal
-    :deliveryid="selectedDelivery"
+      :deliveryid="selectedDelivery"
       :state="modalOpen" :uuid="selectedUUID" @publish="goToPublished"
       @close="closeModal"
     />

@@ -32,6 +32,8 @@ const getStatus = computed(() => {
       return 'Опубликован'
     case 'canceled':
       return 'Отменен'
+    case 'nofunds':
+      return 'Недостаточно средств'
   }
 })
 </script>
@@ -39,16 +41,16 @@ const getStatus = computed(() => {
 <template>
   <div class="buyout-card card bg-base-200 shadow-lg">
     <div class="card-body flex-shrink-0 flex flex-col justify-start p-4 relative">
-      <div class="flex justify-between item mb-2 flex-wrap gap-4">
+      <div class="flex justify-between item gap-2 mb-2">
         <h2 class="card-title">
           Отзыв №{{ place }}
         </h2> <span
           :class="{
 
             'bg-green-600': info.status === 'working' || info.status === 'published',
-            'bg-warning': info.status === 'waiting' || info.status === 'created',
+            'bg-warning': info.status === 'waiting' || info.status === 'created' || info.status === 'nofunds',
             'bg-error': info.status === 'canceled',
-          }" class="text-black p-2 px-8 rounded-lg text-center"
+          }" class="text-black p-2 px-4 rounded-lg text-center"
         >{{ getStatus }}</span>
       </div>
 

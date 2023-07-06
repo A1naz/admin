@@ -91,6 +91,8 @@ function getStatus(status: string) {
     return 'В работе'
   else if (status === 'completed')
     return 'Завершен'
+  else if (status === 'nofunds')
+    return 'Недостаточно средств'
 }
 function removeProduct() {
   productData.value = null
@@ -215,7 +217,7 @@ onMounted(() => {
             <button
               :class="{
                 'btn-disabled': !productData || !query,
-              }" class="btn btn w-full btn-primary"
+              }" class="btn w-full btn-primary"
               @click="create"
             >
               Добавить
@@ -280,7 +282,9 @@ onMounted(() => {
             <template #body="{ data }">
               <div
                 :class="{
-                  'text-warning': data.status === 'created' || data.status === 'work',
+                  'text-error': data.status === 'nofunds',
+                  'text-primary': data.status === 'created',
+                  'text-warning': data.status === 'work',
                   'text-success': data.status === 'completed',
                 }"
               >

@@ -18,6 +18,8 @@ function getStatus(status: string) {
     return 'В работе'
   else if (status === 'completed')
     return 'Завершен'
+  else if (status === 'nofunds')
+    return 'Недостаточно средств'
 }
 onMounted(() => {
   review_likes.value = data.value
@@ -62,7 +64,9 @@ onMounted(() => {
           <template #body="{ data }">
             <div
               :class="{
-                'text-warning': data.status === 'created' || data.status === 'work',
+                'text-error': data.status === 'nofunds',
+                'text-primary': data.status === 'created',
+                'text-warning': data.status === 'work',
                 'text-success': data.status === 'completed',
               }"
             >

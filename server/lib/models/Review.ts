@@ -9,7 +9,7 @@ const ReviewSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   delivery: { type: Schema.Types.ObjectId, ref: 'Delivery', required: true },
   images: { type: Array, required: false },
-  status: { type: String, required: true, enum: ['created', 'waiting', 'working', 'published', 'canceled'] },
+  status: { type: String, required: true, enum: ['created', 'waiting', 'working', 'published', 'canceled', 'nofunds'] },
   recipientphone: { type: String, required: true },
 })
 
