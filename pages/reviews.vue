@@ -103,6 +103,9 @@ function goToPublished() {
       <p class="description">
         На каждый полученный артикул можно оставить отзыв. Оплачивается отдельно от выкупа согласно вашему тарифу.
       </p>
+      <p class="text-xs font-light mt-1 lg:text-sm">
+        Стоимость одного отзыва -  <span class="font-bold">25 руб.</span>
+      </p>
     </div>
     <div class="flex justify-between mb-8 mt-6 items-center">
       <div class="">

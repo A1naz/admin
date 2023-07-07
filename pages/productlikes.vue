@@ -96,6 +96,9 @@ onMounted(() => {
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
       Выберите товар или бренд, чтобы повысить количество добавлений в «Избранное»
     </p>
+    <p class="text-xs font-light mt-1 lg:text-sm">
+      Стоимость одного добавления -  <span class="font-bold">3 руб.</span>
+    </p>
     <div class="mb-4 mt-6 bg-base-200 p-6 rounded-lg">
       <div class="flex flex-wrap items-center gap-6 mb-2">
         <div class="relative">

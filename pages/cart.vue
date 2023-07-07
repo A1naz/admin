@@ -112,6 +112,9 @@ onMounted(() => {
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
       Выберите товар, который будет добавлен в корзину
     </p>
+    <p class="text-xs font-light mt-1 lg:text-sm">
+      Стоимость одного добавления -  <span class="font-bold">3 руб.</span>
+    </p>
     <div class="collapse collapse-plus bg-base-200 rounded-box mb-4 mt-6">
       <input type="checkbox">
 

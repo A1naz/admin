@@ -184,7 +184,9 @@ watch(route, async (newRoute) => {
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
       Здесь формируются и оплачиваются выкупы на Wildberries. Для добавления нажмите на кнопку "Добавить выкупы".
     </p>
-
+    <p class="text-xs font-light mt-1 lg:text-sm">
+      Стоимость одного выкупа -  <span class="font-bold">40 руб.</span>
+    </p>
     <div class="flex justify-between mb-4 items-center mt-6">
       <div class="hidden lg:block">
         <NuxtLink
