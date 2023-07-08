@@ -35,7 +35,7 @@ onMounted(() => {
       Лайки на отзывах, помогут вашим покупателям обратить внимание только на самые важные отзывы.
     </p>
     <p class="text-xs font-light mt-1 lg:text-sm">
-      Стоимость одного лайка -  <span class="font-bold">3 руб.</span>
+      Стоимость одного лайка -  <span class="font-bold">1 руб.</span>
     </p>
     <div class="flex justify-end mb-8 mt-6 items-center">
       <NuxtLink to="/likes/create" class="btn btn-primary btn-sm gap-2 font-medium normal-case self-end">

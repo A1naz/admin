@@ -22,6 +22,9 @@ const rules = computed(() => {
     password: {
       required: helpers.withMessage('Введите пароль', required),
       minLength: helpers.withMessage('Пароль должен быть длиннее 6 символов', minLength(6)),
+      containsNumber: helpers.withMessage('Пароль должен содержать цифру', (value: string) => /[0-9]/.test(value)),
+      englishLetters: helpers.withMessage('Пароль должен состоять из английских букв', (value: string) => /(?=.*[a-zA-Z])(?=.*[0-9])/.test(value)),
+
     },
     confirmPassword: {
       required: helpers.withMessage('Подтвердите пароль', required),
@@ -108,12 +111,9 @@ async function submitForm() {
                 }" required="true" @change="v$.password.$touch"
               >
               <div
-                v-for="error of v$.password.$errors"
-                :key="error.$uid" class="input-errors text-sm text-error mt-1 flex justify-end absolute r-0 w-full"
+                class="input-errors text-sm text-error mt-1 flex justify-end absolute r-0 w-full"
               >
-                <div class="error-msg">
-                  {{ error.$message }}
-                </div>
+                {{ v$.password?.$errors[0]?.$message }}
               </div>
             </div>
             <div class="pb-4">

@@ -108,13 +108,23 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
                     Баланс: {{ currency.format(store.client.balance) }}
                   </div>
                 </div>
-                <NuxtLink
-                  :class="{
-                    'bg-base-300': route.path === '/profile',
-                  }" to="/profile" class="btn btn-sm btn-circle relative"
-                >
-                  <IconCSS name="fluent:person-24-filled" size="24" />
-                </NuxtLink>
+                <div class="flex items-center gap-2">
+                  <div class="tooltip" data-tip="Инструкция по платформе">
+                    <NuxtLink
+                      :external="true" to="https://drive.google.com/file/d/1d6FLWMIgqhrWXHpdHFdAu2H8wnVdB_2S/view?usp=sharing" class="relative btn btn-sm btn-neutral btn-circle bg-neutral-focus hover:bg-neutral"
+                    >
+                      <IconCSS name="fluent:info-24-filled" size="24" />
+                    </NuxtLink>
+                  </div>
+                  <NuxtLink
+                    :class="{
+                      'bg-neutral-focus': route.path !== '/profile',
+                      'text-white': route.path === '/profile',
+                    }" to="/profile" class="btn btn-sm btn-neutral btn-circle relative hover:bg-neutral"
+                  >
+                    <IconCSS name="fluent:person-24-filled" size="24" />
+                  </NuxtLink>
+                </div>
               </div>
             </div>
             <div>
