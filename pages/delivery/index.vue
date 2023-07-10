@@ -106,7 +106,7 @@ watch(route, async (newRoute) => {
     headers: useRequestHeaders(['cookie']) as HeadersInit,
   })
   deliveries.value = data.value
-})
+}, { deep: true, immediate: true })
 </script>
 
 <template>

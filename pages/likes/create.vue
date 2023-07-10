@@ -219,7 +219,7 @@ function sortReviews() {
 watch(route, (route) => {
   sortBy.value = route.query.sortBy as string
   sortReviews()
-})
+}, { deep: true, immediate: true })
 </script>
 
 <template>

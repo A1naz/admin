@@ -173,7 +173,7 @@ watch(route, async (newRoute) => {
     headers: useRequestHeaders(['cookie']) as HeadersInit,
   })
   buyouts.value = data.value
-})
+}, { deep: true, immediate: true })
 </script>
 
 <template>
@@ -238,7 +238,7 @@ watch(route, async (newRoute) => {
       </NuxtLink>
     </div>
     <div v-if="buyouts.length">
-      <div v-if="route.query.status === 'active' || !route.query.status && activeBuyouts.length > 0" class="flex justify-center py-2 rounded-lg px-2 mb-2 bg-base-100 border border-base-200">
+      <div v-if="(route.query.status === 'active' || !route.query.status) && activeBuyouts.length > 0" class="flex justify-center py-2 rounded-lg px-2 mb-2 bg-base-100 border border-base-200">
         <p
           v-if="availableBuyouts" :class="{
             'text-success': availableBuyouts === activeBuyouts.length,

@@ -73,7 +73,7 @@ watch(route, async (newRoute) => {
     reviews.value = data.value
     status.value = 'published'
   }
-})
+}, { deep: true, immediate: true })
 function openPhoto(src: string) {
   openedPhoto.value = src
 }

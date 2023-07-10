@@ -86,12 +86,10 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@bg-dev/nuxt-s3',
     '@nuxtjs/fontaine',
-    'nuxt-delay-hydration',
     '@sfxcode/nuxt-primevue',
     '@nuxtjs/robots',
     '@morev/vue-transitions/nuxt',
     '@sidebase/nuxt-pdf',
-    '@nuxtjs/partytown',
     '@artmizu/yandex-metrika-nuxt',
   ],
   css: [
