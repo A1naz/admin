@@ -111,7 +111,7 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
                 <div class="flex items-center gap-2">
                   <div class="tooltip" data-tip="Инструкция по платформе">
                     <NuxtLink
-                      :external="true" to="https://drive.google.com/file/d/1d6FLWMIgqhrWXHpdHFdAu2H8wnVdB_2S/view?usp=sharing" class="relative btn btn-sm btn-neutral btn-circle bg-neutral-focus hover:bg-neutral"
+                      :external="true" target="_blank" to="https://drive.google.com/file/d/1d6FLWMIgqhrWXHpdHFdAu2H8wnVdB_2S/view?usp=sharing" class="relative btn btn-sm btn-neutral btn-circle bg-neutral-focus hover:bg-neutral"
                     >
                       <IconCSS name="fluent:info-24-filled" size="24" />
                     </NuxtLink>
