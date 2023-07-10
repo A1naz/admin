@@ -17,8 +17,10 @@ async function getReady(user: Document) {
   const format = await Promise.all(
     filtered.map(async (delivery, index) => {
       const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
-      if (!buyout)
-        return
+      if (!buyout) {
+        console.log(delivery._id.toString())
+        return undefined
+      }
       const place = index + 1
 
       const phone = delivery.recipientphone
@@ -65,7 +67,7 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
   const { type } = getQuery(event)
   const workbook = new ExcelJS.Workbook()
-  const ready = await getReady(user)
+  const ready = (await getReady(user)).filter(item => item !== undefined)
   const sheet = workbook.addWorksheet('Готовы к выдаче', {
     headerFooter: { firstHeader: `Всего выкупов: ${ready.length}` },
   })
