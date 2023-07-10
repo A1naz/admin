@@ -21,6 +21,12 @@ export default eventHandler(async (event) => {
       message: 'not found',
     })
   }
+  if (found.status === 'work') {
+    throw createError({
+      statusCode: 404,
+      message: 'Выкуп, принятый в работу архивировать нельзя.',
+    })
+  }
   const delivery = await Delivery.findOne({ idbuyout: found })
   if (delivery) {
     throw createError({

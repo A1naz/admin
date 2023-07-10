@@ -17,10 +17,13 @@ async function getReady(user: Document) {
   const format = await Promise.all(
     filtered.map(async (delivery, index) => {
       const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
-      if (!buyout) {
-        console.log(delivery._id.toString())
+
+      if (!buyout)
         return undefined
-      }
+
+      if (buyout.status === 'archived')
+        console.log(delivery.uuidbuyout)
+
       const place = index + 1
 
       const phone = delivery.recipientphone
