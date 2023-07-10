@@ -117,16 +117,6 @@ watch(targetIsVisible, async (isVisible) => {
     skip.value += 50
   }
 })
-
-watch(route, async (newRoute) => {
-  skip.value = 50
-  end.value = false
-  const { data } = await useFetch('/api/delivery/getReady', {
-    method: 'GET',
-    headers: useRequestHeaders(['cookie']) as HeadersInit,
-  })
-  deliveries.value = data.value
-}, { deep: true, immediate: true })
 </script>
 
 <template>

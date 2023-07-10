@@ -51,7 +51,7 @@ dependencies:
     specifier: ^5.1.0
     version: 5.1.0
   dayjs:
-    specifier: ^1.11.8
+    specifier: ^1.11.9
     version: 1.11.9
   exceljs:
     specifier: ^4.3.0
@@ -63,7 +63,7 @@ dependencies:
     specifier: ^0.10.1
     version: 0.10.1
   jsonwebtoken:
-    specifier: ^9.0.0
+    specifier: ^9.0.1
     version: 9.0.1
   maska:
     specifier: ^2.1.9
@@ -72,10 +72,10 @@ dependencies:
     specifier: ^2.3.0
     version: 2.3.0
   mongodb:
-    specifier: ^5.6.0
+    specifier: ^5.7.0
     version: 5.7.0
   mongoose:
-    specifier: ^7.3.1
+    specifier: ^7.3.2
     version: 7.3.2
   next-auth:
     specifier: ^4.22.1
@@ -102,7 +102,7 @@ dependencies:
     specifier: ^1.63.6
     version: 1.63.6
   unstorage:
-    specifier: ^1.7.0
+    specifier: ^1.8.0
     version: 1.8.0
   uuid:
     specifier: ^9.0.0
@@ -128,7 +128,7 @@ devDependencies:
     specifier: ^0.38.6
     version: 0.38.6(eslint@8.44.0)(typescript@5.1.6)
   '@bg-dev/nuxt-s3':
-    specifier: ^0.2.2
+    specifier: ^0.2.3
     version: 0.2.3(rollup@2.79.1)
   '@nuxt/image-edge':
     specifier: 1.0.0-28020728.5df24eb
@@ -152,7 +152,7 @@ devDependencies:
     specifier: ^6.8.0
     version: 6.8.0(rollup@2.79.1)(webpack@5.88.1)
   '@sfxcode/nuxt-primevue':
-    specifier: ^1.2.3
+    specifier: ^1.2.5
     version: 1.2.5(rollup@2.79.1)(tailwindcss@3.3.2)(vue@3.3.4)
   '@sidebase/nuxt-auth':
     specifier: 0.5.0
@@ -167,13 +167,13 @@ devDependencies:
     specifier: ^9.0.2
     version: 9.0.2
   '@types/node':
-    specifier: ^20.3.2
+    specifier: ^20.4.1
     version: 20.4.1
   '@types/nodemailer':
     specifier: ^6.4.8
     version: 6.4.8
   '@types/qrcode':
-    specifier: ^1.5.0
+    specifier: ^1.5.1
     version: 1.5.1
   '@types/uuid':
     specifier: ^9.0.2
@@ -185,10 +185,10 @@ devDependencies:
     specifier: ^0.0.5
     version: 0.0.5
   daisyui:
-    specifier: ^3.1.7
+    specifier: ^3.2.1
     version: 3.2.1
   eslint:
-    specifier: ^8.43.0
+    specifier: ^8.44.0
     version: 8.44.0
   nuxt:
     specifier: ^3.6.2

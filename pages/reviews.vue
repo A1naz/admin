@@ -7,7 +7,7 @@ definePageMeta({
 const route = useRoute()
 const reviews = ref([]) as any
 const router = useRouter()
-const status = ref(route.query?.status || 'available')
+const status = computed(() => route.query?.status || 'available')
 const openedPhoto = ref('')
 if (status.value === 'available') {
   const { data } = await useFetch('/api/review/available', {
@@ -36,8 +36,8 @@ onMounted(async () => {
 })
 const selectedUUID = ref('')
 
-watch(route, async (newRoute) => {
-  if (newRoute.query.status === 'available' || !newRoute.query.status) {
+watch(() => status.value, async (newRoute) => {
+  if (status.value === 'available') {
     const { data } = await useFetch('/api/review/available', {
       method: 'GET',
       headers: useRequestHeaders(['cookie']) as HeadersInit,
@@ -46,10 +46,9 @@ watch(route, async (newRoute) => {
       },
     })
     reviews.value = data.value
-    status.value = 'available'
     return
   }
-  if (newRoute.query.status === 'published') {
+  if (status.value === 'published') {
     const { data } = await useFetch('/api/review/published', {
       method: 'GET',
       headers: useRequestHeaders(['cookie']) as HeadersInit,
@@ -59,9 +58,8 @@ watch(route, async (newRoute) => {
       },
     })
     reviews.value = data.value
-    status.value = 'published'
   }
-  if (newRoute.query.status === 'nofunds') {
+  if (status.value === 'nofunds') {
     const { data } = await useFetch('/api/review/published', {
       method: 'GET',
       headers: useRequestHeaders(['cookie']) as HeadersInit,
@@ -71,7 +69,6 @@ watch(route, async (newRoute) => {
       },
     })
     reviews.value = data.value
-    status.value = 'published'
   }
 }, { deep: true, immediate: true })
 function openPhoto(src: string) {

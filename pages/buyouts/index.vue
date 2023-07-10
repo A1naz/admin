@@ -13,6 +13,8 @@ const selectedBuyout = ref({})
 const selectedIndex = ref(-1)
 const store = useMainStore()
 const selectedPlace = ref(-1)
+const status = computed(() => route.query?.status || 'all')
+
 function openModal(index: number) {
   selectedIndex.value = index
   selectedPlace.value = buyouts.value.length - index
@@ -29,10 +31,10 @@ const { stop } = useIntersectionObserver(
 )
 const skip = ref(50)
 const end = ref(false)
-const { data } = await useFetch('/api/buyout/get', {
+const { data, refresh } = await useFetch(() => '/api/buyout/get', {
   method: 'GET',
   query: {
-    status: route.query?.status || 'all',
+    status: status.value ?? 'all',
     limit: 50,
   },
   headers: useRequestHeaders(['cookie']) as HeadersInit,
@@ -161,13 +163,13 @@ watch(targetIsVisible, async (isVisible) => {
     skip.value += 50
   }
 })
-watch(route, async (newRoute) => {
+watch(() => status.value, async () => {
   skip.value = 50
   end.value = false
   const { data } = await useFetch('/api/buyout/get', {
     method: 'GET',
     query: {
-      status: newRoute?.query?.status || 'all',
+      status: status.value || 'all',
       limit: 50,
     },
     headers: useRequestHeaders(['cookie']) as HeadersInit,

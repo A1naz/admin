@@ -8,6 +8,8 @@ const openAll = ref(false)
 const route = useRoute()
 const router = useRouter()
 const deliveries = ref([]) as any
+const status = computed(() => route.query?.status || 'all')
+
 function selectStatus(e: Event) {
   const target = e.target as HTMLSelectElement
   router.push({
@@ -40,7 +42,7 @@ const end = ref(false)
 const { data, error } = await useFetch('/api/delivery/get', {
   method: 'GET',
   query: {
-    status: route.query?.status || 'all',
+    status: status.value ?? 'all',
     limit: 50,
   },
   headers: useRequestHeaders(['cookie']) as HeadersInit,
@@ -94,13 +96,13 @@ watch(targetIsVisible, async (isVisible) => {
   }
 })
 
-watch(route, async (newRoute) => {
+watch(() => status.value, async (newRoute) => {
   skip.value = 50
   end.value = false
   const { data } = await useFetch('/api/delivery/get', {
     method: 'GET',
     query: {
-      status: newRoute?.query?.status || 'all',
+      status: status.value ?? 'all',
       limit: 50,
     },
     headers: useRequestHeaders(['cookie']) as HeadersInit,

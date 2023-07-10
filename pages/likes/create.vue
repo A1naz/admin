@@ -12,10 +12,12 @@ const changedReviews = ref<any>([])
 const route = useRoute()
 const router = useRouter()
 const reviews = ref<any>([])
-const sortBy = ref('date')
 const article = ref('')
 const savedArticle = ref('')
 const loading = ref(false)
+const selectSortBy = ref('')
+const sortBy = computed(() => route.query?.sortBy || 'date')
+
 async function getProductReviews() {
   loading.value = true
   changedReviews.value = []
@@ -26,7 +28,7 @@ async function getProductReviews() {
     query: {
       article: savedArticle.value,
       limit: 50,
-      sortBy: route.query.sortBy || 'date',
+      sortBy: sortBy.value ?? 'date',
     },
   })
   loading.value = false
@@ -150,7 +152,7 @@ function removeDislike(id: string) {
   }
 }
 function selectSorting(e: any) {
-  sortBy.value = e.target.value
+  selectSortBy.value = e.target.value
   router.push({
     query: {
       sortBy: e.target.value,
@@ -216,8 +218,8 @@ function sortReviews() {
     reviews.value = reviews.value.sort((a: any, b: any) => b.rank - a.rank)
   }
 }
-watch(route, (route) => {
-  sortBy.value = route.query.sortBy as string
+watch(() => sortBy.value, (route) => {
+  selectSortBy.value = sortBy.value.toString()
   sortReviews()
 }, { deep: true, immediate: true })
 </script>
