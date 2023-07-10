@@ -1,5 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { icons } from './config/pwa'
+
 const baseUrl = '/'
+
 const description = 'Сервис для продвижения Wildberries.'
 export default defineNuxtConfig({
   app: {
@@ -53,9 +56,6 @@ export default defineNuxtConfig({
     native: false,
     directiveOnly: false,
 
-    // Default image must be in the public folder
-    defaultImage: '/images/default-image.jpg',
-
     // To remove class set value to false
     loadingClass: 'isLoading',
     loadedClass: 'isLoaded',
@@ -68,6 +68,11 @@ export default defineNuxtConfig({
 
   nitro: {
     compressPublicAssets: true,
+    prerender: {
+      crawlLinks: false,
+      routes: [],
+      ignore: ['/'],
+    },
     plugins: ['~/server/index.ts'],
   },
   modules: [
@@ -102,9 +107,7 @@ export default defineNuxtConfig({
     'nuxt-seo-kit',
   ],
   delayHydration: {
-    // enables nuxt-delay-hydration in dev mode for testing
-    mode: 'init',
-    debug: process.env.NODE_ENV === 'development',
+    mode: false,
   },
   s3: {
     client: {
@@ -134,15 +137,62 @@ export default defineNuxtConfig({
   },
   pwa: {
     registerType: 'autoUpdate',
-    devOptions: {
-      enabled: false,
-    },
+    scope: '/',
+    base: '/',
     manifest: {
       name: process.env.NAME,
       short_name: process.env.NAME,
       theme_color: '#4f46e5',
       description,
+      icons,
     },
+    client: {
+      installPrompt: true,
+      // you don't need to include this: only for testing purposes
+      // if enabling periodic sync for update use 1 hour or so (periodicSyncForUpdates: 3600)
+      periodicSyncForUpdates: 20,
+    },
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,txt,png,ico,svg}'],
+      navigateFallbackDenylist: [/^\/api\//],
+      cleanupOutdatedCaches: true,
+      runtimeCaching: [
+        {
+          urlPattern: /^https:\/\/fonts.googleapis.com\/.*/i,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'google-fonts-cache',
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 60 * 60 * 24 * 365, // <== 365 days
+            },
+            cacheableResponse: {
+              statuses: [0, 200],
+            },
+          },
+        },
+        {
+          urlPattern: /^https:\/\/fonts.gstatic.com\/.*/i,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'gstatic-fonts-cache',
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 60 * 60 * 24 * 365, // <== 365 days
+            },
+            cacheableResponse: {
+              statuses: [0, 200],
+            },
+          },
+        },
+      ],
+    },
+    registerWebManifestInRouteRules: true,
+    writePlugin: true,
+    devOptions: {
+      enabled: false,
+    },
+
   },
   imports: {
     dirs: ['./stores'],
