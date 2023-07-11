@@ -11,16 +11,17 @@ export const useMainStore = defineStore('main', {
   // optional actions
 
   actions: {
-    async checkTelegramId(client: any) {
-      if (client.telegram && !client.telegramUserId)
-        console.log('no telegram id')
+    checkTelegramId() {
+      if (this.client.telegram && !this.client.telegramUserId)
+        return false
+      else
+        return true
     },
     async getClient() {
       const { data } = await useFetch('/api/user/client', {
         headers: useRequestHeaders(['cookie']) as HeadersInit,
       })
       const client = data.value?.client
-      this.checkTelegramId(client)
       this.setClient(client as object)
     },
 

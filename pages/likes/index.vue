@@ -44,11 +44,30 @@ onMounted(() => {
       </NuxtLink>
     </div>
     <div v-if="review_likes.length">
-      <DataTable v-if="width > 1024" class="bg-base-200 hidden lg:block" :value="review_likes">
+      <DataTable v-if="width > 1024" class="bg-base-200 hidden lg:block overflow-visible" :value="review_likes">
         <Column field="place" header="№" />
         <Column field="image" header="Фото">
           <template #body="{ data }">
-            <nuxt-img width="32" class="rounded-lg object-contain" :src="data.image" loading="lazy" />
+            <div
+              style="width: 28px; height: 36px; overflow: visible; position: relative; border-radius: 4px"
+            >
+              <div class="dropdown dropdown-hover">
+                <label tabindex="0"> <nuxt-img
+                  class="rounded-lg" loading="lazy" fit="fill"
+                  :src="data.image"
+                />
+                </label>
+                <ul
+                  tabindex="0"
+                  class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52 z-2"
+                >
+                  <nuxt-img
+                    class="rounded-lg z-5" loading="lazy" fit="fill"
+                    :src="data.image"
+                  />
+                </ul>
+              </div>
+            </div>
           </template>
         </Column>
         <Column field="article" header="Артикул">
@@ -187,4 +206,8 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped></style>
+<style>
+.p-datatable-wrapper {
+  @apply overflow-visible !important
+}
+</style>

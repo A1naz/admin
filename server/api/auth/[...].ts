@@ -51,7 +51,7 @@ export default NuxtAuthHandler({
         delete user.csrfToken
         delete user.redirect
         delete user.json
-
+        console.log(user)
         const valid = checkSignature(runtimeConfig.BOT_TOKEN, user)
 
         if (!valid)

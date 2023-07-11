@@ -34,9 +34,13 @@ export default eventHandler(async (event) => {
         message: 'Привяжите email, чтобы отвязать Telegram',
       })
     }
-    user.telegramUnlinkEmailSend = undefined
-    user.telegram = undefined
-    await user.save()
+    const newUser = {
+      ...user,
+      telegramUnlinkEmailSend: undefined,
+      telegram: undefined,
+      telegramUserId: undefined,
+    }
+    await user.updateOne(newUser)
 
     return sendRedirect(event, '/profile', 302)
   }
