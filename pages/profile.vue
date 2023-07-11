@@ -150,7 +150,7 @@ async function unlinkTelegram() {
   }
   else {
     alert.show = true
-    alert.message = 'Письмо для подтверждения было отправлено на указанный email'
+    alert.message = 'Письмо для подтверждения было отправлено на указанный email. (Проверьте папку Спам)'
     alert.type = 'success'
   }
   start()
