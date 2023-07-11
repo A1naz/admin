@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
   if (user.telegramUnlinkEmailSend) {
     const dateSend = new Date(user.telegramUnlinkEmailSend)
-    if (Date.now() - dateSend.getTime() < 1000 * 60 * 10) {
+    if (Date.now() - dateSend.getTime() < 1000 * 60) {
       throw createError({
         statusCode: 400,
         message: 'Письмо для отвязки уже было отправлено',
