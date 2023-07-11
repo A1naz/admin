@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { useNotification } from '@kyvg/vue3-notification'
-import { SwipeDirection } from '@vueuse/core'
 import { useMainStore } from '@/stores/main'
 
 const { notify } = useNotification()
@@ -18,16 +17,6 @@ if (status.value === 'authenticated')
 
 const app = ref()
 
-const { isSwiping, direction, coordsStart } = useSwipe(app, {
-  threshold: 50,
-})
-
-watch(isSwiping, (val) => {
-  if (!val)
-    return
-  if (direction.value === SwipeDirection.RIGHT && coordsStart.x < app.value.offsetWidth / 2)
-    store.drawerOpened = true
-})
 watch(client, (newClient) => {
   store.setClient(newClient?.client as object)
 })
@@ -56,8 +45,10 @@ watch(client, (newClient) => {
 </template>
 
 <style lang="css">
-@import '~~/assets/style/datepicker.css';
-
+@import '@/assets/style/datepicker.css';
+.scroll-primary {
+  @apply scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin
+}
 body {
   overflow: hidden;
   @apply scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin

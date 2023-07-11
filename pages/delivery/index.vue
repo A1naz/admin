@@ -85,7 +85,6 @@ watch(targetIsVisible, async (isVisible) => {
         limit: 50,
         skip: skip.value,
       },
-      headers: useRequestHeaders(['cookie']) as HeadersInit,
     })
     if ((data.value as any)?.length === 0) {
       end.value = true
@@ -105,7 +104,6 @@ watch(() => status.value, async (newRoute) => {
       status: status.value ?? 'all',
       limit: 50,
     },
-    headers: useRequestHeaders(['cookie']) as HeadersInit,
   })
   deliveries.value = data.value
 }, { deep: true, immediate: true })

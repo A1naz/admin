@@ -21,32 +21,10 @@ async function logout() {
   })
   store.setClient({})
 }
-function getBreadcrumbs() {
-  const route = useRoute()
-
-  const pathArray = route.path.split('/')
-  pathArray.shift()
-  const breadcrumbs = pathArray.reduce((breadcrumbArray: any, path: string, idx: number) => {
-    const currPath = breadcrumbArray[idx - 1]
-      ? `${breadcrumbArray[idx - 1].to}/${path}`
-      : `/${path}`
-    breadcrumbArray.push({
-      to: breadcrumbArray[idx - 1]
-        ? `${breadcrumbArray[idx - 1].to}/${path}`
-        : `/${path}`,
-      title: useRouter().resolve(currPath).meta.title,
-    })
-    return breadcrumbArray
-  }, [])
-  return breadcrumbs
-}
 
 onMounted(() => {
   theme.value = localStorage.getItem('theme') || 'light'
 })
-
-const breadcrumbs = computed(() => getBreadcrumbs())
-const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path === '/paymenthistory' || route.path === '/reports'))
 </script>
 
 <template>
@@ -72,11 +50,11 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
       <!-- Page content here -->
       <slot />
     </div>
-    <div class="drawer-side ">
+    <div class="drawer-side z-30 shadow-sm">
       <label for="my-drawer" class="drawer-overlay" />
-      <ul class="menu w-72 h-full bg-base-200 text-base-content flex-nowrap">
+      <ul class="menu w-72 h-full bg-base-200 text-base-content flex-nowrap overflow-auto scrollbar-none">
         <!-- Sidebar content here -->
-        <div class="hidden title w-full justify-center p-2 lg:flex">
+        <div class="hidden title w-full justify-center p-2 xl:flex">
           <Logo />
         </div>
         <div class="card m-4 mx-4 bg-neutral-focus text-neutral-content">
@@ -140,7 +118,7 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
         <SidebarItem icon="fluent:document-bullet-list-24-filled" title="Отчеты по выкупам" href="/reports" />
 
         <div class="mt-auto">
-          <div class="w-full  hover:cursor-default p-0 block">
+          <div class="w-full  hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between  w-full items-center p-0 m-0">
               <div
                 class="join-item btn btn-ghost gap-2 flex justify-center items-center normal-case w-[80%] hover:cursor-pointer rounded-lg p-0 m-0"

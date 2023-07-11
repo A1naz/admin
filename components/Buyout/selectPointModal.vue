@@ -36,99 +36,101 @@ const settings = {
   debug: false, // Режим отладки
   version: '2.1', // Версия Я.Карт
 }
+const error = ref()
 
 onMounted(async () => {
-  loading.value = true
-  await loadYmap(settings)
-  await ymaps.ready
-  const myMap = new ymaps.Map('ymap', {
-    center: [55.76, 37.64],
-    zoom: 7,
-    controls: [],
-  })
-  map.value = myMap
-  const searchControl = new ymaps.control.SearchControl({
-    options: {
-      provider: 'yandex#map',
-      noPlacemark: false,
-    },
-  })
-  searchControl.events.add('resultselect', (event: any) => {
-    if (!event.get('skip') && searchControl.getResultsCount()) {
-      const geoObjectsArray = searchControl.getResultsArray()
-      geoObjectsArray.forEach(
-        (marker: any) => {
-          marker.options.set({
-            hasBalloon: false,
-            preset: 'islands#violetDotIconWithCaption',
-            iconOffset: [0, -25],
+  try {
+    loading.value = true
+    await loadYmap(settings)
+    await ymaps.ready
+    const myMap = new ymaps.Map('ymap', {
+      center: [55.76, 37.64],
+      zoom: 7,
+      controls: [],
+    })
+    map.value = myMap
+    const searchControl = new ymaps.control.SearchControl({
+      options: {
+        provider: 'yandex#map',
+        noPlacemark: false,
+      },
+    })
+    searchControl.events.add('resultselect', (event: any) => {
+      if (!event.get('skip') && searchControl.getResultsCount()) {
+        const geoObjectsArray = searchControl.getResultsArray()
+        geoObjectsArray.forEach(
+          (marker: any) => {
+            marker.options.set({
+              hasBalloon: false,
+              preset: 'islands#violetDotIconWithCaption',
+              iconOffset: [0, -25],
 
-          })
-          marker.properties.set({
-            iconCaption: marker.properties._data.name,
-          })
-        },
-      )
-    }
-  })
-  myMap.controls.add(searchControl)
-  myMap.setBounds(originalBounds.value)
-  const objectManager = new ymaps.ObjectManager({
-    // Включаем кластеризацию.
-    clusterize: true,
-    // Опции кластеров задаются с префиксом 'cluster'.
-    clusterHasBalloon: false,
-    // Опции геообъектов задаются с префиксом 'geoObject'.
-    geoObjectOpenBalloonOnClick: false,
-  })
-
-  // Опции можно задавать напрямую в дочерние коллекции.
-  objectManager.clusters.options.set({
-    preset: presetCluster,
-    hintContentLayout: ymaps.templateLayoutFactory.createClass('Группа объектов'),
-  })
-  const iconLayout = ymaps.templateLayoutFactory.createClass('<div>$[properties.iconContent]</div>')
-  const collection = {
-    type: 'FeatureCollection',
-    features: props.pickpoints.map((point: any, index: number) => {
-      return {
-        type: 'Feature',
-        id: index,
-        geometry: {
-          type: 'Point',
-          coordinates: [point.lt, point.lg],
-          radius: 1000,
-        },
-        properties: {
-          iconContent: 'WB',
-          data: {
-            a: point.a,
-            w: point.w,
+            })
+            marker.properties.set({
+              iconCaption: marker.properties._data.name,
+            })
           },
-        },
-        options: {
-          iconColor: '#8d297f',
-          iconLayout: 'default#image',
-          iconImageHref: '/img/pin-map.svg',
-          iconimageoffset: [-5, -38],
-          iconImageSize: [32, 32],
-          iconOffset: [0, 0],
-          iconShadow: true,
-        },
+        )
       }
-    }),
-  }
+    })
+    myMap.controls.add(searchControl)
+    myMap.setBounds(originalBounds.value)
+    const objectManager = new ymaps.ObjectManager({
+    // Включаем кластеризацию.
+      clusterize: true,
+      // Опции кластеров задаются с префиксом 'cluster'.
+      clusterHasBalloon: false,
+      // Опции геообъектов задаются с префиксом 'geoObject'.
+      geoObjectOpenBalloonOnClick: false,
+    })
 
-  objectManager.add(collection)
+    // Опции можно задавать напрямую в дочерние коллекции.
+    objectManager.clusters.options.set({
+      preset: presetCluster,
+      hintContentLayout: ymaps.templateLayoutFactory.createClass('Группа объектов'),
+    })
+    const iconLayout = ymaps.templateLayoutFactory.createClass('<div>$[properties.iconContent]</div>')
+    const collection = {
+      type: 'FeatureCollection',
+      features: props.pickpoints.map((point: any, index: number) => {
+        return {
+          type: 'Feature',
+          id: index,
+          geometry: {
+            type: 'Point',
+            coordinates: [point.lt, point.lg],
+            radius: 1000,
+          },
+          properties: {
+            iconContent: 'WB',
+            data: {
+              a: point.a,
+              w: point.w,
+            },
+          },
+          options: {
+            iconColor: '#8d297f',
+            iconLayout: 'default#image',
+            iconImageHref: '/img/pin-map.svg',
+            iconimageoffset: [-5, -38],
+            iconImageSize: [32, 32],
+            iconOffset: [0, 0],
+            iconShadow: true,
+          },
+        }
+      }),
+    }
 
-  // Добавляем коллекцию на карту.
-  myMap.geoObjects.add(objectManager)
+    objectManager.add(collection)
 
-  objectManager.objects.events.add('click', (e: any) => {
-    const objectId = e.get('objectId')
-    const obj = objectManager.objects.getById(objectId)
+    // Добавляем коллекцию на карту.
+    myMap.geoObjects.add(objectManager)
 
-    const myBalloonContentLayout = ymaps.templateLayoutFactory.createClass(
+    objectManager.objects.events.add('click', (e: any) => {
+      const objectId = e.get('objectId')
+      const obj = objectManager.objects.getById(objectId)
+
+      const myBalloonContentLayout = ymaps.templateLayoutFactory.createClass(
       `<div class="card rounded-lg">
           <div>
             <div class="text-lg font-semibold">Пункт выдачи Wildberries</div>
@@ -151,20 +153,27 @@ onMounted(async () => {
           handleSelect(obj.properties.data.a)
         },
       },
-    )
-    // set this layout as a custom balloon content layout
-    objectManager.objects.setObjectOptions(objectId, {
-      balloonContentLayout: myBalloonContentLayout,
-      balloonPanelMaxMapArea: 0,
+      )
+      // set this layout as a custom balloon content layout
+      objectManager.objects.setObjectOptions(objectId, {
+        balloonContentLayout: myBalloonContentLayout,
+        balloonPanelMaxMapArea: 0,
+      })
+      objectManager.objects.balloon.open(objectId)
     })
-    objectManager.objects.balloon.open(objectId)
-  })
-  // создаем кастомный балун
-  objectManager.objects.events.add('balloonopen', (e: any) => {
-    const objectId = e.get('objectId')
-    const geoObject = objectManager.objects.getById(objectId)
-  })
-  loading.value = false
+    // создаем кастомный балун
+    objectManager.objects.events.add('balloonopen', (e: any) => {
+      const objectId = e.get('objectId')
+      const geoObject = objectManager.objects.getById(objectId)
+    })
+    loading.value = false
+  }
+  catch (e) {
+    loading.value = false
+    // eslint-disable-next-line no-console
+    console.log(e)
+    error.value = 'Не удалось загрузить карту'
+  }
 })
 </script>
 
@@ -183,7 +192,10 @@ onMounted(async () => {
         <div v-if="loading" class="loading flex justify-center items-center h-full">
           <Icon class="animate-spin" size="60" name="mdi:loading" />
         </div>
-        <div class="w-full h-full">
+        <div v-if="error" class="text-lg text-center text-error flex items-center justify-center h-full">
+          {{ error }}
+        </div>
+        <div v-if="!error" class="w-full h-full">
           <div id="ymap" class="yandex-container" />
         </div>
       </div>

@@ -1,7 +1,9 @@
 <script setup lang="tsx">
 import { useNotification } from '@kyvg/vue3-notification'
 import { useWindowSize } from '@vueuse/core'
-import { useMainStore } from '~~/stores/main'
+import { useMainStore } from '@/stores/main'
+import type { Rule } from '@/data/buyout/rules'
+import { rules } from '@/data/buyout/rules'
 
 const { $dayjs } = useNuxtApp()
 const currency = useCurrency()
@@ -9,20 +11,12 @@ const currency = useCurrency()
 const { width, height } = useWindowSize()
 const { notify } = useNotification()
 const disabledCreateButton = ref(false)
-const dp = ref()
-const headers = useRequestHeaders(['cookie']) as HeadersInit
 definePageMeta({
   layout: 'app',
   auth: true,
   title: 'Добавить выкупы',
 })
 const selectPointModal = ref() as Ref<HTMLElement>
-interface Rule {
-  id: number
-  description: string
-  category: number
-  relies?: number
-}
 interface Item {
   image: string
   name: string
@@ -39,34 +33,21 @@ interface Item {
   rules: Rule[]
 }
 
-const defaultRules: Rule[] = [{ id: 1, description: 'Добавление 1 артикула конкурентов в корзину во время выкупа', category: 1 },
-  { id: 2, description: 'Добавление 2 артикулов конкурентов в корзину во время выкупа', category: 1 },
-  { id: 3, description: 'Добавление 3 артикулов конкурентов в корзину во время выкупа', category: 1 },
-  { id: 4, description: 'Находиться в карточке товара не менее 60 секунд, изучать карточку', category: 2 },
-  { id: 5, description: 'Не выкупать если товар не найден в поисковой выдаче (не выкупать по прямой ссылке)', category: 3 },
-  { id: 6, description: 'Выкупать только по будням, не выкупать в выходные дни', category: 4 },
-  { id: 7, description: 'Выкупать только в выходные дни, не выкупать по будням', category: 4 },
-  { id: 8, description: 'Выкупать только с рекламы, если реклама не найдена - не выкупать', category: 5 },
-  { id: 9, description: 'Выкупать с рекламы, если реклама не найдена - выкупать с поиска', category: 5 },
-  { id: 10, description: 'Использовать сортировку в поиске - по популярности', category: 6, relies: 8 },
-  { id: 11, description: 'Использовать сортировку в поиске - по возрастанию цены', category: 6, relies: 8 },
-  { id: 12, description: 'Использовать сортировку в поиске - по убыванию цены', category: 6, relies: 8 },
-  { id: 13, description: 'Использовать сортировку в поиске - по новинкам', category: 6, relies: 8 },
-  { id: 14, description: 'Использовать сортировку в поиске - сначала выгодные', category: 6, relies: 8 },
-  { id: 15, description: 'Использовать сортировку в поиске - по рейтингу', category: 6, relies: 8 },
-]
+const defaultRules: Rule[] = rules
 const route = useRoute()
 const store = useMainStore()
 const article = ref('')
 const products = ref<Item[]>([])
 const loading = ref(false)
 const now = useNow()
+
 const startDate = new Date(now.value)
 const endDate = new Date(now.value)
 startDate.setHours(9, 0)
 endDate.setHours(20, 0)
+
 async function addProduct() {
-  if (article.value === '')
+  if (!article.value)
     return
 
   loading.value = true
@@ -101,6 +82,27 @@ async function addProduct() {
   }))
 }
 
+function removeSearchQuery(index: number, place: number) {
+  products.value[index].searchQuery.splice(place, 1)
+}
+
+function addSearchQuery(index: number) {
+  products.value[index].searchQuery.push('')
+}
+
+function onDateRangeChange(value: unknown[], index: number) {
+  products.value[index].dateRange = value as [Date | null, Date | null]
+}
+interface ISearchQueryChange { value: string; queryIndex: number; productIndex: number }
+
+function onSearchQueryChange(options: ISearchQueryChange) {
+  products.value[options.productIndex].searchQuery[options.queryIndex] = options.value
+}
+
+function onQuantityChange(value: number, index: number) {
+  products.value[index].quantity = value
+}
+
 function onSizeChange(event: Event, index: number) {
   const target = event.target as HTMLInputElement
   products.value[index].selectedSize = target.value
@@ -128,6 +130,7 @@ function onRuleChange(event: Event, index: number, rule: number) {
   }
   else { rules.splice(rules.indexOf(finded), 1) }
 }
+
 function removeProduct(index: number) {
   products.value.splice(index, 1)
 }
@@ -195,14 +198,15 @@ async function createBuyout() {
       type: 'error',
       duration: 3000,
     })
-    return
   }
-  notify({
-    title: 'Выкуп успешно создан',
-    type: 'success',
-    duration: 3000,
-  })
-  navigateTo('/buyouts')
+  else if (data.value!.status === 'ok') {
+    notify({
+      title: 'Выкуп успешно создан',
+      type: 'success',
+      duration: 3000,
+    })
+    navigateTo('/buyouts')
+  }
 }
 
 watch(products.value, (old, value) => {
@@ -219,7 +223,6 @@ async function getPickpoints() {
   try {
     const data = await $fetch('/api/buyout/pickpoints', {
       method: 'GET',
-      headers,
     })
     pickpoints.value = (data as any).points
     loading.value = false
@@ -241,6 +244,7 @@ async function pointModalOpen(index: number) {
   store.selectedItem = index
   modalOpen.value = true
 }
+
 onMounted(async () => {
   getPickpoints()
   if (route.query.uuid) {
@@ -250,7 +254,6 @@ onMounted(async () => {
         uuid: route.query.uuid,
       },
       method: 'GET',
-      headers,
     })
     if (error.value) {
       notify({
@@ -298,12 +301,13 @@ onMounted(async () => {
         <BuyoutCreateCard
           v-for="(product, index) in products" :key="index" :loading="!pickpoints?.length"
           :product="product" :index="index" @point-modal-open="pointModalOpen" @remove="removeProduct"
-          @change-sex="onSexChange" @change-size="onSizeChange"
+          @update-sex="onSexChange" @update-size="onSizeChange" @update-date-range="onDateRangeChange"
+          @add-search-query="addSearchQuery" @remove-search-query="removeSearchQuery" @update-search-query="onSearchQueryChange"
+          @update-quantity="onQuantityChange"
         />
       </div>
       <div v-else class="products-table scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
         <table class="table table-compact w-full mt-4">
-          <!-- head -->
           <thead class="relative mb-2">
             <tr>
               <th class="">
@@ -347,187 +351,13 @@ onMounted(async () => {
           </thead>
 
           <tbody>
-            <tr v-for="(product, index) in products" :key="product.article">
-              <td>
-                {{ index + 1 }}
-              </td>
-              <td>
-                <div
-                  style="width: 28px; height: 36px; overflow: visible; position: relative; border-radius: 4px"
-                >
-                  <div class="dropdown dropdown-hover">
-                    <label tabindex="0"> <nuxt-img
-                      class="rounded-lg" loading="lazy" fit="fill"
-                      :src="product.image"
-                    />
-                    </label>
-                    <ul
-                      tabindex="0"
-                      class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52"
-                    >
-                      <nuxt-img
-                        class="rounded-lg" loading="lazy" fit="fill"
-                        :src="product.image"
-                      />
-                    </ul>
-                  </div>
-                </div>
-              </td>
-              <td class="">
-                <div class="w-48 truncate">
-                  <div class="text-sm font-medium truncate">
-                    {{ product.name }}
-                  </div>
-                  <a
-                    :href="`https://www.wildberries.ru/catalog/${product.article}/detail.aspx`"
-                    target="_blank" class="text-sm text-secondary link link-hover"
-                  >
-                    {{ product.article }}
-                  </a>
-                </div>
-              </td>
-              <td>
-                <div class="text-sm">
-                  {{ product.priceText }}
-                </div>
-              </td>
-              <td>
-                <div class="relative flex items-center flex-grow-0 w-full">
-                  <div
-                    class="absolute left-0 btn btn-ghost btn-sm btn-square"
-                    @click="product.quantity--"
-                  >
-                    <IconCSS size="16" name="ic:round-minus" />
-                  </div>
-                  <input
-                    v-model="product.quantity" type="number" min="1" max="1000"
-                    class="input input-bordered input-sm w-full text-center"
-                  >
-                  <div
-                    class="absolute right-0 btn btn-ghost btn-sm btn-square"
-                    @click="product.quantity++"
-                  >
-                    <IconCSS size="16" name="ic:round-plus" />
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="w-20 2xl:w-full flex items-center">
-                  <select
-                    v-if="product.sizes.length" class="select select-sm select-bordered w-full"
-                    @change="onSizeChange($event, index)"
-                  >
-                    <option
-                      v-for="size in product.sizes" :key="size"
-                      :selected="product.selectedSize === size" :value="size"
-                    >
-                      {{ size }}
-                    </option>
-                  </select>
-                  <div v-else class="text-sm text-center ml-2">
-                    Нет
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="w-20 2xl:w-full">
-                  <select
-                    class="select select-sm select-bordered w-full appearance-none"
-                    @change="onSexChange($event, index)"
-                  >
-                    <option value="none">
-                      Нет
-                    </option>
-                    <option value="male">
-                      Муж
-                    </option>
-                    <option value="female">
-                      Жен
-                    </option>
-                  </select>
-                </div>
-              </td>
-              <td>
-                <div class="w-full flex flex-col gap-2">
-                  <div
-                    v-for="(query, index) of product.searchQuery"
-                    :key="index" class="relative flex items-center flex-grow-0 w-full"
-                  >
-                    <input
-                      v-model="product.searchQuery[index]" type="text" placeholder="Поисковый запрос"
-                      class="input input-bordered input-sm w-full pr-8"
-                    >
-                    <div
-                      v-if="index === 0"
-                      class="absolute right-0 btn btn-ghost btn-sm btn-square"
-                      @click="product.searchQuery.push('')"
-                    >
-                      <IconCSS size="16" name="ic:round-plus" />
-                    </div>
-                    <div
-                      v-if="index !== 0"
-                      class="absolute right-0 btn btn-ghost btn-sm btn-square"
-                      @click="product.searchQuery.splice(index, 1)"
-                    >
-                      <IconCSS size="16" name="material-symbols:close" />
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td class="break-all">
-                <div class="w-full flex flex-col items-start justify-center gap-1 flex-wrap overflow-hidden">
-                  <div v-if="product.adress" class="text-xs mb-1 h-10 w-40 break-all">
-                    <p class="break-all whitespace-normal">
-                      {{ product.adress }}
-                    </p>
-                  </div>
-                  <button
-                    :disabled="!pickpoints" :class="{
-                      'btn-outline': product.adress,
-                      'disabled': !pickpoints,
-                    }" class="btn btn-primary btn-sm normal-case w-full" @click="pointModalOpen(index)"
-                  >
-                    <span v-show="!pickpoints" class="loading loading-spinner" />
-
-                    {{ product.adress
-                      ? 'Изменить' : 'Добавить' }}
-                  </button>
-                </div>
-              </td>
-              <td>
-                <div class="flex items-center">
-                  <div class="w-full">
-                    <div v-show="product.dateRange[1] && product.dateRange[0]" class="text-sm flex flex-col justify-center items-start mb-2">
-                      <div>
-                        {{ `С ${$dayjs(product.dateRange[0]).format('D MMMM HH:mm')}` }}
-                      </div>
-                      <div> {{ `По ${$dayjs(product.dateRange[1]).format('D MMMM HH:mm')}` }}</div>
-                    </div>
-                    <BuyoutDateRangePicker v-model="product.dateRange" :start-date="startDate" />
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="w-full flex justify-between">
-                  <div>
-                    <div class="mb-2">
-                      {{ product.rules.map(rule => rule.id).join(', ') }}
-                    </div>
-                    <label
-                      :for="`modal${index}`" :class="{
-                        'btn-outline': product.rules,
-                      }" class="btn btn-primary btn-sm normal-case "
-                    >{{ 'Настроить' }}
-                    </label>
-                  </div>
-                  <div class="ml-2 w-8 btn btn-ghost btn-sm btn-square" @click="removeProduct(index)">
-                    <IconCSS name="material-symbols:close" size="20" />
-                  </div>
-                </div>
-              </td>
-            </tr>
+            <BuyoutCreateTableRow
+              v-for="(product, index) in products" :key="index" :product="product" :index="index" :loading="!pickpoints?.length" @point-modal-open="pointModalOpen" @remove="removeProduct"
+              @update-sex="onSexChange" @update-size="onSizeChange" @update-date-range="onDateRangeChange"
+              @add-search-query="addSearchQuery" @remove-search-query="removeSearchQuery" @update-search-query="onSearchQueryChange"
+              @update-quantity="onQuantityChange"
+            />
           </tbody>
-          <!-- foot -->
         </table>
       </div>
       <BuyoutSelectPointModal
@@ -552,7 +382,7 @@ onMounted(async () => {
                             выкупы` : `Создать выкуп` }}
       </button>
     </div>
-
+    <!-- refactor this -->
     <div v-for="(product, index) of products" :key="index">
       <input :id="`modal${index}`" type="checkbox" class="modal-toggle">
       <label :for="`modal${index}`" class="modal modal-bottom sm:modal-middle">

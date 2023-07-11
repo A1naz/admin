@@ -18,12 +18,6 @@ MMuZOWZLsxF42gfXkhj5SrqBz6Mer/OGtX7+iZvFSOwZ4Ig59N5W7r7Bddm63K29
 kQw5Z56jTqeAxdfH3kECQQCjCN6JxlOSzyuNUcrOek+QMYeKbvopznUnSdD/qk1m
 2WYMGlLcIaWuQ5OqzCxfYHkCBnGaD/Mr6tCDKnseVYAs
 -----END RSA PRIVATE KEY-----`
-const publicKey = `-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCdu4HtswyNnv/YnDSoWLQSjWAL
-OVzzGtQIxZhG6Ke7TO77/ywigEjxR6JIPDQb/AQ9cfoRtZad4WL2dHfu82KtMgzh
-c0CO1vY5bdEWveY/X0HGuGzGsZj1oUeVMe4AY9CA9FyBa/tHsRp0DPlyZBFerEhK
-gUFDuBvM7shMbrF3bQIDAQAB
------END PUBLIC KEY-----`
 class MailService {
   transporter: nodemailer.Transporter
   constructor() {

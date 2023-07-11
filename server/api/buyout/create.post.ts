@@ -1,15 +1,10 @@
 import { v4 as uuid } from 'uuid'
+import type { Rule } from '@/data/buyout/rules'
 import { Buyout } from '@/server/lib/models/Buyout'
 import { getServerSession } from '#auth'
 import { User } from '~~/server/lib/models/User'
 import getPickpoints from '~/server/lib/getPickpoints'
 
-interface Rule {
-  id: number
-  description: string
-  category: number
-  relies?: number
-}
 interface Item {
   image: string
   name: string

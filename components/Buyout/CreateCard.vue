@@ -15,26 +15,59 @@ const props = defineProps({
   },
 
 })
-const emit = defineEmits(['callback', 'remove', 'changeSize', 'changeSex', 'pointModalOpen'])
-const { $dayjs } = useNuxtApp()
-const router = useRouter()
+const emit = defineEmits(['callback', 'remove', 'updateSize', 'updateSex', 'updateDateRange', 'pointModalOpen', 'updateSearchQuery', 'addSearchQuery', 'removeSearchQuery', 'updateQuantity'])
+
 const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 
 async function deleteBuyOut() {
   emit('remove', props.index)
 }
 function onSizeChange(event: Event) {
-  emit('changeSize',
+  emit('updateSize',
     event,
     props.index,
   )
 }
 function onSexChange(event: Event) {
-  emit('changeSex',
+  emit('updateSex',
     event,
     props.index,
   )
 }
+
+function removeSearchQuery(index: number) {
+  emit('removeSearchQuery', props.index, index)
+}
+function addSearchQuery() {
+  emit('addSearchQuery', props.index)
+}
+function productSearchQueryUpdate(event: Event, index: number) {
+  const newValue = (event.target as HTMLInputElement).value
+  emit('updateSearchQuery',
+    {
+      value: newValue,
+      queryIndex: props.index,
+      productIndex: index,
+    },
+  )
+}
+const productDateRangeModel = computed({
+  get() {
+    return props.product.dateRange
+  },
+  set(newValue: unknown[]) {
+    emit('updateDateRange', newValue, props.index)
+  },
+})
+
+const productQuantityModel = computed({
+  get() {
+    return props.product.quantity
+  },
+  set(newValue: number) {
+    emit('updateQuantity', newValue, props.index)
+  },
+})
 </script>
 
 <template>
@@ -60,7 +93,7 @@ function onSexChange(event: Event) {
       </div>
       <div class="flex justify-between items-center mt-2">
         <span>Даты выкупов: </span>
-        <BuyoutDateRangePicker v-model="product.dateRange" class="w-32" :start-date="startDate" />
+        <BuyoutDateRangePicker v-model="productDateRangeModel" class="w-32" :start-date="startDate" />
       </div>
       <div class="flex justify-between items-center">
         <span>Пол:</span>
@@ -112,20 +145,20 @@ function onSexChange(event: Event) {
             :key="index" class="relative flex items-center flex-grow-0 w-full"
           >
             <input
-              v-model="product.searchQuery[index]" type="text" placeholder="Поисковый запрос"
-              class="input input-bordered input-sm w-full pr-8"
+              :value="query" type="text" placeholder="Поисковый запрос" class="input input-bordered input-sm w-full pr-8"
+              @change="productSearchQueryUpdate($event, index)"
             >
             <div
               v-if="index === 0"
               class="absolute right-0 btn btn-ghost btn-sm btn-square"
-              @click="product.searchQuery.push('')"
+              @click="addSearchQuery"
             >
               <IconCSS size="16" name="ic:round-plus" />
             </div>
             <div
-              v-if="index !== 0"
+              v-else
               class="absolute right-0 btn btn-ghost btn-sm btn-square"
-              @click="product.searchQuery.splice(index, 1)"
+              @click="removeSearchQuery(index)"
             >
               <IconCSS size="16" name="material-symbols:close" />
             </div>
@@ -162,17 +195,15 @@ function onSexChange(event: Event) {
           <div>
             <span class="text-sm text-gray-500">Количество: </span>
             <span class="relative flex items-center flex-grow-0 w-20 m-1">
-              <div class="absolute left-0 btn btn-ghost btn-sm btn-square" @click="product.quantity--">
-
+              <div class="absolute left-0 btn btn-ghost btn-sm btn-square" @click="productQuantityModel--">
                 <IconCSS size="16" name="ic:round-minus" />
               </div>
               <input
-                v-model="product.quantity" type="number" min="1" max="1000"
+                v-model="productQuantityModel" type="number" min="1" max="1000"
                 class="input input-bordered input-sm w-full text-center"
               >
-              <div class="absolute right-0 btn btn-ghost btn-sm btn-square" @click="product.quantity++">
+              <div class="absolute right-0 btn btn-ghost btn-sm btn-square" @click="productQuantityModel++">
                 <IconCSS size="16" name="ic:round-plus" />
-
               </div>
             </span>
           </div>
