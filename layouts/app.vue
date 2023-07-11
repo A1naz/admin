@@ -52,7 +52,7 @@ const noBreadcrumbs = computed(() => !(route.path === '/profile' || route.path =
 <template>
   <div class="drawer lg:drawer-open z-10">
     <input id="my-drawer" type="checkbox" class="drawer-toggle">
-    <div class="drawer-content w-full overflow-visible px-4 py-2 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
+    <div class="drawer-content w-full overflow-auto h-[100vh] px-4 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
       <div class="w-full navbar bg-base-100 lg:hidden">
         <div class="flex-none">
           <label for="my-drawer" class="btn btn-square btn-ghost drawer-button">

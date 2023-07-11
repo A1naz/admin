@@ -27,14 +27,14 @@ watch(() => props.state, (newState) => {
 </script>
 
 <template>
-  <div class="collapse collapse-arrow border border-base-100 bg-base-200 rounded-box z-0 overflow-visible">
+  <div class="collapse collapse-arrow border border-base-100 bg-base-200 rounded-box z-0 overflow-hidden max-w-[95vw]">
     <input v-model="opened" type="checkbox">
     <div class="collapse-title relative text-xl font-medium">
       <div class="flex gap-4">
         <nuxt-img
-          fit="fill" :src="info?.productimage" width="36"
+          fit="contain" :src="info?.productimage" width="36"
           loading="lazy"
-          class="rounded-lg transition-opacity ease-in-out duration-200"
+          class="rounded-lg transition-opacity ease-in-out duration-200 hidden lg:block"
         />
         <div class="w-full">
           <div class="flex justify-between flex-wrap">
@@ -60,8 +60,8 @@ watch(() => props.state, (newState) => {
         </div>
       </div>
     </div>
-    <div class="collapse-content overflow-visible">
-      <div class="product flex gap-4 lg:gap-8 items-center flex-wrap overflow-visible">
+    <div class="collapse-content overflow-hidden">
+      <div class="product flex gap-4 lg:gap-8 items-center flex-wrap overflow-hidden">
         <div>
           <div class="text-sm text-gray-500">
             Артикул
@@ -107,12 +107,10 @@ watch(() => props.state, (newState) => {
             Адрес:
           </div>
           <a
-            target="_blank" class="text-secondary link link-hover w-76 truncate"
+            target="_blank" class="text-secondary link link-hover w-52 lg:w-76 truncate overflow-hidden"
             :href="`https://yandex.ru/maps/?mode=search&text=${info.point}`"
           >
-            <p class="break-all">
-              {{ info.point }}
-            </p>
+            {{ info.point }}
           </a>
         </div>
         <div>

@@ -113,7 +113,7 @@ watch(() => status.value, async (newRoute) => {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mt-1">
+    <h1 class="text-2xl font-bold mt-4">
       Доставки
     </h1>
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
@@ -121,7 +121,7 @@ watch(() => status.value, async (newRoute) => {
       забирать из пункта выдачи.
     </p>
 
-    <div class="flex justify-between mb-8 mt-6 items-center">
+    <div class="flex justify-between mb-8 mt-6 items-center flex-wrap gap-4">
       <select class="select select-bordered select-sm" @change="selectStatus">
         <option value="all" :selected="route.query.status === undefined">
           Все доставки
@@ -167,15 +167,7 @@ watch(() => status.value, async (newRoute) => {
       </TransitionSlide>
       <DeliveryQrModal v-if="modal" :code="modalInfo.code" :src="modalInfo.src" />
     </div>
-    <div v-else class="hero">
-      <div class="hero-content text-center flex justify-center items-center h-80">
-        <div class="max-w-md">
-          <h1 class="text-3xl font-bold">
-            Здесь ничего нет <Icon name="fluent-emoji:thinking-face" />
-          </h1>
-        </div>
-      </div>
-    </div>
+    <Hero v-else />
   </div>
 </template>
 

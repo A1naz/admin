@@ -28,7 +28,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mt-1">
+    <h1 class="text-2xl font-bold mt-4">
       Лайки на отзывы
     </h1>
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
@@ -194,15 +194,7 @@ onMounted(() => {
       </ul>
     </div>
 
-    <div v-else class="hero">
-      <div class="hero-content text-center flex justify-center items-center h-80">
-        <div class="max-w-md">
-          <h1 class="text-3xl font-bold">
-            Здесь ничего нет <Icon name="fluent-emoji:thinking-face" />
-          </h1>
-        </div>
-      </div>
-    </div>
+    <Hero v-else />
   </div>
 </template>
 

@@ -97,6 +97,7 @@ export default defineNuxtConfig({
     'primeicons/primeicons.css',
     '@sfxcode/formkit-primevue/dist/sass/formkit-prime-inputs.scss',
     '@sfxcode/formkit-primevue/dist/sass/formkit-primevue.scss',
+    '@vuepic/vue-datepicker/dist/main.css',
   ],
   extends: [
     'nuxt-seo-kit',
@@ -120,14 +121,11 @@ export default defineNuxtConfig({
     },
   },
   build: {
-    transpile: ['primevue'],
+    transpile: ['primevue', '@vuepic/vue-datepicker'],
   },
   primevue: {
     components: {
       include: ['DataTable', 'Column'],
-    },
-    config: {
-      ripple: true,
     },
   },
   imports: {

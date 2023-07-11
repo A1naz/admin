@@ -180,7 +180,7 @@ watch(() => status.value, async () => {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mt-1">
+    <h1 class="text-2xl font-bold mt-4">
       Выкупы
     </h1>
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
@@ -253,25 +253,19 @@ watch(() => status.value, async () => {
         </p>
       </div>
       <div v-else class="px-2 py-4 mb-2" />
-      <TransitionSlide group class="cards grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        <BuyoutCard
-          v-for="(buyout, index) of buyouts" :key="buyout.uuid" :place="buyouts.length - index"
-          :index="index" :info="buyout" @unarchive="unarchiveBuyout" @archive="archiveBuyout"
-          @open-modal="openModal" @remove="removeBuyout" @unpause="unpauseBuyout"
-        />
-      </TransitionSlide>
+      <div>
+        <TransitionSlide group class="cards grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 h-full">
+          <BuyoutCard
+            v-for="(buyout, index) of buyouts" :key="buyout.uuid" :place="buyouts.length - index"
+            :index="index" :info="buyout" @unarchive="unarchiveBuyout" @archive="archiveBuyout"
+            @open-modal="openModal" @remove="removeBuyout" @unpause="unpauseBuyout"
+          />
+        </TransitionSlide>
+      </div>
       <div ref="target" class="p-2 w-full col-span-1" />
     </div>
 
-    <div v-else class="hero">
-      <div class="hero-content text-center flex justify-center items-center h-80">
-        <div class="max-w-md">
-          <h1 class="text-3xl font-bold">
-            Здесь ничего нет <Icon name="fluent-emoji:thinking-face" />
-          </h1>
-        </div>
-      </div>
-    </div>
+    <Hero v-else />
     <BuyoutInfoModal :info="selectedBuyout" :state="modal" :index="selectedIndex" @close="modal = false" />
   </div>
 </template>

@@ -143,15 +143,7 @@ function goToPublished() {
         />
       </div>
     </div>
-    <div v-else class="hero">
-      <div class="hero-content text-center flex justify-center items-center h-80">
-        <div class="max-w-md">
-          <h1 class="text-3xl font-bold">
-            Здесь ничего нет <Icon name="fluent-emoji:thinking-face" />
-          </h1>
-        </div>
-      </div>
-    </div>
+    <Hero v-else />
     <ReviewModal
       :deliveryid="selectedDelivery"
       :state="modalOpen" :uuid="selectedUUID" @publish="goToPublished"
@@ -164,7 +156,7 @@ function goToPublished() {
     <label for="reviewImageModal" class="modal cursor-pointer">
       <label for="" class="modal-box min-w-0 max-w-5xl p-0">
         <label for="reviewImageModal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2">✕</label>
-        <nuxt-img v-if="openedPhoto" fit="contain" class="object-contain m-auto" :src="openedPhoto" loading="lazy" />
+        <nuxt-img v-if="openedPhoto" fit="contain" class="object-contain m-auto" :src="openedPhoto || ''" loading="lazy" />
       </label>
     </label>
   </div>
