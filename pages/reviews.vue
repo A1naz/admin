@@ -94,7 +94,7 @@ function goToPublished() {
 <template>
   <div>
     <div class="page-header">
-      <h1 class="title">
+      <h1 class="text-2xl font-bold mt-4">
         Отзывы
       </h1>
       <p class="description">

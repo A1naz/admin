@@ -181,7 +181,7 @@ function onTelegramLink(data: any) {
       <span>{{ warning }}</span>
     </div>
     <div class="page-header mb-16">
-      <h1 class="title">
+      <h1 class="text-2xl font-bold mt-4">
         Профиль
       </h1>
       <p class="description">
