@@ -34,17 +34,16 @@ export default eventHandler(async (event) => {
         message: 'Привяжите email, чтобы отвязать Telegram',
       })
     }
-    const newUser = {
-      ...user,
-      telegramUnlinkEmailSend: undefined,
-      telegram: undefined,
-      telegramUserId: undefined,
-    }
-    await user.updateOne(newUser)
+    user.telegramUnlinkEmailSend = undefined
+    user.telegram = undefined
+    user.telegramUserId = undefined
+
+    await user.save()
 
     return sendRedirect(event, '/profile', 302)
   }
   catch (e) {
+    console.log(e)
     return 'Token is not valid'
   }
 })

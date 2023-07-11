@@ -93,6 +93,8 @@ function getStatus(status: string) {
     return 'Завершен'
   else if (status === 'nofunds')
     return 'Недостаточно средств'
+  else
+    return status
 }
 function removeProduct() {
   productData.value = null
@@ -250,139 +252,15 @@ onMounted(() => {
     </div>
 
     <div v-if="carts.length">
-      <ClientOnly>
-        <DataTable v-if="width > 1024" class="bg-base-200 hidden lg:block" :value="carts">
-          <Column field="place" header="№" />
-          <Column field="image" header="Фото">
-            <template #body="{ data }">
-              <nuxt-img class="rounded-lg object-contain h-8" width="32" :src="data.image" loading="lazy" />
-            </template>
-          </Column>
-          <Column field="article" header="Артикул">
-            <template #body="{ data }">
-              <a
-                :href="`https://www.wildberries.ru/catalog/${data.article}/detail.aspx`" target="_blank"
-                class="text-sm text-secondary link link-hover"
-              >
-                {{ data.article }}
-              </a>
-            </template>
-          </Column>
-          <Column field="amount" header="Кол-во">
-            <template #body="{ data }">
-              <div>{{ data.amount }}</div>
-            </template>
-          </Column>
-          <Column field="query" header="Ключевой запрос">
-            <template #body="{ data }">
-              <p class="max-w-xs truncate">
-                {{ data.query }}
-              </p>
-            </template>
-          </Column>
-
-          <Column field="status" header="Статус">
-            <template #body="{ data }">
-              <div
-                :class="{
-                  'text-error': data.status === 'nofunds',
-                  'text-primary': data.status === 'created',
-                  'text-warning': data.status === 'work',
-                  'text-success': data.status === 'completed',
-                }"
-              >
-                {{ getStatus(data.status) }}
-              </div>
-            </template>
-          </Column>
-          <Column field="createdDate" header="Дата создания">
-            <template #body="{ data }">
-              <div>
-                {{ $dayjs(data.createdDate).format('D MMMM HH:mm') }}
-              </div>
-            </template>
-          </Column>
-          <Column field="endedDate" header="Дата завершения">
-            <template #body="{ data }">
-              <div v-if="data.endedDate">
-                {{ $dayjs(data.endedDate).format('D MMMM HH:mm') }}
-              </div>
-              <div v-else>
-                Нет
-              </div>
-            </template>
-          </Column>
-        </DataTable>
-        <div v-else class="cards grid grid-cols-1 gap-4 lg:hidden">
-          <div v-for="(item, index) in carts" :key="index" class="card card-compact bg-base-200 border ">
-            <div class="card-body">
-              <div class="flex gap-4">
-                <div class="image">
-                  <nuxt-img width="32" class="rounded-lg object-contain" :src="item.image" loading="lazy" />
-                </div>
-                <div class="article flex flex-col gap-0.5">
-                  <div class="text-xs">
-                    Артикул
-                  </div>
-                  <a
-                    :href="`https://www.wildberries.ru/catalog/${item.article}/detail.aspx`" target="_blank"
-                    class="text-secondary link link-hover text-sm"
-                  >
-                    {{ item.article }}
-                  </a>
-                </div>
-                <div class="status flex flex-col gap-0.5">
-                  <div class="text-xs">
-                    Статус
-                  </div>
-                  <div
-                    class="text-sm"
-                    :class="{
-                      'text-warning': item.status === 'created' || item.status === 'work',
-                      'text-success': item.status === 'completed',
-                    }"
-                  >
-                    <div>
-                      {{ getStatus(item.status) }}
-                    </div>
-                  </div>
-                </div>
-                <div class="flex flex-col gap-0.5">
-                  <div class="text-xs">
-                    Количество
-                  </div>
-                  <div class="text-sm">
-                    {{ item.amount }}
-                  </div>
-                </div>
-                <div class="date ml-auto text-xs text-end">
-                  {{ $dayjs(item.createdDate).format('D MMMM HH:mm') }}
-                </div>
-              </div>
-              <div class="card-actions justify-start mt-2">
-                <div>Дата Завершения:</div>
-                <div>
-                  <div v-if="item.endedDate">
-                    {{ $dayjs(item.endedDate).format('D MMMM HH:mm') }}
-                  </div>
-                  <div v-else>
-                    Нет
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </ClientOnly>
-    </div>
-    <div v-else class="hero">
-      <div class="hero-content text-center flex justify-center items-center h-80">
-        <div class="max-w-md">
-          <h1 class="text-3xl font-bold">
-            Здесь ничего нет <Icon name="fluent-emoji:thinking-face" />
-          </h1>
-        </div>
+      <div v-if="width > 1024">
+        <CartTable :get-status="getStatus" :carts="carts" />
       </div>
+      <div v-else>
+        <CartCards :carts="carts" :get-status="getStatus" />
+      </div>
+    </div>
+    <div v-else>
+      <Hero />
     </div>
   </div>
 </template>

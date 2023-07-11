@@ -213,7 +213,26 @@ onMounted(() => {
           <Column field="place" header="№" />
           <Column field="image" header="Фото">
             <template #body="{ data }">
-              <nuxt-img class="rounded-lg object-contain h-8" width="32" :src="data.image" />
+              <div
+                style="width: 28px; height: 36px; overflow: visible; position: relative; border-radius: 4px"
+              >
+                <div class="dropdown dropdown-hover">
+                  <label tabindex="0"> <nuxt-img
+                    class="rounded-lg z-0" alt="" loading="lazy" fit="fill"
+                    :src="data.image"
+                  />
+                  </label>
+                  <ul
+                    tabindex="0"
+                    class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52 z-[1]"
+                  >
+                    <nuxt-img
+                      class="rounded-lg z-[1]" loading="lazy" fit="fill"
+                      :src="data.image"
+                    />
+                  </ul>
+                </div>
+              </div>
             </template>
           </Column>
           <Column field="article" header="Артикул">

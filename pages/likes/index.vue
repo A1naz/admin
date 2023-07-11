@@ -53,16 +53,16 @@ onMounted(() => {
             >
               <div class="dropdown dropdown-hover">
                 <label tabindex="0"> <nuxt-img
-                  class="rounded-lg" loading="lazy" fit="fill"
+                  class="rounded-lg z-0" alt="" loading="lazy" fit="fill"
                   :src="data.image"
                 />
                 </label>
                 <ul
                   tabindex="0"
-                  class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52 z-2"
+                  class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52 z-[1]"
                 >
                   <nuxt-img
-                    class="rounded-lg z-5" loading="lazy" fit="fill"
+                    class="rounded-lg z-[1]" loading="lazy" fit="fill"
                     :src="data.image"
                   />
                 </ul>
