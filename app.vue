@@ -57,10 +57,9 @@ watch(client, (newClient) => {
 
 <style lang="css">
 @import '~~/assets/style/datepicker.css';
-html {
-  overflow: hidden;
-}
+
 body {
+  overflow: auto;
   @apply scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin
 }
 

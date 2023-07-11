@@ -95,16 +95,12 @@ export default defineNuxtConfig({
   css: [
     'primevue/resources/primevue.css',
     'primeicons/primeicons.css',
-    '@vuepic/vue-datepicker/dist/main.css',
     '@sfxcode/formkit-primevue/dist/sass/formkit-prime-inputs.scss',
     '@sfxcode/formkit-primevue/dist/sass/formkit-primevue.scss',
   ],
   extends: [
     'nuxt-seo-kit',
   ],
-  delayHydration: {
-    mode: false,
-  },
   s3: {
     client: {
       credentials: {
@@ -124,11 +120,14 @@ export default defineNuxtConfig({
     },
   },
   build: {
-    transpile: ['nuxt', 'primevue'],
+    transpile: ['primevue'],
   },
   primevue: {
     components: {
       include: ['DataTable', 'Column'],
+    },
+    config: {
+      ripple: true,
     },
   },
   imports: {
