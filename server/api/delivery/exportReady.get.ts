@@ -60,50 +60,58 @@ async function getReady(user: Document) {
 }
 
 export default eventHandler(async (event) => {
-  const session = (await getServerSession(event)) as any
+  try {
+    const session = (await getServerSession(event)) as any
 
-  if (!session)
-    return sendRedirect(event, '/auth', 302)
+    if (!session)
+      return sendRedirect(event, '/auth', 302)
 
-  const user = await User.findOne({ uuid: session.uuid })
-  if (!user)
-    return sendRedirect(event, '/auth', 302)
-  const { type } = getQuery(event)
-  const workbook = new ExcelJS.Workbook()
-  const ready = (await getReady(user)).filter(item => item !== undefined)
-  const sheet = workbook.addWorksheet('Готовы к выдаче', {
-    headerFooter: { firstHeader: `Всего выкупов: ${ready.length}` },
-  })
-
-  sheet.columns = [
-    { header: 'Номер', key: 'place', font: { bold: true } },
-    { header: 'QR код', key: 'receiptcode', width: 16, font: { bold: true } },
-    { header: 'Код получения', key: 'receiptcode', width: 16, font: { bold: true } },
-    { header: 'Статус', key: 'currentstatus', width: 16, font: { bold: true } },
-    { header: 'Дата обновления статуса', key: 'statusupdated', width: 16, font: { bold: true } },
-    { header: 'Адрес пункта выдачи', key: 'point', width: 64, font: { bold: true } },
-    { header: 'Товар', key: 'productname', width: 48, font: { bold: true } },
-    { header: 'Получатель', key: 'recipient', width: 16, font: { bold: true } },
-    { header: 'Телефон получателя', key: 'recipientphone', width: 16, font: { bold: true } },
-    { header: 'Дата обновления', key: 'updatedAt', width: 16, font: { bold: true } },
-    { header: 'ID Выкупа', key: 'uuid', width: 16, font: { bold: true } },
-  ]
-
-  sheet.addRows(ready)
-  // add qr codes to sheet
-
-  for (const item of ready) {
-    const image = workbook.addImage({
-      base64: item?.receiptcodeqr,
-      extension: 'png',
+    const user = await User.findOne({ uuid: session.uuid })
+    if (!user)
+      return sendRedirect(event, '/auth', 302)
+    const { type } = getQuery(event)
+    const workbook = new ExcelJS.Workbook()
+    const ready = (await getReady(user)).filter(item => item !== undefined)
+    const sheet = workbook.addWorksheet('Готовы к выдаче', {
+      headerFooter: { firstHeader: `Всего выкупов: ${ready.length}` },
     })
-    sheet.addImage(image, {
-      tl: { col: 1, row: item!.place },
-      ext: { width: 100, height: 100 },
-    })
-    sheet.getRow(item!.place + 1).height = 100
+
+    sheet.columns = [
+      { header: 'Номер', key: 'place', font: { bold: true } },
+      { header: 'QR код', key: 'receiptcode', width: 16, font: { bold: true } },
+      { header: 'Код получения', key: 'receiptcode', width: 16, font: { bold: true } },
+      { header: 'Статус', key: 'currentstatus', width: 16, font: { bold: true } },
+      { header: 'Дата обновления статуса', key: 'statusupdated', width: 16, font: { bold: true } },
+      { header: 'Адрес пункта выдачи', key: 'point', width: 64, font: { bold: true } },
+      { header: 'Товар', key: 'productname', width: 48, font: { bold: true } },
+      { header: 'Получатель', key: 'recipient', width: 16, font: { bold: true } },
+      { header: 'Телефон получателя', key: 'recipientphone', width: 16, font: { bold: true } },
+      { header: 'Дата обновления', key: 'updatedAt', width: 16, font: { bold: true } },
+      { header: 'ID Выкупа', key: 'uuid', width: 16, font: { bold: true } },
+    ]
+
+    sheet.addRows(ready)
+    // add qr codes to sheet
+
+    for (const item of ready) {
+      const image = workbook.addImage({
+        base64: item?.receiptcodeqr,
+        extension: 'png',
+      })
+      sheet.addImage(image, {
+        tl: { col: 1, row: item!.place },
+        ext: { width: 100, height: 100 },
+      })
+      sheet.getRow(item!.place + 1).height = 100
+    }
+    // export table
+    const buffer = await workbook.xlsx.writeBuffer()
+    return buffer
   }
-  // export table
-  const buffer = await workbook.xlsx.writeBuffer()
-  return buffer
+  catch (e) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Не удалось создать таблицу',
+    })
+  }
 })
