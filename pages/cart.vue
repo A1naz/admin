@@ -60,7 +60,7 @@ async function getProductInfo() {
   const { data, error } = await useFetch(`/api/product/${article.value}`, {
     method: 'GET',
   })
-  if ((data.value as any).product) {
+  if ((data.value as any)?.product) {
     productData.value = (data.value as any).product
     urlError.value = false
   }
@@ -180,7 +180,12 @@ onMounted(() => {
                   >
                     <IconCSS size="16" name="ic:round-minus" />
                   </button>
-                  <div class="input-sm rounded-lg w-full text-center bg-base-100 ">
+                  <div
+                    :class="{
+                      'bg-base-200': !productData,
+                    }"
+                    class="input-sm rounded-lg w-full text-center bg-base-100"
+                  >
                     {{ amount }}
                   </div>
                   <button

@@ -10,6 +10,10 @@ const modalInfo = reactive({
   src: '',
   code: 0,
 })
+const router = useRouter()
+const route = useRoute()
+const status = computed(() => route.query?.status || 'all')
+
 const modal = ref(false)
 function openModal(code: number, src: string) {
   modalInfo.src = src
@@ -32,9 +36,20 @@ const { data, error } = await useFetch('/api/reports/get', {
   query: {
     skip: 0,
     limit: 20,
+    status: status.value,
   },
   headers: useRequestHeaders(['cookie']) as HeadersInit,
 })
+
+function selectStatus(e: Event) {
+  const target = e.target as HTMLSelectElement
+  router.push({
+    path: '/reports',
+    query: {
+      status: target.value,
+    },
+  })
+}
 
 onMounted(async () => {
   reports.value = data.value
@@ -48,6 +63,7 @@ watch(targetIsVisible, async (isVisible) => {
       query: {
         limit: 20,
         skip: skip.value,
+        status: status.value,
       },
       headers: useRequestHeaders(['cookie']) as HeadersInit,
     })
@@ -59,6 +75,19 @@ watch(targetIsVisible, async (isVisible) => {
     skip.value += 20
   }
 })
+
+watch(() => status.value, async (newRoute) => {
+  skip.value = 20
+  end.value = false
+  const { data } = await useFetch('/api/reports/get', {
+    method: 'GET',
+    query: {
+      status: status.value ?? 'all',
+      limit: 20,
+    },
+  })
+  reports.value = data.value
+}, { deep: true, immediate: true })
 </script>
 
 <template>
@@ -70,11 +99,23 @@ watch(targetIsVisible, async (isVisible) => {
       В этом разделе можно посмотреть как производились выкупы
     </p>
     <div class="flex justify-between mb-8 mt-6 items-center">
-      <div class="flex gap-4 items-center">
-        <div class="flex items-center">
-          <input id="openAll" v-model="openAll" type="checkbox" class="checkbox checkbox-primary checkbox-sm">
-          <label for="openAll" class="cursor-pointer select-none ml-2">Развернуть все</label>
-        </div>
+      <select class="select select-bordered select-sm" @change="selectStatus">
+        <option value="all" :selected="route.query.status === undefined">
+          Все отчеты
+        </option>
+        <option value="today" :selected="route.query.status === 'today'">
+          Сегодня
+        </option>
+        <option value="3days" :selected="route.query.status === '3days'">
+          3 дня
+        </option>
+        <option value="7days" :selected="route.query.status === '7days'">
+          7 дней
+        </option>
+      </select>
+      <div class="flex items-center">
+        <input id="openAll" v-model="openAll" type="checkbox" class="checkbox checkbox-primary checkbox-sm">
+        <label for="openAll" class="cursor-pointer select-none ml-2">Развернуть все</label>
       </div>
     </div>
 

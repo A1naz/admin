@@ -53,7 +53,7 @@ async function getProductInfo() {
   const { data, error } = await useFetch(`/api/product/${article.value}`, {
     method: 'GET',
   })
-  if ((data.value as any).product) {
+  if ((data.value as any)?.product) {
     productData.value = (data.value as any).product
     urlError.value = false
   }
@@ -177,7 +177,7 @@ onMounted(() => {
             <button
               :class="{
                 'btn-disabled': !productData || !questionText,
-              }" class="btn btn w-full btn-primary"
+              }" class="btn w-full btn-primary"
               @click="create"
             >
               Добавить

@@ -4,7 +4,7 @@ definePageMeta({ auth: false })
 </script>
 
 <template>
-  <section class="">
+  <section>
     <div class="md:h-screen lg:py-0">
       <div class="navbar bg-base-100 px-8">
         <div class="flex-1">
