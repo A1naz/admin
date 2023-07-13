@@ -1,17 +1,9 @@
-import * as fs from 'node:fs'
-import { Readable } from 'node:stream'
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 
-// @ts-expect-error not declaring module
-import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs'
 import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { Delivery } from '@/server/lib/models/Delivery'
 import { Buyout } from '@/server/lib/models/Buyout'
-
-XLSX.set_fs(fs)
-XLSX.stream.set_readable(Readable)
-XLSX.set_cptable(cpexcel)
 
 const keys = Object.keys as <T>(obj: T) =>
 (keyof T extends infer U ? U extends string ? U : U extends number ? `${U}` : never : never)[]
@@ -34,18 +26,23 @@ export default eventHandler(async (event) => {
       })
     }
     const format = await Promise.all(
-      deliveries.map(async (delivery) => {
+      deliveries.map(async (delivery, index) => {
         const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
         if (!buyout)
-          return
+          return undefined
 
         const phone = delivery.recipientphone
         const replaced = `+${phone[0]} (***) *** ${phone.slice(7)}`
 
         return {
+          index,
+          place: index + 1,
           point: delivery.point,
           recipient: delivery.recipient,
           recipientphone: replaced,
+          receiptcodeqr: delivery.receiptcodeqr
+            ? delivery.receiptcodeqr
+            : undefined,
           receiptcode: delivery.receiptcode ? delivery.receiptcode : '',
           currentstatus:
           delivery.statusdelivery[delivery.statusdelivery.length - 1].status,
@@ -58,30 +55,34 @@ export default eventHandler(async (event) => {
         }
       }),
     )
-    const worksheet = XLSX.utils.json_to_sheet(format)
-    XLSX.utils.sheet_add_aoa(worksheet, [['Пункт выдачи', 'Имя', 'Телефон', 'Код выдачи', 'Статус', 'Артикул', 'Размер', 'Товар', 'ID заказа', 'Цена', 'Обновлено']], { origin: 'A1' })
-    const max_width = format.reduce((w, r) => Math.max(w, r!.point.length), 10)
-    const columnWidths: XLSX.ColInfo[] | { wch: any }[] | undefined = []
-    keys(format[0]!).forEach((key) => {
-      const obj = format[0]!
-      const min = 10
-      const propLength = obj[key].toString().length + 1
-      const width = Math.max(min, propLength)
-      columnWidths.push({ wch: width })
+
+    const workbook = new ExcelJS.Workbook()
+    const ready = format.filter(item => item)
+    const sheet = workbook.addWorksheet('Общая таблица', {
+      headerFooter: { firstHeader: `Всего доставок: ${ready.length}` },
     })
-    worksheet['!cols'] = columnWidths
-    worksheet['!rows'] = [{ hpt: 30 }]
 
-    const workbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Доставки')
-
-    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' })
+    sheet.columns = [
+      { header: 'Номер', key: 'place', font: { bold: true } },
+      { header: 'Код получения', key: 'receiptcode', width: 16, font: { bold: true } },
+      { header: 'Статус', key: 'currentstatus', width: 24, font: { bold: true } },
+      { header: 'Адрес пункта выдачи', key: 'point', width: 64, font: { bold: true } },
+      { header: 'Товар', key: 'productname', width: 48, font: { bold: true } },
+      { header: 'Получатель', key: 'recipient', width: 16, font: { bold: true } },
+      { header: 'Телефон получателя', key: 'recipientphone', width: 16, font: { bold: true } },
+      { header: 'Дата обновления', key: 'updatedAt', width: 16, font: { bold: true } },
+      { header: 'ID Выкупа', key: 'uuid', width: 16, font: { bold: true } },
+    ]
+    sheet.addRows(ready)
+    // export table
+    const buffer = await workbook.xlsx.writeBuffer()
     return buffer
   }
   catch (e) {
+    console.log(e)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Не удалось создать таблицу',
+      message: 'Не удалось создать таблицу',
     })
   }
 })

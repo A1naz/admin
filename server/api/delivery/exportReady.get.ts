@@ -21,9 +21,6 @@ async function getReady(user: Document) {
       if (!buyout)
         return undefined
 
-      if (buyout.status === 'archived')
-        console.log(delivery.uuidbuyout)
-
       const place = index + 1
 
       const phone = delivery.recipientphone
@@ -73,7 +70,7 @@ export default eventHandler(async (event) => {
     const workbook = new ExcelJS.Workbook()
     const ready = (await getReady(user)).filter(item => item !== undefined)
     const sheet = workbook.addWorksheet('Готовы к выдаче', {
-      headerFooter: { firstHeader: `Всего выкупов: ${ready.length}` },
+      headerFooter: { firstHeader: `Всего доставок: ${ready.length}` },
     })
 
     sheet.columns = [
@@ -111,7 +108,7 @@ export default eventHandler(async (event) => {
   catch (e) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'Не удалось создать таблицу',
+      message: 'Не удалось создать таблицу',
     })
   }
 })
