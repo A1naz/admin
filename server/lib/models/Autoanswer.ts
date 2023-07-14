@@ -11,6 +11,8 @@ const AutoanswerModel = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   uuid: { type: String, default: uuid() },
   createdAt: { type: Date, default: Date.now },
+  payed: { type: Boolean, default: false },
+  expiryDate: { type: Date, required: false, default: Date.now },
 })
 
 export const Autoanswer = model('Autoanswer', AutoanswerModel)

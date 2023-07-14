@@ -33,7 +33,6 @@ export default eventHandler(async (event) => {
   const found = await Autoanswer.findOne({ user, article, ratingFilterFrom, ratingFilterTo })
 
   if (found) {
-    console.log(found)
     throw createError({
       statusCode: 400,
       message: 'Автоответчик с таким фильтром оценок уже существует.',
