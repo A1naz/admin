@@ -1,5 +1,5 @@
 import { getServerSession } from '#auth'
-import { findImage } from '~~/server/lib/helpers'
+import { findImage, findProductCard } from '@/server/lib/helpers'
 import { User } from '@/server/lib/models/User'
 
 function isValidUrl(urlString: string) {
@@ -31,11 +31,12 @@ export default eventHandler(async (event) => {
   const splitted = url.split('/')
   if (splitted.at(-1) === 'detail.aspx') {
     const article = splitted[splitted.length - 2]
+    const url = findProductCard(article)
     const data: any = await $fetch(
-    `https://wbx-content-v2.wbstatic.net/ru/${article}.json`,
-    {
-      method: 'GET',
-    },
+      url,
+      {
+        method: 'GET',
+      },
     )
 
     const rawData: any = await $fetch(

@@ -1,7 +1,7 @@
 import { getServerSession } from '#auth'
-import { User } from '~~/server/lib/models/User'
-import { Autoanswer } from '~~/server/lib/models/Autoanswer'
-import { findImage } from '~~/server/lib/helpers'
+import { User } from '@/server/lib/models/User'
+import { Autoanswer } from '@/server/lib/models/Autoanswer'
+import { findImage } from '@/server/lib/helpers'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any

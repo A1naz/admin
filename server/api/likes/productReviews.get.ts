@@ -1,4 +1,5 @@
 import { getServerSession } from '#auth'
+import { findProductCard } from '@/server/lib/helpers'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -13,9 +14,9 @@ export default eventHandler(async (event) => {
       body: 'Article is required',
     })
   }
-
+  const urlToCard = findProductCard(article)
   const data: any = await $fetch(
-    `https://wbx-content-v2.wbstatic.net/ru/${article}.json`,
+    urlToCard,
     {
       method: 'GET',
     },
