@@ -5,72 +5,86 @@ definePageMeta({
   title: 'Отзывы',
 })
 const route = useRoute()
-const reviews = ref([]) as any
+const end = ref(false)
+const skip = ref(50)
+const readyForReview = ref<any[] | null>([])
+const reviews = ref<any[] | null>([])
 const router = useRouter()
-const status = computed(() => route.query?.status || 'available')
-const openedPhoto = ref('')
-if (status.value === 'available') {
-  const { data } = await useFetch('/api/review/available', {
-    method: 'GET',
-    headers: useRequestHeaders(['cookie']) as HeadersInit,
-    query: {
-      limit: 50,
-    },
-  })
-  reviews.value = data.value
-}
+const status = computed(() => route.query?.status)
 
-if (status.value === 'published') {
-  const { data } = await useFetch('/api/review/published', {
-    method: 'GET',
-    headers: useRequestHeaders(['cookie']) as HeadersInit,
-    query: {
-      limit: 50,
-    },
-
-  })
-  reviews.value = data.value
-}
-
-onMounted(async () => {
-})
-const selectedUUID = ref('')
-
-watch(() => status.value, async (newRoute) => {
-  if (status.value === 'available') {
+const target = ref(null)
+const targetIsVisible = ref(false)
+const { stop } = useIntersectionObserver(
+  target,
+  ([{ isIntersecting }], observerElement) => {
+    targetIsVisible.value = isIntersecting
+  },
+)
+async function getReviews(status: string, skip: number, limit: number) {
+  if (status === 'available') {
     const { data } = await useFetch('/api/review/available', {
       method: 'GET',
       headers: useRequestHeaders(['cookie']) as HeadersInit,
       query: {
-        limit: 50,
+        limit,
+        skip,
       },
     })
-    reviews.value = data.value
-    return
+    return data.value as any[]
   }
-  if (status.value === 'published') {
+  if (status === 'published') {
     const { data } = await useFetch('/api/review/published', {
       method: 'GET',
       headers: useRequestHeaders(['cookie']) as HeadersInit,
       query: {
-        limit: 50,
+        limit,
+        skip,
         status: 'all',
       },
     })
-    reviews.value = data.value
+    return data.value as any []
   }
-  if (status.value === 'nofunds') {
+  if (status === 'nofunds') {
     const { data } = await useFetch('/api/review/published', {
       method: 'GET',
       headers: useRequestHeaders(['cookie']) as HeadersInit,
       query: {
-        limit: 50,
+        limit,
+        skip,
         status: 'nofunds',
       },
     })
-    reviews.value = data.value
+    return data.value as any[]
   }
-}, { deep: true, immediate: true })
+  loading.value = false
+  return []
+}
+const openedPhoto = ref('')
+reviews.value = await getReviews(status.value as string, 0, 50)
+
+const selectedUUID = ref('')
+watch(targetIsVisible, async (isVisible) => {
+  if (isVisible) {
+    if (end.value)
+      return
+    const data = await getReviews(status.value as string, skip.value, 50)
+    if (data.length === 0) {
+      end.value = true
+      return
+    }
+    reviews.value = [...reviews.value as any[], ...data]
+    skip.value += 50
+  }
+})
+
+watch(() => status.value, async (newRoute, oldRoute) => {
+  skip.value = 50
+  end.value = false
+  if (oldRoute === newRoute)
+    return
+  reviews.value = []
+  reviews.value = await getReviews(newRoute as string, 0, 50)
+}, { deep: true, immediate: false })
 function openPhoto(src: string) {
   openedPhoto.value = src
 }
@@ -129,7 +143,7 @@ function goToPublished() {
         </NuxtLink>
       </div>
     </div>
-    <div v-if="reviews.length">
+    <div v-if="reviews?.length">
       <div v-if="status === 'available'" class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
         <ReviewCard
           v-for="(review, index) of reviews" :key="index" :index="index"
@@ -142,8 +156,10 @@ function goToPublished() {
           :place="reviews.length - index" :index="index" :info="review" @open-image="openPhoto"
         />
       </div>
+      <div ref="target" class="flex justify-center items-center" />
     </div>
     <Hero v-else />
+
     <ReviewModal
       :deliveryid="selectedDelivery"
       :state="modalOpen" :uuid="selectedUUID" @publish="goToPublished"

@@ -20,7 +20,13 @@ const props = defineProps({
 const emit = defineEmits(['close', 'publish'])
 
 const { notify } = useNotification()
-
+const inputs = {
+  file1: ref(),
+  file2: ref(),
+  file3: ref(),
+  file4: ref(),
+  file5: ref(),
+}
 const { $dayjs } = useNuxtApp()
 const { upload, getPublicUrl, remove } = useS3Object()
 
@@ -141,7 +147,10 @@ async function publishReview() {
   emit('close')
   emit('publish')
 }
+
 async function removePhoto(index: number) {
+  const fileInput = inputs[`file${(index + 1) as 1 | 2 | 3 | 4 | 5}`]
+  fileInput.value = null
   loadingIndex.value = index
   const url = form.photos[index].url
 
@@ -281,7 +290,7 @@ onMounted(() => {
                       <Icon name="mdi:loading" class="h-8 w-8 animate-spin" />
                     </div>
                     <input
-                      :ref="`fileInput${index}`" type="file"
+                      :ref="(el) => (inputs[`file${(index + 1)}`] = el)" type="file"
                       class="hidden" @change="(e: Event) => uploadToS3(e, index)"
                     >
                     <IconCSS

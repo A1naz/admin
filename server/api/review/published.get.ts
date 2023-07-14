@@ -5,6 +5,8 @@ import { Review } from '~~/server/lib/models/Review'
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
 
+  const { skip, limit } = getQuery(event)
+
   if (!session)
     return sendRedirect(event, '/auth', 302)
 
@@ -14,9 +16,9 @@ export default eventHandler(async (event) => {
   const { status } = getQuery(event)
   let reviews: any = []
   if (status === 'all')
-    reviews = await Review.find({ user }).sort({ _id: -1 })
+    reviews = await Review.find({ user }).sort({ _id: -1 }).skip(skip as number || 0).limit(limit as number || 0)
   if (status === 'nofunds')
-    reviews = await Review.find({ user, status: 'nofunds' }).sort({ _id: -1 })
+    reviews = await Review.find({ user, status: 'nofunds' }).sort({ _id: -1 }).skip(skip as number || 0).limit(limit as number || 0)
   const format = await Promise.all(
     reviews.map((review: any) => {
       return {

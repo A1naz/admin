@@ -5,6 +5,7 @@ import { Buyout } from '@/server/lib/models/Buyout'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
+  const { skip, limit } = getQuery(event)
 
   if (!session)
     return sendRedirect(event, '/auth', 302)
@@ -19,7 +20,7 @@ export default eventHandler(async (event) => {
     reviewed: false,
   }).sort({
     createdAt: -1,
-  })
+  }).skip(skip as number || 0).limit(limit as number || 0)
   if (!readyForReview)
     return []
 
@@ -27,7 +28,7 @@ export default eventHandler(async (event) => {
     readyForReview.map(async (delivery) => {
       const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
       if (!buyout)
-        return
+        return undefined
       return {
         buyoutuuid: buyout.uuid,
         sex: buyout.gender,
@@ -41,5 +42,5 @@ export default eventHandler(async (event) => {
       }
     }),
   )
-  return format
+  return format.filter(item => item !== undefined)
 })
