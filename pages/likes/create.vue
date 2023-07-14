@@ -72,6 +72,7 @@ function addLike(id: string) {
       dislikes: 0,
     })
 }
+
 function removeLike(id: string) {
   reviews.value.map((review: any) => {
     if (review.id === id)
