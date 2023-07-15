@@ -2,12 +2,17 @@
 <script lang="ts" setup>
 import { useVuelidate } from '@vuelidate/core'
 import { email, helpers, minLength, required } from '@vuelidate/validators'
-import { useMainStore } from '~~/stores/main'
 
 const store = useMainStore()
 
-definePageMeta({ auth: false })
+definePageMeta({
+  auth: {
+    unauthenticatedOnly: true,
+    navigateAuthenticatedTo: '/buyouts',
+  },
+})
 
+const router = useRouter()
 const { status, data, signIn, signOut } = useAuth()
 const name = useRuntimeConfig().public.NAME
 const alert = ref(false)
@@ -33,7 +38,6 @@ async function login() {
       alertType.value = 'warning'
     }
     else {
-      console.log(error)
       alertText.value = 'Неверный email или пароль'
     }
     alert.value = true

@@ -5,7 +5,6 @@ const baseUrl = '/'
 const description = 'Сервис для продвижения Wildberries.'
 export default defineNuxtConfig({
   app: {
-
     baseURL: baseUrl,
     head: {
       viewport: 'width=device-width,initial-scale=1',
@@ -24,11 +23,13 @@ export default defineNuxtConfig({
     dataValue: 'theme',
     classSuffix: '',
   },
+
   auth: {
     origin: process.env.PUBLIC_SITE_URL || 'https://app.topvtop.pro',
     enableGlobalAppMiddleware: true,
     defaultProvider: 'credentials',
   },
+
   image: {
     domains: [
       'wb.ru',
@@ -43,9 +44,11 @@ export default defineNuxtConfig({
       'basket-7.wb.ru',
     ],
   },
+
   yandexMetrika: {
     id: '94036055',
   },
+
   lazyLoad: {
     // These are the default values
     images: true,
@@ -74,6 +77,7 @@ export default defineNuxtConfig({
     },
     plugins: ['~/server/index.ts'],
   },
+
   modules: [
     'nuxt-lazy-load',
     '@nuxtjs/tailwindcss',
@@ -92,6 +96,7 @@ export default defineNuxtConfig({
     '@sidebase/nuxt-pdf',
     '@artmizu/yandex-metrika-nuxt',
   ],
+
   css: [
     'primevue/resources/primevue.css',
     'primeicons/primeicons.css',
@@ -99,9 +104,11 @@ export default defineNuxtConfig({
     '@sfxcode/formkit-primevue/dist/sass/formkit-primevue.scss',
     '@vuepic/vue-datepicker/dist/main.css',
   ],
+
   extends: [
     'nuxt-seo-kit',
   ],
+
   s3: {
     client: {
       credentials: {
@@ -120,17 +127,21 @@ export default defineNuxtConfig({
       },
     },
   },
+
   build: {
     transpile: ['primevue', '@vuepic/vue-datepicker'],
   },
+
   primevue: {
     components: {
       include: ['DataTable', 'Column'],
     },
   },
+
   imports: {
-    dirs: ['./stores'],
+    dirs: ['./stores', './data', './server/lib'],
   },
+
   runtimeConfig: {
     public: {
       siteName: process.env.NAME,
@@ -158,8 +169,22 @@ export default defineNuxtConfig({
     fkApiKey: process.env.fkApiKey,
     fkID: process.env.fkID,
   },
+
   security: {
-    headers: false,
+    headers: {
+      contentSecurityPolicy: false,
+      crossOriginResourcePolicy: false,
+    },
     xssValidator: false,
+  },
+
+  devtools: {
+    enabled: true,
+  },
+  experimental: {
+    payloadExtraction: false,
+    inlineSSRStyles: false,
+    renderJsonPayloads: true,
+    typedPages: true,
   },
 })

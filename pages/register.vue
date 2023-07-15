@@ -2,7 +2,12 @@
 import { useVuelidate } from '@vuelidate/core'
 import { email, helpers, minLength, required, sameAs } from '@vuelidate/validators'
 
-definePageMeta({ auth: false })
+definePageMeta({
+  auth: {
+    unauthenticatedOnly: true,
+    navigateAuthenticatedTo: '/buyouts',
+  },
+})
 const alert = ref(false)
 const alertText = ref('')
 const alertType = ref('success')

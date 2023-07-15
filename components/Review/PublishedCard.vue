@@ -10,10 +10,6 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  place: {
-    type: Number,
-    required: true,
-  },
 
 })
 const emit = defineEmits(['callback', 'remove', 'openModal', 'openImage'])
@@ -43,7 +39,7 @@ const getStatus = computed(() => {
     <div class="card-body flex-shrink-0 flex flex-col justify-start p-4 relative">
       <div class="flex justify-between item gap-2 mb-2">
         <h2 class="card-title">
-          Отзыв №{{ place }}
+          Отзыв
         </h2> <span
           :class="{
 

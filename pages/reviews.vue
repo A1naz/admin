@@ -6,12 +6,12 @@ definePageMeta({
 })
 const route = useRoute()
 const end = ref(false)
-const skip = ref(50)
+const skip = ref(25)
 const readyForReview = ref<any[] | null>([])
 const reviews = ref<any[] | null>([])
 const router = useRouter()
-const status = computed(() => route.query?.status)
-
+const queryStatus = computed(() => route.query?.status ?? 'available')
+const status = ref(route.query?.status ?? 'available')
 const target = ref(null)
 const targetIsVisible = ref(false)
 const { stop } = useIntersectionObserver(
@@ -56,35 +56,36 @@ async function getReviews(status: string, skip: number, limit: number) {
     })
     return data.value as any[]
   }
-  loading.value = false
   return []
 }
 const openedPhoto = ref('')
-reviews.value = await getReviews(status.value as string, 0, 50)
+reviews.value = await getReviews(status.value as string, 0, 25)
 
 const selectedUUID = ref('')
+
 watch(targetIsVisible, async (isVisible) => {
   if (isVisible) {
     if (end.value)
       return
-    const data = await getReviews(status.value as string, skip.value, 50)
+    const data = await getReviews(status.value as string, skip.value, 25)
     if (data.length === 0) {
       end.value = true
       return
     }
     reviews.value = [...reviews.value as any[], ...data]
-    skip.value += 50
+    skip.value += 25
   }
 })
 
-watch(() => status.value, async (newRoute, oldRoute) => {
-  skip.value = 50
+watch(() => queryStatus.value, async (newRoute, oldRoute) => {
+  skip.value = 25
   end.value = false
   if (oldRoute === newRoute)
     return
-  reviews.value = []
-  reviews.value = await getReviews(newRoute as string, 0, 50)
+  reviews.value = await getReviews(newRoute as string, 0, 25)
+  status.value = queryStatus.value
 }, { deep: true, immediate: false })
+
 function openPhoto(src: string) {
   openedPhoto.value = src
 }
@@ -153,7 +154,7 @@ function goToPublished() {
       <div v-if="status === 'published' || status === 'nofunds'" class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
         <ReviewPublishedCard
           v-for="(review, index) of reviews" :key="index"
-          :place="reviews.length - index" :index="index" :info="review" @open-image="openPhoto"
+           :index="index" :info="review" @open-image="openPhoto"
         />
       </div>
       <div ref="target" class="flex justify-center items-center" />

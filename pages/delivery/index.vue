@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { notify } from '@kyvg/vue3-notification'
+
 definePageMeta({
   layout: 'app',
   auth: true,
@@ -59,10 +61,18 @@ async function exportReadyXLS() {
   fileLink.click()
 }
 async function exportXLS() {
-  const { data } = await useFetch('/api/delivery/export', {
+  const { data, error } = await useFetch('/api/delivery/export', {
     responseType: 'blob',
   })
-  const fileURL = window.URL.createObjectURL(new Blob([data.value]))
+  if (error.value) {
+    notify({
+      type: 'error',
+      title: 'Что-то пошло не так',
+      text: 'Не удалось экспортировать данные',
+    })
+    return
+  }
+  const fileURL = window.URL.createObjectURL(new Blob([data.value as any]))
   const fileLink = document.createElement('a')
   fileLink.href = fileURL
   fileLink.setAttribute('download', 'deliveries.xlsx')
