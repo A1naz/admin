@@ -56,6 +56,8 @@ async function sendUrl() {
 
   loadingUrl.value = false
 }
+
+
 let timeout = null as NodeJS.Timeout | null
 async function changeUrl() {
   if (url.value === '')

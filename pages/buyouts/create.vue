@@ -1,8 +1,9 @@
 <script setup lang="tsx">
 import { useNotification } from '@kyvg/vue3-notification'
 import { useWindowSize } from '@vueuse/core'
-import { useMainStore } from '@/stores/main'
+
 import type { Rule } from '@/data/buyout/rules'
+
 import { rules } from '@/data/buyout/rules'
 
 const { $dayjs } = useNuxtApp()
@@ -17,122 +18,64 @@ definePageMeta({
   title: 'Добавить выкупы',
 })
 const selectPointModal = ref() as Ref<HTMLElement>
-interface Item {
-  image: string
-  name: string
-  article: number
-  price: number
-  priceText: string
-  quantity: number
-  sizes: number[] | string[]
-  sex: string
-  searchQuery: string[]
-  adress: string
-  dateRange: [Date | null, Date | null]
-  selectedSize: number | string
-  rules: Rule[]
-}
+const store = useBuyoutStore()
 
 const defaultRules: Rule[] = rules
 const route = useRoute()
-const store = useMainStore()
 const article = ref('')
-const products = ref<Item[]>([])
+const products = computed(() => store.createProducts)
 const loading = ref(false)
 const now = useNow()
-
-const startDate = new Date(now.value)
-const endDate = new Date(now.value)
-startDate.setHours(9, 0)
-endDate.setHours(20, 0)
 
 async function addProduct() {
   if (!article.value)
     return
-
   loading.value = true
-
-  const { data, error } = await useFetch(`/api/product/${article.value}`, {
-    method: 'GET',
-  })
+  await store.addProduct(article.value)
   loading.value = false
-  if (error.value) {
-    notify({
-      title: 'Ошибка',
-      text: error.value?.data?.message,
-      type: 'error',
-    })
-  }
-
-  const product = (data.value as any).product as unknown as Item
-  products.value.push(reactive({
-    image: product.image,
-    name: product.name,
-    article: product.article,
-    price: product.price,
-    quantity: 1,
-    sex: 'Нет',
-    sizes: product?.sizes,
-    dateRange: [startDate, endDate],
-    adress: '',
-    searchQuery: [''],
-    selectedSize: product.sizes[0] ?? 'none',
-    priceText: product.priceText,
-    rules: [],
-  }))
 }
 
 function removeSearchQuery(index: number, place: number) {
-  products.value[index].searchQuery.splice(place, 1)
+  store.removeSearchQuery(index, place)
 }
 
 function addSearchQuery(index: number) {
-  products.value[index].searchQuery.push('')
+  store.addSearchQuery(index)
 }
 
 function onDateRangeChange(value: unknown[], index: number) {
-  products.value[index].dateRange = value as [Date | null, Date | null]
+  store.changeDateRange(value, index)
 }
-interface ISearchQueryChange { value: string; queryIndex: number; productIndex: number }
 
 function onSearchQueryChange(options: ISearchQueryChange) {
-  products.value[options.productIndex].searchQuery[options.queryIndex] = options.value
+  store.changeSearchQuery(options)
 }
 
 function onQuantityChange(value: number, index: number) {
-  products.value[index].quantity = value
+  store.changeQuantity(value, index)
 }
 
 function onSizeChange(event: Event, index: number) {
   const target = event.target as HTMLInputElement
-  products.value[index].selectedSize = target.value
+  store.changeSize(target.value, index)
 }
 
 function onSexChange(event: Event, index: number) {
   const target = event.target as HTMLInputElement
-  products.value[index].sex = target.value
+  store.changeSex(target.value, index)
 }
 
 function onRuleChange(event: Event, index: number, rule: number) {
   const target = event.target as HTMLInputElement
-  const rules = products.value[index].rules
-  const finded = defaultRules.find(item => item.id === rule)
-  if (!finded)
-    return
-  if (target.checked) {
-    if (finded.id === 8) {
-      rules.forEach((rule, index) => {
-        if (rule.id >= 10)
-          rules.splice(index, 1)
-      })
-    }
-    products.value[index].rules.push(finded)
-  }
-  else { rules.splice(rules.indexOf(finded), 1) }
+  store.changeRule(target.checked, index, rule)
 }
 
 function removeProduct(index: number) {
-  products.value.splice(index, 1)
+  store.removeProduct(index)
+}
+
+function handleAddress(address: string) {
+  store.handleAddress(address)
 }
 
 const totalSum = computed(() => {
@@ -140,20 +83,17 @@ const totalSum = computed(() => {
     return acc + item.price * item.quantity
   }, 0)
 })
+
 const totalQuantity = computed(() => {
   return products.value.reduce((acc, item) => {
     return acc + item.quantity
   }, 0)
 })
+
 const pickpoints = shallowRef()
 const modalOpen = ref(false)
 function closeModal() {
   modalOpen.value = false
-}
-
-function handleAddress(address: string) {
-  const index = store.selectedItem!
-  products.value[index].adress = address
 }
 
 async function createBuyout() {
@@ -249,29 +189,7 @@ onMounted(async () => {
   getPickpoints()
   if (route.query.uuid) {
     loading.value = true
-    const { data, error } = await useFetch('/api/buyout/clone', {
-      query: {
-        uuid: route.query.uuid,
-      },
-      method: 'GET',
-    })
-    if (error.value) {
-      notify({
-        title: 'Что-то пошло не так',
-        text: error.value?.data.message,
-        type: 'error',
-        duration: 3000,
-      })
-      return
-    }
-    if (data.value) {
-      const product = {
-        ...data.value,
-        rules: [],
-        dateRange: [startDate, endDate],
-      }
-      products.value.push(product as any)
-    }
+    await store.cloneBuyout(route.query.uuid)
     loading.value = false
   }
 })
@@ -300,10 +218,7 @@ onMounted(async () => {
       <div v-if="width < 1500" class="products-card grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
         <BuyoutCreateCard
           v-for="(product, index) in products" :key="index" :loading="!pickpoints?.length"
-          :product="product" :index="index" @point-modal-open="pointModalOpen" @remove="removeProduct"
-          @update-sex="onSexChange" @update-size="onSizeChange" @update-date-range="onDateRangeChange"
-          @add-search-query="addSearchQuery" @remove-search-query="removeSearchQuery" @update-search-query="onSearchQueryChange"
-          @update-quantity="onQuantityChange"
+          :product="product" :index="index" @point-modal-open="pointModalOpen"
         />
       </div>
       <div v-else class="products-table scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
@@ -352,10 +267,7 @@ onMounted(async () => {
 
           <tbody>
             <BuyoutCreateTableRow
-              v-for="(product, index) in products" :key="index" :product="product" :index="index" :loading="!pickpoints?.length" @point-modal-open="pointModalOpen" @remove="removeProduct"
-              @update-sex="onSexChange" @update-size="onSizeChange" @update-date-range="onDateRangeChange"
-              @add-search-query="addSearchQuery" @remove-search-query="removeSearchQuery" @update-search-query="onSearchQueryChange"
-              @update-quantity="onQuantityChange"
+              v-for="(product, index) in products" :key="index" :product="product" :index="index" :loading="!pickpoints?.length" @point-modal-open="pointModalOpen"
             />
           </tbody>
         </table>

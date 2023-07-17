@@ -1,3 +1,4 @@
+import { useBuyoutStore } from '../../stores/buyout';
 <!-- eslint-disable vue/no-mutating-props -->
 <script setup lang="ts">
 const props = defineProps({
@@ -15,48 +16,43 @@ const props = defineProps({
   },
 
 })
-const emit = defineEmits(['callback', 'remove', 'updateSize', 'updateSex', 'updateDateRange', 'pointModalOpen', 'updateSearchQuery', 'addSearchQuery', 'removeSearchQuery', 'updateQuantity'])
 
+const emit = defineEmits(['callback', 'pointModalOpen'])
+const store = useBuyoutStore()
 const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 
 async function deleteBuyOut() {
-  emit('remove', props.index)
+  store.removeProduct(props.index)
 }
 function onSizeChange(event: Event) {
-  emit('updateSize',
-    event,
-    props.index,
-  )
+  const target = event.target as HTMLInputElement
+  store.changeSize(target.value, props.index)
 }
 function onSexChange(event: Event) {
-  emit('updateSex',
-    event,
-    props.index,
-  )
+  const target = event.target as HTMLInputElement
+  store.changeSex(target.value, props.index)
 }
 
 function removeSearchQuery(index: number) {
-  emit('removeSearchQuery', props.index, index)
+  store.removeSearchQuery(props.index, index)
 }
 function addSearchQuery() {
-  emit('addSearchQuery', props.index)
+  store.addSearchQuery(props.index)
 }
 function productSearchQueryUpdate(event: Event, index: number) {
   const newValue = (event.target as HTMLInputElement).value
-  emit('updateSearchQuery',
-    {
-      value: newValue,
-      queryIndex: props.index,
-      productIndex: index,
-    },
-  )
+  store.changeSearchQuery({
+    value: newValue,
+    queryIndex: props.index,
+    productIndex: index,
+  })
 }
 const productDateRangeModel = computed({
   get() {
     return props.product.dateRange
   },
   set(newValue: unknown[]) {
-    emit('updateDateRange', newValue, props.index)
+    store.changeDateRange(newValue, props.index)
   },
 })
 
@@ -65,7 +61,7 @@ const productQuantityModel = computed({
     return props.product.quantity
   },
   set(newValue: number) {
-    emit('updateQuantity', newValue, props.index)
+    store.changeQuantity(newValue, props.index)
   },
 })
 </script>
@@ -140,29 +136,7 @@ const productQuantityModel = computed({
       </div>
       <div>
         <div class="w-full flex flex-col gap-2">
-          <div
-            v-for="(query, index) of product.searchQuery"
-            :key="index" class="relative flex items-center flex-grow-0 w-full"
-          >
-            <input
-              :value="query" type="text" placeholder="Поисковый запрос" class="input input-bordered input-sm w-full pr-8"
-              @change="productSearchQueryUpdate($event, index)"
-            >
-            <div
-              v-if="index === 0"
-              class="absolute right-0 btn btn-ghost btn-sm btn-square"
-              @click="addSearchQuery"
-            >
-              <IconCSS size="16" name="ic:round-plus" />
-            </div>
-            <div
-              v-else
-              class="absolute right-0 btn btn-ghost btn-sm btn-square"
-              @click="removeSearchQuery(index)"
-            >
-              <IconCSS size="16" name="material-symbols:close" />
-            </div>
-          </div>
+          <BuyoutCreateSearchQueries :product-index="props.index" :article="product.article" :queries="product.searchQuery" @update="productSearchQueryUpdate" @add="addSearchQuery" @remove="removeSearchQuery" />
         </div>
       </div>
 
