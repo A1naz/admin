@@ -265,7 +265,7 @@ onMounted(async () => {
                 Правила
               </th>
               <th class="text-base-content">
-                <button class="btn btn-sm btn-circle btn-ghost text-lg btn-outline" @click="openInfoModal">
+                <button class="btn btn-sm btn-circle btn-ghost text-lg" @click="openInfoModal">
                   ?
                 </button>
               </th>
@@ -332,7 +332,7 @@ onMounted(async () => {
     <dialog id="infoModal" ref="infoModal" class="modal">
       <form method="dialog" class="modal-box">
         <h3 class="font-bold text-lg">
-          Помощь
+          Информация
         </h3>
         <div class="py-4 flex flex-col gap-2">
           <p>
