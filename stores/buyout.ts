@@ -89,10 +89,11 @@ export const useBuyoutStore = defineStore('buyout', {
     changeDateRange(value: unknown[], index: number) {
       this.createProducts[index].dateRange = value as [Date | null, Date | null]
     },
-    changeSearchQueryStatus(index: number, productIndex: number, error = false, loading = false) {
+    changeSearchQueryStatus(index: number, productIndex: number, error = false, loading = false, message?: string) {
       const query = this.createProducts[productIndex].searchQuery[index]
       query.error = error
       query.loading = loading
+      query.message = message
     },
     changeSearchQuery(options: ISearchQueryChange, error = false, loading = false) {
       const query = this.createProducts[options.productIndex].searchQuery[options.queryIndex]

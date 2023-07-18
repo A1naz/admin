@@ -41,14 +41,13 @@ async function onInput(event: Event, index: number) {
     return
   if (result) {
     if (result.found)
-      store.changeSearchQueryStatus(index, props.productIndex, false, false)
+      store.changeSearchQueryStatus(index, props.productIndex, false, false, `Товар найден на ${result.page} стр.`)
     else
       store.changeSearchQueryStatus(index, props.productIndex, true, false)
   }
 }
 
 watch(() => queries, (newValue) => {
-  console.log(newValue)
 })
 onMounted(async () => {
   for (let i = 0; i < props.queries.length; i++) {
@@ -83,8 +82,8 @@ onMounted(async () => {
             Товар не найден
           </div>
           <div v-else>
-            <div v-if="query.value">
-              Товар найден
+            <div v-if="query.value && query.message">
+              {{ query.message }}
             </div>
           </div>
         </div>

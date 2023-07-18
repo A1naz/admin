@@ -4,7 +4,7 @@ export interface SearchQuery {
   value: string
   error: boolean
   loading: boolean
-  message: string | undefined
+  message?: string | null
 }
 export interface Item {
   image: string

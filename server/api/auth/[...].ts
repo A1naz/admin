@@ -6,10 +6,8 @@ import { NuxtAuthHandler } from '#auth'
 
 const runtimeConfig = useRuntimeConfig()
 export default NuxtAuthHandler({
-  // adapter: MongoDBAdapter(clientPromise),
   secret: runtimeConfig.SECRET,
   pages: {
-    // error: '/auth?error'
     signIn: '/auth',
   },
   session: {
@@ -26,7 +24,6 @@ export default NuxtAuthHandler({
       }
       return Promise.resolve(token)
     },
-    // Callback whenever session is checked, see https://next-auth.js.org/configuration/callbacks#session-callback
     session: async ({ session, token, user }) => {
       (session as any).email = token.email;
       (session as any).uuid = token.uuid;
@@ -51,13 +48,12 @@ export default NuxtAuthHandler({
         delete user.csrfToken
         delete user.redirect
         delete user.json
-        console.log(user)
         const valid = checkSignature(runtimeConfig.BOT_TOKEN, user)
 
         if (!valid)
           throw new Error('invalid signature')
 
-        const foundUser = await User.findOne({ telegram: user.username })
+        const foundUser = await User.findOne({ telegramUserId: user.id.toString() })
         if (foundUser) {
           return foundUser
         }
@@ -79,19 +75,14 @@ export default NuxtAuthHandler({
     }),
     // @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
     CredentialsProvider.default({
-      // The name to display on the sign in form (e.g. 'Sign in with...')
       name: 'Credentials',
-      // The credentials is used to generate a suitable form on the sign in page.
-      // You can specify whatever fields you are expecting to be submitted.
-      // e.g. domain, username, password, 2FA token, etc.
-      // You can pass any HTML attribute to the <input> tag through the object.
       credentials: {
         email: {
           label: 'email',
           type: 'text',
         },
         password: {
-          label: 'Password',
+          label: 'password',
           type: 'password',
         },
         code: {

@@ -154,7 +154,7 @@ function goToPublished() {
       <div v-if="status === 'published' || status === 'nofunds'" class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
         <ReviewPublishedCard
           v-for="(review, index) of reviews" :key="index"
-           :index="index" :info="review" @open-image="openPhoto"
+          :index="index" :info="review" @open-image="openPhoto"
         />
       </div>
       <div ref="target" class="flex justify-center items-center" />
@@ -171,9 +171,9 @@ function goToPublished() {
     <input id="reviewImageModal" type="checkbox" class="modal-toggle">
 
     <label for="reviewImageModal" class="modal cursor-pointer">
-      <label for="" class="modal-box min-w-0 max-w-5xl p-0">
+      <label for="" class="modal-box min-w-0 max-w-5xl max-h-[80vh] p-0 overflow-hidden">
         <label for="reviewImageModal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2">✕</label>
-        <nuxt-img v-if="openedPhoto" fit="contain" class="object-contain m-auto" :src="openedPhoto || ''" loading="lazy" />
+        <nuxt-img v-if="openedPhoto" fit="contain" class="object-contain m-auto max-h-[80vh]" :src="openedPhoto || ''" loading="lazy" />
       </label>
     </label>
   </div>

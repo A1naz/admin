@@ -108,7 +108,7 @@ watch(targetIsVisible, async (isVisible) => {
         </Column>
         <Column field="comment" sortable header="Комментарий" />
       </DataTable>
-      <div ref="target" class="flex justify-center items-center" />
+      <div ref="target" class="flex justify-center items-center h-4" />
     </div>
     <ul v-else class="w-full lg:hidden">
       <li v-for="(item, index) in history" :key="index" class="pb-3 sm:pb-4">
@@ -141,7 +141,7 @@ watch(targetIsVisible, async (isVisible) => {
           </div>
         </div>
       </li>
-      <div ref="target" class="flex justify-center items-center" />
+      <div ref="target" class="flex justify-center items-center p-4 h-4" />
     </ul>
   </div>
 </template>
