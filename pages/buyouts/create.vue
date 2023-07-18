@@ -1,28 +1,30 @@
 <script setup lang="tsx">
 import { useNotification } from '@kyvg/vue3-notification'
 import { useWindowSize } from '@vueuse/core'
-
 import type { Rule } from '@/data/buyout/rules'
-
 import { rules } from '@/data/buyout/rules'
+import type { ISearchQueryChange } from '@/stores/buyout'
 
 const { $dayjs } = useNuxtApp()
 const currency = useCurrency()
 
 const { width, height } = useWindowSize()
 const { notify } = useNotification()
-const disabledCreateButton = ref(false)
+
 definePageMeta({
   layout: 'app',
   auth: true,
   title: 'Добавить выкупы',
 })
-const selectPointModal = ref() as Ref<HTMLElement>
+
+const disabledCreateButton = ref(false)
+const selectPointModal = ref<HTMLElement>()
+const infoModal = ref<HTMLDialogElement>()
 const store = useBuyoutStore()
 
 const defaultRules: Rule[] = rules
 const route = useRoute()
-const article = ref('')
+const article = ref<number>()
 const products = computed(() => store.createProducts)
 const loading = ref(false)
 const now = useNow()
@@ -31,8 +33,9 @@ async function addProduct() {
   if (!article.value)
     return
   loading.value = true
-  await store.addProduct(article.value)
-  loading.value = false
+  store.addProduct(article.value).finally(() => {
+    loading.value = false
+  })
 }
 
 function removeSearchQuery(index: number, place: number) {
@@ -76,6 +79,9 @@ function removeProduct(index: number) {
 
 function handleAddress(address: string) {
   store.handleAddress(address)
+}
+function openInfoModal() {
+  infoModal.value?.showModal()
 }
 
 const totalSum = computed(() => {
@@ -189,7 +195,7 @@ onMounted(async () => {
   getPickpoints()
   if (route.query.uuid) {
     loading.value = true
-    await store.cloneBuyout(route.query.uuid)
+    await store.cloneBuyout(route.query.uuid.toString())
     loading.value = false
   }
 })
@@ -222,13 +228,13 @@ onMounted(async () => {
         />
       </div>
       <div v-else class="products-table scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
-        <table class="table table-compact w-full mt-4">
+        <table class="table table-sm table-zebra w-full mt-4">
           <thead class="relative mb-2">
             <tr>
               <th class="">
                 №
               </th>
-              <th class="w-12">
+              <th class="w-12 text-center">
                 <IconCSS name="material-symbols:image-outline" size="20" />
               </th>
               <th class="w-48">
@@ -257,6 +263,11 @@ onMounted(async () => {
               </th>
               <th>
                 Правила
+              </th>
+              <th class="text-base-content">
+                <button class="btn btn-sm btn-circle btn-ghost text-lg btn-outline" @click="openInfoModal">
+                  ?
+                </button>
               </th>
             </tr>
             <progress
@@ -318,6 +329,80 @@ onMounted(async () => {
         </label>
       </label>
     </div>
+    <dialog id="infoModal" ref="infoModal" class="modal">
+      <form method="dialog" class="modal-box">
+        <h3 class="font-bold text-lg">
+          Помощь
+        </h3>
+        <div class="py-4 flex flex-col gap-2">
+          <p>
+            <span class="font-bold">
+              Изображение
+            </span>
+            - Увеличивайте изображение товара просто наводя на него курсором
+          </p>
+          <p>
+            <span class="font-bold">
+              Цена
+            </span>
+            - Цена товара указана без СПП
+          </p>
+          <p>
+            <span class="font-bold">
+              Количество
+            </span>
+            - Указывайте желаемое количество выкупов, но не более 3 штук на 1 ПВЗ в сутки
+          </p>
+          <p>
+            <span class="font-bold">
+              Размер
+            </span>
+            - Выберите желаемый размер товара
+          </p>
+          <p>
+            <span class="font-bold">
+              Пол
+            </span>
+            - Выберите желаемый Пол для выкупов
+          </p>
+          <div>
+            <div>
+              <span class="font-bold">
+                Поисковые запросы
+              </span>
+              - Введите поисковые запросы, чем больше, тем лучше нажимая на "+"
+            </div>
+            <div class="text-sm">
+              Например, при указании 5 поисковых запросов - каждый будет выкупаться по своему запросу, если по данному запросу товар не найден, то запрос игнорируется.
+            </div>
+          </div>
+
+          <p>
+            <span class="font-bold">
+              Адрес
+            </span>
+            - Добавьте Адрес желаемого ПВЗ от куда вы будете забирать товар
+          </p>
+          <p>
+            <span class="font-bold">
+              Даты выкупов
+            </span>
+            - Выберите желаемый диапазон дат и времени для выкупов
+          </p>
+          <p>
+            <span class="font-bold">
+              Правила
+            </span>
+            - Используйте Правила для создания дополнительной безопасности ваших выкупов
+          </p>
+        </div>
+        <div class="modal-action">
+          <button class="btn">
+            Закрыть
+          </button>
+        </div>
+      </form>
+    </dialog>
   </div>
 </template>
 

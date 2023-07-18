@@ -3,7 +3,7 @@ import { notify } from '@kyvg/vue3-notification'
 import type { Item } from '@/data/buyout/createProduct'
 import { rules } from '@/data/buyout/rules'
 
-interface ISearchQueryChange { value: string; queryIndex: number; productIndex: number }
+export interface ISearchQueryChange { value: string; queryIndex: number; productIndex: number }
 
 export const useBuyoutStore = defineStore('buyout', {
   state: () => ({

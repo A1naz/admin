@@ -14,7 +14,13 @@ export default eventHandler(async (event) => {
     {
       method: 'GET',
     },
-  )
+  ).catch((e) => {
+    if (e.status === 404) {
+      throw createError({
+        message: 'Не найдена информация по данному артикулу.',
+      })
+    }
+  })
   const rawData: any = await $fetch(
     `https://card.wb.ru/cards/detail?spp=0&regions=80,64,38,4,115,83,33,68,70,69,30,86,40,1,66,31,48,110,22&pricemarginCoeff=1.0&reg=0&appType=1&emp=0&locale=ru&lang=ru&curr=rub&couponsGeo=2,12,7,3,6,21&dest=12358353&nm=${params.article}`,
     {

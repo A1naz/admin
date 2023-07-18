@@ -206,21 +206,21 @@ const productQuantityModel = computed({
       </div>
     </td>
     <td>
-      <div class="w-full flex justify-between">
-        <div>
-          <div class="mb-2">
-            {{ product.rules.map((rule: Rule) => rule.id).join(', ') }}
-          </div>
-          <label
-            :for="`modal${index}`" :class="{
-              'btn-outline': product.rules,
-            }" class="btn btn-primary btn-sm normal-case "
-          >{{ 'Настроить' }}
-          </label>
+      <div class="w-full">
+        <div class="mb-1">
+          {{ product.rules.map((rule: Rule) => rule.id).join(', ') }}
         </div>
-        <div class="ml-2 w-8 btn btn-ghost btn-sm btn-square" @click="deleteBuyOut">
-          <IconCSS name="material-symbols:close" size="20" />
-        </div>
+        <label
+          :for="`modal${index}`" :class="{
+            'btn-outline': product.rules,
+          }" class="btn btn-primary btn-sm normal-case "
+        >{{ 'Настроить' }}
+        </label>
+      </div>
+    </td>
+    <td>
+      <div class="w-8 btn btn-ghost btn-sm btn-square" @click="deleteBuyOut">
+        <IconCSS name="material-symbols:close" size="20" />
       </div>
     </td>
   </tr>
