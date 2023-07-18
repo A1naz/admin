@@ -36,12 +36,13 @@ export default eventHandler(async (event) => {
   for await (const product of products) {
     const rules = product.rules.map(rule => rule.id)
     const points = (await getPickpoints()).points
+    const searchQueries = product.searchQuery.map((item) => item.value)
     const foundPoint = points.find((p: { a: string }) => p.a === product.adress)
     if (!foundPoint)
       throw createError('Выберите существующий пункт выдачи')
     const buyout = new Buyout({
       article: product.article,
-      searchQuery: product.searchQuery.join(', '),
+      searchQuery: searchQueries.join(', '),
       point: product.adress,
       dateStart: product.dateRange[0],
       dateEnd: product.dateRange[1],
