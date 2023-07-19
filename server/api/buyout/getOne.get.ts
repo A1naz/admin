@@ -35,8 +35,6 @@ export default eventHandler(async (event) => {
     quantity: buyout.quantity,
     gender: buyout.gender,
     status: buyout.status,
-    orderPaymentStatus: buyout.orderPaymentStatus,
-    servicePaymentStatus: buyout.servicePaymentStatus,
     rules: buyout.rules,
     createdAt: buyout.createdAt,
     product: buyout.product,

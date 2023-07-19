@@ -9,6 +9,7 @@ const route = useRoute()
 const router = useRouter()
 const buyouts = ref([]) as any
 const modal = ref(false)
+const logModal = ref(false)
 const selectedBuyout = ref({})
 const selectedIndex = ref(-1)
 const store = useMainStore()
@@ -20,6 +21,12 @@ function openModal(index: number) {
   selectedPlace.value = buyouts.value.length - index
   selectedBuyout.value = buyouts.value[index]
   modal.value = true
+}
+function openLogModal(index: number) {
+  selectedIndex.value = index
+  selectedPlace.value = buyouts.value.length - index
+  selectedBuyout.value = buyouts.value[index]
+  logModal.value = true
 }
 const target = ref(null)
 const targetIsVisible = ref(false)
@@ -258,7 +265,7 @@ watch(() => status.value, async () => {
           <BuyoutCard
             v-for="(buyout, index) of buyouts" :key="buyout.uuid" :place="buyouts.length - index"
             :index="index" :info="buyout" @unarchive="unarchiveBuyout" @archive="archiveBuyout"
-            @open-modal="openModal" @remove="removeBuyout" @unpause="unpauseBuyout"
+            @open-modal="openModal" @remove="removeBuyout" @unpause="unpauseBuyout" @open-log-modal="openLogModal"
           />
         </TransitionSlide>
       </div>
@@ -266,7 +273,8 @@ watch(() => status.value, async () => {
     </div>
 
     <Hero v-else />
-    <BuyoutInfoModal :info="selectedBuyout" :state="modal" :index="selectedIndex" @close="modal = false" />
+    <BuyoutLogModal v-if="logModal" :info="selectedBuyout" :index="selectedIndex" :state="logModal" @close="logModal = false" />
+    <BuyoutInfoModal v-if="modal" :info="selectedBuyout" :state="modal" :index="selectedIndex" @close="modal = false" />
   </div>
 </template>
 

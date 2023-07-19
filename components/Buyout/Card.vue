@@ -12,7 +12,7 @@ const props = defineProps({
   },
 
 })
-const emit = defineEmits(['callback', 'remove', 'openModal', 'archive', 'unarchive', 'unpause'])
+const emit = defineEmits(['callback', 'remove', 'openModal', 'archive', 'unarchive', 'unpause', 'openLogModal'])
 const { $dayjs } = useNuxtApp()
 const currency = useCurrency()
 const router = useRouter()
@@ -24,6 +24,7 @@ function cloneBuyout() {
     },
   })
 }
+
 async function deleteBuyOut() {
   const { data, error } = await useFetch('/api/buyout/delete', {
     method: 'DELETE',
@@ -155,20 +156,24 @@ const getStatus = computed(() => {
         </label>
         <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
           <li>
+            <a @click="$emit('openLogModal', index)">
+              <Icon name="fluent:send-logging-24-filled" />Логи выкупа
+            </a>
+          </li>
+          <li>
             <a @click="cloneBuyout">
               <Icon name="fluent:copy-24-filled" />Дублировать
             </a>
           </li>
-          <li v-if="info.status !== 'archived'">
-            <a @click="archiveBuyout">
+          <li v-if="info.status === 'archived' || info.status === 'active'">
+            <a v-if="info.status !== 'archived'" @click="archiveBuyout">
               <Icon name="material-symbols:archive" />Архивировать
             </a>
-          </li>
-          <li v-else>
-            <a @click="unarchiveBuyout">
+            <a v-else @click="unarchiveBuyout">
               <Icon name="material-symbols:unarchive" />Убрать из архива
             </a>
           </li>
+
           <li>
             <a
               @click="deleteBuyOut"

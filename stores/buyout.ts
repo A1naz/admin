@@ -5,7 +5,6 @@ import { rules } from '@/data/buyout/rules'
 
 export interface ISearchQueryChange { value: string; queryIndex: number; productIndex: number }
 
-
 export const useBuyoutStore = defineStore('buyout', {
   state: () => ({
     createProducts: [] as Item[],
