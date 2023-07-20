@@ -25,6 +25,8 @@ const { data, error } = await useFetch('/api/buyout/getLogs', {
     uuid: props.info.uuid,
   },
 })
+if (data.value)
+  logs.value = data.value
 </script>
 
 <template>
@@ -48,7 +50,7 @@ const { data, error } = await useFetch('/api/buyout/getLogs', {
 
         <div v-if="logs.length" class="flex flex-col gap-2 mt-2 justify-center">
           <div v-for="log of logs" :key="log._id" class="log p-2 bg-base-200 rounded-lg flex justify-between gap-4 items-start">
-            <div class="logText">
+            <div class="logText w-2/3">
               {{ log.text }}
             </div>
             <div class="logDate">
