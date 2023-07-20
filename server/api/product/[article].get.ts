@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import { getServerSession } from '#auth'
 import { findImage, findProductCard } from '~~/server/lib/helpers'
 
@@ -28,10 +29,14 @@ export default eventHandler(async (event) => {
     },
   )
   const priceData = rawData
-  const sizesRaw = data?.sizes_table?.values
-    ? data?.sizes_table?.values.map((size: any) => size.tech_size)
-    : priceData?.data?.products[0]?.sizes.map((size: any) => size.origName)
-  const sizes = sizesRaw[0] === '0' ? [] : sizesRaw
+  let sizes = []
+
+  if (priceData?.data?.products[0]?.sizes)
+    sizes = priceData?.data?.products[0]?.sizes.filter((item: any) => item.stocks.length).map((item: any) => item.origName)
+  else
+    sizes = data?.sizes_table?.values.map((size: any) => size.tech_size)
+
+  fs.writeFileSync('sizes.json', JSON.stringify(sizes))
   const product = priceData?.data?.products.find(
     (item: any) => item.id === Number(params.article),
   )

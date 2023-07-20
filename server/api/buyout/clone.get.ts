@@ -47,10 +47,16 @@ export default eventHandler(async (event) => {
     method: 'GET',
   },
   )
-  const sizes = data?.sizes_table?.values
-    ? data?.sizes_table?.values.map((size: any) => size.tech_size)
-    : []
+
   const priceData = rawData
+
+  let sizes = []
+
+  if (priceData?.data?.products[0]?.sizes)
+    sizes = priceData?.data?.products[0]?.sizes.filter((item: any) => item.stocks.length).map((item: any) => item.origName)
+  else
+    sizes = data?.sizes_table?.values.map((size: any) => size.tech_size)
+
   const product = priceData?.data?.products.find(
     (item: any) => item.id === Number(article),
   )
