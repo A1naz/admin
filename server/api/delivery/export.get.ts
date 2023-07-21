@@ -7,6 +7,7 @@ import { Buyout } from '@/server/lib/models/Buyout'
 
 const keys = Object.keys as <T>(obj: T) =>
 (keyof T extends infer U ? U extends string ? U : U extends number ? `${U}` : never : never)[]
+
 export default eventHandler(async (event) => {
   try {
     const session = (await getServerSession(event)) as any
@@ -17,7 +18,8 @@ export default eventHandler(async (event) => {
     const user = await User.findOne({ uuid: session.uuid })
     if (!user)
       return sendRedirect(event, '/auth', 302)
-    const { type } = getQuery(event)
+
+    const runtimeConfig = useRuntimeConfig()
     const deliveries = await Delivery.find({ user }).sort({ _id: -1 })
     if (!deliveries.length) {
       throw createError({
@@ -49,7 +51,7 @@ export default eventHandler(async (event) => {
           article: delivery.article.toString(),
           size: buyout.sizeparam,
           productname: buyout.product.name,
-          uuid: buyout.uuid,
+          uuid: `#${buyout.uuid}`,
           pricebuy: delivery.pricebuy,
           updatedAt: delivery.updatedAt,
         }
@@ -71,9 +73,18 @@ export default eventHandler(async (event) => {
       { header: 'Получатель', key: 'recipient', width: 16, font: { bold: true } },
       { header: 'Телефон получателя', key: 'recipientphone', width: 16, font: { bold: true } },
       { header: 'Дата обновления', key: 'updatedAt', width: 16, font: { bold: true } },
-      { header: 'ID Выкупа', key: 'uuid', width: 16, font: { bold: true } },
+      { header: 'ID Выкупа', key: 'uuid', width: 32, font: { bold: true } },
     ]
     sheet.addRows(ready)
+
+    const idCol = sheet.getColumn('uuid')
+
+    idCol.eachCell((cell, rowNumber) => {
+      cell.value = {
+        text: cell.value!.toString(),
+        hyperlink: `${runtimeConfig.PUBLIC_SITE_URL}/buyouts?uuid=${cell.value?.toString()}`,
+      }
+    })
     // export table
     const buffer = await workbook.xlsx.writeBuffer()
     return buffer
