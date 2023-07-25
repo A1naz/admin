@@ -46,9 +46,8 @@ async function login() {
     }, 3000)
   }
   else {
-    // No error, continue with the sign in, e.g., by following the returned redirect:
     store.getClient()
-    return navigateTo(url, { external: true })
+    return navigateTo(url)
   }
   loading.value = false
 }

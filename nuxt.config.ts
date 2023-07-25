@@ -122,8 +122,8 @@ export default defineNuxtConfig({
     bucket: 'shifft',
     image: {
       compression: {
-        maxSizeMB: 2,
-        maxWidthOrHeight: 1920,
+        maxSizeMB: 10,
+        maxWidthOrHeight: 4000,
       },
     },
   },
