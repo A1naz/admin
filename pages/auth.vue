@@ -47,7 +47,7 @@ async function login() {
   }
   else {
     store.getClient()
-    return navigateTo(url)
+    return router.push('/buyouts')
   }
   loading.value = false
 }
