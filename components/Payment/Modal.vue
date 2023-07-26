@@ -17,6 +17,7 @@ const transferStatus = ref(null) as Ref<null | string>
 const timer = ref(900)
 const alertOpened = ref(true)
 const secondsLeft = ref(0)
+const paymentID = ref('')
 function cancelTransfer() {
   details.value = null
 }
@@ -80,6 +81,9 @@ async function checkPaymentStatus() {
     return
   const { data, error } = await useFetch<response>('/api/payment/checkStatus', {
     method: 'GET',
+    query: {
+      id: paymentID.value,
+    },
   })
   if (error.value) {
     notify({
@@ -163,10 +167,11 @@ async function pay() {
     })
     return
   }
-  if ((data.value as any)?.status === 'ok') {
-    if ((data.value as any).type === 'transfer')
+  if (data.value && data.value?.status === 'ok') {
+    paymentID.value = data.value!.id
+    if (data.value.type === 'transfer')
       checkForDetails()
-    else if ((data.value as any).type === 'fast')
+    else if (data.value.type === 'fast')
       checkForLink()
   }
 }

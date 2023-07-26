@@ -35,7 +35,8 @@ export default eventHandler(async (event) => {
   })
   await payment.save()
   return {
-    type: paymentType,
+    type: paymentType as string,
+    id: payment._id,
     status: 'ok',
   }
 })

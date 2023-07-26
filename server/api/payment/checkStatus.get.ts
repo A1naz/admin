@@ -11,8 +11,8 @@ export default eventHandler(async (event) => {
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
     return sendRedirect(event, '/auth', 302)
-
-  const payment = await Payment.findOne({ user }).sort({ _id: -1 })
+  const { id } = getQuery(event)
+  const payment = await Payment.findOne({ _id: id, user }).sort({ _id: -1 })
   if (!payment)
     return { status: 'error', message: 'Payment not found' }
 
