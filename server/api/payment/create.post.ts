@@ -19,10 +19,10 @@ export default eventHandler(async (event) => {
       message: 'paymentType is missing',
     })
   }
-  if (amount > 50000) {
+  if (amount > 30000) {
     throw createError({
       statusCode: 400,
-      message: 'Сумма платежа не может превышать 50 000 рублей',
+      message: 'Сумма платежа не может превышать 30 000 рублей',
     })
   }
   const details = paymentType === 'fast' ? { url: null } : paymentType === 'transfer' ? { transferCard: null, transferSum: null } : undefined

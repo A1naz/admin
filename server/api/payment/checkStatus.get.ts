@@ -19,8 +19,6 @@ export default eventHandler(async (event) => {
   const data = {
     status: payment.status,
   }
-  if (data.status === 'success')
-    await Payment.deleteOne({ _id: payment })
 
   return data
 })

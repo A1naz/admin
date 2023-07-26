@@ -306,13 +306,20 @@ function openUrl() {
               {{ details.transferCard }}
             </div>
           </div>
+
           <p class="py-4 text-lg">
-            Сумма для пополнения:
+            Сумма пополнения:
           </p>
           <div class="font-bold text-lg text-center bg-base-200 rounded-lg p-2">
             <div class="tooltip hover:cursor-pointer hover:text-primary" data-tip="Нажмите чтобы скопировать" @click="copyToClipboard(details.transferSum.toString())">
               {{ details.transferSum }} ₽
             </div>
+          </div>
+          <p class="py-4 text-lg">
+            Банк для перевода:
+          </p>
+          <div class="font-bold text-lg text-center bg-base-200 rounded-lg p-2">
+            QIWI Кошелек (Киви банк)
           </div>
         </div>
         <div v-if="alertOpened" class="mt-8 text-sm bg-base-200 p-2 rounded-lg">
