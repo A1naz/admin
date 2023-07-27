@@ -9,6 +9,7 @@ function hasWhiteSpace(s: string) {
   return s.includes(' ') || !/^[a-zA-Z0-9_-]{4,14}$/.test(s)
 }
 export default eventHandler(async (event) => {
+  return { message: 'Регистрация временно недоступна' }
   const body = await readBody(event)
 
   const { email, password } = body
