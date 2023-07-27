@@ -196,6 +196,9 @@ watch(() => status.value, async () => {
     <p class="text-xs font-light mt-1 lg:text-sm">
       Стоимость одного выкупа -  <span class="font-bold">40 руб.</span>
     </p>
+    <p v-if="route.query.status === 'archived'" class="text-xs font-light mt-1 lg:text-sm">
+      Выкупы в архиве удаляются через 10 дней.
+    </p>
     <div class="flex justify-between mb-4 items-center mt-6">
       <div class="hidden lg:block">
         <NuxtLink
