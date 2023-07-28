@@ -41,7 +41,7 @@ if (data.value)
         <div class="text-xl font-bold flex items-center gap-2">
           <IconCSS name="fluent:send-logging-24-filled" />
           <span>
-            Логи выкупа
+            Инфо о выкупе
           </span>
         </div>
         <div class="text-xs text-gray-500">

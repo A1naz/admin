@@ -157,7 +157,7 @@ const getStatus = computed(() => {
         <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
           <li>
             <a @click="$emit('openLogModal', index)">
-              <Icon name="fluent:send-logging-24-filled" />Логи выкупа
+              <Icon name="fluent:send-logging-24-filled" />Инфо о выкупе
             </a>
           </li>
           <li>

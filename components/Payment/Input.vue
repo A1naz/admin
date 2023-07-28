@@ -15,7 +15,7 @@ const props = defineProps({
       currencyDisplay: 'symbol',
       valueRange: {
         min: 100,
-        max: 50000,
+        max: 30000,
       },
       hideCurrencySymbolOnFocus: false,
       hideGroupingSeparatorOnFocus: false,

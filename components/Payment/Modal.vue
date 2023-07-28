@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useNotification } from '@kyvg/vue3-notification'
+import { onMounted } from 'vue'
 
 const url = ref('')
 const paymentForm = reactive({
@@ -28,6 +29,7 @@ function cancelPayment() {
 async function copyToClipboard(text: string) {
   await navigator.clipboard.writeText(text)
 }
+
 const { pause, resume, isActive } = useIntervalFn(() => {
   timer.value -= 1
   secondsLeft.value = timer.value - Math.floor(timer.value / 60) * 60
@@ -145,10 +147,10 @@ async function checkForLink() {
 }
 
 async function pay() {
-  if (paymentForm.paymentSum > 20000 && paymentForm.paymentType === 'transfer') {
+  if (paymentForm.paymentSum > 30000 && paymentForm.paymentType === 'transfer') {
     notify({
       title: 'Что-то пошло не так',
-      text: 'Сумма для перевода не должна превышать 20000 руб.',
+      text: 'Сумма для перевода не должна превышать 30000 руб.',
     })
     return
   }
@@ -199,6 +201,10 @@ async function fkCreateBill() {
 function openUrl() {
   window.open(url.value, '_blank', 'noreferrer,noopener')
 }
+
+onMounted(() => {
+  timer.value = 900
+})
 </script>
 
 <template>
@@ -312,8 +318,11 @@ function openUrl() {
             </div>
           </div>
 
-          <p class="py-4 text-lg">
+          <p class="pt-4 text-lg">
             Сумма пополнения:
+          </p>
+          <p class="pb-4 text-error">
+            СТРОГО КАК УКАЗАНО, С КОПЕЙКАМИ!
           </p>
           <div class="font-bold text-lg text-center bg-base-200 rounded-lg p-2">
             <div class="tooltip hover:cursor-pointer hover:text-primary" data-tip="Нажмите чтобы скопировать" @click="copyToClipboard(details.transferSum.toString())">
