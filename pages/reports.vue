@@ -38,7 +38,6 @@ const { data, error } = await useFetch('/api/reports/get', {
     limit: 20,
     status: status.value,
   },
-  headers: useRequestHeaders(['cookie']) as HeadersInit,
 })
 
 function selectStatus(e: Event) {
@@ -65,7 +64,6 @@ watch(targetIsVisible, async (isVisible) => {
         skip: skip.value,
         status: status.value,
       },
-      headers: useRequestHeaders(['cookie']) as HeadersInit,
     })
     if ((data.value as any)?.length === 0) {
       end.value = true
