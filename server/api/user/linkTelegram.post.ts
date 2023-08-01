@@ -13,8 +13,8 @@ export default eventHandler(async (event) => {
   if (!user)
     return sendRedirect(event, '/auth', 302)
 
-  const candidate = await User.findOne({ telegram: body.username })
-  if (candidate && candidate.uuid !== user.uuid) {
+  const candidate = await User.findOne({ telegramUserId: body.id })
+  if (candidate) {
     throw createError({
       statusCode: 400,
       message: 'Этот Telegram уже занят',

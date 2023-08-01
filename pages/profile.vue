@@ -213,15 +213,15 @@ function onTelegramLink(data: any) {
           <div class="tg w-full justify-between flex gap-2 xl:gap-4 xl:w-1/2">
             <div class="relative flex justify-end w-full items-center flex-grow-0">
               <input
-                :value="store.client?.telegram ? `@${store.client.telegram}` : ''" placeholder="Telegram"
+                :value="store.client?.telegram ? `@${store.client.telegram}` : `${store.client.telegramUserId ?? ''}`" placeholder="Telegram"
                 class="input input-bordered w-full" disabled
               >
               <Icon class="absolute mr-4" size="24" name="logos:telegram" />
             </div>
 
-            <LinkTelegram v-if="!store.client.telegram" @callback="onTelegramLink" />
+            <LinkTelegram v-if="!store.client.telegramUserId" @callback="onTelegramLink" />
             <button
-              v-if="store.client.telegram" class="btn btn-primary"
+              v-if="store.client.telegramUserId" class="btn btn-primary"
               @click="unlinkTelegram"
             >
               Отвязать
