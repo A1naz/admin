@@ -226,11 +226,12 @@ onMounted(() => {
           </div>
           <div class="join join-vertical w-full">
             <input
+              disabled
               v-model="paymentForm.paymentType"
               type="radio"
               name="options"
               value="fast"
-              aria-label="Быстро (2% комиссия)"
+              aria-label="Быстро (Временно недоступно)"
               class="btn join-item"
             >
             <input
