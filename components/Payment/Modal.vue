@@ -5,7 +5,7 @@ import { onMounted } from 'vue'
 const url = ref('')
 const paymentForm = reactive({
   paymentSum: 1000,
-  paymentType: 'fast' as 'transfer' | 'fast',
+  paymentType: 'transfer' as 'transfer' | 'fast',
 })
 const closePaymentModal = ref(null) as Ref<HTMLLabelElement | null>
 const { notify } = useNotification()
