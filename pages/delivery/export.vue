@@ -34,7 +34,7 @@ async function exportToFile() {
   progress.value = 0
   const options = {
     margin: 0,
-    filename: 'delivery.pdf',
+    filename: 'Готовы к выдаче.pdf',
     html2canvas: {
       scale: 1.5,
       letterRendering: true,

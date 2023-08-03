@@ -14,7 +14,7 @@ interface Item {
   quantity: number
   sizes: number[] | string[]
   sex: string
-  searchQuery: string[]
+  searchQuery: any[]
   adress: string
   dateRange: [Date, Date]
   selectedSize: number | string
@@ -36,7 +36,8 @@ export default eventHandler(async (event) => {
   for await (const product of products) {
     const rules = product.rules.map(rule => rule.id)
     const points = (await getPickpoints()).points
-    const searchQueries = product.searchQuery.map((item) => item.value)
+    const searchQueries = product.searchQuery.map((item: any) => item.value)
+
     const foundPoint = points.find((p: { a: string }) => p.a === product.adress)
     if (!foundPoint)
       throw createError('Выберите существующий пункт выдачи')

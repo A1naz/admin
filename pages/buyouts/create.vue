@@ -229,7 +229,7 @@ onMounted(async () => {
       </div>
       <div v-else class="products-table scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
         <table class="table table-sm table-zebra w-full mt-4">
-          <thead class="relative mb-2">
+          <thead class="relative mb-2 text-sm text-base-content" @click="openInfoModal">
             <tr>
               <th class="">
                 №
@@ -288,9 +288,8 @@ onMounted(async () => {
         @close="closeModal"
       />
     </ClientOnly>
-
-    <div v-if="products.length" class="mt-6 flex justify-between items-center">
-      <div class="info">
+    <div v-show="products.length" class="mt-6 flex justify-between items-center h-48">
+      <div>
         <div class="text-sm">
           <span class="text-gray-500">Товаров:</span> <span class="font-bold">{{ totalQuantity
           }} шт.</span>
@@ -305,6 +304,7 @@ onMounted(async () => {
                             выкупы` : `Создать выкуп` }}
       </button>
     </div>
+
     <!-- refactor this -->
     <div v-for="(product, index) of products" :key="index">
       <input :id="`modal${index}`" type="checkbox" class="modal-toggle">
@@ -408,24 +408,11 @@ onMounted(async () => {
 
 <style scoped>
 th {
-    @apply normal-case;
+    @apply normal-case hover:text-primary hover:cursor-pointer;
 }
 
 table td,
 table td * {
     vertical-align: top;
-}
-
-select {
-    /* for Firefox */
-    -moz-appearance: none;
-    /* for Chrome */
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-/* For IE10 */
-select::-ms-expand {
-    display: none;
 }
 </style>

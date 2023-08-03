@@ -249,6 +249,22 @@ watch(() => status.value, async () => {
         Добавить выкупы
       </NuxtLink>
     </div>
+    <!-- <div class="search flex justify-between items-center">
+      <select class="select select-bordered select-sm" @change="selectStatus">
+        <option value="all" :selected="route.query.status === undefined">
+          За все время
+        </option>
+        <option value="active" :selected="route.query.status === 'active'">
+          Сегодня
+        </option>
+        <option value="completed" :selected="route.query.status === 'completed'">
+          3 дня
+        </option>
+        <option value="archived" :selected="route.query.status === 'archived'">
+          Неделя
+        </option>
+      </select>
+    </div> -->
     <div v-if="buyouts.length">
       <div v-if="(route.query.status === 'active' || !route.query.status) && activeBuyouts.length > 0" class="flex justify-center py-2 rounded-lg px-2 mb-2 bg-base-100 border border-base-200">
         <p

@@ -44,7 +44,7 @@ async function exportToXLS() {
   const fileURL = window.URL.createObjectURL(new Blob([data.value as any]))
   const fileLink = document.createElement('a')
   fileLink.href = fileURL
-  fileLink.setAttribute('download', 'paymenthistory.xlsx')
+  fileLink.setAttribute('download', 'Финансовый отчет услуг TOPVTOP.xlsx')
   document.body.appendChild(fileLink)
   fileLink.click()
 }
