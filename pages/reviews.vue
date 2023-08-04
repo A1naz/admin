@@ -157,7 +157,7 @@ function goToPublished() {
           :index="index" :info="review" @open-image="openPhoto"
         />
       </div>
-      <div ref="target" class="flex justify-center items-center" />
+      <div ref="target" class="flex justify-center items-center h-4" />
     </div>
     <Hero v-else />
 

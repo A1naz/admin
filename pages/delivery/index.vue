@@ -171,7 +171,7 @@ watch(() => status.value, async (newRoute) => {
             :info="delivery" @open-modal="openModal"
           />
         </li>
-        <div ref="target" class="flex justify-center items-center" />
+        <div ref="target" class="flex justify-center items-center h-4" />
       </TransitionSlide>
       <DeliveryQrModal v-if="modal" :code="modalInfo.code" :src="modalInfo.src" />
     </div>

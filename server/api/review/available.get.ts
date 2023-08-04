@@ -23,7 +23,6 @@ export default eventHandler(async (event) => {
   }).skip(skip as number || 0).limit(limit as number || 0)
   if (!readyForReview)
     return []
-
   const format = await Promise.all(
     readyForReview.map(async (delivery) => {
       const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
