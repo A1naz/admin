@@ -241,81 +241,81 @@ onMounted(async () => {
                 Название
               </th>
               <th>
-                <div class="flex justify-between w-full gap-2">
+                <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Цена
                   </span>
-                  <span>
+                  <span class="rounded-lg bg-base-200 px-1 text-xs">
                     ?
                   </span>
                 </div>
               </th>
               <th>
-                <div class="flex justify-between w-full gap-2 ">
+                <div class="flex justify-between w-full gap-1 items-center ">
                   <span>
                     Количество
                   </span>
-                  <span>
+                  <span class="rounded-lg bg-base-200 px-1 text-xs">
                     ?
                   </span>
                 </div>
               </th>
               <th>
-                <div class="flex justify-between w-full gap-2">
+                <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Размер
                   </span>
-                  <span>
+                  <span class="rounded-lg bg-base-200 px-1 text-xs">
                     ?
                   </span>
                 </div>
               </th>
               <th>
-                <div class="flex justify-between w-full gap-2">
+                <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Пол
                   </span>
-                  <span>
+                  <span class="rounded-lg bg-base-200 px-1 text-xs">
                     ?
                   </span>
                 </div>
               </th>
               <th>
-                <div class="flex justify-between w-full gap-2">
+                <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Поисковые запросы
                   </span>
-                  <span>
+                  <span class="rounded-lg bg-base-200 px-1 text-xs">
                     ?
                   </span>
                 </div>
               </th>
               <th class="min-w-40">
-                <div class="flex justify-between w-full gap-2">
+                <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Адрес
                   </span>
-                  <span>
+                  <span class="rounded-lg bg-base-200 px-1 text-xs">
                     ?
                   </span>
                 </div>
               </th>
               <th>
-                <div class="flex justify-between w-full gap-2">
+                <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Даты выкупов
                   </span>
-                  <span>
+                  <span class="rounded-lg bg-base-200 px-1 text-xs">
                     ?
                   </span>
                 </div>
               </th>
               <th>
-                <div class="flex justify-between w-full gap-2">
+                <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Правила
                   </span>
-                  <span>
+                  <span class="rounded-lg bg-base-200 px-1 text-xs">
                     ?
                   </span>
                 </div>
