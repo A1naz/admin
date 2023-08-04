@@ -241,34 +241,86 @@ onMounted(async () => {
                 Название
               </th>
               <th>
-                Цена
+                <div class="flex justify-between w-full gap-2">
+                  <span>
+                    Цена
+                  </span>
+                  <span>
+                    ?
+                  </span>
+                </div>
               </th>
               <th>
-                Количество
+                <div class="flex justify-between w-full gap-2 ">
+                  <span>
+                    Количество
+                  </span>
+                  <span>
+                    ?
+                  </span>
+                </div>
               </th>
               <th>
-                Размер
+                <div class="flex justify-between w-full gap-2">
+                  <span>
+                    Размер
+                  </span>
+                  <span>
+                    ?
+                  </span>
+                </div>
               </th>
               <th>
-                Пол
+                <div class="flex justify-between w-full gap-2">
+                  <span>
+                    Пол
+                  </span>
+                  <span>
+                    ?
+                  </span>
+                </div>
               </th>
               <th>
-                Поисковые запросы
+                <div class="flex justify-between w-full gap-2">
+                  <span>
+                    Поисковые запросы
+                  </span>
+                  <span>
+                    ?
+                  </span>
+                </div>
               </th>
               <th class="min-w-40">
-                Адрес
+                <div class="flex justify-between w-full gap-2">
+                  <span>
+                    Адрес
+                  </span>
+                  <span>
+                    ?
+                  </span>
+                </div>
               </th>
               <th>
-                Даты выкупов ?
+                <div class="flex justify-between w-full gap-2">
+                  <span>
+                    Даты выкупов
+                  </span>
+                  <span>
+                    ?
+                  </span>
+                </div>
               </th>
               <th>
-                Правила
+                <div class="flex justify-between w-full gap-2">
+                  <span>
+                    Правила
+                  </span>
+                  <span>
+                    ?
+                  </span>
+                </div>
               </th>
-              <th class="text-base-content">
-                <button class="btn btn-sm btn-circle btn-ghost text-lg" @click="openInfoModal">
-                  ?
-                </button>
-              </th>
+              <th class="text-base-content" />
             </tr>
             <progress
               v-show="loading"

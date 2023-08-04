@@ -15,6 +15,7 @@ const selectedIndex = ref(-1)
 const store = useMainStore()
 const selectedPlace = ref(-1)
 const status = computed(() => route.query?.status || 'all')
+const dateFilter = ref('all')
 
 function openModal(index: number) {
   selectedIndex.value = index
@@ -42,6 +43,7 @@ const { data, refresh } = await useFetch(() => '/api/buyout/get', {
   method: 'GET',
   query: {
     status: status.value ?? 'all',
+    dateFilter: dateFilter.value,
     limit: 50,
   },
   headers: useRequestHeaders(['cookie']) as HeadersInit,
@@ -91,6 +93,22 @@ function selectStatus(e: Event) {
     },
   })
 }
+
+async function selectFilterDate(e: Event) {
+  const target = e.target as HTMLSelectElement
+  dateFilter.value = target.value
+  skip.value = 50
+  end.value = false
+  const { data } = await useFetch('/api/buyout/get', {
+    method: 'GET',
+    query: {
+      status: status.value || 'all',
+      dateFilter: dateFilter.value,
+      limit: 50,
+    },
+  })
+  buyouts.value = data.value
+}
 onMounted(async () => {
   if (route.query?.uuid) {
     const uuid = route.query?.uuid
@@ -105,7 +123,6 @@ onMounted(async () => {
           query: {
             uuid,
           },
-          headers: useRequestHeaders(['cookie']) as HeadersInit,
         })
 
         if (data.value) {
@@ -158,9 +175,9 @@ watch(targetIsVisible, async (isVisible) => {
       query: {
         status: route.query?.status || 'all',
         limit: 50,
+        dateFilter: dateFilter.value,
         skip: skip.value,
       },
-      headers: useRequestHeaders(['cookie']) as HeadersInit,
     })
     if ((data.value as any).length === 0) {
       end.value = true
@@ -177,9 +194,9 @@ watch(() => status.value, async () => {
     method: 'GET',
     query: {
       status: status.value || 'all',
+      dateFilter: dateFilter.value,
       limit: 50,
     },
-    headers: useRequestHeaders(['cookie']) as HeadersInit,
   })
   buyouts.value = data.value
 }, { deep: true, immediate: true })
@@ -249,22 +266,22 @@ watch(() => status.value, async () => {
         Добавить выкупы
       </NuxtLink>
     </div>
-    <!-- <div class="search flex justify-between items-center">
-      <select class="select select-bordered select-sm" @change="selectStatus">
-        <option value="all" :selected="route.query.status === undefined">
+    <div class="search flex justify-between items-center">
+      <select class="select select-bordered select-sm" @change="selectFilterDate">
+        <option value="all">
           За все время
         </option>
-        <option value="active" :selected="route.query.status === 'active'">
+        <option value="today">
           Сегодня
         </option>
-        <option value="completed" :selected="route.query.status === 'completed'">
+        <option value="3days">
           3 дня
         </option>
-        <option value="archived" :selected="route.query.status === 'archived'">
+        <option value="7days">
           Неделя
         </option>
       </select>
-    </div> -->
+    </div>
     <div v-if="buyouts.length">
       <div v-if="(route.query.status === 'active' || !route.query.status) && activeBuyouts.length > 0" class="flex justify-center py-2 rounded-lg px-2 mb-2 bg-base-100 border border-base-200">
         <p

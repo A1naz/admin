@@ -8,7 +8,7 @@ export default eventHandler(async (event) => {
   if (!session)
     return sendRedirect(event, '/auth', 302)
 
-  const { status, limit, skip } = getQuery(event)
+  const { status, limit, skip, dateFilter } = getQuery(event)
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
     return sendRedirect(event, '/auth', 302)
@@ -59,7 +59,17 @@ export default eventHandler(async (event) => {
       .skip(skip as number)
       .limit(limit as number)
   }
-
+  switch (dateFilter) {
+    case 'today':
+      buyouts = buyouts.filter(item => new Date(item.createdAt) > new Date(Date.now() - 1000 * 60 * 60 * 24))
+      break
+    case '3days':
+      buyouts = buyouts.filter(item => new Date(item.createdAt) > new Date(Date.now() - 1000 * 60 * 60 * 24 * 3))
+      break
+    case '7days':
+      buyouts = buyouts.filter(item => new Date(item.createdAt) > new Date(Date.now() - 1000 * 60 * 60 * 24 * 7))
+      break
+  }
   const format = buyouts.map((buyout) => {
     const place = all.findIndex(item => item.uuid === buyout.uuid)
     return {
@@ -74,8 +84,6 @@ export default eventHandler(async (event) => {
       quantity: buyout.quantity,
       gender: buyout.gender,
       status: buyout.status,
-      // orderPaymentStatus: buyout.orderPaymentStatus,
-      // servicePaymentStatus: buyout.servicePaymentStatus,
       completed: buyout.completed,
       rules: buyout.rules,
       createdAt: buyout.createdAt,
