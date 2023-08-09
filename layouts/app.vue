@@ -121,7 +121,7 @@ onMounted(() => {
           <div class="w-full  hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between  w-full items-center p-0 m-0">
               <div
-                class="join-item btn btn-ghost gap-2 flex justify-center items-center normal-case w-[80%] hover:cursor-pointer rounded-lg p-0 m-0"
+                class="join-item btn btn-ghost gap-2 flex justify-center items-center normal-case w-[60%] hover:cursor-pointer rounded-lg p-0 m-0"
                 @click="logout"
               >
                 <Icon name="fluent:sign-out-24-filled" size="24" />
@@ -129,6 +129,9 @@ onMounted(() => {
                   Выйти
                 </span>
               </div>
+              <a href="https://t.me/+Y9WKYbGsMeM3ZDli">
+                <label class="join-item btn btn-ghost btn-square z-10"><Icon class="w-6 h-6" name="ic:baseline-telegram" /></label>
+              </a>
               <label class="join-item btn btn-ghost btn-square z-10 w-[20%] swap swap-rotate">
 
                 <!-- this hidden checkbox controls the state -->

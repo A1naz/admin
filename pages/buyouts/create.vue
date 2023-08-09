@@ -21,7 +21,7 @@ const disabledCreateButton = ref(false)
 const selectPointModal = ref<HTMLElement>()
 const infoModal = ref<HTMLDialogElement>()
 const store = useBuyoutStore()
-
+const infoType = ref('')
 const defaultRules: Rule[] = rules
 const route = useRoute()
 const article = ref<number>()
@@ -80,7 +80,8 @@ function removeProduct(index: number) {
 function handleAddress(address: string) {
   store.handleAddress(address)
 }
-function openInfoModal() {
+function openInfoModal(type: string) {
+  infoType.value = type
   infoModal.value?.showModal()
 }
 
@@ -229,18 +230,18 @@ onMounted(async () => {
       </div>
       <div v-else class="products-table scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
         <table class="table table-sm table-zebra w-full mt-4">
-          <thead class="relative mb-2 text-sm text-base-content" @click="openInfoModal">
+          <thead class="relative mb-2 text-sm text-base-content">
             <tr>
               <th class="">
                 №
               </th>
-              <th class="w-12 text-center">
+              <th class="w-12 text-center" @click="openInfoModal('picture')">
                 <IconCSS name="material-symbols:image-outline" size="20" />
               </th>
               <th class="w-48">
                 Название
               </th>
-              <th>
+              <th @click="openInfoModal('price')">
                 <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Цена
@@ -250,7 +251,7 @@ onMounted(async () => {
                   </span>
                 </div>
               </th>
-              <th>
+              <th @click="openInfoModal('quantity')">
                 <div class="flex justify-between w-full gap-1 items-center ">
                   <span>
                     Количество
@@ -260,7 +261,7 @@ onMounted(async () => {
                   </span>
                 </div>
               </th>
-              <th>
+              <th @click="openInfoModal('size')">
                 <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Размер
@@ -270,7 +271,7 @@ onMounted(async () => {
                   </span>
                 </div>
               </th>
-              <th>
+              <th @click="openInfoModal('sex')">
                 <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Пол
@@ -280,7 +281,7 @@ onMounted(async () => {
                   </span>
                 </div>
               </th>
-              <th>
+              <th @click="openInfoModal('search')">
                 <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Поисковые запросы
@@ -290,7 +291,7 @@ onMounted(async () => {
                   </span>
                 </div>
               </th>
-              <th class="min-w-40">
+              <th class="min-w-40" @click="openInfoModal('adress')">
                 <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Адрес
@@ -300,7 +301,7 @@ onMounted(async () => {
                   </span>
                 </div>
               </th>
-              <th>
+              <th @click="openInfoModal('dates')">
                 <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Даты выкупов
@@ -310,7 +311,7 @@ onMounted(async () => {
                   </span>
                 </div>
               </th>
-              <th>
+              <th @click="openInfoModal('rules')">
                 <div class="flex justify-between w-full gap-1 items-center">
                   <span>
                     Правила
@@ -387,37 +388,37 @@ onMounted(async () => {
           Информация
         </h3>
         <div class="py-4 flex flex-col gap-2">
-          <p>
+          <p v-if="infoType === 'picture'">
             <span class="font-bold">
               Изображение
             </span>
             - Увеличивайте изображение товара просто наводя на него курсором
           </p>
-          <p>
+          <p v-if="infoType === 'price'">
             <span class="font-bold">
               Цена
             </span>
             - Цена товара указана без СПП
           </p>
-          <p>
+          <p v-if="infoType === 'quantity'">
             <span class="font-bold">
               Количество
             </span>
             - Указывайте желаемое количество выкупов, но не более 3 штук на 1 ПВЗ в сутки
           </p>
-          <p>
+          <p v-if="infoType === 'size'">
             <span class="font-bold">
               Размер
             </span>
             - Выберите желаемый размер товара
           </p>
-          <p>
+          <p v-if="infoType === 'sex'">
             <span class="font-bold">
               Пол
             </span>
             - Выберите желаемый Пол для выкупов
           </p>
-          <div>
+          <div v-if="infoType === 'search'">
             <div>
               <span class="font-bold">
                 Поисковые запросы
@@ -428,20 +429,19 @@ onMounted(async () => {
               Например, при указании 5 поисковых запросов - каждый будет выкупаться по своему запросу, если по данному запросу товар не найден, то запрос игнорируется.
             </div>
           </div>
-
-          <p>
+          <p v-if="infoType === 'adress'">
             <span class="font-bold">
               Адрес
             </span>
             - Добавьте Адрес желаемого ПВЗ от куда вы будете забирать товар
           </p>
-          <p>
+          <p v-if="infoType === 'dates'">
             <span class="font-bold">
               Даты выкупов
             </span>
             - Выберите желаемый диапазон дат и времени для выкупов
           </p>
-          <p>
+          <p v-if="infoType === 'rules'">
             <span class="font-bold">
               Правила
             </span>
