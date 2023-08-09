@@ -5,6 +5,7 @@ import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { Delivery } from '@/server/lib/models/Delivery'
 import { Buyout } from '@/server/lib/models/Buyout'
+import { Buyoutlog } from '@/server/lib/models/Buyoutlog'
 
 const keys = Object.keys as <T>(obj: T) =>
 (keyof T extends infer U ? U extends string ? U : U extends number ? `${U}` : never : never)[]
@@ -20,7 +21,9 @@ async function getReady(user: Document) {
 
       if (!buyout)
         return undefined
-
+      const logs = await Buyoutlog.find({ buyout: buyout._id })
+      const foundLog = logs.find(item => item.text.includes('Выкуп выполнен'))
+      const finishDate = new Date(foundLog ? foundLog.date : buyout.createdAt)
       const place = index + 1
 
       const phone = delivery.recipientphone
@@ -49,6 +52,7 @@ async function getReady(user: Document) {
         recipient: delivery.recipient,
         createdAt: new Date(buyout.createdAt),
         recipientphone: replaced,
+        finishDate,
         updatedAt: new Date(delivery.updatedAt),
       }
     }).filter(item => item !== undefined),
@@ -81,7 +85,7 @@ export default eventHandler(async (event) => {
       { header: 'Товар', key: 'productname', width: 48, font: { bold: true } },
       { header: 'Артикул', key: 'article', width: 16, font: { bold: true } },
       { header: 'Размер', key: 'size', width: 16, font: { bold: true } },
-      { header: 'Дата создания заказа', key: 'createdAt', width: 16, font: { bold: true } },
+      { header: 'Дата создания заказа', key: 'finishDate', width: 16, font: { bold: true } },
       { header: 'Дата доставки в ПВЗ', key: 'statusupdated', width: 16, font: { bold: true } },
       { header: 'Код ПВЗ', key: 'receiptcode', width: 16, font: { bold: true } },
       { header: 'ID Выкупа', key: 'uuid', width: 16, font: { bold: true } },
