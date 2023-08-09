@@ -152,6 +152,17 @@ const availableBuyouts = computedEager(() => {
   })
   return result
 })
+const neededDeposit = computedEager(() => {
+  let result = 0
+  let sum = 0
+  activeBuyouts.value.forEach((buyout: any) => {
+    sum += buyout.product.price * buyout.quantity
+  })
+  if (sum > store.client.balance)
+    result = sum - store.client.balance
+
+  return result
+})
 const formatAvailable = computedEager(() => {
   if (!availableBuyouts.value)
     return ''
@@ -289,7 +300,7 @@ watch(() => status.value, async () => {
             'text-success': availableBuyouts === activeBuyouts.length,
           }" class="text-sm"
         >
-          {{ availableBuyouts === activeBuyouts.length ? 'Баланса хватит на все выкупы' : `Баланса хватит на ${availableBuyouts} ${formatAvailable} из ${activeBuyouts.length}` }}
+          {{ availableBuyouts === activeBuyouts.length ? 'Баланса хватит на все выкупы' : `Баланса хватит на ${availableBuyouts} ${formatAvailable} из ${activeBuyouts.length}.` }} <span v-if="neededDeposit > 0">{{ `Пополните баланс на ${Math.round(neededDeposit)} для выполнения всех выкупов.` }}</span>
         </p>
         <p v-if="availableBuyouts === 0 && activeBuyouts.length > 0" class="text-center text-warning text-sm">
           Недостаточно средств для совершения выкупа, пополните баланс.
