@@ -17,6 +17,7 @@ const { stop } = useIntersectionObserver(
 const skip = ref(50)
 const end = ref(false)
 
+const filterType = ref('all')
 const PrimeVue = usePrimeVue()
 const { width, height } = useWindowSize()
 const route = useRoute()
@@ -25,6 +26,7 @@ const history = ref([]) as any
 const { data, error } = await useFetch('/api/paymenthistory/get', {
   method: 'GET',
   query: {
+    type: filterType.value,
     skip: 0,
     limit: 50,
   },
@@ -32,7 +34,20 @@ const { data, error } = await useFetch('/api/paymenthistory/get', {
 })
 history.value = data.value
 const exportDates = ref([])
-
+async function selectType(e: Event) {
+  const target = e.target as HTMLSelectElement
+  filterType.value = target.value
+  skip.value = 50
+  end.value = false
+  const { data } = await useFetch('/api/paymenthistory/get', {
+    method: 'GET',
+    query: {
+      type: filterType.value,
+      limit: 50,
+    },
+  })
+  history.value = data.value
+}
 async function exportToXLS() {
   const { data } = await useFetch('/api/paymenthistory/export', {
     method: 'POST',
@@ -56,6 +71,7 @@ watch(targetIsVisible, async (isVisible) => {
     const { data, error } = await useFetch('/api/paymenthistory/get', {
       method: 'GET',
       query: {
+        type: filterType.value,
         limit: 50,
         skip: skip.value,
       },
@@ -80,6 +96,20 @@ watch(targetIsVisible, async (isVisible) => {
       Здесь можно увидеть движение вашего баланса
     </p>
     <div class="flex justify-between mb-8 mt-6 items-center">
+      <select class="select select-bordered select-sm" @change="selectType">
+        <option value="all">
+          Все
+        </option>
+        <option value="buyouts">
+          Выкупы
+        </option>
+        <option value="reviews">
+          Отзывы
+        </option>
+        <option value="questions">
+          Вопросы
+        </option>
+      </select>
       <div class="flex gap-4 items-center">
         <div v-if="history.length" class="export">
           <DateRangePicker v-model="exportDates" save-button="Экспорт в Excel" :start-date="new Date()" @select="exportToXLS">
