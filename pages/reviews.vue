@@ -110,7 +110,7 @@ function goToPublished() {
   <div>
     <div class="page-header">
       <h1 class="text-2xl font-bold mt-4">
-        Отзывы
+        Отзывы <a class="hover:text-primary" href="https://youtu.be/CETd_wnqAuI"><IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
       </h1>
       <p class="description">
         На каждый полученный артикул можно оставить отзыв. Оплачивается отдельно от выкупа согласно вашему тарифу.

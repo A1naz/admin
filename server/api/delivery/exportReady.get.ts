@@ -47,6 +47,7 @@ async function getReady(user: Document) {
           ? delivery.receiptcodeqr
           : undefined,
         recipient: delivery.recipient,
+        createdAt: new Date(buyout.createdAt),
         recipientphone: replaced,
         updatedAt: new Date(delivery.updatedAt),
       }
@@ -76,15 +77,18 @@ export default eventHandler(async (event) => {
     sheet.columns = [
       { header: 'Номер', key: 'place', font: { bold: true } },
       { header: 'QR код', key: 'receiptcode', width: 16, font: { bold: true } },
-      { header: 'Код получения', key: 'receiptcode', width: 16, font: { bold: true } },
       { header: 'Статус', key: 'currentstatus', width: 16, font: { bold: true } },
-      { header: 'Дата обновления статуса', key: 'statusupdated', width: 16, font: { bold: true } },
-      { header: 'Адрес пункта выдачи', key: 'point', width: 64, font: { bold: true } },
       { header: 'Товар', key: 'productname', width: 48, font: { bold: true } },
-      { header: 'Получатель', key: 'recipient', width: 16, font: { bold: true } },
-      { header: 'Телефон получателя', key: 'recipientphone', width: 16, font: { bold: true } },
-      { header: 'Дата обновления', key: 'updatedAt', width: 16, font: { bold: true } },
+      { header: 'Артикул', key: 'article', width: 16, font: { bold: true } },
+      { header: 'Размер', key: 'size', width: 16, font: { bold: true } },
+      { header: 'Дата создания заказа', key: 'createdAt', width: 16, font: { bold: true } },
+      { header: 'Дата доставки в ПВЗ', key: 'statusupdated', width: 16, font: { bold: true } },
+      { header: 'Код ПВЗ', key: 'receiptcode', width: 16, font: { bold: true } },
       { header: 'ID Выкупа', key: 'uuid', width: 16, font: { bold: true } },
+      { header: 'ПВЗ', key: 'point', width: 64, font: { bold: true } },
+      { header: 'Получатель', key: 'recipient', width: 16, font: { bold: true } },
+      { header: 'Телефон', key: 'recipientphone', width: 16, font: { bold: true } },
+      { header: 'Дата обновления', key: 'updatedAt', width: 16, font: { bold: true } },
     ]
 
     sheet.addRows(ready)

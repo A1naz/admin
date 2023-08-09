@@ -182,7 +182,7 @@ function onTelegramLink(data: any) {
     </div>
     <div class="page-header mb-16">
       <h1 class="text-2xl font-bold mt-4">
-        Профиль
+        Профиль <a class="hover:text-primary" href="https://youtu.be/cnFxy1Hieo8"><IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
       </h1>
       <p class="description">
         Здесь вы можете управлять настройками вашего аккаунта.
