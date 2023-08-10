@@ -78,6 +78,7 @@ onMounted(() => {
                       i
                     </NuxtLink>
                   </div>
+                  <div class="tooltip" data-tip="Профиль пользователя">
                   <NuxtLink
                     :class="{
                       'bg-neutral-focus': route.path !== '/profile',
@@ -86,6 +87,7 @@ onMounted(() => {
                   >
                     <IconCSS name="fluent:person-24-filled" size="24" />
                   </NuxtLink>
+                  </div>
                 </div>
               </div>
             </div>

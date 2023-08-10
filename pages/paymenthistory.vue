@@ -90,7 +90,11 @@ watch(targetIsVisible, async (isVisible) => {
 <template>
   <div>
     <h1 class="text-2xl font-bold mt-4">
-      История платежей <a class="hover:text-primary" target="_blank"  href="https://youtu.be/vwm4RuS-ZJY"><IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
+      История платежей 
+      <div class="tooltip tooltip-bottom" data-tip="Видео-инструкция по балансу">
+      <a class="hover:text-primary" target="_blank"  href="https://youtu.be/vwm4RuS-ZJY">
+        <IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
+      </div>
     </h1>
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm mb-6">
       Здесь можно увидеть движение вашего баланса
