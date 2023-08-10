@@ -11,8 +11,9 @@ export const useBuyoutStore = defineStore('buyout', {
     selectedItem: null as number | null,
     defaultRules: rules,
   }),
-  // optional actions
-
+  persist: {
+    storage: persistedState.localStorage
+  },
   actions: {
     async cloneBuyout(uuid: string) {
       const { data, error } = await useFetch('/api/buyout/clone', {

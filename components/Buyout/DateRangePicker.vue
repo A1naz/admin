@@ -30,6 +30,7 @@ function getSecondDate(dates: [Date | null, Date | null] | []) {
   return ''
 }
 type UpdateMonthYear = (month: number, year: number) => void
+type updateTime = (time: number[], hours: boolean) => void
 
 function updateMonth(event: InputEvent, updateMonthYear: UpdateMonthYear, year: number) {
   updateMonthYear(+(event.target as HTMLSelectElement).value, year)
@@ -59,6 +60,15 @@ function handleDate(modelData: any) {
   date.value = [first, second]
   emit('update:modelValue', modelData)
 }
+function handleTime(index: number, value: number, hours = true, updateTime: updateTime, time: any){
+  console.log(time.hours)
+
+  if (index === 0)
+    updateTime([value, time.hours[1]], true)
+  else 
+   updateTime([time.hours[0], value], true)
+
+}
 </script>
 
 <template>
@@ -66,6 +76,7 @@ function handleDate(modelData: any) {
     <VueDatePicker
       v-model="date" position="left" :teleport-center="width < 1024"
       :teleport="true" :min-date="startDate" :prevent-min-max-navigation="true" :dark="colorMode.value === 'dark'"
+      :time-picker-inline="true"
       locale="ru" range cancel-text="" select-text="Сохранить" @update:model-value="handleDate"
     >
       <template #trigger>
@@ -131,6 +142,34 @@ function handleDate(modelData: any) {
           <div class="text-base-content">
             Указать время
           </div>
+        </div>
+      </template>
+      <template #time-picker="{ time, updateTime }">
+        <div class="custom-time-picker-component">
+          <span class="text-center px-2">Укажите часы</span>
+          <div class="flex items-center gap-2 px-2 pt-1">
+            <select 
+            class="select select-sm w-full" 
+            :value="time.hours[0]"
+            @change="handleTime(0, +$event.target.value, true, updateTime, time)"
+          >
+            <option 
+              v-for="h in hoursArray"
+              :key="h.value"
+              :value="h.value">{{ h.text }}</option>
+          </select>
+          <select
+            class="select select-sm w-full"
+            :value="time.hours[1]"
+            @change="handleTime(1, +$event.target.value, true, updateTime, time)"
+          >
+          <option 
+              v-for="h in hoursArray"
+              :key="h.value"
+              :value="h.value">{{ h.text }}</option>
+          </select>
+          </div>
+          
         </div>
       </template>
     </VueDatePicker>

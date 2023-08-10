@@ -83,6 +83,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxt/image-edge',
     '@pinia/nuxt',
+    '@pinia-plugin-persistedstate/nuxt',
     'nuxt-icon',
     '@sidebase/nuxt-auth',
     '@vueuse/nuxt',

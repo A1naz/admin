@@ -122,7 +122,7 @@ watch(() => status.value, async (newRoute) => {
 <template>
   <div>
     <h1 class="text-2xl font-bold mt-4">
-      Доставки <a class="hover:text-primary" href="https://youtu.be/URh2G7fzl-g"><IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
+      Доставки <a class="hover:text-primary"  target="_blank"  href="https://youtu.be/URh2G7fzl-g"><IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
     </h1>
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
       В этом разделе можно отследить статусы выкупов после оплаты. Статус "Доставлен" означает, что товар можно
