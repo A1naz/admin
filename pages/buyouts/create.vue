@@ -229,16 +229,16 @@ onMounted(async () => {
         />
       </div>
       <div v-else class="products-table scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
-        <table class="table table-sm table-zebra w-full mt-4">
+        <table class="table table-xs table-zebra w-full mt-4">
           <thead class="relative mb-2 text-sm text-base-content">
             <tr>
-              <th class="">
+              <th class="hidden 3xl:block">
                 №
               </th>
               <th class="w-12 text-center" @click="openInfoModal('picture')">
                 <IconCSS name="material-symbols:image-outline" size="20" />
               </th>
-              <th class="w-48">
+              <th class="w-36 3xl:w-48">
                 Название
               </th>
               <th @click="openInfoModal('price')">
@@ -254,7 +254,7 @@ onMounted(async () => {
               <th @click="openInfoModal('quantity')">
                 <div class="flex justify-between w-full gap-1 items-center ">
                   <span>
-                    Количество
+                    Кол-во
                   </span>
                   <span class="rounded-lg bg-base-200 px-1 text-xs">
                     ?

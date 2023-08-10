@@ -69,7 +69,7 @@ const productQuantityModel = computed({
 
 <template>
   <tr>
-    <td>
+    <td class="hidden 3xl:block">
       {{ index + 1 }}
     </td>
     <td>
