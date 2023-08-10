@@ -78,7 +78,7 @@ onMounted(() => {
                       i
                     </NuxtLink>
                   </div>
-                  <div class="tooltip" data-tip="Профиль пользователя">
+                  <div class="tooltip" data-tip="Профиль">
                   <NuxtLink
                     :class="{
                       'bg-neutral-focus': route.path !== '/profile',
