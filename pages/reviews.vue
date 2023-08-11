@@ -149,7 +149,7 @@ function goToPublished() {
       </div>
     </div>
     <div v-if="reviews?.length">
-      <div v-if="status === 'available'" class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+      <div v-if="status === 'available'" class="cards grid grid-cols-1 gap-4">
         <ReviewCard
           v-for="(review, index) of reviews" :key="index" :index="index"
           :info="review" @open-modal="openModal"

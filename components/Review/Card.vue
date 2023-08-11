@@ -18,50 +18,67 @@ function openBuyout() {
 </script>
 
 <template>
-  <div
-    class="card card-compact shadow-md transition duration-300 ease-in-out border-[2.5px] border-transparent hover:shadow-xl"
-  >
-    <figure class="rounded-lg">
-      <a
-        class="w-full h-72" :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`"
-        target="_blank"
-      >
-        <nuxt-img fit="contain" class="w-full h-72 object-contain rounded-lg" :src="info.productimage" loading="lazy" /> </a>
-    </figure>
-    <div class="card-body overflow-hidden">
-      <div class="truncate">
-        <div class="card-title truncate mb-0 pb-0">
-          <span class="truncate">{{ info.productname }}</span>
-        </div>
-        <div class="flex flex-col gap-2">
-          <div class="flex justify-between gap-2 flex-wrap">
-            <a
-              :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`" target="_blank"
-              class="text-sm text-secondary link link-hover"
+  <div class="rounded-lg bg-base-200">
+    <div class="p-4 relative text-xl font-medium flex flex-col gap-2">
+      <div class="flex gap-4">
+        <a
+          class="" :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`"
+          target="_blank"
+        >
+          <div class="dropdown dropdown-hover">
+            <label tabindex="0"> <nuxt-img
+              width="36"
+              class="rounded-lg" loading="lazy" fit="fill"
+              :src="info?.productimage"
+            />
+            </label>
+            <ul
+              tabindex="0"
+              class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52 z-10"
             >
-              {{ info.article }}
-            </a>
-            <label
-              class="link link-hover text-sm text-gray-500 hover:text-primary truncate z-10"
-              @click="openBuyout"
-            >
-              Выкуп
-
-              #{{
-                info.buyoutuuid }}</label>
+              <nuxt-img
+                class="rounded-lg" loading="lazy" fit="fill"
+                :src="info?.productimage"
+              />
+            </ul>
           </div>
-          <div class="flex gap-2">
-            <div>Пол: {{ info.sex === 'female' ? 'Женский' : info.sex === 'male' ? 'Мужской' : 'Нет' }}</div>
-            <div>Размер: {{ info.size === 'none' ? 'Нет' : info.size }}</div>
+        </a>
+        <div class="w-full">
+          <div class="flex justify-between flex-wrap">
+            <span> {{ info.productname }}
+            </span>
+            <label
+              class="text-[0.6rem] link link-hover sm:text-[0.8rem] lg:text-xs text-gray-500 hover:text-primary truncate z-10"
+              @click="openBuyout"
+            >#{{
+              info.buyoutuuid }}</label>
+          </div>
+          <div class="flex justify-between flex-wrap gap-2 items-center">
+            <div class="text-sm">
+              <a
+                :href="`https://www.wildberries.ru/catalog/${info.article}/detail.aspx`" target="_blank"
+                class="text-sm text-secondary link link-hover"
+              >
+                {{ info.article }}
+              </a>
+            </div>
+
+            <div class="mt-2 lg:m-0 text-xs">
+              Обновлено {{ $dayjs(info.updatedAt).format('D MMMM HH:mm') }}
+            </div>
           </div>
         </div>
       </div>
-      <div class="card-actions">
+      <div class="flex justify-between items-center">
+        <div class="flex gap-2 text-sm">
+          <div>Пол: {{ info.sex === 'female' ? 'Женский' : info.sex === 'male' ? 'Мужской' : 'Нет' }}</div>
+          <div>Размер: {{ info.size === 'none' ? 'Нет' : info.size }}</div>
+        </div>
         <label
-          for="review-modal" class="btn btn-primary btn-block"
+          for="review-modal" class="btn btn-sm btn-primary"
           @click="$emit('openModal', info.buyoutuuid, info.id)"
-        >Оставить
-          отзыв</label>
+        >Оставить отзыв
+        </label>
       </div>
     </div>
   </div>
