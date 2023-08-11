@@ -217,8 +217,8 @@ watch(() => status.value, async () => {
   <div>
     <h1 class="text-2xl font-bold mt-4">
       Выкупы
-        <div class="tooltip tooltip-bottom" data-tip="Видео-инструкция по выкупам">
-          <a class="hover:text-primary" target="_blank" href="https://youtu.be/QQf2mYMZkN8">
+      <div class="tooltip tooltip-bottom" data-tip="Видео-инструкция по выкупам">
+        <a class="hover:text-primary" target="_blank" href="https://youtu.be/QQf2mYMZkN8">
           <IconCSS size="24" class="h-8 w-8" name="uil:youtube" />
         </a>
       </div>
@@ -282,7 +282,7 @@ watch(() => status.value, async () => {
         Добавить выкупы
       </NuxtLink>
     </div>
-    <div class="search flex justify-between items-center">
+    <div class="search flex justify-between items-center mb-4">
       <select class="select select-bordered select-sm" @change="selectFilterDate">
         <option value="all">
           За все время

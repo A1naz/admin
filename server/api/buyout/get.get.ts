@@ -59,9 +59,11 @@ export default eventHandler(async (event) => {
       .skip(skip as number)
       .limit(limit as number)
   }
+  const today = new Date(Date.now())
+  today.setHours(0, 0, 0, 0)
   switch (dateFilter) {
     case 'today':
-      buyouts = buyouts.filter(item => new Date(item.createdAt) > new Date(Date.now() - 1000 * 60 * 60 * 24))
+      buyouts = buyouts.filter(item => new Date(item.createdAt) > today)
       break
     case '3days':
       buyouts = buyouts.filter(item => new Date(item.createdAt) > new Date(Date.now() - 1000 * 60 * 60 * 24 * 3))
