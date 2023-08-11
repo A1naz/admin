@@ -12,6 +12,8 @@ const { notify } = useNotification()
 const router = useRouter()
 const details = ref(null) as any
 const loading = ref(false)
+const openedPhoto = ref('')
+const infoModal = ref<HTMLDialogElement>()
 const currency = useCurrency()
 const store = useMainStore()
 const transferStatus = ref(null) as Ref<null | string>
@@ -147,10 +149,10 @@ async function checkForLink() {
 }
 
 async function pay() {
-  if (paymentForm.paymentSum > 30000 && paymentForm.paymentType === 'transfer') {
+  if (paymentForm.paymentSum > 20000 && paymentForm.paymentType === 'transfer') {
     notify({
       title: 'Что-то пошло не так',
-      text: 'Сумма для перевода не должна превышать 30000 руб.',
+      text: 'Сумма для перевода не должна превышать 20000 руб.',
     })
     return
   }
@@ -216,8 +218,12 @@ onMounted(() => {
         for="payment-modal" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
         @click="cancelPayment"
       >✕</label>
-      <h3 class="text-xl font-bold mb-2">Пополнить баланс</h3>
-
+      <div class="flex items-center gap-2 mb-2">
+        <h3 class="text-xl font-bold ">Пополнить баланс</h3>
+        <a class="btn btn-sm btn-ghost" @click="infoModal?.showModal()">
+          ?
+        </a>
+      </div>
       <div>
         <div class="w-full flex flex-col gap-6 justify-center items-start" action="">
           <div class="sum w-full">
@@ -226,8 +232,8 @@ onMounted(() => {
           </div>
           <div class="join join-vertical w-full">
             <input
-              disabled
               v-model="paymentForm.paymentType"
+              disabled
               type="radio"
               name="options"
               value="fast"
@@ -301,9 +307,15 @@ onMounted(() => {
       <div class="modal-box relative">
         <div v-if="!alertOpened" class="details-box">
           <label for="transfer-modal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2" @click="cancelTransfer">✕</label>
-          <h3 class="font-bold text-lg">
-            Данные для перевода
-          </h3>
+          <div class="flex items-center gap-2">
+            <h3 class="font-bold text-lg">
+              Данные для перевода
+            </h3>
+            <button class="btn btn-sm" @click="infoModal?.showModal()">
+              Как пополнить баланс?
+            </button>
+          </div>
+
           <div class="flex items-center gap-2 relative">
             <span class="text-primary">
               {{ Math.floor(timer / 60) < 10 ? `0${Math.floor(timer / 60)}` : Math.floor(timer / 60) }}:{{ secondsLeft < 10 ? `0${secondsLeft}` : secondsLeft }}
@@ -338,21 +350,33 @@ onMounted(() => {
           </div>
         </div>
         <div v-if="alertOpened" class="mt-8 text-sm bg-base-200 p-2 rounded-lg">
-          <span class="font-bold text-red-500 text-lg text-center">
-            Внимание!
-          </span>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="font-bold text-red-500 text-lg text-center">
+              Внимание!
+            </span>
+            <button class="btn btn-sm" @click="infoModal?.showModal()">
+              Как пополнить баланс?
+            </button>
+          </div>
           <p class="">
-            В данных платежа указан вариант пополнения баланса через номер телефона для перевода по СБП на банк QIWI и Кошелек (КИВИ Банк).
+            Пополнение баланса происходит с карты любого банка на указанный номер телефона/кошелька банка QIWI или Киви кошелек (другими словами).
           </p>
           <p class="pt-2">
-            Сумма, изменяется в поиске для совершения безопасного платежа, возможно, с 0% комиссии, зависит от вашего банка.
+            При пополнении вводите только те данные, которые мы вам предоставляем.
           </p>
           <p class="pt-2">
-            Баланс необходимо пополнить на УКАЗАННУЮ сумму, иначе будет сбой в пополнении и нам придется ручками зачислять вам, а это время!
+            <span class="font-bold text-base">
+              А именно, номер кошелька/телефона QIWI и сумму перевода с копейками!
+            </span>
           </p>
-
           <p class="pt-2">
-            Максимальная сумма за 1 транзакцию 30 000 рублей.
+            Для перевода войдите в приложение вашего банка, выберите перевод на QIWI, введите нужную сумму, данные кошелька и нажмите Перевести/Оплатить
+          </p>
+          <p class="pt-2">
+            Максимальная сумма за 1 транзакцию 20 000 рублей.
+          </p>
+          <p class="pt-2 font-bold text-base">
+            Переводы с QIWI на QIWI запрещены. В связи с блокировками кошельков.
           </p>
           <button class="btn btn-block btn-neutral py-2 my-2" @click="alertOpened = false">
             С информацией ознакомился
@@ -361,6 +385,58 @@ onMounted(() => {
       </div>
     </div>
   </div>
+  <dialog ref="infoModal" class="modal">
+    <form method="dialog" class="modal-box">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+        ✕
+      </button>
+      <h3 class="text-base font-bold">
+        Чтобы пополнить баланс, выполните простые рекомендации:
+      </h3>
+      <ul class="py-2">
+        <li>
+          1. Создайте запрос на пополнение
+        </li>
+        <li>
+          2. Перейдите в приложение банка
+        </li>
+        <li>
+          3. Найдите способ пополнения СПБ
+        </li>
+        <li>
+          4. Введите необходимые данные:
+        </li>
+        <li>
+          - номер телефона QIWI кошелька
+        </li>
+        <li>
+          - точную сумму (С КОПЕЙКАМИ!)
+        </li>
+        <li>
+          5. Отправьте сумму нажав кнопку Перевести
+        </li>
+      </ul>
+      <p class="pt-2">
+        Пополняйте баланс один раз в 10 минут, не более 20 000 рублей
+      </p>
+      <div class="images flex gap-2 items-center justify-center mt-2">
+        <label for="sbpImageModal" class="cursor-pointer"><nuxt-img class="rounded-lg" src="info/sbp1.jpg" loading="lazy" fit="fill" @click="openedPhoto = 'info/sbp1.jpg'" />
+        </label>
+        <label for="sbpImageModal" class="cursor-pointer"><nuxt-img class="rounded-lg" src="info/sbp2.jpg" loading="lazy" fit="fill" @click="openedPhoto = 'info/sbp2.jpg'" />
+        </label>
+        <label for="sbpImageModal" class="cursor-pointer"><nuxt-img class="rounded-lg" src="info/sbp3.jpg" loading="lazy" fit="fill" @click="openedPhoto = 'info/sbp3.jpg'" />
+        </label>
+      </div>
+    </form>
+    <input id="sbpImageModal" type="checkbox" class="modal-toggle">
+
+    <label for="sbpImageModal" class="modal cursor-pointer">
+      <label for="" class="modal-box max-h-[80vh] p-0 overflow-hidden">
+        <label for="sbpImageModal" class="btn btn-sm btn-ghost btn-circle absolute right-2 top-2">✕</label>
+        <nuxt-img v-if="openedPhoto" fit="contain" class="object-contain m-auto max-h-[80vh]" :src="openedPhoto || ''" loading="lazy" />
+      </label>
+    </label>
+  </dialog>
 </template>
 
 <style scoped></style>

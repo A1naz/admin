@@ -110,10 +110,10 @@ function goToPublished() {
   <div>
     <div class="page-header">
       <h1 class="text-2xl font-bold mt-4">
-        Отзывы 
+        Отзывы
         <div class="tooltip tooltip-bottom" data-tip="Видео-инструкция по отзывам">
-        <a class="hover:text-primary" target="_blank"  href="https://youtu.be/CETd_wnqAuI">
-          <IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
+          <a class="hover:text-primary" target="_blank" href="https://youtu.be/CETd_wnqAuI">
+            <IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
         </div>
       </h1>
       <p class="description">
