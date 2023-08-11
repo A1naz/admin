@@ -57,6 +57,8 @@ function handleDate(modelData: any) {
     second.setHours(first.getHours())
   if (second.getMinutes() < first.getMinutes())
     second.setMinutes(first.getMinutes())
+  first.setHours(9)
+  second.setHours(20)
   date.value = [first, second]
   emit('update:modelValue', modelData)
 }
