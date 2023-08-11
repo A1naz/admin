@@ -90,16 +90,27 @@ watch(targetIsVisible, async (isVisible) => {
 <template>
   <div>
     <h1 class="text-2xl font-bold mt-4">
-      История платежей 
+      История платежей
       <div class="tooltip tooltip-bottom" data-tip="Видео-инструкция по балансу">
-      <a class="hover:text-primary" target="_blank"  href="https://youtu.be/vwm4RuS-ZJY">
-        <IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
+        <a class="hover:text-primary" target="_blank" href="https://youtu.be/vwm4RuS-ZJY">
+          <IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
       </div>
     </h1>
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm mb-6">
       Здесь можно увидеть движение вашего баланса
     </p>
-    <div class="flex justify-between mb-8 mt-6 items-center">
+    <div class="flex gap-4 mb-8 mt-6 items-center">
+      <div class="flex gap-4 items-center">
+        <div v-if="history.length" class="export">
+          <ClientOnly>
+            <DateRangePicker v-model="exportDates" save-button="Экспорт в Excel" :start-date="new Date()" @select="exportToXLS">
+              <button class="btn btn-sm btn-primary">
+                Экспорт
+              </button>
+            </DateRangePicker>
+          </ClientOnly>
+        </div>
+      </div>
       <select class="select select-bordered select-sm" @change="selectType">
         <option value="all">
           Все
@@ -114,15 +125,6 @@ watch(targetIsVisible, async (isVisible) => {
           Вопросы
         </option>
       </select>
-      <div class="flex gap-4 items-center">
-        <div v-if="history.length" class="export">
-          <DateRangePicker v-model="exportDates" save-button="Экспорт в Excel" :start-date="new Date()" @select="exportToXLS">
-            <button class="btn btn-sm btn-primary">
-              Экспорт
-            </button>
-          </DateRangePicker>
-        </div>
-      </div>
     </div>
     <div v-if="width > 1024">
       <DataTable sort-field="dataoperation" :sort-order="-1" class="bg-base-200 hidden lg:block" :value="history" removable-sort>

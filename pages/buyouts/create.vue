@@ -20,6 +20,7 @@ definePageMeta({
 const disabledCreateButton = ref(false)
 const selectPointModal = ref<HTMLElement>()
 const infoModal = ref<HTMLDialogElement>()
+const checksModal = ref<HTMLDialogElement>()
 const store = useBuyoutStore()
 const infoType = ref('')
 const defaultRules: Rule[] = rules
