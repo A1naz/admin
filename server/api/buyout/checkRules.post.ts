@@ -57,7 +57,7 @@ export default eventHandler(async (event) => {
     }
     if (rules.includes(8)) {
       for (const query of item.searchQuery) {
-        const searchResult = await findPositionByQuery(query.value, item.article)
+        const searchResult = await findPositionByQuery(query.value, item.article, sort)
         if (!searchResult.found) {
           result.success = false
           result.message = `Товар ${item.article} не найден в поисковой выдаче по запросу ${query.value}`

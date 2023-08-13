@@ -367,7 +367,6 @@ onMounted(async () => {
       </button>
     </div>
 
-    <!-- refactor this -->
     <div v-if="ruleModal">
       <input id="ruleModal" type="checkbox" class="modal-toggle">
       <label for="ruleModal" class="modal modal-open modal-bottom sm:modal-middle">
