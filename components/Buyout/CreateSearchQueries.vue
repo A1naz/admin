@@ -42,6 +42,9 @@ async function onInput(event: Event, index: number) {
   if (result) {
     if (result.found)
       store.changeSearchQueryStatus(index, props.productIndex, false, false, `Товар найден на ${result.page} стр.`)
+    if (result.advert)
+      store.changeSearchQueryStatus(index, props.productIndex, false, false, `Товар найден в рекламе на ${result.page} стр.`)
+
     else
       store.changeSearchQueryStatus(index, props.productIndex, true, false)
   }
