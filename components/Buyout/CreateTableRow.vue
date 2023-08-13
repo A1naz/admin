@@ -17,11 +17,15 @@ const props = defineProps({
   },
 
 })
-const emit = defineEmits(['callback', 'pointModalOpen'])
+const emit = defineEmits(['callback', 'pointModalOpen', 'ruleModalOpen'])
 
 const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 
 const store = useBuyoutStore()
+
+function copyBuyout() {
+  store.createProducts.push(store.createProducts[props.index])
+}
 async function deleteBuyOut() {
   store.removeProduct(props.index)
 }
@@ -210,15 +214,19 @@ const productQuantityModel = computed({
         <div class="mb-1">
           {{ product.rules.map((rule: Rule) => rule.id).join(', ') }}
         </div>
-        <label
-          :for="`modal${index}`" :class="{
+        <button
+          :class="{
             'btn-outline': product.rules,
-          }" class="btn btn-primary btn-sm normal-case "
-        >{{ 'Настроить' }}
-        </label>
+          }" class="btn btn-primary btn-sm normal-case " @click="$emit('ruleModalOpen', index)"
+        >
+          {{ 'Настроить' }}
+        </button>
       </div>
     </td>
     <td>
+      <div class="w-8 btn btn-ghost btn-sm btn-square" @click="copyBuyout">
+        <IconCSS name="fluent:copy-20-filled" size="20" />
+      </div>
       <div class="w-8 btn btn-ghost btn-sm btn-square" @click="deleteBuyOut">
         <IconCSS name="material-symbols:close" size="20" />
       </div>

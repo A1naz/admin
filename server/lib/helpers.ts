@@ -31,7 +31,7 @@ export function findProductCard(article: number) {
   return result
 }
 
-export async function findPositionByQuery(query: string, article: number) {
+export async function findPositionByQuery(query: string, article: number, sort = 'popular') {
   const pages = 30
   const result = {
     found: false,
@@ -55,14 +55,13 @@ export async function findPositionByQuery(query: string, article: number) {
   }
 
   for (let i = 1; i <= pages; i++) {
-    const data: any = await $fetch(`https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=popular&spp=31&suppressSpellcheck=false&page=${i}`, { parseResponse: JSON.parse })
+    const data: any = await $fetch(`https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=${sort}&spp=31&suppressSpellcheck=false&page=${i}`, { parseResponse: JSON.parse })
     const products = data?.data?.products
     if (!products)
       return result
 
     products.forEach((el: any) => {
       if (el.id === article) {
-        console.log(el)
         result.found = true
         result.page = i
       }

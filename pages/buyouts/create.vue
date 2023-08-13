@@ -18,9 +18,11 @@ definePageMeta({
 })
 
 const disabledCreateButton = ref(false)
+const ruleModal = ref(false)
+const selectedRuleProductIndex = ref(0)
 const selectPointModal = ref<HTMLElement>()
+const checksModal = ref(false)
 const infoModal = ref<HTMLDialogElement>()
-const checksModal = ref<HTMLDialogElement>()
 const store = useBuyoutStore()
 const infoType = ref('')
 const defaultRules: Rule[] = rules
@@ -39,6 +41,10 @@ async function addProduct() {
   })
 }
 
+function ruleModalOpen(index: number) {
+  ruleModal.value = true
+  selectedRuleProductIndex.value = index
+}
 function removeSearchQuery(index: number, place: number) {
   store.removeSearchQuery(index, place)
 }
@@ -103,8 +109,7 @@ const modalOpen = ref(false)
 function closeModal() {
   modalOpen.value = false
 }
-
-async function createBuyout() {
+function openChecksModal() {
   let valid = true
   let errorMsg = ''
   products.value.forEach((item) => {
@@ -132,6 +137,9 @@ async function createBuyout() {
     })
     return
   }
+  checksModal.value = true
+}
+async function createBuyout() {
   disabledCreateButton.value = true
   const { data, error } = await useFetch('/api/buyout/create', {
     method: 'POST',
@@ -332,7 +340,7 @@ onMounted(async () => {
 
           <tbody>
             <BuyoutCreateTableRow
-              v-for="(product, index) in products" :key="index" :product="product" :index="index" :loading="!pickpoints?.length" @point-modal-open="pointModalOpen"
+              v-for="(product, index) in products" :key="index" :product="product" :index="index" :loading="!pickpoints?.length" @rule-modal-open="ruleModalOpen" @point-modal-open="pointModalOpen"
             />
           </tbody>
         </table>
@@ -353,30 +361,31 @@ onMounted(async () => {
           }}</span>
         </div>
       </div>
-      <button class="btn btn-primary btn-sm normal-case" :disabled="disabledCreateButton" @click="createBuyout">
+      <button class="btn btn-primary btn-sm normal-case" :disabled="disabledCreateButton" @click="openChecksModal">
         {{ products.length > 1 ? `Создать
                             выкупы` : `Создать выкуп` }}
       </button>
     </div>
 
     <!-- refactor this -->
-    <div v-for="(product, index) of products" :key="index">
-      <input :id="`modal${index}`" type="checkbox" class="modal-toggle">
-      <label :for="`modal${index}`" class="modal modal-bottom sm:modal-middle">
+    <div v-if="ruleModal">
+      <input id="ruleModal" type="checkbox" class="modal-toggle">
+      <label for="ruleModal" class="modal modal-open modal-bottom sm:modal-middle">
         <label for="" class="modal-box relative">
           <label
-            :for="`modal${index}`"
+            for="ruleModal"
             class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            @click="ruleModal = false"
           >✕</label>
           <h3 class="font-bold text-lg mb-2">Выберите нужные правила для этого выкупа</h3>
           <div v-for="(rule) of defaultRules" :key="rule.id" class="">
             <div class="label cursor-pointer flex gap-4 items-start">
               <span class="label-text">{{ rule.id }}. {{ rule.description }}</span>
               <input
-                :disabled="!!product.rules.find(item => item.category === rule.category && item.id !== rule.id) || !!product.rules.find(item => item.id === rule?.relies)"
+                :disabled="!!store.createProducts[selectedRuleProductIndex].rules.find(item => item.category === rule.category && item.id !== rule.id) || !!store.createProducts[selectedRuleProductIndex].rules.find(item => item.id === rule?.relies)"
                 type="checkbox" class="checkbox checkbox-primary"
-                :checked="product.rules.indexOf(rule) > -1"
-                @change="onRuleChange($event, index, rule.id)"
+                :checked="!!store.createProducts[selectedRuleProductIndex].rules.find(item => item.id === rule.id)"
+                @change="onRuleChange($event, selectedRuleProductIndex, rule.id)"
               >
             </div>
           </div>
@@ -456,6 +465,7 @@ onMounted(async () => {
         </div>
       </form>
     </dialog>
+    <BuyoutCreateChecksModal v-if="checksModal" :state="checksModal" @create="createBuyout" @close="checksModal = false" />
   </div>
 </template>
 

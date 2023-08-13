@@ -12,7 +12,7 @@ export const useBuyoutStore = defineStore('buyout', {
     defaultRules: rules,
   }),
   persist: {
-    storage: persistedState.localStorage
+    storage: persistedState.localStorage,
   },
   actions: {
     async cloneBuyout(uuid: string) {

@@ -79,14 +79,14 @@ onMounted(() => {
                     </NuxtLink>
                   </div>
                   <div class="tooltip" data-tip="Профиль">
-                  <NuxtLink
-                    :class="{
-                      'bg-neutral-focus': route.path !== '/profile',
-                      'text-white': route.path === '/profile',
-                    }" to="/profile" class="btn btn-sm btn-neutral btn-circle relative hover:bg-neutral"
-                  >
-                    <IconCSS name="fluent:person-24-filled" size="24" />
-                  </NuxtLink>
+                    <NuxtLink
+                      :class="{
+                        'bg-neutral-focus': route.path !== '/profile',
+                        'text-white': route.path === '/profile',
+                      }" to="/profile" class="btn btn-sm btn-neutral btn-circle relative hover:bg-neutral"
+                    >
+                      <IconCSS name="fluent:person-24-filled" size="24" />
+                    </NuxtLink>
                   </div>
                 </div>
               </div>
@@ -131,7 +131,7 @@ onMounted(() => {
                   Выйти
                 </span>
               </div>
-              <a href="https://t.me/+Y9WKYbGsMeM3ZDli">
+              <a target="_blank" href="https://t.me/+Y9WKYbGsMeM3ZDli">
                 <label class="join-item btn btn-ghost btn-square z-10"><Icon class="w-6 h-6" name="ic:baseline-telegram" /></label>
               </a>
               <label class="join-item btn btn-ghost btn-square z-10 w-[20%] swap swap-rotate">
