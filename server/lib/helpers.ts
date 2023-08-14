@@ -43,8 +43,6 @@ export async function findPositionByQuery(query: string, article: number, sort =
   const advertPages = advertData.pages
   if (advertData.adverts) {
     const foundIndex = advertData.adverts.findIndex((el: any) => el.id === article)
-    const foundItem = advertData.adverts.find((el: any) => el.id === article)
-    console.log(foundItem)
     if (foundIndex !== -1) {
       const item = advertData.adverts[foundIndex]
       const place = foundIndex + 1
