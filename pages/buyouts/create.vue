@@ -235,6 +235,7 @@ onMounted(async () => {
         <BuyoutCreateCard
           v-for="(product, index) in products" :key="index" :loading="!pickpoints?.length"
           :product="product" :index="index" @point-modal-open="pointModalOpen"
+          @rule-modal-open="ruleModalOpen"
         />
       </div>
       <div v-else class="products-table scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">

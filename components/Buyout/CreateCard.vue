@@ -17,7 +17,7 @@ const props = defineProps({
 
 })
 
-const emit = defineEmits(['callback', 'pointModalOpen'])
+const emit = defineEmits(['callback', 'pointModalOpen', 'ruleModalOpen'])
 const store = useBuyoutStore()
 const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 
@@ -107,12 +107,13 @@ const productQuantityModel = computed({
       </div>
       <div class="flex justify-between items-center">
         <span>Правила:</span>
-        <label
-          :for="`modal${index}`" :class="{
+        <button
+          :class="{
             'btn-outline': product.rules,
-          }" class="btn btn-primary btn-sm normal-case w-32"
-        >{{ 'Настроить' }}
-        </label>
+          }" class="btn btn-primary btn-sm normal-case w-32" @click="emit('ruleModalOpen', index)"
+        >
+          {{ 'Настроить' }}
+        </button>
       </div>
       <div class="flex justify-between items-center mt-2">
         <div class="w-full flex flex-col items-start justify-center gap-1">
