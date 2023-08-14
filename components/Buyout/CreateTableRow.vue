@@ -24,7 +24,8 @@ const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 const store = useBuyoutStore()
 
 function copyBuyout() {
-  store.createProducts.push(store.createProducts[props.index])
+  const item = JSON.stringify(store.createProducts[props.index])
+  store.createProducts.push(JSON.parse(item))
 }
 async function deleteBuyOut() {
   store.removeProduct(props.index)
