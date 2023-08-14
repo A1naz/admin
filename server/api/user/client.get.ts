@@ -24,7 +24,7 @@ export default eventHandler(async (event) => {
     lastName: user.lastName,
     hasPassword: !!user.password,
     telegramUserId: user.telegramUserId,
-    wbApiKey: hiddenKey,
+    wbApiKey: user.wbApiKey,
   }
   return {
     client,

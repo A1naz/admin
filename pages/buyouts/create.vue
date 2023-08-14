@@ -146,7 +146,6 @@ async function createBuyout() {
     body: JSON.stringify(products.value),
   })
   disabledCreateButton.value = false
-
   if (error.value) {
     notify({
       title: 'Что-то пошло не так',
@@ -161,6 +160,7 @@ async function createBuyout() {
       type: 'success',
       duration: 3000,
     })
+    store.createProducts = []
     navigateTo('/buyouts')
   }
 }

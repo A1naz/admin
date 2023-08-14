@@ -297,6 +297,20 @@ watch(() => status.value, async () => {
           Неделя
         </option>
       </select>
+      <div class="flex gap-1 items-center">
+        <select class="select select-bordered select-sm">
+          <option value="article">
+            Артикул
+          </option>
+          <option value="id">
+            ID выкупа
+          </option>
+          <option value="name">
+            Имя товара
+          </option>
+        </select>
+        <input type="text" class="input input-sm input-bordered" placeholder="Поиск">
+      </div>
     </div>
     <div v-if="buyouts.length">
       <div v-if="(route.query.status === 'active' || !route.query.status) && activeBuyouts.length > 0" class="flex justify-center py-2 rounded-lg px-2 mb-2 bg-base-100 border border-base-200">
