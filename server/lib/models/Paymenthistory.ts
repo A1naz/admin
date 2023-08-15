@@ -6,7 +6,7 @@ const paymenthistorySchema = new Schema({
   type: { type: String },
   article: { type: String },
   typeoperations: { type: String },
-  basisoperation: { type: String },
+  basisoperation: { type: String, text: true },
   dataoperation: { type: Date },
   comment: { type: String },
 })

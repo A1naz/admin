@@ -6,6 +6,8 @@ definePageMeta({
   auth: true,
   title: 'История платежей',
 })
+const autoTarget = ref(true)
+
 const target = ref(null)
 const targetIsVisible = ref(false)
 const { stop } = useIntersectionObserver(
@@ -15,6 +17,7 @@ const { stop } = useIntersectionObserver(
   },
 )
 const skip = ref(50)
+const dateFilter = ref('all')
 const end = ref(false)
 
 const filterType = ref('all')
@@ -23,16 +26,26 @@ const { width, height } = useWindowSize()
 const route = useRoute()
 const currency = useCurrency()
 const history = ref([]) as any
-const { data, error } = await useFetch('/api/paymenthistory/get', {
-  method: 'GET',
-  query: {
-    type: filterType.value,
-    skip: 0,
-    limit: 50,
-  },
-
+const search = reactive({
+  text: '',
+  loading: false,
+  error: false,
+  type: 'uuid',
 })
-history.value = data.value
+async function getPaymentHistory() {
+  const { data, error } = await useFetch('/api/paymenthistory/get', {
+    method: 'GET',
+    query: {
+      type: filterType.value,
+      skip: 0,
+      limit: 50,
+    },
+
+  })
+  history.value = data.value
+}
+await getPaymentHistory()
+
 const exportDates = ref([])
 async function selectType(e: Event) {
   const target = e.target as HTMLSelectElement
@@ -43,6 +56,47 @@ async function selectType(e: Event) {
     method: 'GET',
     query: {
       type: filterType.value,
+      limit: 50,
+    },
+  })
+  history.value = data.value
+}
+async function findPaymentHistory(value: string, type: string) {
+  if (!value) {
+    autoTarget.value = true
+    await getPaymentHistory()
+    search.loading = false
+    return
+  }
+  const { data, error } = await useFetch('/api/paymenthistory/search', {
+    query: {
+      string: value,
+      type,
+    },
+  })
+  if (data.value)
+    history.value = data.value
+
+  search.loading = false
+}
+
+const findPaymentHistoryDebounced = useDebounceFn(findPaymentHistory, 1000)
+
+async function onSearchInput(event: Event) {
+  const newValue = (event.target as HTMLInputElement).value
+  autoTarget.value = false
+  search.loading = true
+  findPaymentHistoryDebounced(search.text, search.type)
+}
+async function selectFilterDate(e: Event) {
+  const target = e.target as HTMLSelectElement
+  dateFilter.value = target.value
+  skip.value = 50
+  end.value = false
+  const { data } = await useFetch('/api/paymenthistory/get', {
+    method: 'GET',
+    query: {
+      dateFilter: dateFilter.value,
       limit: 50,
     },
   })
@@ -65,12 +119,13 @@ async function exportToXLS() {
 }
 
 watch(targetIsVisible, async (isVisible) => {
-  if (isVisible) {
+  if (isVisible && autoTarget.value) {
     if (end.value)
       return
     const { data, error } = await useFetch('/api/paymenthistory/get', {
       method: 'GET',
       query: {
+        dateFilter: dateFilter.value,
         type: filterType.value,
         limit: 50,
         skip: skip.value,
@@ -99,32 +154,64 @@ watch(targetIsVisible, async (isVisible) => {
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm mb-6">
       Здесь можно увидеть движение вашего баланса
     </p>
-    <div class="flex gap-4 mb-8 mt-6 items-center">
-      <div class="flex gap-4 items-center">
-        <div v-if="history.length" class="export">
-          <ClientOnly>
-            <DateRangePicker v-model="exportDates" save-button="Экспорт в Excel" :start-date="new Date()" @select="exportToXLS">
-              <button class="btn btn-sm btn-primary">
-                Экспорт
-              </button>
-            </DateRangePicker>
-          </ClientOnly>
+    <div class="flex gap-4 mb-8 mt-6 items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="flex gap-4 items-center">
+          <div v-if="history.length" class="export">
+            <ClientOnly>
+              <DateRangePicker v-model="exportDates" save-button="Экспорт в Excel" :start-date="new Date()" @select="exportToXLS">
+                <button class="btn btn-sm btn-primary">
+                  Экспорт
+                </button>
+              </DateRangePicker>
+            </ClientOnly>
+          </div>
+        </div>
+        <select class="select select-bordered select-sm" @change="selectType">
+          <option value="all">
+            Все
+          </option>
+          <option value="buyouts">
+            Выкупы
+          </option>
+          <option value="reviews">
+            Отзывы
+          </option>
+          <option value="questions">
+            Вопросы
+          </option>
+        </select>
+        <select class="select select-bordered select-sm" @change="selectFilterDate">
+          <option value="all">
+            За все время
+          </option>
+          <option value="today">
+            Сегодня
+          </option>
+          <option value="3days">
+            3 дня
+          </option>
+          <option value="7days">
+            Неделя
+          </option>
+        </select>
+      </div>
+
+      <div class="flex gap-1 items-center">
+        <select v-model="search.type" disabled class="select select-bordered select-sm">
+          <option value="uuid">
+            Основание операции / ID
+          </option>
+        </select>
+        <div class="relative flex items-center flex-grow-0 w-full">
+          <input v-model="search.text" type="text" class="input input-sm input-bordered" placeholder="Поиск" @input="onSearchInput($event)">
+
+          <span
+            v-if="search.loading"
+            class="absolute right-2 loading loading-spinner loading-xs p-2"
+          />
         </div>
       </div>
-      <select class="select select-bordered select-sm" @change="selectType">
-        <option value="all">
-          Все
-        </option>
-        <option value="buyouts">
-          Выкупы
-        </option>
-        <option value="reviews">
-          Отзывы
-        </option>
-        <option value="questions">
-          Вопросы
-        </option>
-      </select>
     </div>
     <div v-if="width > 1024">
       <DataTable sort-field="dataoperation" :sort-order="-1" class="bg-base-200 hidden lg:block" :value="history" removable-sort>
