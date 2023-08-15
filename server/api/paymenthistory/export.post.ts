@@ -3,6 +3,30 @@ import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { paymenthistory } from '~~/server/lib/models/Paymenthistory'
 
+function getHistoryType(type: string) {
+  let result = ''
+  switch (type) {
+    case 'buyouts':
+      result = 'Выкуп'
+      break
+    case 'reviews':
+      result = 'Отзыв'
+      break
+    case 'likes':
+      result = 'Лайк'
+      break
+    case 'productlikes':
+      result = 'Лайк на товар / бренд'
+      break
+    case 'carts':
+      result = 'Добавление в корзину'
+      break
+    case 'questions':
+      result = 'Вопрос'
+      break
+  }
+  return result
+}
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
 
@@ -26,16 +50,27 @@ export default eventHandler(async (event) => {
   const sheet = workbook.addWorksheet('Готовы к выдаче', {
     headerFooter: { firstHeader: `Всего записей: ${history.length}` },
   })
-
+  const mapped = history.map(item => ({
+    summ: item.summ,
+    typeoperations: item.typeoperations,
+    type: getHistoryType(item.type || ''),
+    article: item.article,
+    basisoperation: item.basisoperation,
+    dataoperation: item.dataoperation,
+    comment: item.comment,
+  }))
+  console.log(mapped)
   sheet.columns = [
     { header: 'Сумма', key: 'summ', font: { bold: true } },
     { header: 'Тип операции', key: 'typeoperations', width: 16, font: { bold: true } },
+    { header: 'Услуга', key: 'type', width: 16, font: { bold: true } },
+    { header: 'Артикул', key: 'article', width: 16, font: { bold: true } },
     { header: 'Основание операции', key: 'basisoperation', width: 32, font: { bold: true } },
     { header: 'Дата', key: 'dataoperation', width: 16, font: { bold: true } },
     { header: 'Комментарий', key: 'comment', width: 16, font: { bold: true } },
 
   ]
-  sheet.addRows(history)
+  sheet.addRows(mapped)
   const buffer = await workbook.xlsx.writeBuffer()
   return buffer
 })

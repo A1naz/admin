@@ -89,7 +89,7 @@ const productQuantityModel = computed({
           </label>
           <ul
             tabindex="0"
-            class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52"
+            class="dropdown-content mt-4 p-2 shadow bg-base-100 rounded-box w-52 z-10"
           >
             <nuxt-img
               class="rounded-lg" loading="lazy" fit="fill"

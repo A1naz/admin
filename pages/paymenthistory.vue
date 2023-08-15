@@ -140,6 +140,34 @@ watch(targetIsVisible, async (isVisible) => {
     skip.value += 50
   }
 })
+function getHistoryType(type: string) {
+  let result = ''
+  switch (type) {
+    case 'buyouts':
+      result = 'Выкуп'
+      break
+    case 'reviews':
+      result = 'Отзыв'
+      break
+    case 'likes':
+      result = 'Лайк'
+      break
+    case 'productlikes':
+      result = 'Лайк на товар / бренд'
+      break
+    case 'carts':
+      result = 'Добавление в корзину'
+      break
+    case 'questions':
+      result = 'Вопрос'
+      break
+  }
+  return result
+}
+const router = useRouter()
+function openBuyout(uuid: string) {
+  router.push(`/buyouts?uuid=${uuid}`)
+}
 </script>
 
 <template>
@@ -221,7 +249,40 @@ watch(targetIsVisible, async (isVisible) => {
           </template>
         </Column>
         <Column field="typeoperations" sortable header="Тип операции" />
-        <Column field="basisoperation" sortable header="Основание операции" />
+        <Column field="type" sortable header="Услуга">
+          <template #body="{ data }">
+            <div class="">
+              {{ getHistoryType(data.type) }}
+            </div>
+          </template>
+        </Column>
+        <Column field="article" sortable header="Артикул">
+          <template #body="{ data }">
+            <div class="">
+              <a
+                :href="`https://www.wildberries.ru/catalog/${data.article}/detail.aspx`" target="_blank"
+                class="text-sm text-secondary link link-hover"
+              >
+                {{ data.article }}
+              </a>
+            </div>
+          </template>
+        </Column>
+
+        <Column field="basisoperation" sortable header="Основание операции">
+          <template #body="{ data }">
+            <div v-if="data.type === 'buyouts'">
+              <label
+                class="link link-hover hover:text-primary truncate z-10"
+                @click="openBuyout(data.basisoperation.slice(data.basisoperation.indexOf('#') + 1, data.basisoperation.length))"
+              >
+                {{ data.basisoperation }}</label>
+            </div>
+            <div v-else>
+              {{ data.basisoperation }}
+            </div>
+          </template>
+        </Column>
         <Column field="dataoperation" sortable header="Дата">
           <template #body="{ data }">
             <div class="">

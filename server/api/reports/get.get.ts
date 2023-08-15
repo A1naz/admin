@@ -59,7 +59,6 @@ export default eventHandler(async (event) => {
     }
   }
   else { history = await Report.find({ user }).sort({ _id: -1 }).skip(skip as number).limit(limit as number) }
-  console.log(history)
   for await (const item of history) {
     const buyout = await Buyout.findOne({ _id: item.buyout })
     if (!buyout)
