@@ -38,7 +38,7 @@ function updateInitital() {
   initialForm.lastName = store.client.lastName
   initialForm.email = store.client.email
   initialForm.username = store.client.username
-  wbApiKeys.value = store.client.wbApiKeys
+  wbApiKeys.value = store.client.wbApiKeys.length ? JSON.parse(JSON.stringify(store.client.wbApiKeys)) : ['']
 }
 onMounted(async () => {
   updateInitital()
@@ -286,22 +286,31 @@ function onTelegramLink(data: any) {
         <div v-for="(key, index) of wbApiKeys" :key="key" class="flex flex-col gap-6 w-full mt-1 relative">
           <div class="flex gap-2 relative">
             <input
-              v-model="wbApiKeys[index]" type="text" placeholder="Стандартный апи ключ Wildberries"
+              v-model="wbApiKeys[index]"
+              :disabled="store.client.wbApiKeys[index] === wbApiKeys[index]" type="text" placeholder="Стандартный апи ключ Wildberries"
               class="input input-bordered input-primary w-full"
             >
+
             <div
               v-if="index === 0"
               class="btn btn-primary btn-square"
-              @click="wbApiKeys.push('')"
+              @click="wbApiKeys[0] = ''"
             >
-              <IconCSS size="16" name="ic:round-plus" />
+              <IconCSS size="20" name="material-symbols:close" />
             </div>
             <div
               v-else
               class="btn btn-primary btn-square"
               @click="wbApiKeys.splice(index, 1)"
             >
-              <IconCSS size="16" name="material-symbols:close" />
+              <IconCSS size="20" name="material-symbols:close" />
+            </div>
+            <div
+              v-if="index === 0"
+              class="btn btn-primary btn-square"
+              @click="wbApiKeys.push('')"
+            >
+              <IconCSS size="20" name="fluent:add-20-filled" />
             </div>
           </div>
         </div>
