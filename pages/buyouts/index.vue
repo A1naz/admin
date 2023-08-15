@@ -16,7 +16,13 @@ const store = useMainStore()
 const selectedPlace = ref(-1)
 const status = computed(() => route.query?.status || 'all')
 const dateFilter = ref('all')
-
+const autoTarget = ref(true)
+const search = reactive({
+  text: '',
+  loading: false,
+  error: false,
+  type: 'article',
+})
 function openModal(index: number) {
   selectedIndex.value = index
   selectedPlace.value = buyouts.value.length - index
@@ -39,17 +45,19 @@ const { stop } = useIntersectionObserver(
 )
 const skip = ref(50)
 const end = ref(false)
-const { data, refresh } = await useFetch(() => '/api/buyout/get', {
-  method: 'GET',
-  query: {
-    status: status.value ?? 'all',
-    dateFilter: dateFilter.value,
-    limit: 50,
-  },
-  headers: useRequestHeaders(['cookie']) as HeadersInit,
-})
-buyouts.value = data.value
+async function getBuyouts() {
+  const { data } = await useFetch(() => '/api/buyout/get', {
+    method: 'GET',
+    query: {
+      status: status.value ?? 'all',
+      dateFilter: dateFilter.value,
+      limit: 50,
+    },
+  })
+  buyouts.value = data.value
+}
 
+await getBuyouts()
 function removeBuyout(uuid: string) {
   buyouts.value = buyouts.value.filter((buyout: any) => buyout.uuid !== uuid)
 }
@@ -108,6 +116,35 @@ async function selectFilterDate(e: Event) {
     },
   })
   buyouts.value = data.value
+}
+async function findBuyouts(value: string, type: string) {
+  if (!value) {
+    autoTarget.value = true
+    search.loading = false
+    getBuyouts()
+    return
+  }
+  const { data, error } = await useFetch('/api/buyout/search', {
+    query: {
+      string: value,
+      type,
+    },
+  })
+  if (data.value) {
+    buyouts.value = data.value
+    console.log(buyouts.value)
+  }
+
+  search.loading = false
+}
+
+const findBuyoutsDebounced = useDebounceFn(findBuyouts, 1000)
+
+async function onSearchInput(event: Event) {
+  const newValue = (event.target as HTMLInputElement).value
+  autoTarget.value = false
+  search.loading = true
+  findBuyoutsDebounced(search.text, search.type)
 }
 onMounted(async () => {
   if (route.query?.uuid) {
@@ -178,7 +215,7 @@ const formatAvailable = computedEager(() => {
     return 'выкупов'
 })
 watch(targetIsVisible, async (isVisible) => {
-  if (isVisible) {
+  if (isVisible && autoTarget.value) {
     if (end.value)
       return
     const { data } = await useFetch('/api/buyout/get', {
@@ -282,7 +319,7 @@ watch(() => status.value, async () => {
         Добавить выкупы
       </NuxtLink>
     </div>
-    <div class="search flex justify-between items-center mb-4">
+    <div class="search flex justify-between items-center mb-4 flex-wrap gap-2">
       <select class="select select-bordered select-sm" @change="selectFilterDate">
         <option value="all">
           За все время
@@ -298,18 +335,25 @@ watch(() => status.value, async () => {
         </option>
       </select>
       <div class="flex gap-1 items-center">
-        <select class="select select-bordered select-sm">
+        <select v-model="search.type" class="select select-bordered select-sm">
           <option value="article">
             Артикул
           </option>
-          <option value="id">
+          <option value="uuid">
             ID выкупа
           </option>
           <option value="name">
             Имя товара
           </option>
         </select>
-        <input type="text" class="input input-sm input-bordered" placeholder="Поиск">
+        <div class="relative flex items-center flex-grow-0 w-full">
+          <input v-model="search.text" type="text" class="input input-sm input-bordered" placeholder="Поиск" @input="onSearchInput($event)">
+
+          <span
+            v-if="search.loading"
+            class="absolute right-2 loading loading-spinner loading-xs p-2"
+          />
+        </div>
       </div>
     </div>
     <div v-if="buyouts.length">

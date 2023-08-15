@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { User } from './User'
 
 const ProductSchema = new Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, text: true },
   price: { type: String, required: true },
   priceText: { type: String, required: true },
   image: { type: String, required: true },

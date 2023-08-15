@@ -49,8 +49,6 @@ async function onInput(event: Event, index: number) {
   }
 }
 
-watch(() => queries, (newValue) => {
-})
 onMounted(async () => {
   for (let i = 0; i < props.queries.length; i++) {
     if (!props.queries[i].value)
