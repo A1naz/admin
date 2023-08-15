@@ -393,7 +393,7 @@ onMounted(async () => {
       </label>
     </div>
     <dialog id="infoModal" ref="infoModal" class="modal">
-      <form method="dialog" class="modal-box">
+      <form method="dialog" class="modal-box p-4">
         <h3 class="font-bold text-lg">
           Информация
         </h3>
@@ -458,8 +458,8 @@ onMounted(async () => {
             - Используйте Правила для создания дополнительной безопасности ваших выкупов
           </p>
         </div>
-        <div class="modal-action">
-          <button class="btn">
+        <div class="modal-action mt-0">
+          <button class="btn btn-sm">
             Закрыть
           </button>
         </div>
