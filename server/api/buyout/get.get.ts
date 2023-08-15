@@ -16,7 +16,7 @@ export default eventHandler(async (event) => {
   const all = await Buyout.find({ user })
   let buyouts
   if (status === 'all') {
-    buyouts = await Buyout.find({ user })
+    buyouts = await Buyout.find({ user, status: { $ne: 'completed' } })
       .sort({ createdAt: -1 })
       .skip(skip as number)
       .limit(limit as number)

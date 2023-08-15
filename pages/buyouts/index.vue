@@ -284,18 +284,18 @@ watch(() => status.value, async () => {
           Активные
         </NuxtLink>
         <NuxtLink
-          to="/buyouts?status=completed" :external="false" :class="{
-            'btn-active': route.query.status === 'completed',
-          }" class="btn btn-ghost btn-sm normal-case font-medium"
-        >
-          Завершенные
-        </NuxtLink>
-        <NuxtLink
           to="/buyouts?status=archived" :external="false" :class="{
             'btn-active': route.query.status === 'archived',
           }" class="btn btn-ghost btn-sm normal-case font-medium"
         >
           В архиве
+        </NuxtLink>
+        <NuxtLink
+          to="/buyouts?status=completed" :external="false" :class="{
+            'btn-active': route.query.status === 'completed',
+          }" class="btn btn-ghost btn-sm normal-case font-medium"
+        >
+          Завершенные
         </NuxtLink>
       </div>
       <select class="select select-bordered select-sm lg:hidden" @change="selectStatus">
@@ -305,11 +305,11 @@ watch(() => status.value, async () => {
         <option value="active" :selected="route.query.status === 'active'">
           Активные
         </option>
-        <option value="completed" :selected="route.query.status === 'completed'">
-          Завершенные
-        </option>
         <option value="archived" :selected="route.query.status === 'archived'">
           В архиве
+        </option>
+        <option value="completed" :selected="route.query.status === 'completed'">
+          Завершенные
         </option>
       </select>
       <div class="flex items-center gap-2 flex-wrap">
