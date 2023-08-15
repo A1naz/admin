@@ -312,10 +312,15 @@ watch(() => status.value, async () => {
           В архиве
         </option>
       </select>
-      <NuxtLink to="/buyouts/create" class="btn btn-primary btn-sm gap-2 font-medium normal-case self-end">
-        <Icon name="fluent:add-24-filled" size="24" />
-        Добавить выкупы
-      </NuxtLink>
+      <div class="flex items-center gap-2 flex-wrap">
+        <a href="info/Информационная таблица по выкупам.xlsx" class="btn btn-sm">
+          Скачать шаблон
+        </a>
+        <NuxtLink to="/buyouts/create" class="btn btn-primary btn-sm gap-2 font-medium normal-case self-end">
+          <Icon name="fluent:add-24-filled" size="24" />
+          Добавить выкупы
+        </NuxtLink>
+      </div>
     </div>
     <div class="search flex justify-between items-center mb-4 flex-wrap gap-2">
       <select class="select select-bordered select-sm" @change="selectFilterDate">
