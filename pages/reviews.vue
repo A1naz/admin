@@ -10,10 +10,18 @@ const skip = ref(25)
 const readyForReview = ref<any[] | null>([])
 const reviews = ref<any[] | null>([])
 const router = useRouter()
+const autoTarget = ref(true)
 const queryStatus = computed(() => route.query?.status ?? 'available')
 const status = ref(route.query?.status ?? 'available')
 const target = ref(null)
 const targetIsVisible = ref(false)
+const search = reactive({
+  text: '',
+  loading: false,
+  error: false,
+  type: 'article',
+})
+
 const { stop } = useIntersectionObserver(
   target,
   ([{ isIntersecting }], observerElement) => {
@@ -63,8 +71,35 @@ reviews.value = await getReviews(status.value as string, 0, 25)
 
 const selectedUUID = ref('')
 
+async function findReviews(value: string, type: string) {
+  if (!value) {
+    autoTarget.value = true
+    reviews.value = await getReviews(status.value as string, 0, 25)
+    search.loading = false
+    return
+  }
+  const { data, error } = await useFetch('/api/review/search', {
+    query: {
+      string: value,
+      type,
+    },
+  })
+  if (data.value)
+    reviews.value = data.value
+
+  search.loading = false
+}
+
+const findReviewsDebounced = useDebounceFn(findReviews, 1000)
+
+async function onSearchInput(event: Event) {
+  autoTarget.value = false
+  search.loading = true
+  findReviewsDebounced(search.text, search.type)
+}
+
 watch(targetIsVisible, async (isVisible) => {
-  if (isVisible) {
+  if (isVisible && autoTarget.value) {
     if (end.value)
       return
     const data = await getReviews(status.value as string, skip.value, 25)
@@ -123,7 +158,7 @@ function goToPublished() {
         Стоимость одного отзыва -  <span class="font-bold">25 руб.</span>
       </p>
     </div>
-    <div class="flex justify-between mb-8 mt-6 items-center">
+    <div class="flex justify-between mb-2 mt-6 items-center">
       <div class="">
         <NuxtLink
           to="/reviews?status=available" :class="{
@@ -146,6 +181,27 @@ function goToPublished() {
         >
           Недостаточно средств
         </NuxtLink>
+      </div>
+    </div>
+    <div v-if="status === 'available'" class="search flex justify-between items-center mb-8 flex-wrap gap-2">
+      <div />
+      <div class="flex gap-1 items-center">
+        <select v-model="search.type" class="select select-bordered select-sm">
+          <option value="article">
+            Артикул
+          </option>
+          <option value="uuid">
+            ID выкупа
+          </option>
+        </select>
+        <div class="relative flex items-center flex-grow-0 w-full">
+          <input v-model="search.text" type="text" class="input input-sm input-bordered" placeholder="Поиск" @input="onSearchInput($event)">
+
+          <span
+            v-if="search.loading"
+            class="absolute right-2 loading loading-spinner loading-xs p-2"
+          />
+        </div>
       </div>
     </div>
     <div v-if="reviews?.length">

@@ -130,10 +130,8 @@ async function findBuyouts(value: string, type: string) {
       type,
     },
   })
-  if (data.value) {
+  if (data.value)
     buyouts.value = data.value
-    console.log(buyouts.value)
-  }
 
   search.loading = false
 }

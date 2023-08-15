@@ -10,8 +10,14 @@ const openAll = ref(false)
 const route = useRoute()
 const router = useRouter()
 const deliveries = ref([]) as any
+const autoTarget = ref(true)
 const status = computed(() => route.query?.status || 'all')
-
+const search = reactive({
+  text: '',
+  loading: false,
+  error: false,
+  type: 'article',
+})
 function selectStatus(e: Event) {
   const target = e.target as HTMLSelectElement
   router.push({
@@ -41,14 +47,18 @@ const { stop } = useIntersectionObserver(
 )
 const skip = ref(50)
 const end = ref(false)
-const { data, error } = await useFetch('/api/delivery/get', {
-  method: 'GET',
-  query: {
-    status: status.value ?? 'all',
-    limit: 50,
-  },
-  headers: useRequestHeaders(['cookie']) as HeadersInit,
-})
+async function getDeliveries() {
+  const { data, error } = await useFetch('/api/delivery/get', {
+    method: 'GET',
+    query: {
+      status: status.value ?? 'all',
+      limit: 50,
+    },
+  })
+  deliveries.value = data.value
+}
+await getDeliveries()
+
 async function exportReadyXLS() {
   const { data } = await useFetch('/api/delivery/exportReady', {
     responseType: 'blob',
@@ -80,12 +90,36 @@ async function exportXLS() {
   fileLink.click()
 }
 
-onMounted(async () => {
-  deliveries.value = data.value
-})
+async function findDeliveries(value: string, type: string) {
+  if (!value) {
+    autoTarget.value = true
+    await getDeliveries()
+    search.loading = false
+    return
+  }
+  const { data, error } = await useFetch('/api/delivery/search', {
+    query: {
+      string: value,
+      type,
+    },
+  })
+  if (data.value)
+    deliveries.value = data.value
+
+  search.loading = false
+}
+
+const findDeliveriesDebounced = useDebounceFn(findDeliveries, 1000)
+
+async function onSearchInput(event: Event) {
+  const newValue = (event.target as HTMLInputElement).value
+  autoTarget.value = false
+  search.loading = true
+  findDeliveriesDebounced(search.text, search.type)
+}
 
 watch(targetIsVisible, async (isVisible) => {
-  if (isVisible) {
+  if (isVisible && autoTarget.value) {
     if (end.value)
       return
     const { data, error } = await useFetch('/api/delivery/get', {
@@ -122,9 +156,8 @@ watch(() => status.value, async (newRoute) => {
 <template>
   <div>
     <h1 class="text-2xl font-bold mt-4">
-      
       Доставки <div class="tooltip tooltip-bottom" data-tip="Видео-инструкция по заборам">
-        <a class="hover:text-primary"  target="_blank"  href="https://youtu.be/URh2G7fzl-g">
+        <a class="hover:text-primary" target="_blank" href="https://youtu.be/URh2G7fzl-g">
           <IconCSS size="24" class="h-8 w-8" name="uil:youtube" />
         </a>
       </div>
@@ -134,7 +167,7 @@ watch(() => status.value, async (newRoute) => {
       забирать из пункта выдачи.
     </p>
 
-    <div class="flex justify-between mb-8 mt-6 items-center flex-wrap gap-4">
+    <div class="flex justify-between mb-2 mt-6 items-center flex-wrap gap-4">
       <select class="select select-bordered select-sm" @change="selectStatus">
         <option value="all" :selected="route.query.status === undefined">
           Все доставки
@@ -165,6 +198,27 @@ watch(() => status.value, async (newRoute) => {
               <li><a @click="exportXLS">Общая таблица Excel</a></li>
             </ul>
           </div>
+        </div>
+      </div>
+    </div>
+    <div class="search flex justify-between items-center mb-8 flex-wrap gap-2">
+      <div />
+      <div class="flex gap-1 items-center">
+        <select v-model="search.type" class="select select-bordered select-sm">
+          <option value="article">
+            Артикул
+          </option>
+          <option value="uuid">
+            ID выкупа
+          </option>
+        </select>
+        <div class="relative flex items-center flex-grow-0 w-full">
+          <input v-model="search.text" type="text" class="input input-sm input-bordered" placeholder="Поиск" @input="onSearchInput($event)">
+
+          <span
+            v-if="search.loading"
+            class="absolute right-2 loading loading-spinner loading-xs p-2"
+          />
         </div>
       </div>
     </div>

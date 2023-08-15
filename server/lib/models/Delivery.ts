@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose'
 
 const DeliverySchema = new Schema({
-  article: { type: Number, required: true },
+  article: { type: Number, required: true, text: true },
   pricebuy: { type: Number, required: true },
   point: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
