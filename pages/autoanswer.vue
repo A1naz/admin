@@ -7,12 +7,15 @@ definePageMeta({
   title: 'Автоответчик на отзывы',
 })
 const { $dayjs } = useNuxtApp()
+const store = useMainStore()
+
 const form = reactive({
   ratingFilterFrom: 1,
   ratingFilterTo: 5,
   text: '',
   article: '',
   product: '',
+  apiKey: store.client.wbApiKeys[0],
 })
 const initial = {
   ratingFilterFrom: 1,
@@ -20,8 +23,8 @@ const initial = {
   text: '',
   article: '',
   product: '',
+  apiKey: store.client.wbApiKeys[0],
 }
-const store = useMainStore()
 const autoanswers = ref([]) as any
 const amount = ref(0)
 const now = useNow()
@@ -151,7 +154,7 @@ onMounted(() => {
     <p class="text-xs font-light mt-1 lg:text-sm">
       Стоимость одного автоответчика -  <span class="font-bold">100 руб.</span>
     </p>
-    <div v-if="!store.client.wbApiKey" class="alert alert-warning mt-6">
+    <div v-if="!store.client.wbApiKeys.length || store.client.wbApiKeys[0] === ''" class="alert alert-warning mt-6">
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
       <span>Добавьте апи ключ в настройках профиля для работы Автоответчика</span>
     </div>
@@ -188,6 +191,17 @@ onMounted(() => {
                   </div>
                 </button>
               </div>
+            </div>
+            <div class="w-full">
+              <div>Апи-ключ:</div>
+              <select v-model="form.apiKey" class="select select-bordered w-full select-sm mt-2">
+                <option v-if="store.client.wbApiKeys[0] === ''" disabled selected>
+                  У вас нет привязанных ключей
+                </option>
+                <option v-for="key of store.client.wbApiKeys" :key="key" :value="key">
+                  {{ key }}
+                </option>
+              </select>
             </div>
           </div>
           <div class="mt-4 flex gap-6 items-start flex-wrap justify-stretch flex-1 lg:flex-nowrap">

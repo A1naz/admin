@@ -8,7 +8,7 @@ definePageMeta({
 const warning = ref('')
 
 const store = useMainStore()
-const wbApiKey = ref('')
+const wbApiKeys = ref([''])
 const form = reactive({
   firstName: '',
   lastName: '',
@@ -38,7 +38,7 @@ function updateInitital() {
   initialForm.lastName = store.client.lastName
   initialForm.email = store.client.email
   initialForm.username = store.client.username
-  wbApiKey.value = store.client.wbApiKey
+  wbApiKeys.value = store.client.wbApiKeys
 }
 onMounted(async () => {
   updateInitital()
@@ -58,12 +58,6 @@ const disabledChangePasswordButton = computed(() => {
     return passwordForm.oldPassword == '' || passwordForm.newPassword == ''
   else
     return passwordForm.newPassword == ''
-})
-const disabledSettingsButton = computed(() => {
-  if (store.client.wbApiKey === wbApiKey.value)
-    return true
-
-  return false
 })
 
 async function updatePassword() {
@@ -91,13 +85,10 @@ async function updatePassword() {
   await store.getClient()
 }
 async function setApiKey() {
-  if (wbApiKey.value === store.client.wbApiKey)
-    return
-
   const { data, error } = await useFetch('/api/user/setApiKey', {
     method: 'POST',
     body: {
-      wbApiKey: wbApiKey.value,
+      wbApiKeys: wbApiKeys.value,
     },
     headers,
   })
@@ -108,7 +99,7 @@ async function setApiKey() {
   }
   else {
     alert.show = true
-    alert.message = 'API ключ изменен.'
+    alert.message = 'API ключи изменены.'
     alert.type = 'success'
   }
   start()
@@ -291,15 +282,31 @@ function onTelegramLink(data: any) {
           Введите стандартный ключ api для работы автоответчика
         </div>
       </div>
-      <div class="flex flex-col gap-6 w-full mt-1 relative">
-        <div class="flex gap-2">
-          <input
-            v-model="wbApiKey" type="text" placeholder="Стандартный апи ключ Wildberries"
-            class="input input-bordered input-primary w-full"
-          >
+      <div class="flex flex-col gap-2 w-full">
+        <div v-for="(key, index) of wbApiKeys" :key="key" class="flex flex-col gap-6 w-full mt-1 relative">
+          <div class="flex gap-2 relative">
+            <input
+              v-model="wbApiKeys[index]" type="text" placeholder="Стандартный апи ключ Wildberries"
+              class="input input-bordered input-primary w-full"
+            >
+            <div
+              v-if="index === 0"
+              class="btn btn-primary btn-square"
+              @click="wbApiKeys.push('')"
+            >
+              <IconCSS size="16" name="ic:round-plus" />
+            </div>
+            <div
+              v-else
+              class="btn btn-primary btn-square"
+              @click="wbApiKeys.splice(index, 1)"
+            >
+              <IconCSS size="16" name="material-symbols:close" />
+            </div>
+          </div>
         </div>
         <button
-          :disabled="disabledSettingsButton" class="btn btn-primary xl:w-40 mr-0 self-end"
+          class="btn btn-primary xl:w-40 mr-0 self-end"
           @click="setApiKey"
         >
           Сохранить

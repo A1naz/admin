@@ -9,13 +9,15 @@ export default eventHandler(async (event) => {
 
   const body = await readBody(event)
 
-  const { wbApiKey } = body
+  const { wbApiKeys } = body
 
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
     return sendRedirect(event, '/auth', 302)
 
-  user.wbApiKey = wbApiKey
+  const filtered = wbApiKeys.filter((key: string) => key.length)
+
+  user.wbApiKeys = filtered
   await user.save()
   return {
     status: 'ok',

@@ -10,9 +10,6 @@ export default eventHandler(async (event) => {
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
     return sendRedirect(event, '/auth', 302)
-  let hiddenKey
-  if (user.wbApiKey)
-    hiddenKey = '*'.repeat(user.wbApiKey.length)
 
   const client = {
     email: user.email,
@@ -24,7 +21,7 @@ export default eventHandler(async (event) => {
     lastName: user.lastName,
     hasPassword: !!user.password,
     telegramUserId: user.telegramUserId,
-    wbApiKey: user.wbApiKey,
+    wbApiKeys: user.wbApiKeys || [''],
   }
   return {
     client,

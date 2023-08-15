@@ -14,14 +14,14 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const body = await readBody(event)
-  const { article, ratingFilterFrom, ratingFilterTo, text, product } = body
-  if (!article || !ratingFilterFrom || !ratingFilterTo || !text || !product) {
+  const { article, ratingFilterFrom, ratingFilterTo, text, product, apiKey } = body
+  if (!article || !ratingFilterFrom || !ratingFilterTo || !text || !product || !apiKey) {
     throw createError({
       statusCode: 400,
       message: 'Некорректный запрос',
     })
   }
-  if (!user.wbApiKey) {
+  if (!user.wbApiKeys) {
     throw createError({
       statusCode: 400,
       message: 'Добавьте апи ключ Wildberries для работы автоответчика!',
@@ -44,6 +44,7 @@ export default eventHandler(async (event) => {
     ratingFilterTo: parseInt(ratingFilterTo),
     text,
     article,
+    wbApiKey: apiKey,
     product,
   })
   await created.save()

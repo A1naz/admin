@@ -7,6 +7,7 @@ const UserSchema = new Schema({
   lastName: { type: String, required: false },
   email: { type: String, unique: false, required: false },
   wbApiKey: { type: String, required: false },
+  wbApiKeys: { type: Array, required: false },
   password: { type: String, required: false },
   uuid: { type: String, unique: true, required: true, default: uuid() },
   roles: [{ type: String, ref: 'Role' }],
