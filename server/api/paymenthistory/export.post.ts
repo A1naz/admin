@@ -59,7 +59,6 @@ export default eventHandler(async (event) => {
     dataoperation: item.dataoperation,
     comment: item.comment,
   }))
-  console.log(mapped)
   sheet.columns = [
     { header: 'Сумма', key: 'summ', font: { bold: true } },
     { header: 'Тип операции', key: 'typeoperations', width: 16, font: { bold: true } },

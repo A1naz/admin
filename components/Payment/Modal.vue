@@ -17,7 +17,7 @@ const infoModal = ref<HTMLDialogElement>()
 const currency = useCurrency()
 const store = useMainStore()
 const transferStatus = ref(null) as Ref<null | string>
-const timer = ref(900)
+const timer = ref(1200)
 const alertOpened = ref(true)
 const secondsLeft = ref(0)
 const paymentID = ref('')
@@ -71,7 +71,7 @@ async function checkForDetails() {
   if (data.value?.status === 'ok') {
     details.value = { transferCard: data.value.transferCard, transferSum: data.value.transferSum }
     loading.value = false
-    timer.value = 900
+    timer.value = 1200
     alertOpened.value = true
     checkPaymentStatus()
     resume()
