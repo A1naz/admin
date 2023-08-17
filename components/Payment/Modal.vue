@@ -220,9 +220,9 @@ onMounted(() => {
       >✕</label>
       <div class="flex items-center gap-2 mb-2">
         <h3 class="text-xl font-bold ">Пополнить баланс</h3>
-        <a class="btn btn-sm btn-ghost" @click="infoModal?.showModal()">
-          ?
-        </a>
+        <button class="btn btn-sm" @click="infoModal?.showModal()">
+          Как пополнить баланс?
+        </button>
       </div>
       <div>
         <div class="w-full flex flex-col gap-6 justify-center items-start" action="">
@@ -349,14 +349,14 @@ onMounted(() => {
             QIWI Кошелек (Киви банк)
           </div>
         </div>
-        <div v-if="alertOpened" class="mt-8 text-sm bg-base-200 p-2 rounded-lg">
+        <div v-if="alertOpened" class="text-sm bg-base-200 p-2 rounded-lg">
+          <button class="btn btn-sm btn-primary mb-2" @click="infoModal?.showModal()">
+            Как пополнить баланс?
+          </button>
           <div class="flex items-center gap-2 mb-2">
             <span class="font-bold text-red-500 text-lg text-center">
               Внимание!
             </span>
-            <button class="btn btn-sm" @click="infoModal?.showModal()">
-              Как пополнить баланс?
-            </button>
           </div>
           <p class="">
             Пополнение баланса происходит с карты любого банка на указанный номер телефона/кошелька банка QIWI или Киви кошелек (другими словами).
