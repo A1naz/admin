@@ -27,6 +27,11 @@ const { data, error } = await useFetch('/api/buyout/getLogs', {
 })
 if (data.value)
   logs.value = data.value
+
+onKeyStroke('Escape', (e) => {
+  e.preventDefault()
+  emit('close')
+})
 </script>
 
 <template>

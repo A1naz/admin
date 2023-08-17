@@ -18,6 +18,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'publish'])
+const closeButton = ref<HTMLElement>()
 
 const { notify } = useNotification()
 const inputs = {
@@ -190,9 +191,10 @@ onMounted(() => {
 <template>
   <input id="review-modal" type="checkbox" class="modal-toggle">
   <div
-    :class="{
+    ref="closeButton" :class="{
       'modal-open': state,
-    }" class="modal"
+    }"
+    class="modal"
   >
     <div class="modal-box">
       <label

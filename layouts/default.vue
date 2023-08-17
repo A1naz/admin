@@ -1,7 +1,7 @@
 <script lang="ts" setup></script>
 
 <template>
-  <div>
+  <div class="overflow-auto">
     <slot />
   </div>
 </template>

@@ -209,6 +209,11 @@ onMounted(async () => {
     loading.value = false
   }
 })
+onKeyStroke('Escape', (e) => {
+  e.preventDefault()
+  ruleModal.value = false
+  infoModal.value?.close()
+})
 </script>
 
 <template>

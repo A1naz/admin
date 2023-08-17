@@ -120,7 +120,7 @@ watch(targetIsVisible, async (isVisible) => {
 </script>
 
 <template>
-  <div>
+  <div class="overflow-auto">
     <ClientOnly>
       <progress class="progress progress-primary w-full fixed" :value="progress" :max="max" />
       <div class="flex">
@@ -130,7 +130,7 @@ watch(targetIsVisible, async (isVisible) => {
           Скачать PDF
         </button>
       </div>
-      <div v-if="deliveries" ref="pdfSection">
+      <div v-if="deliveries" ref="pdfSection" class="overflow-auto">
         <h1 class="text-3xl font-bold text-center p-4 bg-purple-700 text-white">
           Готовы к выдаче
         </h1>

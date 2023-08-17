@@ -43,6 +43,11 @@ const getGender = computed(() => {
       return 'Нет'
   }
 })
+
+onKeyStroke('Escape', (e) => {
+  e.preventDefault()
+  emit('close')
+})
 </script>
 
 <template>

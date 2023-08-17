@@ -175,6 +175,11 @@ onMounted(async () => {
     error.value = 'Не удалось загрузить карту'
   }
 })
+
+onKeyStroke('Escape', (e) => {
+  e.preventDefault()
+  emit('close')
+})
 </script>
 
 <template>
