@@ -24,6 +24,12 @@ onMounted(async () => {
 watch(() => props.state, (newState) => {
   opened.value = newState
 })
+function daysToPenalty(updatedAt: Date) {
+  const penaltyDay = new Date(updatedAt.getTime() + (5 * 24 * 60 * 60 * 1000))
+  const now = new Date()
+  const timeLeft = new Date(penaltyDay.getTime() - now.getTime())
+  return timeLeft.getDay()
+}
 </script>
 
 <template>
@@ -52,7 +58,9 @@ watch(() => props.state, (newState) => {
                 {{ info.currentstatus }}
               </span>
             </div>
-
+            <!-- <div v-if="info.currentstatus === 'Готов к выдаче'">
+              {{ daysToPenalty(new Date(info.updatedAt)) }}
+            </div> -->
             <div class="mt-2 lg:m-0 text-xs">
               Обновлено {{ $dayjs(info.updatedAt).format('D MMMM HH:mm') }}
             </div>

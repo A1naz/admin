@@ -291,6 +291,13 @@ watch(() => status.value, async () => {
           В архиве
         </NuxtLink>
         <NuxtLink
+          to="/buyouts?status=paused" :external="false" :class="{
+            'btn-active': route.query.status === 'paused',
+          }" class="btn btn-ghost btn-sm normal-case font-medium"
+        >
+          Пауза
+        </NuxtLink>
+        <NuxtLink
           to="/buyouts?status=completed" :external="false" :class="{
             'btn-active': route.query.status === 'completed',
           }" class="btn btn-ghost btn-sm normal-case font-medium"
@@ -307,6 +314,9 @@ watch(() => status.value, async () => {
         </option>
         <option value="archived" :selected="route.query.status === 'archived'">
           В архиве
+        </option>
+        <option value="paused" :selected="route.query.status === 'paused'">
+          Пауза
         </option>
         <option value="completed" :selected="route.query.status === 'completed'">
           Завершенные
