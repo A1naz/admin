@@ -52,7 +52,7 @@ onMounted(async () => {
     const searchControl = new ymaps.control.SearchControl({
       options: {
         provider: 'yandex#map',
-        noPlacemark: false,
+        noPlacemark: true,
       },
     })
     searchControl.events.add('resultselect', (event: any) => {

@@ -182,7 +182,7 @@ function openBuyout(uuid: string) {
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm mb-6">
       Здесь можно увидеть движение вашего баланса
     </p>
-    <div class="flex gap-4 mb-8 mt-6 items-center justify-between">
+    <div class="flex gap-4 mb-8 mt-6 items-center justify-between flex-wrap">
       <div class="flex items-center gap-2">
         <div class="flex gap-4 items-center">
           <div v-if="history.length" class="export">
@@ -228,7 +228,7 @@ function openBuyout(uuid: string) {
       <div class="flex gap-1 items-center">
         <select v-model="search.type" disabled class="select select-bordered select-sm">
           <option value="uuid">
-            Основание операции / ID
+            Основание / ID
           </option>
         </select>
         <div class="relative flex items-center flex-grow-0 w-full">

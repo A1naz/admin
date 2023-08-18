@@ -10,6 +10,7 @@ definePageMeta({
     unauthenticatedOnly: true,
     navigateAuthenticatedTo: '/buyouts',
   },
+  title: 'Вход',
 })
 
 const router = useRouter()
@@ -141,7 +142,7 @@ const v$ = useVuelidate(rules, formData)
 
             <p class="text-sm font-light  ">
               Еще не зарегистрированы? <NuxtLink to="/register" class="font-medium hover:underline dark:text-primary-500">
-                Сделайте это тут
+                Регистрация
               </NuxtLink>
             </p>
             <div class="divider">

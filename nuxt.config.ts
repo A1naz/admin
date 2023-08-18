@@ -2,7 +2,7 @@
 
 const baseUrl = '/'
 
-const description = 'Сервис для продвижения Wildberries.'
+const description = 'TOPvTOP — платформа «всё в одном» для комплексного продвижения товаров на маркетплейсах: управление рекламными кампаниями, AB-тестирование карточек, закупка товаром, заборы с ПВЗ и фулфилмент по всему миру. Решайте любые задачи с TOPvTOP!'
 export default defineNuxtConfig({
   app: {
     baseURL: baseUrl,

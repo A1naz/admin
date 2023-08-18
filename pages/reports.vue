@@ -10,10 +10,16 @@ const modalInfo = reactive({
   src: '',
   code: 0,
 })
+const autoTarget = ref(true)
 const router = useRouter()
 const route = useRoute()
 const status = computed(() => route.query?.status || 'all')
-
+const search = reactive({
+  text: '',
+  loading: false,
+  error: false,
+  type: 'uuid',
+})
 const modal = ref(false)
 function openModal(code: number, src: string) {
   modalInfo.src = src
@@ -30,16 +36,46 @@ const { stop } = useIntersectionObserver(
 )
 const skip = ref(20)
 const end = ref(false)
+async function getReports() {
+  const { data, error } = await useFetch('/api/reports/get', {
+    method: 'GET',
+    query: {
+      skip: 0,
+      limit: 20,
+      status: status.value,
+    },
+  })
+  reports.value = data.value
+}
 
-const { data, error } = await useFetch('/api/reports/get', {
-  method: 'GET',
-  query: {
-    skip: 0,
-    limit: 20,
-    status: status.value,
-  },
-})
+await getReports()
 
+async function findReports(value: string, type: string) {
+  if (!value) {
+    autoTarget.value = true
+    await getReports()
+    search.loading = false
+    return
+  }
+  const { data, error } = await useFetch('/api/reports/search', {
+    query: {
+      string: value,
+      type,
+    },
+  })
+  if (data.value)
+    reports.value = data.value
+
+  search.loading = false
+}
+
+const findReportsDebounced = useDebounceFn(findReports, 1000)
+async function onSearchInput(event: Event) {
+  const newValue = (event.target as HTMLInputElement).value
+  autoTarget.value = false
+  search.loading = true
+  findReportsDebounced(search.text, search.type)
+}
 function selectStatus(e: Event) {
   const target = e.target as HTMLSelectElement
   router.push({
@@ -50,11 +86,8 @@ function selectStatus(e: Event) {
   })
 }
 
-onMounted(async () => {
-  reports.value = data.value
-})
 watch(targetIsVisible, async (isVisible) => {
-  if (isVisible) {
+  if (isVisible && autoTarget.value) {
     if (end.value)
       return
     const { data, error } = await useFetch('/api/reports/get', {
@@ -111,9 +144,27 @@ watch(() => status.value, async (newRoute) => {
           7 дней
         </option>
       </select>
-      <div class="flex items-center">
-        <input id="openAll" v-model="openAll" type="checkbox" class="checkbox checkbox-primary checkbox-sm">
-        <label for="openAll" class="cursor-pointer select-none ml-2">Развернуть все</label>
+      <div class="flex gap-2 items-center flex-wrap">
+        <div class="flex items-center">
+          <input id="openAll" v-model="openAll" type="checkbox" class="checkbox checkbox-primary checkbox-sm">
+          <label for="openAll" class="cursor-pointer select-none ml-2">Развернуть все</label>
+        </div>
+
+        <div class="flex gap-1 items-center">
+          <select v-model="search.type" disabled class="select select-bordered select-sm">
+            <option value="uuid">
+              ID
+            </option>
+          </select>
+          <div class="relative flex items-center flex-grow-0 w-full">
+            <input v-model="search.text" type="text" class="input input-sm input-bordered" placeholder="Поиск" @input="onSearchInput($event)">
+
+            <span
+              v-if="search.loading"
+              class="absolute right-2 loading loading-spinner loading-xs p-2"
+            />
+          </div>
+        </div>
       </div>
     </div>
 

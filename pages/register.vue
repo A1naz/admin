@@ -7,6 +7,7 @@ definePageMeta({
     unauthenticatedOnly: true,
     navigateAuthenticatedTo: '/buyouts',
   },
+  title: 'Регистрация',
 })
 const alert = ref(false)
 const alertText = ref('')
