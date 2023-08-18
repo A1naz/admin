@@ -174,7 +174,7 @@ const getStatus = computed(() => {
             </a>
           </li>
 
-          <li>
+          <li v-if="info.status !== 'work'">
             <a
               @click="deleteBuyOut"
             >
