@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { loadYmap } from 'vue-yandex-maps'
+import { notify } from '@kyvg/vue3-notification'
 
 const props = defineProps({
   pickpoints: {
@@ -13,15 +14,37 @@ const props = defineProps({
 })
 const emit = defineEmits(['callback', 'close'])
 const store = useMainStore()
+
 function closeModal() {
   emit('close')
 }
 const loading = ref(false)
 const map = ref()
 function handleSelect(address: string) {
+  if (props.pickpoints.findIndex((item: any) => item.a === address) === -1) {
+    return notify({
+      type: 'error',
+      title: 'Что-то пошло не так',
+      text: 'Этот пункт выдачи не найден',
+    })
+  }
+
+  let pointStore = localStorage.getItem('pointStore')
+  if (!pointStore)
+    pointStore = ''
+
+  const arr = pointStore.trim().split('--').reverse()
+  if (arr[0] === '')
+    arr.shift()
+  if (arr.length > 13)
+    arr.shift()
+  arr.push(address)
+  const unique = [...new Set(arr)].reverse()
+  localStorage.setItem('pointStore', unique.join('--'))
   emit('callback', address)
   closeModal()
 }
+const lastPoints = localStorage.getItem('pointStore')?.split('--')
 const presetCluster = 'islands#violetClusterIcons'
 
 const originalBounds = ref([
@@ -200,8 +223,20 @@ onKeyStroke('Escape', (e) => {
         <div v-if="error" class="text-lg text-center text-error flex items-center justify-center h-full">
           {{ error }}
         </div>
-        <div v-if="!error" class="w-full h-full">
-          <div id="ymap" class="yandex-container" />
+        <div v-if="!error" class="flex gap-4 h-full">
+          <div class="w-full h-full">
+            <div id="ymap" class="yandex-container rounded-lg" />
+          </div>
+          <div class="last h-full rounded-lg p-2 max-w-xs">
+            <h2 class="font-bold">
+              Последние использованные ПВЗ
+            </h2>
+            <div class="flex flex-col gap-2 mt-2">
+              <button v-for="(item, index) of lastPoints" :key="index" class="btn pvz text-xs btn-neutral rounded-lg p-2" @click="handleSelect(item)">
+                {{ item }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
