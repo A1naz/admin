@@ -27,7 +27,7 @@ const store = useBuyoutStore()
 const infoType = ref('')
 const defaultRules: Rule[] = rules
 const route = useRoute()
-const article = ref<number>()
+const article = ref<string>()
 const products = computed(() => store.createProducts)
 const loading = ref(false)
 const now = useNow()
@@ -36,9 +36,19 @@ async function addProduct() {
   if (!article.value)
     return
   loading.value = true
-  store.addProduct(article.value).finally(() => {
+  const string = article.value.toString().trim()
+  if (string.includes(',')) {
+    const articles = string.split(',')
+    for (const item of articles)
+      await store.addProduct(Number(item))
     loading.value = false
-  })
+  }
+  else {
+    store.addProduct(Number(article.value)).finally(() => {
+      loading.value = false
+    })
+  }
+  article.value = ''
 }
 
 function ruleModalOpen(index: number) {
@@ -225,12 +235,12 @@ onKeyStroke('Escape', (e) => {
       Создайте новые выкупы. Введите артикулы товаров и заполните необходимые данные.
     </p>
     <div class="mt-6 flex items-center">
-      <div class="relative flex justify-end items-center flex-grow-0 w-60">
+      <div class="relative flex justify-end items-center flex-grow-0 w-80 gap-1">
         <input
-          v-model="article" type="number" placeholder="Артикул" class="input input-sm input-bordered w-full"
+          v-model="article" placeholder="Артикул" class="input input-sm input-bordered w-full"
           @keydown.enter="addProduct"
         >
-        <button class="btn btn-ghost btn-sm absolute normal-case" @click="addProduct">
+        <button class="btn btn-sm normal-case" @click="addProduct">
           Добавить
         </button>
       </div>

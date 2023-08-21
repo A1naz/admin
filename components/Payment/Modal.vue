@@ -350,13 +350,13 @@ onMounted(() => {
           </div>
         </div>
         <div v-if="alertOpened" class="text-sm bg-base-200 p-2 rounded-lg">
-          <button class="btn btn-sm btn-primary mb-2" @click="infoModal?.showModal()">
-            Как пополнить баланс?
-          </button>
-          <div class="flex items-center gap-2 mb-2">
+          <div class="flex justify-between items-start gap-2 mb-2">
             <span class="font-bold text-red-500 text-lg text-center">
               Внимание!
             </span>
+            <button class="btn btn-sm btn-primary mb-2" @click="infoModal?.showModal()">
+              Как пополнить баланс?
+            </button>
           </div>
           <p class="">
             Пополнение баланса происходит с карты любого банка на указанный номер телефона/кошелька банка QIWI или Киви кошелек (другими словами).
