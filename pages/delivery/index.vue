@@ -168,7 +168,30 @@ watch(() => status.value, async (newRoute) => {
     </p>
 
     <div class="flex justify-between mb-2 mt-6 items-center flex-wrap gap-4">
-      <select class="select select-bordered select-sm" @change="selectStatus">
+      <div class="hidden lg:block">
+        <NuxtLink
+          to="/delivery" :external="false" :class="{
+            'btn-active': route.query.status === undefined,
+          }" class="btn btn-ghost btn-sm normal-case font-medium"
+        >
+          Все доставки
+        </NuxtLink>
+        <NuxtLink
+          to="/delivery?status=active" :external="false" :class="{
+            'btn-active': route.query.status === 'active',
+          }" class="btn btn-ghost btn-sm normal-case font-medium"
+        >
+          Активные
+        </NuxtLink>
+        <NuxtLink
+          to="/delivery?status=completed" :external="false" :class="{
+            'btn-active': route.query.status === 'completed',
+          }" class="btn btn-ghost btn-sm normal-case font-medium"
+        >
+          Завершенные
+        </NuxtLink>
+      </div>
+      <select class="select select-bordered select-sm lg:hidden" @change="selectStatus">
         <option value="all" :selected="route.query.status === undefined">
           Все доставки
         </option>
