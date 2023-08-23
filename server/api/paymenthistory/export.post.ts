@@ -50,7 +50,8 @@ export default eventHandler(async (event) => {
   const sheet = workbook.addWorksheet('Готовы к выдаче', {
     headerFooter: { firstHeader: `Всего записей: ${history.length}` },
   })
-  const mapped = history.map(item => ({
+  const mapped = history.map((item, index) => ({
+    number: index + 1,
     summ: item.summ,
     typeoperations: item.typeoperations,
     type: getHistoryType(item.type || ''),
@@ -60,6 +61,7 @@ export default eventHandler(async (event) => {
     comment: item.comment,
   }))
   sheet.columns = [
+    { header: 'Номер', key: 'index', font: { bold: true } },
     { header: 'Сумма', key: 'summ', font: { bold: true } },
     { header: 'Тип операции', key: 'typeoperations', width: 16, font: { bold: true } },
     { header: 'Услуга', key: 'type', width: 16, font: { bold: true } },

@@ -1,5 +1,6 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcrypt'
+import { v4 as uuid } from 'uuid'
 import { checkSignature } from '~~/server/lib/telegram/mod'
 import { User } from '~/server/lib/models/User'
 import { NuxtAuthHandler } from '#auth'
@@ -59,7 +60,7 @@ export default NuxtAuthHandler({
         }
         else {
           const newUser = new User({
-            uuid: user.id.toString(),
+            uuid: uuid(),
             telegram: user.username,
             username: user.username,
             telegramUserId: user.id.toString(),

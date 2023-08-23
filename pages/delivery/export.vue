@@ -95,97 +95,73 @@ onMounted(async () => {
   }) as ArrayBuffer
   font.value = response
 })
-
-watch(targetIsVisible, async (isVisible) => {
-  if (isVisible) {
-    if (end.value)
-      return
-    const { data, error } = await useFetch('/api/delivery/get', {
-      method: 'GET',
-      query: {
-        status: route.query?.status || 'all',
-        limit: 50,
-        skip: skip.value,
-      },
-      headers: useRequestHeaders(['cookie']) as HeadersInit,
-    })
-    if ((data.value as any)?.length === 0) {
-      end.value = true
-      return
-    }
-    deliveries.value = [...deliveries.value, ...data.value! as any]
-    skip.value += 50
-  }
-})
 </script>
 
 <template>
   <div class="overflow-auto">
-    <ClientOnly>
-      <progress class="progress progress-primary w-full fixed" :value="progress" :max="max" />
-      <div class="flex">
-        <button
-          class="btn m-2 mt-4" @click="exportToFile"
-        >
-          Скачать PDF
-        </button>
-      </div>
-      <div v-if="deliveries" ref="pdfSection" class="overflow-auto">
-        <h1 class="text-3xl font-bold text-center p-4 bg-purple-700 text-white">
-          Готовы к выдаче
+    <progress class="progress progress-primary w-full fixed" :value="progress" :max="max" />
+    <div class="flex">
+      <button
+        class="btn m-2 mt-4" @click="exportToFile"
+      >
+        Скачать PDF
+      </button>
+    </div>
+    <div v-if="deliveries" ref="pdfSection" class="h-[90vh]">
+      <h1 class="text-3xl font-bold text-center p-4 bg-purple-700 text-white">
+        Готовы к выдаче
+      </h1>
+      <div v-for="(point, index) of Object.keys(deliveries)" :key="index" :aria-label="`pdf-page-${index + 1}`" class="point relative">
+        <h1 class="text-center text-2xl font-bold absolute top-1 w-full">
+          {{ point }}
         </h1>
-        <div v-for="(point, index) of Object.keys(deliveries)" :key="index" :aria-label="`pdf-page-${index + 1}`" class="point relative">
-          <h1 class="text-center text-2xl font-bold absolute top-1 w-full">
-            {{ point }}
-          </h1>
-          <div class="deliveryCards grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 px-2">
-            <div v-for="(delivery, index) of deliveries[point]" :key="index" class="card h-[703px] rounded-none shadow-xl border border-primary mt-[65px] mb-[25px] mx-2">
-              <figure><nuxt-img class="p-4 object-contain h-72" :src="delivery.receiptcodeqr" :alt="delivery.receiptcode" /></figure>
-              <div class="card-body p-0">
-                <h2 class="card-title text-center">
-                  {{ delivery.productname }}
-                </h2>
-                <div class="info grid grid-cols-2 gap-2 mt-4 justify-center text-center">
-                  <div>
-                    {{ currency.format(delivery.pricebuy) }}
-                  </div>
-                  <div>
-                    {{ $dayjs(delivery.updatedAt).format('D.MM.YYYY') }}
-                  </div>
-                  <div>Артикул</div>
-                  <div>{{ delivery.article }}</div>
-                  <div>Размер</div>
-                  <div>{{ delivery.size }}</div>
-                  <div>Получатель</div>
-                  <div>{{ delivery.recipient }}</div>
-                  <div>Телефон</div>
-                  <div>{{ delivery.recipientphone }}</div>
-                  <div class="font-bold">
-                    Код получения
-                  </div>
-                  <div class="font-bold text-lg">
-                    {{ delivery.receiptcode }}
-                  </div>
+        <div class="deliveryCards grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 px-2">
+          <div v-for="(delivery, index) of deliveries[point]" :key="index" class="card h-[703px] rounded-none shadow-xl border border-primary mt-[65px] mb-[25px] mx-2">
+            <figure><nuxt-img class="p-4 object-contain h-72" :src="delivery.receiptcodeqr" :alt="delivery.receiptcode" /></figure>
+            <div class="card-body p-0">
+              <h2 class="card-title text-center">
+                {{ delivery.productname }}
+              </h2>
+              <div class="info grid grid-cols-2 gap-2 mt-4 justify-center text-center">
+                <div>
+                  {{ currency.format(delivery.pricebuy) }}
                 </div>
-                <div class="text-center my-4 text-sm">
-                  <div>ID выкупа</div>
-                  <a class="link" :href="`/buyouts?uuid=${delivery.uuid}`">#{{ delivery.uuid }}</a>
+                <div>
+                  {{ $dayjs(delivery.updatedAt).format('D.MM.YYYY') }}
                 </div>
+                <div>Артикул</div>
+                <div>{{ delivery.article }}</div>
+                <div>Размер</div>
+                <div>{{ delivery.size }}</div>
+                <div>Получатель</div>
+                <div>{{ delivery.recipient }}</div>
+                <div>Телефон</div>
+                <div>{{ delivery.recipientphone }}</div>
+                <div class="font-bold">
+                  Код получения
+                </div>
+                <div class="font-bold text-lg">
+                  {{ delivery.receiptcode }}
+                </div>
+              </div>
+              <div class="text-center my-4 text-sm">
+                <div>ID выкупа</div>
+                <a class="link" :href="`/buyouts?uuid=${delivery.uuid}`">#{{ delivery.uuid }}</a>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div v-else class="hero">
-        <div class="hero-content text-center flex justify-center items-center h-80">
-          <div class="max-w-md">
-            <h1 class="text-3xl font-bold">
-              Здесь ничего нет <Icon name="fluent-emoji:thinking-face" />
-            </h1>
-          </div>
+    </div>
+    <div v-else class="hero">
+      <div class="hero-content text-center flex justify-center items-center h-80">
+        <div class="max-w-md">
+          <h1 class="text-3xl font-bold">
+            Здесь ничего нет <Icon name="fluent-emoji:thinking-face" />
+          </h1>
         </div>
       </div>
-    </ClientOnly>
+    </div>
   </div>
 </template>
 
