@@ -78,7 +78,7 @@ export const useBuyoutStore = defineStore('buyout', {
         searchQuery: [{ value: '', loading: false, error: false }],
         selectedSize: product.sizes[0] ?? 'none',
         priceText: product.priceText,
-        rules: [],
+        rules: [{ category: 3, description: 'Не выкупать если товар не найден в поисковой выдаче (не выкупать по прямой ссылке)', id: 5 }],
       }))
     },
     removeSearchQuery(index: number, place: number) {
