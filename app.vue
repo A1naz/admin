@@ -37,7 +37,7 @@ watch(client, (newClient) => {
       </template>
     </notifications>
     <NuxtLayout>
-      <NuxtLoadingIndicator :color="colorMode.value === 'light' ? '#570df8' : '#ff79c6'" />
+      <NuxtLoadingIndicator :color="colorMode.value === 'light' ? '#570df8' : '#A56BF7'" />
       <SeoKit />
       <NuxtPage />
     </NuxtLayout>

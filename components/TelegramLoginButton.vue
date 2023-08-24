@@ -74,7 +74,7 @@ onMounted(() => {
 
 <template>
   <div ref="telegram" class="w-full flex justify-center">
-    <label class="btn gap-2 btn-outline normal-case font-medium btn-block border-blue-500 text-blue-500" @click="login">
+    <label class="btn btn-lg gap-2 btn-outline normal-case font-medium btn-block border-blue-500 text-blue-500" @click="login">
       <Icon size="24" name="logos:telegram" />
       Войти через Telegram
     </label>

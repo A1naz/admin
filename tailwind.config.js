@@ -16,8 +16,8 @@ module.exports = {
       '2xl': '1536px',
       // => @media (min-width: 1536px) { ... }
 
-      '3xl': '1816px'
-    }
+      '3xl': '1816px',
+    },
   },
   daisyui: {
     themes: [
@@ -64,6 +64,7 @@ module.exports = {
       {
         dark: {
           ...require('daisyui/src/theming/themes')['[data-theme=dracula]'],
+          'primary': '#A56BF7',
           'primary-content': '#ffffff',
           'neutral-content': '#ffffff',
           '--btn-text-case': 'normalcase',

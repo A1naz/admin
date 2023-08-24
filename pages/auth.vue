@@ -6,6 +6,7 @@ import { email, helpers, minLength, required } from '@vuelidate/validators'
 const store = useMainStore()
 
 definePageMeta({
+  colorMode: 'dark',
   auth: {
     unauthenticatedOnly: true,
     navigateAuthenticatedTo: '/buyouts',
@@ -91,70 +92,84 @@ const v$ = useVuelidate(rules, formData)
 </script>
 
 <template>
-  <section class="">
-    <Toast :type="alertType" :active="alert">
+  <div id="auth">
+    <Toast :type="alertType" style="z-index: 1000;" :active="alert">
       {{ alertText }}
     </Toast>
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-      <NuxtLink to="/" class="flex items-center text-2xl font-semibold ">
-        <Logo />
-      </NuxtLink>
-      <div class="card w-full rounded-lg shadow-lg  md:mt-0 sm:max-w-md xl:p-0 ">
-        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-          <h1 class="text-xl font-bold leading-tight tracking-tight  md:text-2xl ">
-            Войдите в аккаунт
-          </h1>
-          <form class="space-y-4 md:space-y-6" action="#">
-            <div>
-              <label for="email" class="block mb-2 text-sm font-medium ">Email</label>
-              <input
-                id="email" v-model="formData.email" type="email" name="email"
-                class="input input-bordered  sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
-                :class="{
-                  'input-error': v$.email.$error,
-                }" placeholder="name@company.com" required="true"
-              >
-            </div>
-            <div>
-              <label for="password" class="block mb-2 text-sm font-medium ">Пароль</label>
-              <input
-                id="password" v-model="formData.password" type="password" name="password" placeholder="••••••••"
-                class="input input-bordered sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
-                :class="{
-                  'input-error': v$.password.$error,
-                }" required="true"
-              >
-            </div>
-            <div class="flex items-center justify-between">
-              <NuxtLink to="/resetPassword" class="link link-hover text-sm font-medium  hover:underline ">
-                Забыли
-                пароль?
-              </NuxtLink>
-            </div>
-            <button
-              type="submit" class="btn btn-primary w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              @click.prevent="login"
-            >
-              <span v-show="loading" class="loading loading-spinner" />
 
-              Войти
-            </button>
+    <section class="left">
+      <h3>Войдите в аккаунт</h3>
 
-            <p class="text-sm font-light  ">
-              Еще не зарегистрированы? <NuxtLink to="/register" class="font-medium hover:underline dark:text-primary-500">
-                Регистрация
-              </NuxtLink>
-            </p>
-            <div class="divider">
-              Или
-            </div>
+      <div class="box">
+        <form>
+          <label>Email <span>*</span></label>
+          <input
+            id="email" v-model="formData.email" type="email" name="email" placeholder="Введите свой email" :class="{
+              'input-error': v$.email.$error,
+            }" required="true"
+          >
 
-            <TelegramLoginButton mode="callback" class="rounded-lg m-auto" />
-          </form>
+          <label>Пароль <span>*</span></label>
+          <input
+            id="password" v-model="formData.password" type="password" name="password" placeholder="••••••••" :class="{
+              'input-error': v$.password.$error,
+            }" required="true"
+          >
+
+          <a href="">Забыли пароль?</a>
+          <button
+            type="submit" class="btn btn-primary w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            @click.prevent="login"
+          >
+            <span v-show="loading" class="loading loading-spinner" />
+
+            Войти
+          </button>
+
+          <p>
+            Ещё не зарегистрированы? <NuxtLink href="/register">
+              Регистрация
+            </NuxtLink>
+          </p>
+        </form>
+
+        <div class="line">
+          <div />
+          <p>Или</p>
+          <div />
         </div>
+        <TelegramLoginButton mode="callback" />
+
+        <p class="text">
+          *Регистрируясь вы принимаете <a href="">Пользовательское соглашение</a>, <br>
+          и подтверждаете, что ознакомлены с <a href="">Политикой конфиденциальности</a>.
+        </p>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="right">
+      <div class="box">
+        <div class="logo">
+          wb
+        </div>
+
+        <h1>Самовыкупы на <br> WildBerries</h1>
+        <h2>
+          <span>[</span> комплексное продвижение <br>
+          - попробовать бесплатно <span>]</span>
+        </h2>
+      </div>
+
+      <img class="phone" src="~/assets/phone.png" alt="">
+
+      <img class="figure1" src="~/assets/figure1.svg" alt="">
+      <img class="figure2" src="~/assets/figure2.svg" alt="">
+      <img class="figure3" src="~/assets/figure3.svg" alt="">
+      <img class="line" src="~/assets/line.svg" alt="">
+    </section>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@import url('~/assets/style/preview.css');
+</style>
