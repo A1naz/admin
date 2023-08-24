@@ -2,7 +2,11 @@
 import { useVuelidate } from '@vuelidate/core'
 import { email, helpers, minLength, required, sameAs } from '@vuelidate/validators'
 
-definePageMeta({ auth: false, title: 'Смена пароля' })
+definePageMeta({
+  colorMode: 'dark',
+  auth: false,
+  title: 'Смена пароля',
+})
 const name = useRuntimeConfig().NAME
 
 const formData = reactive({
