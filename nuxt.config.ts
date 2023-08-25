@@ -172,6 +172,11 @@ export default defineNuxtConfig({
   },
 
   security: {
+    rateLimiter: {
+      tokensPerInterval: 200,
+      interval: 'hour',
+      fireImmediately: false,
+    },
     headers: false,
     xssValidator: false,
   },
