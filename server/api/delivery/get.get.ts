@@ -72,7 +72,6 @@ export default eventHandler(async (event) => {
         size: buyout.sizeparam,
         point: delivery.point,
         statusdelivery: delivery.statusdelivery,
-        statuses: delivery.statusdelivery,
         currentstatus:
           delivery.statusdelivery[delivery.statusdelivery.length - 1].status,
         statusupdated:

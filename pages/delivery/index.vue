@@ -32,10 +32,17 @@ const modalInfo = reactive({
   code: 0,
 })
 const modal = ref(false)
+const statusModal = ref(false)
+const penaltyModal = ref(false)
+const currentStatusdDelivery = ref<any[]>([])
 function openModal(code: number, src: string) {
   modalInfo.src = src
   modalInfo.code = code
   modal.value = true
+}
+function openStatusModal(statusdelivery: any[]) {
+  currentStatusdDelivery.value = statusdelivery
+  statusModal.value = true
 }
 const target = ref(null)
 const targetIsVisible = ref(false)
@@ -251,6 +258,8 @@ watch(() => status.value, async (newRoute) => {
           <DeliveryExpand
             :state="openAll"
             :info="delivery" @open-modal="openModal"
+            @open-status-modal="openStatusModal"
+            @open-penalty-modal="penaltyModal = true"
           />
         </li>
         <div ref="target" class="flex justify-center items-center h-4" />
@@ -258,6 +267,8 @@ watch(() => status.value, async (newRoute) => {
       <DeliveryQrModal v-if="modal" :code="modalInfo.code" :src="modalInfo.src" />
     </div>
     <Hero v-else />
+    <DeliveryPenaltyModal :state="penaltyModal" @close="penaltyModal = false" />
+    <DeliveryStatusModal v-if="deliveries?.length" :statusdelivery="currentStatusdDelivery" :state="statusModal" @close="statusModal = false" />
   </div>
 </template>
 

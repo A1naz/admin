@@ -8,7 +8,7 @@ const props = defineProps({
     type: Boolean,
   },
 })
-const emit = defineEmits(['openModal'])
+const emit = defineEmits(['openModal', 'openStatusModal', 'openPenaltyModal'])
 const { $dayjs } = useNuxtApp()
 const currency = useCurrency()
 const store = useMainStore()
@@ -24,11 +24,21 @@ onMounted(async () => {
 watch(() => props.state, (newState) => {
   opened.value = newState
 })
-function daysToPenalty(updatedAt: Date) {
+function daysToPenalty(statusdelivery: any[]) {
+  const item = statusdelivery.find(item => item.status === 'Готов к выдаче')
+  if (!item)
+    return
+
+  const updatedAt = new Date(item.date)
   const penaltyDay = new Date(updatedAt.getTime() + (5 * 24 * 60 * 60 * 1000))
   const now = new Date()
-  const timeLeft = new Date(penaltyDay.getTime() - now.getTime())
-  return timeLeft.getDay()
+  const timeLeft = penaltyDay.getTime() - now.getTime()
+  // eslint-disable-next-line max-statements-per-line
+  if (timeLeft < 0) { return 'Получение со штрафом!' }
+  else {
+    const days = Math.round(timeLeft / 1000 / 60 / 60 / 24)
+    return `Для получения без штрафа осталось: ${days} д.`
+  }
 }
 </script>
 
@@ -53,14 +63,15 @@ function daysToPenalty(updatedAt: Date) {
               info.uuid }}</label>
           </div>
           <div class="flex justify-between flex-wrap gap-2 items-center">
-            <div class="text-sm">
-              <span class="text-gray-400">Статус: </span> <span>
+            <button class="text-sm link link-hover z-10" @click="emit('openStatusModal', info.statusdelivery)">
+              <span class="text-primary">Статус: </span>
+              <span>
                 {{ info.currentstatus }}
               </span>
+            </button>
+            <div v-if="info.currentstatus === 'Готов к выдаче' && info.statusdelivery.length > 1" class="text-sm text-warning link link-hover z-10" @click="emit('openPenaltyModal')">
+              {{ daysToPenalty(info.statusdelivery) }}
             </div>
-            <!-- <div v-if="info.currentstatus === 'Готов к выдаче'">
-              {{ daysToPenalty(new Date(info.updatedAt)) }}
-            </div> -->
             <div class="mt-2 lg:m-0 text-xs">
               Обновлено {{ $dayjs(info.updatedAt).format('D MMMM HH:mm') }}
             </div>
