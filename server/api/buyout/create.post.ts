@@ -32,6 +32,16 @@ export default eventHandler(async (event) => {
 
   const body = await readBody(event)
   const last = await Buyout.findOne({ user }).sort({ _id: -1 })
+
+  const activeBuyouts = await Buyout.find({ user, status: { $in: ['active', 'paused', 'work', 'created'] } })
+  const sum = activeBuyouts.reduce((acc, item) => {
+    const price = parseInt(item.product.price) * (item.quantity - item.completed)
+    return acc + price
+  }, 0)
+
+  if (user.balance < sum)
+    throw createError('Пополните баланс для создания новых выкупов.')
+
   const products: Item[] = body
   for await (const product of products) {
     const rules = product.rules.map(rule => rule.id)
