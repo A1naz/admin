@@ -35,6 +35,7 @@ export default eventHandler(async (event) => {
 
         const phone = delivery.recipientphone
         const replaced = `+${phone[0]} (***) *** ${phone.slice(7)}`
+        const currentstatus = delivery.statusdelivery?.length ? delivery.statusdelivery[delivery.statusdelivery.length - 1].status : 'Неизвестно'
 
         return {
           index,
@@ -46,8 +47,7 @@ export default eventHandler(async (event) => {
             ? delivery.receiptcodeqr
             : undefined,
           receiptcode: delivery.receiptcode ? delivery.receiptcode : '',
-          currentstatus:
-          delivery.statusdelivery[delivery.statusdelivery.length - 1].status,
+          currentstatus,
           article: delivery.article.toString(),
           size: buyout.sizeparam,
           productname: buyout.product.name,
