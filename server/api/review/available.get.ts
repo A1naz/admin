@@ -19,7 +19,7 @@ export default eventHandler(async (event) => {
     status: 'completed',
     reviewed: false,
   }).sort({
-    createdAt: -1,
+    _id: -1,
   }).skip(skip as number || 0).limit(limit as number || 0)
   if (!readyForReview)
     return []
@@ -28,6 +28,8 @@ export default eventHandler(async (event) => {
       const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
       if (!buyout)
         return undefined
+      console.log(delivery)
+
       return {
         buyoutuuid: buyout.uuid,
         sex: buyout.gender,

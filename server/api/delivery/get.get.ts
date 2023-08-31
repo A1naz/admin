@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
   if (!user)
     return sendRedirect(event, '/auth', 302)
 
-  const all = await Delivery.find({ user })
+  // const all = await Delivery.find({ user })
   let deliveries
   if (status === 'all') {
     deliveries = await Delivery.find({ user })
@@ -57,16 +57,16 @@ export default eventHandler(async (event) => {
       if (!buyout)
         return null
 
-      const place = all.findIndex(
-        item => item._id.toString() === delivery._id.toString(),
-      )
+      // const place = all.findIndex(
+      //   item => item._id.toString() === delivery._id.toString(),
+      // )
 
       const phone = delivery.recipientphone
       const replaced = `+${phone[0]} (***) *** ${phone.slice(7)}`
       const currentstatus = delivery.statusdelivery?.length ? delivery.statusdelivery[delivery.statusdelivery.length - 1].status : 'Неизвестно'
       const statusupdated = delivery.statusdelivery?.length ? delivery.statusdelivery[delivery.statusdelivery.length - 1].date : new Date()
       return {
-        place: place + 1,
+        // place: place + 1,
         uuid: buyout.uuid,
         article: delivery.article,
         pricebuy: delivery.pricebuy,

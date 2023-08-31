@@ -54,7 +54,7 @@ function daysToPenalty(statusdelivery: any[]) {
         />
         <div class="w-full">
           <div class="flex justify-between flex-wrap">
-            <span> Доставка №{{ info.place }}
+            <span> Доставка
             </span>
             <label
               class="text-[0.6rem] link link-hover sm:text-[0.8rem] lg:text-xs text-gray-500 hover:text-primary truncate z-10"
