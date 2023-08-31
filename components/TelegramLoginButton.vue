@@ -16,9 +16,10 @@ const store = useMainStore()
 const { signIn } = useAuth()
 const bot_id = useRuntimeConfig().public.BOT_ID
 const bot_login = useRuntimeConfig().public.BOT_LOGIN
-
+const route = useRoute()
 async function onTelegramAuth(user: any) {
-  const { error, url } = await signIn('telegram-login', { ...user, redirect: false })
+  const referral = route.query.ref
+  const { error, url } = await signIn('telegram-login', { ...user, redirect: false, referral })
 
   if (error) {
     console.log(error)

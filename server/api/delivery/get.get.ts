@@ -63,7 +63,8 @@ export default eventHandler(async (event) => {
 
       const phone = delivery.recipientphone
       const replaced = `+${phone[0]} (***) *** ${phone.slice(7)}`
-
+      const currentstatus = delivery.statusdelivery?.length ? delivery.statusdelivery[delivery.statusdelivery.length - 1].status : 'Неизвестно'
+      const statusupdated = delivery.statusdelivery?.length ? delivery.statusdelivery[delivery.statusdelivery.length - 1].date : new Date()
       return {
         place: place + 1,
         uuid: buyout.uuid,
@@ -72,11 +73,8 @@ export default eventHandler(async (event) => {
         size: buyout.sizeparam,
         point: delivery.point,
         statusdelivery: delivery.statusdelivery,
-        currentstatus:
-          delivery.statusdelivery[delivery.statusdelivery.length - 1].status,
-        statusupdated:
-          delivery.statusdelivery[delivery.statusdelivery.length - 1].date,
-
+        currentstatus,
+        statusupdated,
         productname: buyout.product.name,
         productimage: buyout.product.image,
         receiptcode: delivery.receiptcode ? delivery.receiptcode : undefined,

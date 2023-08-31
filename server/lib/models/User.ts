@@ -1,6 +1,11 @@
 import { Schema, model } from 'mongoose'
 import { v4 as uuid } from 'uuid'
 
+const partnerSchema = new Schema({
+  balance: { type: Number, default: 0 },
+  refCount: { type: Number, default: 0 },
+  rewardPercent: { type: Number, default: 10 },
+})
 const UserSchema = new Schema({
   username: { type: String, unique: true, required: true, text: true },
   firstName: { type: String, required: false },
@@ -18,6 +23,10 @@ const UserSchema = new Schema({
   tg2fa: { type: Boolean, required: false, default: false },
   balance: { type: Number, default: 0, required: true },
   registrationDate: { type: Date, default: Date.now },
+  partner: {
+    type: partnerSchema,
+    ref: 'Partner',
+  },
 })
 
 export const User = model('User', UserSchema)

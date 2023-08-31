@@ -3,6 +3,8 @@ import { v4 as uuid } from 'uuid'
 import validator from 'validator'
 import { getServerSession } from '#auth'
 import { User } from '~~/server/lib/models/User'
+import { Referral } from '~~/server/lib/models/Referral'
+
 import MailService from '~~/server/lib/mailService.js'
 
 function hasWhiteSpace(s: string) {
@@ -11,7 +13,7 @@ function hasWhiteSpace(s: string) {
 export default eventHandler(async (event) => {
   const body = await readBody(event)
 
-  const { email, password } = body
+  const { email, password, referral } = body
 
   if (!email || !password)
     return { status: 'error', error: 'missing email or password' }
@@ -67,5 +69,28 @@ export default eventHandler(async (event) => {
   }
 
   await user.save()
+
+  if (referral) {
+    const inviter = await User.findOne({ username: referral })
+    if (!inviter)
+      return
+    if (inviter.partner) {
+      const refCount = inviter?.partner.refCount ?? 0
+      inviter.partner.refCount = refCount + 1
+
+      const referralFound = await Referral.findOne({ user: inviter })
+      if (referralFound) {
+        referralFound.referrals.push(user._id)
+        await referralFound.save()
+      }
+      else {
+        await Referral.create({
+          user: inviter,
+          referrals: [user._id],
+        })
+      }
+      await inviter.save()
+    }
+  }
   return { status: 'ok', error: null }
 })

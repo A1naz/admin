@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid'
 import { checkSignature } from '~~/server/lib/telegram/mod'
 import { User } from '~/server/lib/models/User'
 import { NuxtAuthHandler } from '#auth'
+import { Referral } from '~/server/lib/models/Referral'
 
 const runtimeConfig = useRuntimeConfig()
 export default NuxtAuthHandler({
@@ -49,6 +50,9 @@ export default NuxtAuthHandler({
         delete user.csrfToken
         delete user.redirect
         delete user.json
+        const referral = JSON.parse(JSON.stringify(user.referral))
+        delete user.referral
+
         const valid = checkSignature(runtimeConfig.BOT_TOKEN, user)
 
         if (!valid)
@@ -70,6 +74,25 @@ export default NuxtAuthHandler({
             emailConfirmed: true,
           })
           await newUser.save()
+          if (referral) {
+            const inviter = await User.findOne({ username: referral })
+            if (inviter && inviter.partner) {
+              const refCount = inviter?.partner.refCount ?? 0
+              inviter.partner.refCount = refCount + 1
+              const referralFound = await Referral.findOne({ user: inviter })
+              if (referralFound) {
+                referralFound.referrals.push(user._id)
+                await referralFound.save()
+              }
+              else {
+                await Referral.create({
+                  user: inviter,
+                  referrals: [user._id],
+                })
+              }
+              await inviter.save()
+            }
+          }
           return newUser
         }
       },

@@ -21,6 +21,7 @@ export default eventHandler(async (event) => {
     hasPassword: !!user.password,
     telegramUserId: user.telegramUserId,
     wbApiKeys: user.wbApiKeys.length ? user.wbApiKeys : [],
+    partner: user.partner,
   }
   return {
     client,

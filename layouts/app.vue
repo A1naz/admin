@@ -118,6 +118,7 @@ onMounted(() => {
         </h3>
         <SidebarItem icon="fluent:history-24-filled" title="История платежей" href="/paymenthistory" />
         <SidebarItem icon="fluent:document-bullet-list-24-filled" title="Отчеты по выкупам" href="/reports" />
+        <SidebarItem icon="fluent:people-team-24-filled" title="Партнерская программа" href="/partner" />
 
         <div class="mt-auto">
           <div class="w-full  hover:cursor-default p-0 block mt-8">

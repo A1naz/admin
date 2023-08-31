@@ -47,7 +47,7 @@ export default eventHandler(async (event) => {
     },
   }).sort({ _id: -1 })
   const workbook = new ExcelJS.Workbook()
-  const sheet = workbook.addWorksheet('Готовы к выдаче', {
+  const sheet = workbook.addWorksheet('История платежей', {
     headerFooter: { firstHeader: `Всего записей: ${history.length}` },
   })
   const mapped = history.map((item, index) => ({

@@ -12,12 +12,16 @@ definePageMeta({
 })
 const alert = ref(false)
 const alertText = ref('')
+const route = useRoute()
 const alertType = ref('success')
+const referral = computed(() => route.query?.ref || null)
+
 const result = ref()
 const formData = reactive({
   email: '',
   password: '',
   confirmPassword: '',
+  referral,
 })
 const loading = ref(false)
 const rules = computed(() => {
