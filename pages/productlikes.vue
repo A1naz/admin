@@ -57,7 +57,6 @@ async function sendUrl() {
   loadingUrl.value = false
 }
 
-
 let timeout = null as NodeJS.Timeout | null
 async function changeUrl() {
   if (url.value === '')
@@ -99,7 +98,7 @@ onMounted(() => {
       Выберите товар или бренд, чтобы повысить количество добавлений в «Избранное»
     </p>
     <p class="text-xs font-light mt-1 lg:text-sm">
-      Стоимость одного добавления -  <span class="font-bold">1 руб.</span>
+      Стоимость одного добавления -  <span class="font-bold">2 руб.</span>
     </p>
     <div class="mb-4 mt-6 bg-base-200 p-6 rounded-lg">
       <div class="flex flex-wrap items-center gap-6 mb-2">

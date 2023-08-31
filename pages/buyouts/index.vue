@@ -262,7 +262,7 @@ watch(() => status.value, async () => {
       Здесь формируются и оплачиваются выкупы на Wildberries. Для добавления нажмите на кнопку "Добавить выкупы".
     </p>
     <p class="text-xs font-light mt-1 lg:text-sm">
-      Стоимость одного выкупа -  <span class="font-bold">60 руб.</span>
+      Стоимость одного выкупа -  <span class="font-bold">80 руб.</span>
     </p>
     <p v-if="route.query.status === 'archived'" class="text-xs font-light mt-1 lg:text-sm">
       Выкупы в архиве удаляются через 10 дней.
