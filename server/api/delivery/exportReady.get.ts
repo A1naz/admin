@@ -13,7 +13,8 @@ const keys = Object.keys as <T>(obj: T) =>
 async function getReady(user: Document) {
   const deliveries = await Delivery.find({ user }).sort({ _id: -1 })
   const filtered = deliveries.filter((item) => {
-    return item.statusdelivery[item.statusdelivery.length - 1].status === 'Готов к выдаче' || item.statusdelivery[item.statusdelivery.length - 1].status === 'Готов к получению'
+    const currentstatus = item.statusdelivery?.length ? item.statusdelivery[item.statusdelivery.length - 1].status : 'Неизвестно'
+    return currentstatus === 'Готов к выдаче' || currentstatus === 'Готов к получению'
   })
   const format = await Promise.all(
     filtered.map(async (delivery, index) => {
@@ -112,6 +113,7 @@ export default eventHandler(async (event) => {
     return buffer
   }
   catch (e) {
+    console.log(e)
     throw createError({
       statusCode: 500,
       message: 'Не удалось создать таблицу',

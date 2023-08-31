@@ -119,7 +119,7 @@ export default NuxtAuthHandler({
         if (!email || !password)
           return null
 
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email }) || await User.findOne({ username: email })
         if (!user)
           throw new Error('User not found')
         if (runtimeConfig.env === 'developer')

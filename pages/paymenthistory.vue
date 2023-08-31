@@ -146,6 +146,9 @@ function getHistoryType(type: string) {
     case 'buyouts':
       result = 'Выкуп'
       break
+    case 'buyouts service':
+      result = 'Оплата выкупа'
+      break
     case 'reviews':
       result = 'Отзыв'
       break
@@ -271,7 +274,7 @@ function openBuyout(uuid: string) {
 
         <Column field="basisoperation" sortable header="Основание операции">
           <template #body="{ data }">
-            <div v-if="data.type === 'buyouts'">
+            <div v-if="data.type === 'buyouts' || data.type === 'buyouts service'">
               <label
                 class="link link-hover hover:text-primary truncate z-10"
                 @click="openBuyout(data.basisoperation.slice(data.basisoperation.indexOf('#') + 1, data.basisoperation.length))"
