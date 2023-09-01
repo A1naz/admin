@@ -80,13 +80,13 @@ export default eventHandler(async (event) => {
 
       const referralFound = await Referral.findOne({ user: inviter })
       if (referralFound) {
-        referralFound.referrals.push(user._id)
+        referralFound.referrals.push({ user: user._id, date: new Date() })
         await referralFound.save()
       }
       else {
         await Referral.create({
           user: inviter,
-          referrals: [user._id],
+          referrals: [{ user: user._id, date: new Date() }],
         })
       }
       await inviter.save()

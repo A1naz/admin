@@ -90,7 +90,6 @@ export default eventHandler(async (event) => {
     return buffer
   }
   catch (e) {
-    console.log(e)
     throw createError({
       statusCode: 500,
       message: 'Не удалось создать таблицу',
