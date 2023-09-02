@@ -33,7 +33,7 @@ export default eventHandler(async (event) => {
   const body = await readBody(event)
   const last = await Buyout.findOne({ user }).sort({ _id: -1 })
 
-  const activeBuyouts = await Buyout.find({ user, status: { $in: ['active', 'paused', 'work', 'created'] } })
+  const activeBuyouts = await Buyout.find({ user, status: { $in: ['active', 'work', 'created'] } })
   const sum = activeBuyouts.reduce((acc, item) => {
     const price = parseInt(item.product.price) * (item.quantity - item.completed)
     return acc + price
