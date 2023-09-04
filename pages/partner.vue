@@ -17,7 +17,7 @@ async function copyToClipboard(text: string) {
 }
 const url = runtimeConfig.public.siteUrl
 
-const refUrl = computed(() => `${url}register?ref=${client.username}`)
+const refUrl = computed(() => `${url}/register?ref=${client.username}`)
 </script>
 
 <template>
