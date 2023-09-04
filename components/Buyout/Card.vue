@@ -165,7 +165,7 @@ const getStatus = computed(() => {
               <Icon name="fluent:copy-24-filled" />Дублировать
             </a>
           </li>
-          <li v-if="info.status === 'archived' || info.status === 'active'">
+          <li v-if="info.status === 'archived' || info.status === 'active' || info.status === 'paused'">
             <a v-if="info.status !== 'archived'" @click="archiveBuyout">
               <Icon name="material-symbols:archive" />Архивировать
             </a>

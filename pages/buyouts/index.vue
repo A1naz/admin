@@ -323,7 +323,7 @@ watch(() => status.value, async () => {
         </option>
       </select>
       <div class="flex items-center gap-2 flex-wrap">
-        <a href="info/Информационная таблица по выкупам.xlsx" class="btn btn-sm hidden lg:block">
+        <a href="info/Информационная таблица по выкупам.xlsx" class="btn btn-sm hidden lg:flex lg:items-center">
           Скачать шаблон
         </a>
         <NuxtLink to="/buyouts/create" class="btn btn-primary btn-sm gap-2 font-medium normal-case self-end">
