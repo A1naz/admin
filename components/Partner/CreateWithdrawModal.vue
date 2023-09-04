@@ -7,7 +7,7 @@ const props = defineProps({
     required: true,
   },
 })
-const emit = defineEmits(['close', 'publish'])
+const emit = defineEmits(['close', 'create'])
 
 const currency = useCurrency()
 
@@ -31,11 +31,12 @@ async function createWithdraw() {
     notify({ type: 'error', title: 'Что-то пошло не так', text: error.value?.message })
 
   if (data.value) {
-    if (data.value.status === 'ok')
+    if (data.value.status === 'ok') {
       notify({ type: 'success', title: 'Вывод успешно создан' })
+      emit('create')
+    }
 
-    else
-      notify({ type: 'error', title: 'Что-то пошло не так', text: 'Не удалось создать вывод' })
+    else { notify({ type: 'error', title: 'Что-то пошло не так', text: data.value.message }) }
   }
 }
 const now = useNow()

@@ -10,19 +10,26 @@ export default eventHandler(async (event) => {
   if (!user)
     return sendRedirect(event, '/auth', 302)
   const { amount, card, fio } = await readBody(event)
+
   if (!amount || !card || !fio) {
     throw createError({
       statusCode: 400,
       message: 'Заполните все данные',
     })
   }
+  if (Number(amount) < 5000) {
+    return {
+      status: 'error',
+      message: 'Минимальная сумма вывода - 5000 руб.',
+    }
+  }
   const balance = user.partner?.balance
 
   if (!balance || Number(amount) > balance) {
-    throw createError({
-      statusCode: 400,
+    return {
+      status: 'error',
       message: 'Сумма вывода не должна быть больше доступного баланса',
-    })
+    }
   }
 
   const withdraw = await PartnerWithdraw.create({
@@ -35,7 +42,11 @@ export default eventHandler(async (event) => {
       fio,
     },
   })
-  if (withdraw)
+
+  if (withdraw) {
+    user.partner.balance -= Number(amount)
+    await user.save()
     return { status: 'ok', document: withdraw }
-  else return { status: 'error' }
+  }
+  else { return { status: 'error', message: 'Не удалось создать вывод' } }
 })

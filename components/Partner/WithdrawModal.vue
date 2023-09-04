@@ -10,8 +10,17 @@ const emit = defineEmits(['close', 'publish'])
 const currency = useCurrency()
 const createWithdrawModal = ref(false)
 const closeButton = ref<HTMLElement>()
-const { data, error } = await useFetch('api/partner/withdraws')
-const withdraws = ref(data.value as any[])
+const withdraws = ref<any[]>([])
+
+async function getWithdraws() {
+  const { data, error } = await useFetch('api/partner/withdraws')
+  withdraws.value = data.value as any[]
+}
+await getWithdraws()
+async function withdrawCreated() {
+  createWithdrawModal.value = false
+  getWithdraws()
+}
 const { $dayjs } = useNuxtApp()
 
 const now = useNow()
@@ -63,14 +72,14 @@ onKeyStroke('Escape', (e) => {
               <td>{{ item.status }}</td>
               <td>{{ currency.format(item.amount) }}</td>
               <td>{{ item.type }}</td>
-              <td>{{ item.details }}</td>
+              <td>{{ item.details.card }} {{ item.details.fio }}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
-  <PartnerCreateWithdrawModal :state="createWithdrawModal" @close="createWithdrawModal = false" />
+  <PartnerCreateWithdrawModal :state="createWithdrawModal" @create="withdrawCreated" @close="createWithdrawModal = false" />
 </template>
 
 <style scoped>
