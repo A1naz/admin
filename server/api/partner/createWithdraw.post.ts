@@ -46,7 +46,7 @@ export default eventHandler(async (event) => {
   if (withdraw) {
     user.partner.balance -= Number(amount)
     await user.save()
-    return { status: 'ok', document: withdraw }
+    return { status: 'ok', document: withdraw, message: 'success' }
   }
   else { return { status: 'error', message: 'Не удалось создать вывод' } }
 })
