@@ -128,7 +128,11 @@ export default defineNuxtConfig({
       },
     },
   },
-
+  hooks: {
+    close: () => {
+      process.exit()
+    },
+  },
   build: {
     transpile: ['primevue', '@vuepic/vue-datepicker'],
   },
