@@ -10,6 +10,15 @@ export default eventHandler(async (event) => {
   const user = await User.findOne({ uuid: session.uuid })
   if (!user)
     return sendRedirect(event, '/auth', 302)
+
+  if (!user.partner) {
+    user.partner = {
+      refCount: 0,
+      rewardPercent: 0,
+      balance: 0,
+    }
+    await user.save()
+  }
   const client = {
     email: user.email,
     username: user.email === user.username ? undefined : user.username,
