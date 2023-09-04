@@ -30,7 +30,7 @@ onKeyStroke('Escape', (e) => {
     }"
     class="modal"
   >
-    <div class="modal-box">
+    <div class="modal-box w-10/12 max-w-4xl">
       <label
         for="review-modal" class="btn btn-sm btn-circle absolute right-2 top-2 btn-ghost"
         @click="$emit('close')"

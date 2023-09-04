@@ -26,6 +26,11 @@ const UserSchema = new Schema({
   partner: {
     type: partnerSchema,
     ref: 'Partner',
+    default: {
+      balance: 0,
+      refCount: 0,
+      rewardPercent: 0,
+    },
   },
 })
 

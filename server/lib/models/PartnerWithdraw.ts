@@ -7,7 +7,7 @@ const PartnerWithdrawModel = new Schema({
   status: { type: String, required: true, default: 'created', enum: ['created', 'work', 'cancelled', 'completed', 'error'] },
   date: { type: Date, default: Date.now(), required: true },
   type: { type: String, required: true, enum: ['card', 'account'] },
-  details: { type: String },
+  details: { type: Object },
 })
 
 export const PartnerWithdraw = model('PartnerWithdraw', PartnerWithdrawModel)

@@ -8,7 +8,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'publish'])
 
 const currency = useCurrency()
-
+const createWithdrawModal = ref(false)
 const closeButton = ref<HTMLElement>()
 const { data, error } = await useFetch('api/partner/withdraws')
 const withdraws = ref(data.value as any[])
@@ -30,7 +30,7 @@ onKeyStroke('Escape', (e) => {
     }"
     class="modal"
   >
-    <div class="modal-box">
+    <div class="modal-box w-10/12 max-w-4xl">
       <label
         for="review-modal" class="btn btn-sm btn-circle absolute right-2 top-2 btn-ghost"
         @click="$emit('close')"
@@ -39,7 +39,7 @@ onKeyStroke('Escape', (e) => {
         <h3 class="text-lg font-bold mb-2">
           Вывод средств
         </h3>
-        <button class="btn btn-sm btn-primary">
+        <button class="btn btn-sm btn-primary" @click="createWithdrawModal = true">
           Создать вывод
         </button>
       </div>
@@ -70,6 +70,7 @@ onKeyStroke('Escape', (e) => {
       </div>
     </div>
   </div>
+  <PartnerCreateWithdrawModal :state="createWithdrawModal" @close="createWithdrawModal = false" />
 </template>
 
 <style scoped>
