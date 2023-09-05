@@ -34,7 +34,7 @@ const refUrl = computed(() => `${url}/register?ref=${client.username}`)
           Ваш партнерский счет:
         </div>
         <div class="balance text-xl text-primary font-bold">
-          {{ store.client.partner.balance }} руб.
+          {{ currency.format(store.client.partner.balance) }}
         </div>
       </div>
       <div class="referrals">
