@@ -180,26 +180,10 @@ async function pay() {
   }
 }
 
-async function fkCreateBill() {
-  if (!paymentForm.paymentSum)
-    return
-  const { data, error } = await useFetch('/api/payment/createBill', {
-    method: 'POST',
-    body: {
-      amount: paymentForm.paymentSum,
-    },
-  })
-  if (error.value) {
-    notify({
-      title: 'Ошибка',
-      text: 'Произошла ошибка при создании платежа',
-      type: 'error',
-    })
-  }
-  if (data.value && data.value.payUrl)
-    window.location = data.value.payUrl as any
+function setSum(amount: number) {
+  paymentForm.paymentSum = amount
+  console.log(paymentForm.paymentSum)
 }
-
 function openUrl() {
   window.open(url.value, '_blank', 'noreferrer,noopener')
 }
@@ -220,17 +204,23 @@ onMounted(() => {
       >✕</label>
       <div class="flex items-center gap-2 mb-2">
         <h3 class="text-xl font-bold ">Пополнить баланс</h3>
-        <button class="btn btn-sm" @click="infoModal?.showModal()">
+        <button class="bg-base-300 p-1 rounded-lg px-2 text-sm" @click="infoModal?.showModal()">
           Как пополнить баланс?
         </button>
       </div>
       <div>
-        <div class="w-full flex flex-col gap-6 justify-center items-start" action="">
+        <div class="w-full flex flex-col gap-2 justify-center items-start" action="">
           <div class="sum w-full">
             <h3 class="text-lg mb-2">Сумма к пополнению</h3>
             <PaymentInput v-model="paymentForm.paymentSum" />
           </div>
-          <div class="join join-vertical w-full">
+          <div class="fastbuttons flex gap-2 w-full">
+            <button class="btn btn-sm flex-1" @click="setSum(5000)">5000 ₽</button>
+            <button class="btn btn-sm flex-1" @click="setSum(10000)">10 000 ₽</button>
+            <button class="btn btn-sm flex-1" @click="setSum(15000)">15 000 ₽</button>
+            <button class="btn btn-sm flex-1" @click="setSum(20000)">20 000 ₽</button>
+          </div>
+          <div class="join join-vertical w-full mt-4">
             <input
               v-model="paymentForm.paymentType"
               disabled

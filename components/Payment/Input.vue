@@ -25,7 +25,14 @@ const props = defineProps({
   },
 
 })
-const { inputRef: rubInput } = useCurrencyInput(props.options)
+const { inputRef: rubInput, setValue } = useCurrencyInput(props.options)
+
+watch(
+  () => props.modelValue,
+  (value) => {
+    setValue(value)
+  },
+)
 </script>
 
 <template>
