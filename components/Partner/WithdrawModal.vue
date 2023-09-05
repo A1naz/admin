@@ -44,7 +44,7 @@ onKeyStroke('Escape', (e) => {
         for="review-modal" class="btn btn-sm btn-circle absolute right-2 top-2 btn-ghost"
         @click="$emit('close')"
       >✕</label>
-      <div class="flex justify-between gap-2 items-center py-2">
+      <div class="flex justify-between gap-2 items-center py-2 mt-2">
         <h3 class="text-lg font-bold mb-2">
           Вывод средств
         </h3>

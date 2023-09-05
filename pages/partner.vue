@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { notify } from '@kyvg/vue3-notification'
+
 definePageMeta({
   layout: 'app',
   auth: true,
@@ -14,6 +16,9 @@ const client = store.client
 const partner = client.partner
 async function copyToClipboard(text: string) {
   await navigator.clipboard.writeText(text)
+  notify({
+    title: 'Ссылка скопирована в буфер обмена',
+  })
 }
 const url = runtimeConfig.public.siteUrl
 
@@ -59,8 +64,8 @@ const refUrl = computed(() => `${url}/register?ref=${client.username}`)
       <div>
         <div>Ваша ссылка для приглашения:</div>
         <div class="bg-base-100 rounded-lg p-2 border border-primary mt-2 flex justify-between gap-2 items-center">
-          <span>{{ refUrl }}</span>
-          <button class="btn btn-sm" @click="copyToClipboard(refUrl)">
+          <span class="link lg:link-hover" @click="copyToClipboard(refUrl)">{{ refUrl }}</span>
+          <button class="btn btn-sm hidden lg:block" @click="copyToClipboard(refUrl)">
             Скопировать
           </button>
         </div>
