@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
   if (!user.partner) {
     user.partner = {
       refCount: 0,
-      rewardPercent: 0,
+      rewardPercent: 10,
       balance: 0,
     }
     await user.save()
