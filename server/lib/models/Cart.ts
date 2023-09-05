@@ -10,7 +10,7 @@ const CartSchema = new Schema({
   name: { type: String },
   image: { type: String },
   size: { type: String, required: true },
-  createdDate: { type: Date, default: new Date(Date.now()) },
+  createdDate: { type: Date, default: new Date() },
   endedDate: { type: Date },
 })
 

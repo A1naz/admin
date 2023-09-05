@@ -29,6 +29,7 @@ export default eventHandler(async (event) => {
     period,
     image,
     name,
+    createdDate: new Date(),
   })
   await created.save()
   return {

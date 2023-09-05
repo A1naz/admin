@@ -37,6 +37,7 @@ export default eventHandler(async (event) => {
     dislikes,
     total: likes + dislikes,
     image,
+    createdDate: new Date(),
   })
   await created.save()
   return {
