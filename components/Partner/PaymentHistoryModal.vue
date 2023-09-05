@@ -56,7 +56,7 @@ onKeyStroke('Escape', (e) => {
             <!-- row 1 -->
             <tr v-for="(item, index) in history" :key="index">
               <td>{{ $dayjs(item.date).format('D MMMM HH:mm') }}</td>
-              <td>{{ currency.format(item.amount) }}</td>
+              <td>{{ item.amount }} руб.</td>
               <td>{{ item.type }}</td>
               <td>{{ item.description }}</td>
             </tr>
