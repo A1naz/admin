@@ -182,7 +182,6 @@ async function pay() {
 
 function setSum(amount: number) {
   paymentForm.paymentSum = amount
-  console.log(paymentForm.paymentSum)
 }
 function openUrl() {
   window.open(url.value, '_blank', 'noreferrer,noopener')
