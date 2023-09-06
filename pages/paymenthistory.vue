@@ -19,7 +19,7 @@ const { stop } = useIntersectionObserver(
 const skip = ref(50)
 const dateFilter = ref('all')
 const end = ref(false)
-
+const store = useMainStore()
 const filterType = ref('all')
 const PrimeVue = usePrimeVue()
 const { width, height } = useWindowSize()
@@ -117,6 +117,10 @@ async function exportToXLS() {
   document.body.appendChild(fileLink)
   fileLink.click()
 }
+function openInfoModal() {
+  store.infoModal = true
+  store.infoType = 'paymenthistory'
+}
 
 watch(targetIsVisible, async (isVisible) => {
   if (isVisible && autoTarget.value) {
@@ -175,13 +179,12 @@ function openBuyout(uuid: string) {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mt-4">
-      История платежей
-      <div class="tooltip tooltip-bottom" data-tip="Видео-инструкция по балансу">
-        <a class="hover:text-primary" target="_blank" href="https://youtu.be/vwm4RuS-ZJY">
-          <IconCSS size="24" class="h-8 w-8" name="uil:youtube" /></a>
-      </div>
-    </h1>
+    <div class="flex items-center gap-2 mt-4">
+      <h1 class="text-2xl font-bold ">
+        История платежей
+      </h1>
+      <InfoButton @click="openInfoModal" />
+    </div>
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm mb-6">
       Здесь можно увидеть движение вашего баланса
     </p>

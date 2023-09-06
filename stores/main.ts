@@ -7,6 +7,8 @@ export const useMainStore = defineStore('main', {
     pickpoints: [] as any,
     selectedItem: null as number | null,
     drawerOpened: null as boolean | null,
+    infoModal: false,
+    infoType: '',
   }),
   // optional actions
 

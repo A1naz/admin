@@ -4,6 +4,7 @@ const colorMode = useColorMode()
 
 const theme = ref('light')
 const route = useRoute()
+const infoModal = ref(false)
 const { status, data, signIn, signOut } = useAuth()
 const currency = useCurrency()
 const pageContent = ref()
@@ -153,6 +154,7 @@ onMounted(() => {
       </ul>
     </div>
     <PaymentModal />
+    <InfoModal :state="store.infoModal" />
   </div>
 </template>
 

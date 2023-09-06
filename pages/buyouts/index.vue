@@ -212,6 +212,11 @@ const formatAvailable = computedEager(() => {
   else
     return 'выкупов'
 })
+
+function openInfoModal() {
+  store.infoModal = true
+  store.infoType = 'buyouts'
+}
 watch(targetIsVisible, async (isVisible) => {
   if (isVisible && autoTarget.value) {
     if (end.value)
@@ -250,14 +255,13 @@ watch(() => status.value, async () => {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mt-4">
-      Выкупы
-      <div class="tooltip tooltip-bottom" data-tip="Видео-инструкция по выкупам">
-        <a class="hover:text-primary" target="_blank" href="https://youtu.be/QQf2mYMZkN8">
-          <IconCSS size="24" class="h-8 w-8" name="uil:youtube" />
-        </a>
-      </div>
-    </h1>
+    <div class="flex items-center gap-2 mt-4">
+      <h1 class="text-2xl font-bold ">
+        Выкупы
+      </h1>
+      <InfoButton @click="openInfoModal" />
+    </div>
+
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
       Здесь формируются и оплачиваются выкупы на Wildberries. Для добавления нажмите на кнопку "Добавить выкупы".
     </p>

@@ -20,4 +20,5 @@ const rules: Rule[] = [{ id: 1, description: 'Добавление 1 артик�
   { id: 14, description: 'Использовать сортировку в поиске - сначала выгодные', category: 6, relies: 8 },
   { id: 15, description: 'Использовать сортировку в поиске - по рейтингу', category: 6, relies: 8 },
 ]
-export { rules, Rule }
+export { rules }
+export type { Rule }

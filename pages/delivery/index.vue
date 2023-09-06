@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { notify } from '@kyvg/vue3-notification'
+import { useMainStore } from '../../stores/main'
 
 definePageMeta({
   layout: 'app',
@@ -9,6 +10,7 @@ definePageMeta({
 const openAll = ref(false)
 const route = useRoute()
 const router = useRouter()
+const store = useMainStore()
 const deliveries = ref([]) as any
 const autoTarget = ref(true)
 const status = computed(() => route.query?.status || 'all')
@@ -125,6 +127,11 @@ async function onSearchInput(event: Event) {
   findDeliveriesDebounced(search.text, search.type)
 }
 
+function openInfoModal() {
+  store.infoModal = true
+  store.infoType = 'deliveries'
+}
+
 watch(targetIsVisible, async (isVisible) => {
   if (isVisible && autoTarget.value) {
     if (end.value)
@@ -162,13 +169,12 @@ watch(() => status.value, async (newRoute) => {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mt-4">
-      Доставки <div class="tooltip tooltip-bottom" data-tip="Видео-инструкция по заборам">
-        <a class="hover:text-primary" target="_blank" href="https://youtu.be/URh2G7fzl-g">
-          <IconCSS size="24" class="h-8 w-8" name="uil:youtube" />
-        </a>
-      </div>
-    </h1>
+    <div class="flex items-center gap-2 mt-4">
+      <h1 class="text-2xl font-bold ">
+        Доставки
+      </h1>
+      <InfoButton @click="openInfoModal" />
+    </div>
     <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
       В этом разделе можно отследить статусы выкупов после оплаты. Статус "Доставлен" означает, что товар можно
       забирать из пункта выдачи.
