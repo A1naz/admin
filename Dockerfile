@@ -46,9 +46,9 @@ ENV fkSecret2=${fkSecret2}
 ENV fkID=${fkID}
 
 
-RUN npm install -g pnpm
-RUN pnpm install
-RUN pnpm run build
+RUN apk add --no-cache python3 make g++
+RUN npm install
+RUN npm run build
 ENV NODE_ENV production
 ENV PORT 80
 
