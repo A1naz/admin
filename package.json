@@ -90,8 +90,5 @@
     "prettier-plugin-tailwindcss": "^0.2.8",
     "tailwind-scrollbar": "^3.0.5",
     "typescript": "^5.2.2"
-  },
-  "overrides": {
-    "next-auth": "4.22.5"
   }
 }
