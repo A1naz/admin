@@ -259,10 +259,10 @@ watch(() => status.value, async () => {
       <h1 class="text-2xl font-bold ">
         Выкупы
       </h1>
-      <InfoButton @click="openInfoModal" />
+      <InfoButton @openModal="openInfoModal" />
     </div>
 
-    <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
+    <p class="text-xs font-light mt-1 lg:text-sm">
       Здесь формируются и оплачиваются выкупы на Wildberries. Для добавления нажмите на кнопку "Добавить выкупы".
     </p>
     <p class="text-xs font-light mt-1 lg:text-sm">
@@ -327,7 +327,7 @@ watch(() => status.value, async () => {
         </option>
       </select>
       <div class="flex items-center gap-2 flex-wrap">
-        <a href="info/Информационная таблица по выкупам.xlsx" class="btn btn-sm hidden lg:flex lg:items-center">
+        <a href="info/Информационная таблица по выкупам.xlsx" class="btn btn-sm btn-primary hidden lg:flex lg:items-center">
           Скачать шаблон
         </a>
         <NuxtLink to="/buyouts/create" class="btn btn-primary btn-sm gap-2 font-medium normal-case self-end">

@@ -37,10 +37,14 @@ const title = computed(() => {
   else if (store.infoType === 'paymenthistory')
     return 'История платежей'
 })
+onKeyStroke('Escape', (e) => {
+  e.preventDefault()
+  store.infoModal = false
+})
 </script>
 
 <template>
-  <input id="review-modal" type="checkbox" class="modal-toggle">
+  <input id="infoModal" type="checkbox" class="modal-toggle">
   <div
     :class="{
       'modal-open': state,
@@ -59,6 +63,7 @@ const title = computed(() => {
 
       <iframe class="w-full h-[30rem] rounded-lg my-4" src="https://www.youtube.com/embed/nE1GQd6XV9Y?si=fjE2fbBAPomggp_n" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
     </div>
+    <label class="modal-backdrop" for="infoModal" @click="store.infoModal = false">Close</label>
   </div>
 </template>
 

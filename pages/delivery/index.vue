@@ -173,9 +173,9 @@ watch(() => status.value, async (newRoute) => {
       <h1 class="text-2xl font-bold ">
         Доставки
       </h1>
-      <InfoButton @click="openInfoModal" />
+      <InfoButton @openModal="openInfoModal" />
     </div>
-    <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
+    <p class="text-xs font-light mt-1 lg:text-sm">
       В этом разделе можно отследить статусы выкупов после оплаты. Статус "Доставлен" означает, что товар можно
       забирать из пункта выдачи.
     </p>

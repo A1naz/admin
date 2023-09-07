@@ -135,6 +135,6 @@ input::-webkit-inner-spin-button {
 }
 
 .description {
-  @apply text-sm text-gray-500 font-light mt-1
+  @apply text-sm  font-light mt-1
 }
 </style>

@@ -30,7 +30,7 @@ const refUrl = computed(() => `${url}/register?ref=${client.username}`)
     <h1 class="text-2xl font-bold mt-4">
       Партнерская программа
     </h1>
-    <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
+    <p class="text-xs font-light mt-1 lg:text-sm">
       Приглашайте друзей и получайте бонусы
     </p>
     <div class="card bg-base-200 p-4 mt-6 flex flex-col gap-2">
@@ -65,7 +65,7 @@ const refUrl = computed(() => `${url}/register?ref=${client.username}`)
         <div>Ваша ссылка для приглашения:</div>
         <div class="bg-base-100 rounded-lg p-2 border border-primary mt-2 flex justify-between gap-2 items-center">
           <span class="link lg:link-hover" @click="copyToClipboard(refUrl)">{{ refUrl }}</span>
-          <button class="btn btn-sm hidden lg:block" @click="copyToClipboard(refUrl)">
+          <button class="btn btn-sm btn-primary hidden lg:block" @click="copyToClipboard(refUrl)">
             Скопировать
           </button>
         </div>

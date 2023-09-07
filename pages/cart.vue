@@ -111,7 +111,7 @@ onMounted(() => {
     <h1 class="text-2xl font-bold mt-4">
       Корзина
     </h1>
-    <p class="text-xs text-gray-500 font-light mt-1 lg:text-sm">
+    <p class="text-xs font-light mt-1 lg:text-sm">
       Выберите товар, который будет добавлен в корзину
     </p>
     <p class="text-xs font-light mt-1 lg:text-sm">

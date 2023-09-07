@@ -24,6 +24,7 @@ export default eventHandler(async (event) => {
       },
     },
   )
+  fs.writeFileSync('rawPoints.json', JSON.stringify(data.value))
   const points = data.value.pickups
   const collection = points.map((point: any) => {
     return {

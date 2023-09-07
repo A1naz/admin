@@ -154,7 +154,7 @@ function goToPublished() {
         <h1 class="text-2xl font-bold ">
           Отзывы
         </h1>
-        <InfoButton @click="openInfoModal" />
+        <InfoButton @openModal="openInfoModal" />
       </div>
       <p class="description">
         На каждый полученный артикул можно оставить отзыв. Оплачивается отдельно от выкупа согласно вашему тарифу.
