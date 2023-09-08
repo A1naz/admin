@@ -182,6 +182,9 @@ watch(() => status.value, async (newRoute) => {
     <p class="text-xs font-light mt-1 lg:text-sm">
       Совершайте заборы ваших товаров в течение 5 дней с момента прибытия на ПВЗ. За каждый последующий день вы получаете штраф 25 рублей за единицу не забранного товара
     </p>
+    <p class="text-xs font-bold mt-1 lg:text-sm">
+      Возвраты финансовых средств на не забранные товары с ПВЗ отсутствуют! Работает по модели Выкупил - Забрал.
+    </p>
 
     <div class="flex justify-between mb-2 mt-6 items-center flex-wrap gap-4">
       <div class="hidden lg:block">

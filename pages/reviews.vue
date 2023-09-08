@@ -180,6 +180,13 @@ function goToPublished() {
           Опубликованные
         </NuxtLink>
         <NuxtLink
+          to="/reviews?status=canceled" :class="{
+            'btn-active': route.query.status === 'canceled',
+          }" class="btn btn-ghost btn-sm normal-case font-medium"
+        >
+          Отмененные
+        </NuxtLink>
+        <NuxtLink
           to="/reviews?status=nofunds" :class="{
             'btn-active': route.query.status === 'nofunds',
           }" class="btn btn-ghost btn-sm normal-case font-medium"

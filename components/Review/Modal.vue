@@ -263,9 +263,12 @@ onMounted(() => {
           </div>
         </div>
         <div>
-          <div class="pb-2">
+          <div>
             Фото
           </div>
+          <p class="mb-2 text-sm font-light">
+            Разрешены фото в формате PNG, JPG.
+          </p>
           <ClientOnly>
             <div
               class="flex gap-2 items-center overflow-x-scroll flex-nowrap basis-32 pb-4 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin scrollbar-rounded-[12px]"
@@ -292,7 +295,7 @@ onMounted(() => {
                       <Icon name="mdi:loading" class="h-8 w-8 animate-spin" />
                     </div>
                     <input
-                      :ref="(el) => (inputs[`file${(index + 1)}`] = el)" type="file"
+                      :ref="(el) => (inputs[`file${(index + 1)}`] = el)" type="file" accept="image/png, image/gif, image/jpeg"
                       class="hidden" @change="(e: Event) => uploadToS3(e, index)"
                     >
                     <IconCSS

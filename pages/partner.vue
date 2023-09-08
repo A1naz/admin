@@ -33,6 +33,9 @@ const refUrl = computed(() => `${url}/register?ref=${client.username}`)
     <p class="text-xs font-light mt-1 lg:text-sm">
       Приглашайте друзей и получайте бонусы
     </p>
+    <p class="text-xs mt-1 lg:text-sm font-bold">
+      Вывод финансовых средств недоступен до 15.10.2023. Для перевода реферальных на основной баланс напишите в службу заботы.
+    </p>
     <div class="card bg-base-200 p-4 mt-6 flex flex-col gap-2">
       <div class="account">
         <div>
