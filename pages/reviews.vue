@@ -33,7 +33,6 @@ async function getReviews(status: string, skip: number, limit: number) {
   if (status === 'available') {
     const { data } = await useFetch('/api/review/available', {
       method: 'GET',
-      headers: useRequestHeaders(['cookie']) as HeadersInit,
       query: {
         limit,
         skip,
@@ -41,22 +40,20 @@ async function getReviews(status: string, skip: number, limit: number) {
     })
     return data.value as any[]
   }
-  if (status === 'published') {
+  else if (status === 'published') {
     const { data } = await useFetch('/api/review/published', {
       method: 'GET',
-      headers: useRequestHeaders(['cookie']) as HeadersInit,
       query: {
         limit,
         skip,
-        status: 'all',
+        status: 'published',
       },
     })
     return data.value as any []
   }
-  if (status === 'nofunds') {
+  else if (status === 'nofunds') {
     const { data } = await useFetch('/api/review/published', {
       method: 'GET',
-      headers: useRequestHeaders(['cookie']) as HeadersInit,
       query: {
         limit,
         skip,
@@ -65,7 +62,17 @@ async function getReviews(status: string, skip: number, limit: number) {
     })
     return data.value as any[]
   }
-  return []
+  else {
+    const { data } = await useFetch('/api/review/published', {
+      method: 'GET',
+      query: {
+        limit,
+        skip,
+        status,
+      },
+    })
+    return data.value as any[]
+  }
 }
 const openedPhoto = ref('')
 reviews.value = await getReviews(status.value as string, 0, 25)
@@ -121,6 +128,7 @@ watch(targetIsVisible, async (isVisible) => {
 watch(() => queryStatus.value, async (newRoute, oldRoute) => {
   skip.value = 25
   end.value = false
+  console.log(newRoute)
   if (oldRoute === newRoute)
     return
   reviews.value = await getReviews(newRoute as string, 0, 25)
@@ -180,6 +188,13 @@ function goToPublished() {
           Опубликованные
         </NuxtLink>
         <NuxtLink
+          to="/reviews?status=work" :class="{
+            'btn-active': route.query.status === 'work',
+          }" class="btn btn-ghost btn-sm normal-case font-medium"
+        >
+          В работе
+        </NuxtLink>
+        <NuxtLink
           to="/reviews?status=canceled" :class="{
             'btn-active': route.query.status === 'canceled',
           }" class="btn btn-ghost btn-sm normal-case font-medium"
@@ -223,7 +238,7 @@ function goToPublished() {
           :info="review" @open-modal="openModal"
         />
       </div>
-      <div v-if="status === 'published' || status === 'nofunds'" class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+      <div v-else class="cards grid grid-cols-1 gap-4 lg:grid-cols-3 2xl:grid-cols-4">
         <ReviewPublishedCard
           v-for="(review, index) of reviews" :key="index"
           :index="index" :info="review" @open-image="openPhoto"
