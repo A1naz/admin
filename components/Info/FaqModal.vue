@@ -4,10 +4,13 @@ onKeyStroke('Escape', (e) => {
   e.preventDefault()
   store.faqModal = false
 })
+function close() {
+  store.faqModal = false
+}
 </script>
 
 <template>
-  <input id="infoModal" type="checkbox" class="modal-toggle">
+  <input id="faqModal" type="checkbox" class="modal-toggle">
   <div
     :class="{
       'modal-open': store.faqModal,
@@ -17,7 +20,7 @@ onKeyStroke('Escape', (e) => {
     <div class="modal-box w-6/12 max-w-4xl">
       <label
         for="review-modal" class="btn btn-sm btn-circle absolute right-2 top-2 btn-ghost"
-        @click="store.faqModal = false"
+        @click="close"
       >✕</label>
       <h1 class="text-xl font-bold">
         Часто задаваемые вопросы
@@ -363,7 +366,7 @@ onKeyStroke('Escape', (e) => {
       </div>
     </div>
 
-    <label class="modal-backdrop" for="infoModal" @click="store.faqModal = false">Close</label>
+    <label class="modal-backdrop" for="faqModal" @click="close">Close</label>
   </div>
 </template>
 
