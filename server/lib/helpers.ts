@@ -32,40 +32,52 @@ export function findProductCard(article: number) {
 }
 
 export async function findPositionByQuery(query: string, article: number, sort = 'popular') {
-  const pages = 60
-  const result = {
-    found: false,
-    page: -1,
-    advert: false,
-  }
-
-  const advertData: any = await $fetch(`https://catalog-ads.wildberries.ru/api/v6/search?keyword=${query}`, { parseResponse: JSON.parse })
-  const advertPages = advertData.pages
-  if (advertData.adverts) {
-    const foundIndex = advertData.adverts.findIndex((el: any) => el.id === article)
-    if (foundIndex !== -1) {
-      const item = advertData.adverts[foundIndex]
-      const place = foundIndex + 1
-      const page = Math.ceil(place / advertPages[0].count)
-      result.found = true
-      result.page = page
-      result.advert = true
-      return result
+  try {
+    const pages = 30
+    const result = {
+      found: false,
+      page: -1,
+      advert: false,
     }
-  }
 
-  for (let i = 1; i <= pages; i++) {
-    const data: any = await $fetch(`https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=${sort}&spp=31&suppressSpellcheck=false&page=${i}`, { parseResponse: JSON.parse })
-    const products = data?.data?.products
-    if (!products)
-      return result
-
-    products.forEach((el: any) => {
-      if (el.id === article) {
+    const advertData: any = await $fetch(`https://catalog-ads.wildberries.ru/api/v6/search?keyword=${query}`, { parseResponse: JSON.parse })
+    const advertPages = advertData.pages
+    if (advertData.adverts) {
+      const foundIndex = advertData.adverts.findIndex((el: any) => el.id === article)
+      if (foundIndex !== -1) {
+        const item = advertData.adverts[foundIndex]
+        const place = foundIndex + 1
+        const page = Math.ceil(place / advertPages[0].count)
         result.found = true
-        result.page = i
+        result.page = page
+        result.advert = true
+        return result
       }
-    })
+    }
+
+    for (let i = 1; i <= pages; i++) {
+      const data: any = await $fetch(`https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=${sort}&spp=31&suppressSpellcheck=false&page=${i}`, { parseResponse: JSON.parse })
+      console.log(i)
+      const products = data?.data?.products
+      if (!products)
+        return result
+
+      products.forEach((el: any) => {
+        if (el.id === article) {
+          result.found = true
+          result.page = i
+        }
+      })
+    }
+    return result
   }
-  return result
+  catch (e) {
+    const result = {
+      found: false,
+      page: -1,
+      advert: false,
+    }
+    console.log(e)
+    return result
+  }
 }
