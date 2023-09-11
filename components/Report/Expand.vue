@@ -56,11 +56,7 @@ watch(() => props.state, (newState) => {
     </div>
     <div class="collapse-content">
       <div class="flex flex-col gap-4">
-        <div class="cardNumber">
-          Карта для выкупа: {{ info.card }}
-        </div>
         <div class="screenshots flex flex-col gap-2">
-          <span>Скриншоты:</span>
           <div class="images flex gap-6 flex-wrap max-w-full">
             <div v-for="(image, index) of info.screenshots" :key="index">
               <nuxt-img

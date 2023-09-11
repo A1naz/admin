@@ -9,6 +9,7 @@ export const useMainStore = defineStore('main', {
     drawerOpened: null as boolean | null,
     infoModal: false,
     infoType: '',
+    faqModal: false,
   }),
   // optional actions
 

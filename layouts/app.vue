@@ -154,7 +154,8 @@ onMounted(() => {
       </ul>
     </div>
     <PaymentModal />
-    <InfoModal :state="store.infoModal" />
+    <InfoModal v-if="store.infoModal" :state="store.infoModal" />
+    <InfoFaqModal />
   </div>
 </template>
 

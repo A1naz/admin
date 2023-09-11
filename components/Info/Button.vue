@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const emit = defineEmits(['openModal'])
+const store = useMainStore()
 </script>
 
 <template>
@@ -8,9 +9,9 @@ const emit = defineEmits(['openModal'])
       <IconCSS size="18" class="h-8 w-8" name="uil:youtube" />
       Видеообучение
     </button>
-    <a target="_blank" href="https://docs.google.com/document/d/1VVEjeQJwh1FeTolOudA_EoX5uRTzL3zi-Mi2uuZBono/edit?usp=sharing" class="btn btn-xs btn-primary">
+    <button class="btn btn-xs btn-primary" @click="store.faqModal = true">
       FAQ
-    </a>
+    </button>
   </div>
 </template>
 
