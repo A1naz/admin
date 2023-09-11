@@ -32,7 +32,7 @@ export function findProductCard(article: number) {
 }
 
 export async function findPositionByQuery(query: string, article: number, sort = 'popular') {
-  const pages = 30
+  const pages = 60
   const result = {
     found: false,
     page: -1,
