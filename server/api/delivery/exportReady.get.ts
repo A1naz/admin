@@ -31,6 +31,8 @@ async function getReady(user: Document) {
       const replaced = `+${phone[0]} (***) *** ${phone.slice(7)}`
       const currentstatus = delivery.statusdelivery?.length ? delivery.statusdelivery[delivery.statusdelivery.length - 1].status : 'Неизвестно'
       const statusupdated = delivery.statusdelivery?.length ? new Date(delivery.statusdelivery[delivery.statusdelivery.length - 1].date) : new Date()
+      const deliveryDate = delivery.statusdelivery?.length ? new Date(delivery.statusdelivery?.find(item => item.status === 'Готов к выдаче' || item.status === 'Готов к получению')?.date) : new Date()
+      const expireDate = new Date(deliveryDate.getTime() + 1000 * 60 * 60 * 24 * 5)
       return {
         index,
         place,
@@ -39,6 +41,8 @@ async function getReady(user: Document) {
         pricebuy: delivery.pricebuy,
         size: buyout.sizeparam,
         point: delivery.point,
+        deliveryDate,
+        expireDate,
         statusdelivery: delivery.statusdelivery,
         currentstatus,
         statusupdated,
@@ -85,7 +89,8 @@ export default eventHandler(async (event) => {
       { header: 'Артикул', key: 'article', width: 16, font: { bold: true } },
       { header: 'Размер', key: 'size', width: 16, font: { bold: true } },
       { header: 'Дата создания заказа', key: 'finishDate', width: 16, font: { bold: true } },
-      { header: 'Дата доставки в ПВЗ', key: 'statusupdated', width: 16, font: { bold: true } },
+      { header: 'Дата доставки в ПВЗ', key: 'deliveryDate', width: 16, font: { bold: true } },
+      { header: 'Дата окончания срока забора с ПВЗ', key: 'expireDate', width: 16, font: { bold: true } },
       { header: 'Код ПВЗ', key: 'receiptcode', width: 16, font: { bold: true } },
       { header: 'ID Выкупа', key: 'uuid', width: 16, font: { bold: true } },
       { header: 'ПВЗ', key: 'point', width: 64, font: { bold: true } },
