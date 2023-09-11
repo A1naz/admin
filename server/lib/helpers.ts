@@ -57,7 +57,6 @@ export async function findPositionByQuery(query: string, article: number, sort =
 
     for (let i = 1; i <= pages; i++) {
       const data: any = await $fetch(`https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=${sort}&spp=31&suppressSpellcheck=false&page=${i}`, { parseResponse: JSON.parse })
-      console.log(i)
       const products = data?.data?.products
       if (!products)
         return result
@@ -66,8 +65,11 @@ export async function findPositionByQuery(query: string, article: number, sort =
         if (el.id === article) {
           result.found = true
           result.page = i
+          return result
         }
       })
+      if (result.found)
+        return result
     }
     return result
   }
