@@ -49,11 +49,22 @@ const props = defineProps<IProps>()
               {{ item.amount }}
             </div>
           </div>
-          <div class="date ml-auto text-xs text-end">
-            {{ $dayjs(item.createdDate).format('D MMMM HH:mm') }}
+        </div>
+        <div class="flex gap-0.5">
+          <div>
+            <div class="text-xs">
+              Размер
+            </div>
+            <div class="text-sm">
+              {{ item.size }}
+            </div>
           </div>
         </div>
         <div class="card-actions justify-start mt-2">
+          <div>Дата Создания:</div>
+          <div class="date text-end">
+            {{ $dayjs(item.createdDate).format('D MMMM HH:mm') }}
+          </div>
           <div>Дата Завершения:</div>
           <div>
             <div v-if="item.endedDate">

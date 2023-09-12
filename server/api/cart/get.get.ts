@@ -20,6 +20,7 @@ export default eventHandler(async (event) => {
       article: cart.article,
       amount: cart.amount,
       image: cart.image,
+      size: cart.size,
       query: cart.query,
       createdDate: cart.createdDate,
       endedDate: cart.endedDate || null,

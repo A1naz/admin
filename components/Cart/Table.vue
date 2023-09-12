@@ -45,6 +45,11 @@ const { $dayjs } = useNuxtApp()
           </a>
         </template>
       </Column>
+      <Column field="size" header="Размер">
+        <template #body="{ data }">
+          <div>{{ data.size }}</div>
+        </template>
+      </Column>
       <Column field="amount" header="Кол-во">
         <template #body="{ data }">
           <div>{{ data.amount }}</div>

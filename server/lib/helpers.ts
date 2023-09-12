@@ -7,6 +7,8 @@ function p(t: any, e: any) {
       return i + 1
   }
 }
+const sleep = ms => new Promise(r => setTimeout(r, ms))
+
 export function findImage(article: number) {
   const t = article
 
@@ -33,7 +35,7 @@ export function findProductCard(article: number) {
 
 export async function findPositionByQuery(query: string, article: number, sort = 'popular') {
   try {
-    const pages = 30
+    const pages = 60
     const result = {
       found: false,
       page: -1,
@@ -56,8 +58,9 @@ export async function findPositionByQuery(query: string, article: number, sort =
     }
 
     for (let i = 1; i <= pages; i++) {
-      const data: any = await $fetch(`https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=${sort}&spp=31&suppressSpellcheck=false&page=${i}`, { parseResponse: JSON.parse })
-      const products = data?.data?.products
+      const data: any = await $fetch(`https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=${sort}&spp=31&suppressSpellcheck=false&page=${i}`)
+      const parsed = JSON.parse(data)
+      const products = parsed?.data?.products
       if (!products)
         return result
 
