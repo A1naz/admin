@@ -7,7 +7,7 @@ const partnerSchema = new Schema({
   rewardPercent: { type: Number, default: 10 },
 })
 const UserSchema = new Schema({
-  username: { type: String, unique: true, required: true, text: true },
+  username: { type: String, unique: true, required: true },
   firstName: { type: String, required: false },
   lastName: { type: String, required: false },
   email: { type: String, unique: false, required: false },

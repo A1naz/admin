@@ -54,21 +54,19 @@ export default eventHandler(async (event) => {
   const user = new User({
     email,
     password: hash,
-    username: email.split('@')[0],
+    username: email.split('@')[0].replaceAll('.', ''),
     roles: ['user'],
     uuid: uuid(),
   })
+  await user.save()
   const url = useRuntimeConfig().PUBLIC_SITE_URL
   const link = `${url}/api/auth/activate?uuid=${user.uuid}`
   try {
     await MailService.sendActivationMail(user.email, link)
   }
   catch (error) {
-    console.log(error)
     return { status: 'error', error: 'Ошибка отправки письма.' }
   }
-
-  await user.save()
 
   if (referral) {
     const inviter = await User.findOne({ username: referral })
