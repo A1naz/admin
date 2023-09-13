@@ -82,7 +82,6 @@ export async function findPositionByQuery(query: string, article: number, sort =
       page: -1,
       advert: false,
     }
-    console.log(e)
     return result
   }
 }

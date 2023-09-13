@@ -17,8 +17,8 @@ export default eventHandler(async (event) => {
   let reviews: any = []
   if (status === 'all')
     reviews = await Review.find({ user }).sort({ _id: -1 }).skip(skip as number || 0).limit(limit as number || 0)
-  else if (status === ' work')
-    reviews = await Review.find({ user, status: { $in: ['created', 'working', 'waiting'] } }).sort({ _id: -1 }).skip(skip as number || 0).limit(limit as number || 0)
+  else if (status === 'work')
+    reviews = await Review.find({ user, status: { $in: ['created', 'working', 'waiting', 'work'] } }).sort({ _id: -1 }).skip(skip as number || 0).limit(limit as number || 0)
   else if (status)
     reviews = await Review.find({ user, status: status.toString() }).sort({ _id: -1 }).skip(skip as number || 0).limit(limit as number || 0)
   const format = await Promise.all(
