@@ -7,32 +7,32 @@ export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
   const { skip, limit } = getQuery(event)
 
-  if (!session)
-    return sendRedirect(event, '/auth', 302)
+  if (!session) return sendRedirect(event, '/auth', 302)
 
   const user = await User.findOne({ uuid: session.uuid })
-  if (!user)
-    return sendRedirect(event, '/auth', 302)
+  if (!user) return sendRedirect(event, '/auth', 302)
 
   const readyForReview = await Delivery.find({
     user,
     status: 'completed',
     reviewed: false,
-  }).sort({
-    _id: -1,
-  }).skip(skip as number || 0).limit(limit as number || 0)
-  if (!readyForReview)
-    return []
+  })
+    .sort({
+      _id: -1,
+    })
+    .skip((skip as number) || 0)
+    .limit((limit as number) || 0)
+  if (!readyForReview) return []
   const format = await Promise.all(
     readyForReview.map(async (delivery) => {
       const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
-      if (!buyout)
+      if (!buyout) {
         return undefined
-      console.log(delivery)
-
+      }
+      
       return {
         buyoutuuid: buyout.uuid,
-        sex: buyout.gender,
+        sex: delivery.data8 ? delivery.data8 : buyout.gender,
         article: delivery.article,
         pricebuy: delivery.pricebuy,
         size: buyout.sizeparam,
@@ -41,7 +41,7 @@ export default eventHandler(async (event) => {
         updatedAt: delivery.updatedAt,
         id: delivery._id,
       }
-    }),
+    })
   )
-  return format.filter(item => item !== undefined)
+  return format.filter((item) => item !== undefined)
 })

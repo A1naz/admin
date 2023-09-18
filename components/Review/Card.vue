@@ -71,7 +71,7 @@ function openBuyout() {
       </div>
       <div class="flex justify-between items-center">
         <div class="flex gap-2 text-sm">
-          <div>Пол: {{ info.sex === 'female' ? 'Женский' : info.sex === 'male' ? 'Мужской' : 'Нет' }}</div>
+          <div>Пол: {{ info.sex.toLowerCase() === 'female' ? 'Женский' : info.sex.toLowerCase() === 'male' ? 'Мужской' : 'Нет' }}</div>
           <div>Размер: {{ info.size === 'none' ? 'Нет' : info.size }}</div>
         </div>
         <label
