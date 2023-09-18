@@ -7,7 +7,7 @@ function p(t: any, e: any) {
       return i + 1
   }
 }
-const sleep = ms => new Promise(r => setTimeout(r, ms))
+const sleep = (ms: any) => new Promise(r => setTimeout(r, ms))
 
 export function findImage(article: number) {
   const t = article

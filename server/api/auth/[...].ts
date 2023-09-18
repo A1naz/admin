@@ -27,13 +27,12 @@ export default NuxtAuthHandler({
       return Promise.resolve(token)
     },
     session: async ({ session, token, user }) => {
-      (session as any).email = token.email;
-      (session as any).uuid = token.uuid;
-      (session as any).username = token.username;
-      (session as any).balance = token.balance
+      ;(session as any).email = token.email
+      ;(session as any).uuid = token.uuid
+      ;(session as any).username = token.username
+      ;(session as any).balance = token.balance
       const found = await User.findOne({ uuid: token.uuid })
-      if (!found)
-        return Promise.reject(new Error('User not found'))
+      if (!found) return Promise.reject(new Error('User not found'))
 
       return Promise.resolve(session)
     },
@@ -55,14 +54,14 @@ export default NuxtAuthHandler({
 
         const valid = checkSignature(runtimeConfig.BOT_TOKEN, user)
 
-        if (!valid)
-          throw new Error('invalid signature')
+        if (!valid) throw new Error('invalid signature')
 
-        const foundUser = await User.findOne({ telegramUserId: user.id.toString() })
+        const foundUser = await User.findOne({
+          telegramUserId: user.id.toString(),
+        })
         if (foundUser) {
           return foundUser
-        }
-        else {
+        } else {
           const newUser = new User({
             uuid: uuid(),
             telegram: user.username,
@@ -81,10 +80,12 @@ export default NuxtAuthHandler({
               inviter.partner.refCount = refCount + 1
               const referralFound = await Referral.findOne({ user: inviter })
               if (referralFound) {
-                referralFound.referrals.push({ user: user._id, date: new Date() })
+                referralFound.referrals.push({
+                  user: user._id,
+                  date: new Date(),
+                })
                 await referralFound.save()
-              }
-              else {
+              } else {
                 await Referral.create({
                   user: inviter,
                   referrals: [{ user: user._id, date: new Date() }],
@@ -116,26 +117,25 @@ export default NuxtAuthHandler({
 
       async authorize(credentials: any) {
         const { email, password, code } = credentials
-        if (!email || !password)
-          return null
+        if (!email || !password) return null
 
-        const user = await User.findOne({ email }) || await User.findOne({ username: email })
-        if (!user)
+        const user =
+          (await User.findOne({ email })) ||
+          (await User.findOne({ username: email }))
+        if (!user) {
+          console.log('49082131111313131313131313131313131313131313131313131')
+
           throw new Error('User not found')
-        if (runtimeConfig.env === 'developer')
-          return user
-        if (!user.password)
-          throw new Error('Password not set')
+        }
+        if (runtimeConfig.env === 'developer') return user
+        if (!user.password) throw new Error('Password not set')
 
         const isValid = await bcrypt.compare(password, user.password)
 
-        if (!isValid)
-          throw new Error('Invalid password')
+        if (!isValid) throw new Error('Invalid password')
 
-        if (!user.emailConfirmed)
-          throw new Error('Email is not confirmed')
-        if (user.tg2fa && user.telegramUserId && !code)
-          throw new Error('2fa')
+        if (!user.emailConfirmed) throw new Error('Email is not confirmed')
+        if (user.tg2fa && user.telegramUserId && !code) throw new Error('2fa')
 
         return user
       },
