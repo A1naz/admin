@@ -29,6 +29,7 @@
     "exceljs": "^4.3.0",
     "freekassa-node": "^2.0.0",
     "html2pdf.js": "^0.10.1",
+    "https-proxy-agent": "^7.0.2",
     "jsonwebtoken": "^9.0.2",
     "maska": "^2.1.10",
     "md5": "^2.3.0",

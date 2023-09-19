@@ -321,12 +321,20 @@ function openBuyout(uuid: string) {
           </div>
           <div class="collapse-content">
             <div class="flex flex-col">
-              <dt class="mb-1 text-gray-500 text-sm  dark:text-gray-400">
-                Комментарий
-              </dt>
               <dd class="font-semibold text-sm">
-                {{ item.comment }}
+                <a
+                :href="`https://www.wildberries.ru/catalog/${item.article}/detail.aspx`" target="_blank"
+                class="text-sm text-secondary link link-hover"
+              >
+                {{ item.article }}
+              </a>
               </dd>
+              <dt v-if="item.comment" class="mb-1 text-gray-500 text-sm  dark:text-gray-400">
+                Комментарий
+                <dd class="font-semibold text-sm">
+                  {{ item.comment }}
+                </dd>
+              </dt>
             </div>
           </div>
         </div>

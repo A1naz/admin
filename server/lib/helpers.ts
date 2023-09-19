@@ -1,13 +1,15 @@
+import * as https from 'https'
+import { HttpsProxyAgent } from 'https-proxy-agent'
 const c = [143, 287, 431, 719, 1007, 1061, 1115, 1169, 1313, 1601, 1655, 1919]
+import { proxies } from './proxy'
 
 function p(t: any, e: any) {
   for (let i = 0; i < e.length; i++) {
     const first = e[i - 1] ? e[i - 1] : 0
-    if (t > first && t <= e[i])
-      return i + 1
+    if (t > first && t <= e[i]) return i + 1
   }
 }
-const sleep = (ms: any) => new Promise(r => setTimeout(r, ms))
+const sleep = (ms: any) => new Promise((r) => setTimeout(r, ms))
 
 export function findImage(article: number) {
   const t = article
@@ -33,19 +35,34 @@ export function findProductCard(article: number) {
   return result
 }
 
-export async function findPositionByQuery(query: string, article: number, sort = 'popular') {
+export async function findPositionByQuery(
+  query: string,
+  article: number,
+  sort = 'popular'
+) {
+
   try {
-    const pages = 60
+    const pages = 50
     const result = {
       found: false,
       page: -1,
       advert: false,
     }
 
-    const advertData: any = await $fetch(`https://catalog-ads.wildberries.ru/api/v6/search?keyword=${query}`, { parseResponse: JSON.parse })
+    const randomNumber = Math.floor(Math.random() * 105)
+
+    const advertData: any = await $fetch(
+      `https://catalog-ads.wildberries.ru/api/v6/search?keyword=${query}`,
+      {
+        agent: new HttpsProxyAgent(`${proxies[randomNumber]}`),
+        parseResponse: JSON.parse,
+      }
+    )
     const advertPages = advertData.pages
     if (advertData.adverts) {
-      const foundIndex = advertData.adverts.findIndex((el: any) => el.id === article)
+      const foundIndex = advertData.adverts.findIndex(
+        (el: any) => el.id === article
+      )
       if (foundIndex !== -1) {
         const item = advertData.adverts[foundIndex]
         const place = foundIndex + 1
@@ -58,11 +75,19 @@ export async function findPositionByQuery(query: string, article: number, sort =
     }
 
     for (let i = 1; i <= pages; i++) {
-      const data: any = await $fetch(`https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=${sort}&spp=31&suppressSpellcheck=false&page=${i}`)
+      const random = Math.floor(Math.random() * 105)
+      
+      const data: any = await $fetch(
+        `https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=${sort}&spp=31&suppressSpellcheck=false&page=${i}`,
+        {
+          agent: new HttpsProxyAgent(`${proxies[random]}`),
+        }
+      )
+
       const parsed = JSON.parse(data)
       const products = parsed?.data?.products
-      if (!products)
-        return result
+
+      if (!products) return result
 
       products.forEach((el: any) => {
         if (el.id === article) {
@@ -71,12 +96,12 @@ export async function findPositionByQuery(query: string, article: number, sort =
           return result
         }
       })
-      if (result.found)
-        return result
+      if (result.found) return result
     }
     return result
-  }
-  catch (e) {
+  } catch (e) {
+    console.log(e)
+
     const result = {
       found: false,
       page: -1,

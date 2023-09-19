@@ -18,7 +18,7 @@ function close() {
     }"
     class="modal"
   >
-    <div class="modal-box w-6/12 max-w-4xl">
+    <div class="modal-box w-11/12 max-w-4xl">
       <label
         for="review-modal" class="btn btn-sm btn-circle absolute right-2 top-2 btn-ghost"
         @click="close"
