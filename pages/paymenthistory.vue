@@ -329,10 +329,14 @@ function openBuyout(uuid: string) {
                 {{ item.article }}
               </a>
               </dd>
-              <dt v-if="item.comment" class="mb-1 text-gray-500 text-sm  dark:text-gray-400">
-                Комментарий
+              <dt  class="mb-1 text-gray-500 text-sm  dark:text-gray-400">
                 <dd class="font-semibold text-sm">
-                  {{ item.comment }}
+                  Услуга - {{getHistoryType(item.type) }}
+                </dd>
+              </dt>
+              <dt v-if="item.comment" class="mb-1 text-gray-500 text-sm  dark:text-gray-400">
+                <dd class="font-semibold text-sm">
+                  Комментарий - {{ item.comment }}
                 </dd>
               </dt>
             </div>
