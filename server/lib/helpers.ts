@@ -35,14 +35,16 @@ export function findProductCard(article: number) {
   return result
 }
 
+const cycleCount = 0
 export async function findPositionByQuery(
   query: string,
   article: number,
-  sort = 'popular'
+  sort = 'popular',
+  n: number = 0,
+  cycleCount: number = 0
 ) {
-
+  const pages = 50
   try {
-    const pages = 50
     const result = {
       found: false,
       page: -1,
@@ -74,39 +76,62 @@ export async function findPositionByQuery(
       }
     }
 
-    for (let i = 1; i <= pages; i++) {
-      const random = Math.floor(Math.random() * 105)
-      
-      const data: any = await $fetch(
-        `https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=${sort}&spp=31&suppressSpellcheck=false&page=${i}`,
-        {
-          agent: new HttpsProxyAgent(`${proxies[random]}`),
-        }
-      )
+    async function findPositionCycle() {
+      for (let i = n; i <= pages; i++) {
+        n++
+        const random = Math.floor(Math.random() * 105)
 
-      const parsed = JSON.parse(data)
-      const products = parsed?.data?.products
+        const data: any = await $fetch(
+          `https://search.wb.ru/exactmatch/ru/male/v4/search?TestGroup=test&TestID=188&appType=1&curr=rub&dest=-1257786&query=${query}&regions=80,38,4,64,83,33,68,70,69,30,86,75,40,1,66,110,22,31,48,71,114&resultset=catalog&sort=${sort}&spp=31&suppressSpellcheck=false&page=${i}`,
+          {
+            method: 'GET',
+            agent: new HttpsProxyAgent(`${proxies[random]}`),
+          }
+        )
 
-      if (!products) return result
+        const parsed = JSON.parse(data)
+        const products = parsed?.data?.products
 
-      products.forEach((el: any) => {
-        if (el.id === article) {
-          result.found = true
-          result.page = i
-          return result
-        }
-      })
-      if (result.found) return result
+        if (!products) return result
+
+        products.forEach((el: any) => {
+          if (el.id === article) {
+            result.found = true
+            result.page = i
+            return result
+          }
+        })
+        if (result.found) return result
+      }
+      return result
     }
-    return result
-  } catch (e) {
-    console.log(e)
 
+    if (n < pages) {
+      const cycleResult = await findPositionCycle()
+      return cycleResult
+    } else return result
+  } catch (e) {
+    cycleCount++
+    if (n <= 1) {
+      const newResult: any = await findPositionByQuery(query, article, sort, n)
+      return newResult
+    } else if (n < pages && cycleCount < 10) {
+      await sleep(5000)
+      const newResult: any = await findPositionByQuery(
+        query,
+        article,
+        sort,
+        n,
+        cycleCount
+      )
+      return newResult
+    }
     const result = {
       found: false,
       page: -1,
       advert: false,
     }
+
     return result
   }
 }

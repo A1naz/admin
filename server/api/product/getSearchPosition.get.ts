@@ -12,7 +12,7 @@ export default eventHandler(async (event) => {
     if (!article || !query)
       return { found: false, page: -1, advert: false }
     
-    const result = await findPositionByQuery(query.toString().replaceAll(' ', '%20'), Number(article))
+    const result: any = await findPositionByQuery(query.toString().replaceAll(' ', '%20'), Number(article))
     return result
   }
   catch (e) {
