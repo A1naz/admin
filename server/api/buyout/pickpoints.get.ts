@@ -15,17 +15,17 @@ export default eventHandler(async (event) => {
       return sendStream(event, fs.createReadStream('points.json'))
     }
   }
-  const data: any = await $fetch(
-    'https://www.wildberries.ru/webapi/spa/modules/pickups',
-    {
-      method: 'GET',
-      headers: {
-        'x-requested-with': 'XMLHttpRequest',
-      },
-    }
-  )
-
+  
   if (fs.existsSync('points.json')) {
+    const data: any = await $fetch(
+      'https://www.wildberries.ru/webapi/spa/modules/pickups',
+      {
+        method: 'GET',
+        headers: {
+          'x-requested-with': 'XMLHttpRequest',
+        },
+      }
+    )
     const cached = fs.readFileSync('points.json', 'utf8')
     const parsed = JSON.parse(cached)
 
