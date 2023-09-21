@@ -31,7 +31,6 @@ export default eventHandler(async (event) => {
 
     // Удаление объектов с deleteMark >= 10
     parsed.points.forEach((obj: any) => {
-
       if (obj.deleteMark && obj.deleteMark >= 10) {
         const index = parsed.points.findIndex((el: any) => el.id === obj.id)
         if (index !== -1) {
@@ -67,6 +66,8 @@ export default eventHandler(async (event) => {
       //Увеличиваем deleteMark, для points(ПВЗ), которые не прилетели из вб
       if (!data.value.pickups.some((el: any) => el.id === obj.id)) {
         obj.deleteMark++
+      } else {
+        obj.deleteMark = 0
       }
     })
 
@@ -89,7 +90,34 @@ export default eventHandler(async (event) => {
     }
     fs.writeFileSync('points.json', JSON.stringify(cache))
     return sendStream(event, fs.createReadStream('points.json'))
-  }
+  } else {
+    const data: any = await $fetch(
+      'https://www.wildberries.ru/webapi/spa/modules/pickups',
+      {
+        method: 'GET',
+        headers: {
+          'x-requested-with': 'XMLHttpRequest',
+        },
+      }
+    )
 
-  return sendStream(event, fs.createReadStream('points.json'))
+    fs.writeFileSync('rawPoints.json', JSON.stringify(data.value))
+    const points = data.value.pickups
+    const collection = points.map((point: any) => {
+      return {
+        id: point.id,
+        lt: point.coordinates[0],
+        lg: point.coordinates[1],
+        w: point.workTime,
+        a: point.address,
+      }
+    })
+
+    const cache = {
+      updated: new Date(),
+      points: collection,
+    }
+    fs.writeFileSync('points.json', JSON.stringify(cache))
+    return sendStream(event, fs.createReadStream('points.json'))
+  }
 })
