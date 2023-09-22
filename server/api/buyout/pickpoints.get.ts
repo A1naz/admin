@@ -11,7 +11,7 @@ export default eventHandler(async (event) => {
     const parsed = JSON.parse(cached)
     const now = new Date()
     const diff = now.getTime() - new Date(parsed.updated).getTime()
-    if (diff < 1000) {
+    if (diff < 1000 * 60 * 60) {
       return sendStream(event, fs.createReadStream('points.json'))
     }
   }
