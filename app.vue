@@ -8,12 +8,16 @@ const colorMode = useColorMode()
 const { status, data } = useAuth()
 
 const store = useMainStore()
-const { pending, data: client, error, refresh } = useLazyAsyncData('client', () => $fetch('/api/user/client'))
+const {
+  pending,
+  data: client,
+  error,
+  refresh,
+} = useLazyAsyncData('client', () => $fetch('/api/user/client'))
 useIntervalFn(() => {
   refresh()
 }, 1000 * 60)
-if (status.value === 'authenticated')
-  await store.getClient()
+if (status.value === 'authenticated') await store.getClient()
 
 const app = ref()
 
@@ -24,7 +28,12 @@ watch(client, (newClient) => {
 
 <template>
   <div ref="app">
-    <notifications position="top right" :max="2" :close-on-click="true" :pause-on-hover="true">
+    <notifications
+      position="top right"
+      :max="2"
+      :close-on-click="true"
+      :pause-on-hover="true"
+    >
       <template #body="props">
         <div style="padding: 1rem; z-index: 1000">
           <div class="notify-card">
@@ -37,9 +46,12 @@ watch(client, (newClient) => {
       </template>
     </notifications>
     <NuxtLayout>
-      <NuxtLoadingIndicator :color="colorMode.value === 'light' ? '#570df8' : '#A56BF7'" />
+      <NuxtLoadingIndicator
+        :color="colorMode.value === 'light' ? '#570df8' : '#A56BF7'"
+      />
       <SeoKit />
       <NuxtPage />
+      <div class="my-16 md:my-0"></div>
     </NuxtLayout>
   </div>
 </template>
@@ -47,25 +59,25 @@ watch(client, (newClient) => {
 <style lang="css">
 @import '@/assets/style/datepicker.css';
 .scroll-primary {
-  @apply scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin
+  @apply scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin;
 }
 body {
   overflow: hidden;
-  @apply scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin
+  @apply scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin;
 }
 
 .notify-text {
   font-size: 0.9rem;
   font-weight: 400;
   margin-bottom: 0.5rem;
-  color: gray
+  color: gray;
 }
 
 .notify-title {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: white
+  color: white;
 }
 
 .notify-card {
@@ -96,7 +108,7 @@ input::-webkit-inner-spin-button {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity .2s linear;
+  transition: opacity 0.2s linear;
 }
 
 .fade-enter,
@@ -127,14 +139,14 @@ input::-webkit-inner-spin-button {
 }
 
 .heading {
-  @apply text-xl font-bold mt-1
+  @apply text-xl font-bold mt-1;
 }
 
 .title {
-  @apply text-2xl font-bold mt-1
+  @apply text-2xl font-bold mt-1;
 }
 
 .description {
-  @apply text-sm  font-light mt-1
+  @apply text-sm  font-light mt-1;
 }
 </style>

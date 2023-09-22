@@ -10,10 +10,8 @@ const currency = useCurrency()
 const pageContent = ref()
 const lightMode = ref(colorMode.value === 'dark')
 function changeTheme() {
-  if (colorMode.value === 'light')
-    colorMode.preference = 'dark'
-  else
-    colorMode.preference = 'light'
+  if (colorMode.value === 'light') colorMode.preference = 'dark'
+  else colorMode.preference = 'light'
 }
 
 async function logout() {
@@ -30,16 +28,25 @@ onMounted(() => {
 
 <template>
   <div class="drawer lg:drawer-open z-10">
-    <input id="my-drawer" type="checkbox" class="drawer-toggle">
-    <div class="drawer-content w-full overflow-auto h-[100vh] px-4 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin">
+    <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+    <div
+      class="drawer-content w-full overflow-auto h-[100vh] px-4 scrollbar-thumb-primary scrollbar-track-base-200 scrollbar-thin"
+    >
       <div class="w-full navbar bg-base-100 lg:hidden">
         <div class="flex-none">
           <label for="my-drawer" class="btn btn-square btn-ghost drawer-button">
             <svg
-              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
               class="inline-block w-6 h-6 stroke-current"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </label>
         </div>
@@ -53,7 +60,9 @@ onMounted(() => {
     </div>
     <div class="drawer-side z-30 shadow-sm">
       <label for="my-drawer" class="drawer-overlay" />
-      <ul class="menu w-72 h-full bg-base-200 text-base-content flex-nowrap overflow-auto scrollbar-none">
+      <ul
+        class="menu w-72 h-full bg-base-200 text-base-content flex-nowrap overflow-auto scrollbar-none"
+      >
         <!-- Sidebar content here -->
         <div class="hidden title w-full justify-center p-2 xl:flex">
           <Logo />
@@ -64,8 +73,13 @@ onMounted(() => {
               <div class="flex justify-between items-start">
                 <div class="">
                   <div class="font-bold">
-                    {{ store.client?.username ? store.client.username : store.client.telegram ? store.client.telegram
-                      : store.client.email.split('@')[0] }}
+                    {{
+                      store.client?.username
+                        ? store.client.username
+                        : store.client.telegram
+                        ? store.client.telegram
+                        : store.client.email.split('@')[0]
+                    }}
                   </div>
                   <div class="balance text-xs text-gray-400">
                     Баланс: {{ currency.format(store.client.balance) }}
@@ -74,7 +88,10 @@ onMounted(() => {
                 <div class="flex items-center gap-2">
                   <div class="tooltip" data-tip="Инструкция по платформе">
                     <NuxtLink
-                      :external="true" target="_blank" to="https://drive.google.com/file/d/1d6FLWMIgqhrWXHpdHFdAu2H8wnVdB_2S/view?usp=sharing" class="relative btn btn-sm btn-neutral btn-circle bg-neutral-focus hover:bg-neutral text-xl font-bold text-center"
+                      :external="true"
+                      target="_blank"
+                      to="https://drive.google.com/file/d/1d6FLWMIgqhrWXHpdHFdAu2H8wnVdB_2S/view?usp=sharing"
+                      class="relative btn btn-sm btn-neutral btn-circle bg-neutral-focus hover:bg-neutral text-xl font-bold text-center"
                     >
                       i
                     </NuxtLink>
@@ -84,7 +101,9 @@ onMounted(() => {
                       :class="{
                         'bg-neutral-focus': route.path !== '/profile',
                         'text-white': route.path === '/profile',
-                      }" to="/profile" class="btn btn-sm btn-neutral btn-circle relative hover:bg-neutral"
+                      }"
+                      to="/profile"
+                      class="btn btn-sm btn-neutral btn-circle relative hover:bg-neutral"
                     >
                       <IconCSS name="fluent:person-24-filled" size="24" />
                     </NuxtLink>
@@ -93,7 +112,10 @@ onMounted(() => {
               </div>
             </div>
             <div>
-              <label for="payment-modal" class="btn btn-block btn-sm btn-neutral hover:bg-neutral">
+              <label
+                for="payment-modal"
+                class="btn btn-block btn-sm btn-neutral hover:bg-neutral"
+              >
                 Пополнить
               </label>
             </div>
@@ -102,51 +124,103 @@ onMounted(() => {
         <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
           Продвижение товаров
         </h3>
-        <SidebarItem title="Выкупы" icon="fluent:payment-24-filled" href="/buyouts" />
-        <SidebarItem title="Доставки" icon="fluent:box-24-filled" href="/delivery" />
-        <SidebarItem title="Отзывы" icon="fluent:comment-24-filled" href="/reviews" />
+        <SidebarItem
+          title="Выкупы"
+          icon="fluent:payment-24-filled"
+          href="/buyouts"
+        />
+        <SidebarItem
+          title="Доставки"
+          icon="fluent:box-24-filled"
+          href="/delivery"
+        />
+        <SidebarItem
+          title="Отзывы"
+          icon="fluent:comment-24-filled"
+          href="/reviews"
+        />
         <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
           Улучшение репутации
         </h3>
-        <SidebarItem title="Лайки на отзывы" icon="fluent:thumb-like-24-filled" href="/likes" />
-        <SidebarItem title="Лайки на товар / бренд" icon="fluent:heart-24-filled" href="/productlikes" />
-        <SidebarItem title="Вопросы" icon="fluent:chat-bubbles-question-24-filled" href="/questions" />
-        <SidebarItem title="Корзина" icon="fluent:cart-24-filled" href="/cart" />
-        <SidebarItem title="Автоответчик на отзывы" icon="fluent:phone-chat-24-filled" href="/autoanswer" />
+        <SidebarItem
+          title="Лайки на отзывы"
+          icon="fluent:thumb-like-24-filled"
+          href="/likes"
+        />
+        <SidebarItem
+          title="Лайки на товар / бренд"
+          icon="fluent:heart-24-filled"
+          href="/productlikes"
+        />
+        <SidebarItem
+          title="Вопросы"
+          icon="fluent:chat-bubbles-question-24-filled"
+          href="/questions"
+        />
+        <SidebarItem
+          title="Корзина"
+          icon="fluent:cart-24-filled"
+          href="/cart"
+        />
+        <SidebarItem
+          title="Автоответчик на отзывы"
+          icon="fluent:phone-chat-24-filled"
+          href="/autoanswer"
+        />
 
-        <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
-          Дополнительно
-        </h3>
-        <SidebarItem icon="fluent:history-24-filled" title="История платежей" href="/paymenthistory" />
-        <SidebarItem icon="fluent:document-bullet-list-24-filled" title="Отчеты по выкупам" href="/reports" />
-        <SidebarItem icon="fluent:people-team-24-filled" title="Партнерская программа" href="/partner" />
+        <h3 class="opacity-60 text-xs p-3 px-8 uppercase">Дополнительно</h3>
+        <SidebarItem
+          icon="fluent:history-24-filled"
+          title="История платежей"
+          href="/paymenthistory"
+        />
+        <SidebarItem
+          icon="fluent:document-bullet-list-24-filled"
+          title="Отчеты по выкупам"
+          href="/reports"
+        />
+        <SidebarItem
+          icon="fluent:people-team-24-filled"
+          title="Партнерская программа"
+          href="/partner"
+        />
 
         <div class="mt-auto">
-          <div class="w-full  hover:cursor-default p-0 block mt-8">
-            <div class="join flex justify-between  w-full items-center p-0 m-0">
+          <div class="w-full hover:cursor-default p-0 block mt-8">
+            <div class="join flex justify-between w-full items-center p-0 m-0">
               <div
                 class="join-item btn btn-ghost gap-2 flex justify-center items-center normal-case w-[60%] hover:cursor-pointer rounded-lg p-0 m-0"
                 @click="logout"
               >
                 <Icon name="fluent:sign-out-24-filled" size="24" />
-                <span>
-                  Выйти
-                </span>
+                <span> Выйти </span>
               </div>
               <a target="_blank" href="https://t.me/+Y9WKYbGsMeM3ZDli">
-                <label class="join-item btn btn-ghost btn-square z-10"><Icon class="w-6 h-6" name="ic:baseline-telegram" /></label>
+                <label class="join-item btn btn-ghost btn-square z-10"
+                  ><Icon class="w-6 h-6" name="ic:baseline-telegram"
+                /></label>
               </a>
-              <label class="join-item btn btn-ghost btn-square z-10 w-[20%] swap swap-rotate">
-
+              <label
+                class="join-item btn btn-ghost btn-square z-10 w-[20%] swap swap-rotate"
+              >
                 <!-- this hidden checkbox controls the state -->
-                <input v-model="lightMode" type="checkbox" @click="changeTheme">
+                <input
+                  v-model="lightMode"
+                  type="checkbox"
+                  @click="changeTheme"
+                />
 
                 <!-- sun icon -->
-                <Icon class="swap-on fill-current w-6 h-6" name="fluent:weather-sunny-24-regular" />
+                <Icon
+                  class="swap-on fill-current w-6 h-6"
+                  name="fluent:weather-sunny-24-regular"
+                />
 
                 <!-- moon icon -->
-                <Icon class="swap-off fill-current w-6 h-6" name="fluent:weather-moon-24-regular" />
-
+                <Icon
+                  class="swap-off fill-current w-6 h-6"
+                  name="fluent:weather-moon-24-regular"
+                />
               </label>
             </div>
           </div>

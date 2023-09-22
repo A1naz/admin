@@ -123,8 +123,6 @@ export default NuxtAuthHandler({
           (await User.findOne({ email })) ||
           (await User.findOne({ username: email }))
         if (!user) {
-          console.log('49082131111313131313131313131313131313131313131313131')
-
           throw new Error('User not found')
         }
         if (runtimeConfig.env === 'developer') return user

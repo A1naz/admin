@@ -11,11 +11,11 @@ export default eventHandler(async (event) => {
     const parsed = JSON.parse(cached)
     const now = new Date()
     const diff = now.getTime() - new Date(parsed.updated).getTime()
-    if (diff < 1000 * 60 * 60) {
+    if (diff < 1000 * 60 * 60) {      
       return sendStream(event, fs.createReadStream('points.json'))
     }
   }
-  
+
   if (fs.existsSync('points.json')) {
     const data: any = await $fetch(
       'https://www.wildberries.ru/webapi/spa/modules/pickups',
@@ -31,7 +31,7 @@ export default eventHandler(async (event) => {
 
     // Удаление объектов с deleteMark >= 10
     parsed.points.forEach((obj: any) => {
-      if (obj.deleteMark && obj.deleteMark >= 10) {
+      if (obj.deleteMark && obj.deleteMark >= 5) {
         const index = parsed.points.findIndex((el: any) => el.id === obj.id)
         if (index !== -1) {
           parsed.points.splice(index, 1)
@@ -44,8 +44,10 @@ export default eventHandler(async (event) => {
     //Добавление новых пвз, только прилетевших из вб
     data.value.pickups.forEach((obj: any) => {
       if (obj.id) {
-        const index = parsed.points.findIndex((el: any) => el.id === obj.id)
-        if (index === -1) {
+        const index = parsed.points.findIndex(
+          (el: any) => el.id === obj.id || el.a === obj.address
+        )
+        if (index === -1 && obj.id) {
           parsed.points.push({
             id: obj.id,
             lt: obj.coordinates[0],
@@ -70,8 +72,6 @@ export default eventHandler(async (event) => {
         obj.deleteMark = 0
       }
     })
-
-    fs.writeFileSync('rawPoints.json', JSON.stringify(data.value))
 
     // const points = data.value.pickups
     // const collection = points.map((point: any) => {
@@ -101,7 +101,6 @@ export default eventHandler(async (event) => {
       }
     )
 
-    fs.writeFileSync('rawPoints.json', JSON.stringify(data.value))
     const points = data.value.pickups
     const collection = points.map((point: any) => {
       return {
