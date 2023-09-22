@@ -51,7 +51,6 @@ watch(client, (newClient) => {
       />
       <SeoKit />
       <NuxtPage />
-      <div class="my-16 md:my-0"></div>
     </NuxtLayout>
   </div>
 </template>
