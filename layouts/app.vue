@@ -67,117 +67,13 @@ onMounted(() => {
         <div class="hidden title w-full justify-center p-2 xl:flex">
           <Logo />
         </div>
-        <div class="card m-4 mx-4 bg-neutral-focus text-neutral-content">
-          <div class="card-body gap-4 p-4">
-            <div>
-              <div class="flex justify-between items-start">
-                <div class="">
-                  <div class="font-bold">
-                    {{
-                      store.client?.username
-                        ? store.client.username
-                        : store.client.telegram
-                        ? store.client.telegram
-                        : store.client.email.split('@')[0]
-                    }}
-                  </div>
-                  <div class="balance text-xs text-gray-400">
-                    Баланс: {{ currency.format(store.client.balance) }}
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <div class="tooltip" data-tip="Инструкция по платформе">
-                    <NuxtLink
-                      :external="true"
-                      target="_blank"
-                      to="https://drive.google.com/file/d/1d6FLWMIgqhrWXHpdHFdAu2H8wnVdB_2S/view?usp=sharing"
-                      class="relative btn btn-sm btn-neutral btn-circle bg-neutral-focus hover:bg-neutral text-xl font-bold text-center"
-                    >
-                      i
-                    </NuxtLink>
-                  </div>
-                  <div class="tooltip" data-tip="Профиль">
-                    <NuxtLink
-                      :class="{
-                        'bg-neutral-focus': route.path !== '/profile',
-                        'text-white': route.path === '/profile',
-                      }"
-                      to="/profile"
-                      class="btn btn-sm btn-neutral btn-circle relative hover:bg-neutral"
-                    >
-                      <IconCSS name="fluent:person-24-filled" size="24" />
-                    </NuxtLink>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <label
-                for="payment-modal"
-                class="btn btn-block btn-sm btn-neutral hover:bg-neutral"
-              >
-                Пополнить
-              </label>
-            </div>
-          </div>
+        <div class="flex flex-col w-full border-opacity-50">
+          <div class="divider"></div>
         </div>
-        <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
-          Продвижение товаров
-        </h3>
         <SidebarItem
-          title="Выкупы"
-          icon="fluent:payment-24-filled"
-          href="/buyouts"
-        />
-        <SidebarItem
-          title="Доставки"
-          icon="fluent:box-24-filled"
-          href="/delivery"
-        />
-        <SidebarItem
-          title="Отзывы"
-          icon="fluent:comment-24-filled"
-          href="/reviews"
-        />
-        <h3 class="opacity-60 text-xs p-3 px-8 uppercase">
-          Улучшение репутации
-        </h3>
-        <SidebarItem
-          title="Лайки на отзывы"
-          icon="fluent:thumb-like-24-filled"
-          href="/likes"
-        />
-        <SidebarItem
-          title="Лайки на товар / бренд"
-          icon="fluent:heart-24-filled"
-          href="/productlikes"
-        />
-        <SidebarItem
-          title="Вопросы"
-          icon="fluent:chat-bubbles-question-24-filled"
-          href="/questions"
-        />
-        <SidebarItem
-          title="Корзина"
-          icon="fluent:cart-24-filled"
-          href="/cart"
-        />
-        <SidebarItem
-          title="Автоответчик на отзывы"
-          icon="fluent:phone-chat-24-filled"
-          href="/autoanswer"
-        />
-
-        <h3 class="opacity-60 text-xs p-3 px-8 uppercase">Дополнительно</h3>
-        <SidebarItem
-          icon="fluent:history-24-filled"
-          title="История платежей"
-          href="/paymenthistory"
-        />
-        <SidebarItem
-          icon="fluent:document-bullet-list-24-filled"
-          title="Отчеты по выкупам"
-          href="/reports"
+          title="Пользователи и права"
+          icon="mdi:user"
+          href="/users"
         />
         <SidebarItem
           icon="fluent:people-team-24-filled"
@@ -195,11 +91,6 @@ onMounted(() => {
                 <Icon name="fluent:sign-out-24-filled" size="24" />
                 <span> Выйти </span>
               </div>
-              <a target="_blank" href="https://t.me/+Y9WKYbGsMeM3ZDli">
-                <label class="join-item btn btn-ghost btn-square z-10"
-                  ><Icon class="w-6 h-6" name="ic:baseline-telegram"
-                /></label>
-              </a>
               <label
                 class="join-item btn btn-ghost btn-square z-10 w-[20%] swap swap-rotate"
               >
@@ -227,9 +118,6 @@ onMounted(() => {
         </div>
       </ul>
     </div>
-    <PaymentModal />
-    <InfoModal :state="store.infoModal" />
-    <InfoFaqModal />
   </div>
 </template>
 

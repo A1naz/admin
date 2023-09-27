@@ -79,7 +79,10 @@ async function submitForm() {
 </script>
 
 <template>
-  <Toast :type="alertType" style="z-index: 1000;" :active="alert">
+  <div class="hero min-h-screen bg-base-200">
+    Регистрация недоступна
+  </div>
+  <!-- <Toast :type="alertType" style="z-index: 1000;" :active="alert">
     {{ alertText }}
   </Toast>
   <div id="auth">
@@ -192,7 +195,7 @@ async function submitForm() {
       <img class="figure3" src="~/assets/figure3.svg" alt="">
       <img class="line" src="~/assets/line.svg" alt="">
     </section>
-  </div>
+  </div> -->
 </template>
 
 <style scoped>

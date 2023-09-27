@@ -2,7 +2,8 @@
 
 const baseUrl = '/'
 
-const description = 'TOPvTOP — платформа «всё в одном» для комплексного продвижения товаров на маркетплейсах: управление рекламными кампаниями, AB-тестирование карточек, закупка товаром, заборы с ПВЗ и фулфилмент по всему миру. Решайте любые задачи с TOPvTOP!'
+const description =
+  'TOPvTOP — платформа «всё в одном» для комплексного продвижения товаров на маркетплейсах: управление рекламными кампаниями, AB-тестирование карточек, закупка товаром, заборы с ПВЗ и фулфилмент по всему миру. Решайте любые задачи с TOPvTOP!'
 export default defineNuxtConfig({
   app: {
     baseURL: baseUrl,
@@ -11,11 +12,18 @@ export default defineNuxtConfig({
       title: process.env.NAME,
       link: [{ rel: 'icon', href: '/favicon.svg' }],
       titleTemplate: '%pageTitle %titleSeparator %siteName',
-      meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'TOPVTOP - сервис продвижения Wildberries' },
-        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }],
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        {
+          name: 'description',
+          content: 'TOPVTOP - сервис продвижения Wildberries',
+        },
+        {
+          name: 'apple-mobile-web-app-status-bar-style',
+          content: 'black-translucent',
+        },
+      ],
     },
-
   },
 
   colorMode: {
@@ -106,9 +114,7 @@ export default defineNuxtConfig({
     '@vuepic/vue-datepicker/dist/main.css',
   ],
 
-  extends: [
-    'nuxt-seo-kit',
-  ],
+  extends: ['nuxt-seo-kit'],
 
   s3: {
     client: {

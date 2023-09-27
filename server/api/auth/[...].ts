@@ -2,7 +2,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 import { checkSignature } from '~~/server/lib/telegram/mod'
-import { User } from '~/server/lib/models/User'
+import { AdminUser } from '~/server/lib/models/AdminUser'
 import { NuxtAuthHandler } from '#auth'
 import { Referral } from '~/server/lib/models/Referral'
 
@@ -31,7 +31,7 @@ export default NuxtAuthHandler({
       ;(session as any).uuid = token.uuid
       ;(session as any).username = token.username
       ;(session as any).balance = token.balance
-      const found = await User.findOne({ uuid: token.uuid })
+      const found = await AdminUser.findOne({ uuid: token.uuid })
       if (!found) return Promise.reject(new Error('User not found'))
 
       return Promise.resolve(session)
@@ -56,13 +56,13 @@ export default NuxtAuthHandler({
 
         if (!valid) throw new Error('invalid signature')
 
-        const foundUser = await User.findOne({
+        const foundUser = await AdminUser.findOne({
           telegramUserId: user.id.toString(),
         })
         if (foundUser) {
           return foundUser
         } else {
-          const newUser = new User({
+          const newUser = new AdminUser({
             uuid: uuid(),
             telegram: user.username,
             username: user.username,
@@ -74,7 +74,7 @@ export default NuxtAuthHandler({
           })
           await newUser.save()
           if (referral) {
-            const inviter = await User.findOne({ username: referral })
+            const inviter = await AdminUser.findOne({ username: referral })
             if (inviter && inviter.partner) {
               const refCount = inviter?.partner.refCount ?? 0
               inviter.partner.refCount = refCount + 1
@@ -120,10 +120,13 @@ export default NuxtAuthHandler({
         if (!email || !password) return null
 
         const user =
-          (await User.findOne({ email })) ||
-          (await User.findOne({ username: email }))
+          (await AdminUser.findOne({ email })) ||
+          (await AdminUser.findOne({ username: email }))
         if (!user) {
           throw new Error('User not found')
+        }
+        if (!user.roles.includes('admin')) {
+          throw new Error('Admin not found')
         }
         if (runtimeConfig.env === 'developer') return user
         if (!user.password) throw new Error('Password not set')
