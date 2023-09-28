@@ -2,6 +2,7 @@
 import { Referral } from '~/server/lib/models/Referral'
 import { User } from '~/server/lib/models/User'
 import { getServerSession } from '#auth'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { PartnerWithdraw } from '~/server/lib/models/PartnerWithdraw'
 import mongoose from 'mongoose'
 
@@ -41,6 +42,12 @@ export default eventHandler(async (event) => {
   inviter.partner.refCount = inviter.partner.refCount - 1
   await foundReferral.save()
   await inviter.save()
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    actionId: 42,
+    actionDescription: `Пользователь ${foundUser.uuid} - ${foundUser.username} удален из рефералов пользователя ${inviter.uuid} - ${inviter.username}`,
+  })
 
   return { status: 'ok' }
 })

@@ -4,38 +4,33 @@ const props: any = defineProps({
   user: Object,
   userReferrals: Array,
   loading: Boolean,
+  referrals: Array,
+  filteredReferrals: Array
 })
+
+const emit = defineEmits(['searchReferrals'])
+
 const user: any = toRef(props, 'user')
-const referrals = toRef(props, 'userReferrals')
+const referrals = toRef(props, 'referrals')
+const filteredReferrals = toRef(props, 'filteredReferrals')
 const loading = toRef(props, 'loading')
 const query = ref('')
 const users = ref<any>([])
 const inputLoading = ref(false)
 
-async function getUsers(searchValue: string = '') {
-  const { data }: any = await useFetch('/api/user/getUsers', {
-    method: 'GET',
-    params: {
-      page: 1,
-      searchValue,
-    },
-  })
-
-  users.value = data.value.users
-}
-
 async function onInput(event: Event) {
   findSearchQueryDebounced()
 }
 
-const findSearchQuery = async () => {
-  if (query.value.replaceAll(' ', '') == '') {
-    return
-  }
+async function searchReferrals(searchValue: string) {
+  emit('searchReferrals', searchValue)
+}
+const findSearchQuery = () => {
   inputLoading.value = true
-  await getUsers(query.value)
+  searchReferrals(query.value)
   inputLoading.value = false
 }
+
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 
 async function addToReferral(userId: String) {
@@ -62,9 +57,9 @@ async function addToReferral(userId: String) {
   }
 
   if (data.value) {
-    users.value.forEach((el: any, i: any) => {
+    filteredReferrals.value.forEach((el: any, i: any) => {
       if (el.uuid === userId) {
-        users.value[i].isAddedToReferral = true
+        filteredReferrals.value[i].requireToAddReferral = false
       }
     })
     notify({
@@ -92,9 +87,9 @@ async function deleteFromReferral(userId: String) {
     })
   }
   if (data.value) {
-    users.value.forEach((el: any, i: any) => {
+    filteredReferrals.value.forEach((el: any, i: any) => {
       if (el.uuid === userId) {
-        users.value[i].isAddedToReferral = false
+        filteredReferrals.value[i].requireToAddReferral = true
       }
     })
     notify({
@@ -106,23 +101,23 @@ async function deleteFromReferral(userId: String) {
 </script>
 
 <template>
-  <input type="checkbox" id="referral_modal" class="modal-toggle" />
+  <input type="checkbox" id="referral_options_modal" class="modal-toggle" />
   <div class="modal">
     <div class="modal-box w-9/12 max-w-full">
       <form method="dialog">
         <label
-          for="referral_modal"
+          for="referral_options_modal"
           class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
         >
           ✕
         </label>
       </form>
-      <div class="my-2 ml-5">
-        Добавить реферала пользователю: {{ user.username }}
+      <div class="my-2 ml-5">Рефералы пользователя: {{ user.username }}</div>
+      <div v-if="loading" class="hero">
+        <span class="loading loading-dots loading-lg my-2"></span>
       </div>
-
-      <div class="overflow-x-auto">
-        <div>
+      <div class="overflow-x-auto" v-else-if="!loading">
+        <div v-if="referrals.length > 0">
           <label
             ><input
               v-model="query"
@@ -137,11 +132,14 @@ async function deleteFromReferral(userId: String) {
             class="loading loading-spinner text-primary loading-large ml-4"
           />
         </div>
+        <div v-else>
+          <h1 class="hero text-xl font-bold ml-5 my-2">Нет рефералов</h1>
+        </div>
         <div
           class="my-2 mx-2 overflow-y-auto"
           :style="{ 'max-height': 500 + 'px' }"
         >
-          <table class="table my-3">
+          <table class="table my-3" v-if="referrals.length > 0">
             <!-- head -->
             <thead>
               <tr>
@@ -152,7 +150,11 @@ async function deleteFromReferral(userId: String) {
               </tr>
             </thead>
             <tbody>
-              <tr class="hover" v-for="user in users" :key="user.uuid">
+              <tr
+                class="hover"
+                v-for="user in filteredReferrals"
+                :key="user.uuid"
+              >
                 <td style="max-width: 130px">{{ user.uuid }}</td>
                 <td style="max-width: 150px">
                   <div class="mx-1 overflow-x-auto">
@@ -166,7 +168,7 @@ async function deleteFromReferral(userId: String) {
                 </td>
                 <td style="max-width: 20px">
                   <div
-                    v-if="!user.isAddedToReferral"
+                    v-if="user.requireToAddReferral"
                     class="tooltip"
                     data-tip="Добавить"
                   >
@@ -193,7 +195,7 @@ async function deleteFromReferral(userId: String) {
 
       <div class="modal-action"></div>
     </div>
-    <label class="modal-backdrop cursor-pointer" for="referral_modal"
+    <label class="modal-backdrop cursor-pointer" for="referral_options_modal"
       >Close</label
     >
   </div>

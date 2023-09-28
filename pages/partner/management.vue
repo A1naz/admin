@@ -11,8 +11,10 @@ const inputLoading = ref(false)
 const curPage = ref(1)
 const isPageBtnsDisabled = ref(false)
 const query = ref('')
-const selectedUser = ref({})
+const selectedUser = ref<any>({})
 const referralModalLoading = ref(false)
+const referrals = ref<any>([])
+const filteredReferrals = ref<any>([])
 
 definePageMeta({
   layout: 'app',
@@ -21,6 +23,9 @@ definePageMeta({
 })
 
 async function getUsers(searchValue: string = '') {
+  if (searchValue.length > 1) {
+    curPage.value = 1
+  }
   const { data }: any = await useFetch('/api/user/getUsers', {
     method: 'GET',
     params: {
@@ -66,7 +71,38 @@ const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 
 function openReferralModal(user: any) {
   selectedUser.value = user
+}
+
+async function getReferralsInfo() {
+  const { data } = await useFetch('/api/partner/getReferralsInfo', {
+    method: 'GET',
+    params: {
+      userId: selectedUser.value.uuid,
+    },
+  })
+  if (data.value) {
+    referrals.value = data.value
+    filteredReferrals.value = data.value
+  }
+}
+
+async function openOptionsModal(user: any) {
+  selectedUser.value = user
   referralModalLoading.value = true
+  await getReferralsInfo()
+  referralModalLoading.value = false
+}
+
+function searchReferrals(searchValue: string) {
+  console.log(searchValue)
+
+  filteredReferrals.value = referrals.value.filter(
+    (el: any) =>
+      el.username.includes(searchValue) ||
+      el.email.includes(searchValue) ||
+      el.uuid.includes(searchValue)
+  )
+  console.log(filteredReferrals.value)
 }
 </script>
 
@@ -121,46 +157,56 @@ function openReferralModal(user: any) {
           <th>username</th>
           <th>email</th>
           <th>Управление</th>
-          <th>Настройки</th>
+          <!-- <th></th> -->
         </tr>
       </thead>
       <tbody>
         <!-- row 1 -->
         <tr v-for="user in users" class="hover">
-          <th style="max-width: 300px">
+          <th style="max-width: 300px; min-width: 250px;">
             <div class="py-2 overflow-x-auto text-xs">
               {{ user.uuid }}
             </div>
           </th>
-          <th style="max-width: 300px">
+          <th style="max-width: 300px; min-width: 250px;">
             <div class="py-2 overflow-x-auto">
               {{ user.username }}
             </div>
           </th>
-          <th style="max-width: 300px">
+          <th style="max-width: 300px; min-width: 250px;">
             <div class="py-2 overflow-x-auto">
               {{ user.email }}
             </div>
           </th>
-          <th style="width: 190px">
+          <th style="width: 190px" class="flex">
             <label
               for="referral_modal"
-              class="btn btn-primary btn-sm"
+              class="btn btn-primary btn-sm mr-1"
               @click="openReferralModal(user)"
               >Добавить реферала</label
             >
-          </th>
-          <th style="width: 140px;">
-            <label for="" class="btn btn-primary btn-sm" @click=""
-              >Настройки</label
+            <label
+              for="referral_options_modal"
+              class="btn btn-primary btn-sm"
+              @click="openOptionsModal(user)"
+              >Рефералы</label
             >
           </th>
+          <!-- <th style="width: 140px;">
+          </th> -->
         </tr>
       </tbody>
     </table>
   </div>
 
   <PartnerReferralModal :user="selectedUser" :loading="referralModalLoading" />
+  <PartnerOptionsModal
+    :user="selectedUser"
+    :loading="referralModalLoading"
+    :referrals="referrals"
+    :filteredReferrals="filteredReferrals"
+    @searchReferrals="searchReferrals"
+  />
 </template>
 
 <style scoped>
