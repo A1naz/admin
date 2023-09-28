@@ -51,8 +51,8 @@ RUN apk add --no-cache python3 make g++
 RUN pnpm install
 RUN pnpm run build
 ENV NODE_ENV production
-ENV PORT 80
+ENV PORT 5000
 
-EXPOSE 80 
+EXPOSE 5000
 
 ENTRYPOINT ["node", ".output/server/index.mjs"]
