@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 const store = useMainStore()
 const colorMode = useColorMode()
+const partnerStore = usePartnerStore()
 
 const theme = ref('light')
 const route = useRoute()
@@ -61,7 +62,7 @@ onMounted(() => {
     <div class="drawer-side z-30 shadow-sm">
       <label for="my-drawer" class="drawer-overlay" />
       <ul
-        class="menu w-72 h-full bg-base-200 text-base-content flex-nowrap overflow-auto scrollbar-none"
+        class="menu h-full bg-base-200 text-base-content flex-nowrap overflow-auto scrollbar-none"
       >
         <!-- Sidebar content here -->
         <div class="hidden title w-full justify-center p-2 xl:flex">
@@ -76,10 +77,14 @@ onMounted(() => {
           href="/users"
         />
         <SidebarItem
+          :title="`Партнерская программа ${
+            partnerStore.quantity > 0 ? partnerStore.quantity + '+' : ''
+          }`"
           icon="fluent:people-team-24-filled"
-          title="Партнерская программа"
           href="/partner"
-        />
+        >
+          <template #title> Партнерская программа </template>
+        </SidebarItem>
 
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">

@@ -33,6 +33,7 @@ export default eventHandler(async (event) => {
   }
 
   const withdraw = await PartnerWithdraw.create({
+    userUuid: user.uuid,
     user,
     amount: Number(amount),
     status: 'created',

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useNotification } from '@kyvg/vue3-notification'
 import { useMainStore } from '@/stores/main'
+import { usePartnerStore } from '@/stores/partner'
 
 const { notify } = useNotification()
 const colorMode = useColorMode()
@@ -24,6 +25,8 @@ const app = ref()
 watch(client, (newClient) => {
   store.setClient(newClient?.client as object)
 })
+const partnerStore = usePartnerStore()
+partnerStore.getNotificationQuantity()
 </script>
 
 <template>
