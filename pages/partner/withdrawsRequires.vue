@@ -2,6 +2,7 @@
 import Paginator from 'primevue/paginator'
 import { notify } from '@kyvg/vue3-notification'
 
+const partnerStore = usePartnerStore()
 const { height, width } = useWindowSize()
 const withdraws = ref<any>([])
 const withdrawsCount = ref(0)
@@ -22,7 +23,7 @@ definePageMeta({
   title: 'Партнерская программа',
 })
 
-async function getUsers(searchValue: string = '') {
+async function getWithdraws(searchValue: string = '') {
   if (searchValue.length > 1) {
     curPage.value = 1
   }
@@ -30,6 +31,7 @@ async function getUsers(searchValue: string = '') {
     method: 'GET',
     params: {
       page: curPage.value,
+      searchValue: query.value,
     },
   })
 
@@ -38,7 +40,7 @@ async function getUsers(searchValue: string = '') {
   pages.value = Math.ceil(withdrawsCount.value / elPerPage)
 }
 
-await getUsers()
+await getWithdraws()
 
 async function swapPage(destination: number) {
   if (destination < 0 && curPage.value <= 1) return
@@ -51,9 +53,84 @@ async function swapPage(destination: number) {
   }
   curPage.value += destination
   isPageBtnsDisabled.value = true
-  await getUsers()
+  await getWithdraws()
   isPageBtnsDisabled.value = false
 }
+
+async function closeWithdraw(id: string) {
+  const { data }: any = await useFetch('/api/partner/closeWithdraw', {
+    method: 'POST',
+    params: {
+      withdrawId: id,
+    },
+  })
+
+  if (data.value) {
+    withdraws.value.forEach((el: any, i: any) => {
+      if (el._id === id) {
+        el.isClosed = true
+        el.isCancelled = false
+      }
+    })
+    notify({
+      type: 'success',
+      title: 'Выплата закрыта',
+    })
+    partnerStore.quantity--
+  }
+}
+
+async function cancelWithdraw(id: string) {
+  const { data }: any = await useFetch('/api/partner/cancelWithdraw', {
+    method: 'POST',
+    params: {
+      withdrawId: id,
+    },
+  })
+
+  if (data.value) {
+    withdraws.value.forEach((el: any, i: any) => {
+      if (el._id === id) {
+        el.isClosed = false
+        el.isCancelled = true
+      }
+    })
+
+    notify({
+      type: 'success',
+      title: 'Выплата отменена',
+    })
+
+    partnerStore.quantity--
+  }
+}
+
+async function returnWithdraw(id: string) {
+  const { data }: any = await useFetch('/api/partner/returnWithdraw', {
+    method: 'POST',
+    params: {
+      withdrawId: id,
+    },
+  })
+
+  withdraws.value.forEach((el: any, i: any) => {
+    if (el._id === id) {
+      el.isClosed = false
+      el.isCancelled = false
+    }
+  })
+
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Выплата возвращена',
+    })
+
+    partnerStore.quantity++
+  }
+}
+
+
 async function onInput(event: Event) {
   findSearchQueryDebounced()
 }
@@ -63,55 +140,27 @@ const findSearchQuery = async () => {
     return
   }
   inputLoading.value = true
-  await getUsers(query.value)
+  await getWithdraws(query.value)
   inputLoading.value = false
 }
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
-
-function openReferralModal(user: any) {
-  selectedUser.value = user
-}
-
-async function getReferralsInfo() {
-  const { data } = await useFetch('/api/partner/getReferralsInfo', {
-    method: 'GET',
-    params: {
-      userId: selectedUser.value.uuid,
-    },
-  })
-  if (data.value) {
-    referrals.value = data.value
-    filteredReferrals.value = data.value
-  }
-}
-
-async function openOptionsModal(user: any) {
-  selectedUser.value = user
-  referralModalLoading.value = true
-  await getReferralsInfo()
-  referralModalLoading.value = false
-}
-
-function searchReferrals(searchValue: string) {
-  console.log(searchValue)
-
-  filteredReferrals.value = referrals.value.filter(
-    (el: any) =>
-      el.username.includes(searchValue) ||
-      el.email.includes(searchValue) ||
-      el.uuid.includes(searchValue)
-  )
-  console.log(filteredReferrals.value)
-}
 </script>
 
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Управление партнерами</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">Партнерская программа</h1>
+  <div class="text-sm breadcrumbs ml-5">
+    <ul>
+      <li><NuxtLink to="/partner">Партнерская программа</NuxtLink></li>
+      <li>
+        <NuxtLink to="/partner/withdrawsRequires">Запросы выплат</NuxtLink>
+      </li>
+    </ul>
+  </div>
   <PartnerDivider />
   <div class="divider"></div>
   <div class="flex w-full justify-between">
     <div>
-      <!-- <label tabindex="10"
+      <label tabindex="10"
         ><input
           v-model="query"
           type="text"
@@ -123,7 +172,7 @@ function searchReferrals(searchValue: string) {
       <span
         v-if="inputLoading"
         class="loading loading-spinner text-primary loading-large ml-4"
-      /> -->
+      />
     </div>
 
     <div class="join mr-2">
@@ -146,16 +195,18 @@ function searchReferrals(searchValue: string) {
   </div>
   <div
     class="my-2 mx-2 overflow-y-auto"
-    :style="{ 'max-height': height - 250 + 'px' }"
+    :style="{ 'max-height': height - 270 + 'px' }"
   >
     <table class="table">
       <!-- head -->
       <thead>
         <tr>
+          <th>ID</th>
           <th>userId</th>
-          <th>FIO</th>
-          <th>type</th>
-          <th>card</th>
+          <th>ФИО</th>
+          <th>Тип</th>
+          <th>сумма</th>
+          <th>карта</th>
           <th></th>
         </tr>
       </thead>
@@ -163,24 +214,50 @@ function searchReferrals(searchValue: string) {
         <!-- row 1 -->
         <tr v-for="withdraw in withdraws" class="hover">
           <th style="max-width: 300px; min-width: 250px">
+            {{ withdraw._id }}
+          </th>
+          <th style="max-width: 300px; min-width: 250px">
             {{ withdraw.userUuid }}
           </th>
-          <th style="max-width: 300px; min-width: 250px">
+          <th
+            style="max-width: 300px; min-width: 250px"
+            class="overflow-x-auto"
+          >
             {{ withdraw.details.fio }}
           </th>
-          <th style="max-width: 300px; min-width: 250px">
-            {{ withdraw.type }}
+          <th style="max-width: 80px; min-width: 75px">
+            {{ withdraw.type == 'card' ? 'Карта' : 'Аккаунт' }}
           </th>
-          <th style="width: 190px" class="flex">
+          <th style="max-width: 80px; min-width: 75px">
+            {{ withdraw.amount }} ₽
+          </th>
+          <th style="max-width: 180px; min-width: 170px">
             {{ withdraw.details.card }}
           </th>
-          <th>
-            <label
-              for="referral_withdraw_close_modal"
-              class="btn btn-primary btn-sm"
-              @click=""
-              >Закрыть</label
-            >
+          <th style="width: 200px">
+            <div class="my-5" v-if="withdraw.isClosed || withdraw.isCancelled">
+              <label
+                for="referral_withdraw_close_modal"
+                class="btn btn-info btn-sm"
+                @click="returnWithdraw(withdraw._id)"
+                >Отменить</label
+              >
+            </div>
+            <div v-if="!withdraw.isCancelled && !withdraw.isClosed">
+              <label
+                for="referral_withdraw_close_modal"
+                class="btn btn-primary btn-sm"
+                @click="closeWithdraw(withdraw._id)"
+                >Закрыть выплату</label
+              >
+
+              <label
+                for="referral_withdraw_close_modal"
+                class="btn bg-red-400 btn-sm my-1"
+                @click="cancelWithdraw(withdraw._id)"
+                >Отменить выплату</label
+              >
+            </div>
           </th>
         </tr>
       </tbody>

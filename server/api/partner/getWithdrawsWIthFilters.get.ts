@@ -8,23 +8,33 @@ export default eventHandler(async (event) => {
 
   if (!session) return sendRedirect(event, '/auth', 302)
 
-  const { page, searchValue }: any = getQuery(event)
-
+  const { page, searchValue, filters, sort }: any = getQuery(event)
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (!userAdmin || !userAdmin.roles.includes('admin'))
     return sendRedirect(event, '/auth', 302)
+  const trueFilters = JSON.parse(filters)
+  if (!trueFilters.sumTo) delete trueFilters.sumTo
+  if (!trueFilters.sumFrom) delete trueFilters.sumFrom
 
   const withdraws = await PartnerWithdraw.find({
+    amount: {
+      $gte: Number(trueFilters.sumFrom) || 0,
+      $lte: Number(trueFilters.sumTo) || 999999,
+    },
     $or: [
       { _id: ObjectId.isValid(searchValue) ? new ObjectId(searchValue) : null },
       { userUuid: { $regex: searchValue, $options: 'i' } },
       { 'details.fio': { $regex: searchValue, $options: 'i' } },
       { 'details.card': { $regex: searchValue, $options: 'i' } },
     ],
-    status: 'created',
+    status:
+      trueFilters.status !== 'any' ? trueFilters.status : { $exists: true },
+    type: trueFilters.type !== 'any' ? trueFilters.type : { $exists: true },
   })
+    .sort(JSON.parse(sort))
     .skip(withdrawsPerPage * (+page - 1))
     .limit(withdrawsPerPage)
+
   const withdrawsCount = await PartnerWithdraw.count()
 
   return {

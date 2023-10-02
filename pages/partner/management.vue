@@ -107,7 +107,15 @@ function searchReferrals(searchValue: string) {
 </script>
 
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Управление партнерами</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">Партнерская программа</h1>
+  <div class="text-sm breadcrumbs ml-5">
+    <ul>
+      <li><NuxtLink to="/partner">Партнерская программа</NuxtLink></li>
+      <li>
+        <NuxtLink to="/partner/management">Управление партнерами</NuxtLink>
+      </li>
+    </ul>
+  </div>
   <PartnerDivider />
   <div class="divider"></div>
   <div class="flex w-full justify-between">
@@ -147,7 +155,7 @@ function searchReferrals(searchValue: string) {
   </div>
   <div
     class="my-2 mx-2 overflow-y-auto"
-    :style="{ 'max-height': height - 250 + 'px' }"
+    :style="{ 'max-height': height - 270 + 'px' }"
   >
     <table class="table">
       <!-- head -->
@@ -163,17 +171,17 @@ function searchReferrals(searchValue: string) {
       <tbody>
         <!-- row 1 -->
         <tr v-for="user in users" class="hover">
-          <th style="max-width: 300px; min-width: 250px;">
+          <th style="max-width: 300px; min-width: 250px">
             <div class="py-2 overflow-x-auto text-xs">
               {{ user.uuid }}
             </div>
           </th>
-          <th style="max-width: 300px; min-width: 250px;">
+          <th style="max-width: 300px; min-width: 250px">
             <div class="py-2 overflow-x-auto">
               {{ user.username }}
             </div>
           </th>
-          <th style="max-width: 300px; min-width: 250px;">
+          <th style="max-width: 300px; min-width: 250px">
             <div class="py-2 overflow-x-auto">
               {{ user.email }}
             </div>

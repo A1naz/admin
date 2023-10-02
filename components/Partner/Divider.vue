@@ -15,10 +15,10 @@ const partnerStore = usePartnerStore()
         </NuxtLink>
       </li>
       <li>
-        <a>
+        <NuxtLink to="/partner/withdraws">
           <Icon name="ic:round-request-page" size="24" />
           Выплаты
-        </a>
+        </NuxtLink>
       </li>
 
       <li>

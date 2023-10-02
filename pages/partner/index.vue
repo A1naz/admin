@@ -1,14 +1,18 @@
 ﻿<script setup lang="ts">
 import { notify } from '@kyvg/vue3-notification'
 const route = useRoute()
+const partnerStore = usePartnerStore()
 
 definePageMeta({
   layout: 'app',
   auth: true,
   title: 'Партнерская программа',
 })
-
-navigateTo('/partner/management')
+if (partnerStore.quantity) {
+  navigateTo('/partner/withdrawsRequires')
+} else {
+  navigateTo('/partner/withdraws')
+}
 </script>
 
 <template>
