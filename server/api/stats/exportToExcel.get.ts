@@ -86,7 +86,6 @@ export default eventHandler(async (event) => {
     }
 
     const ready = format
-    console.log(ready)
 
     const sheet = workbook.addWorksheet('Отчет о платежах', {
       headerFooter: { firstHeader: `Всего: ${ready.length}` },
