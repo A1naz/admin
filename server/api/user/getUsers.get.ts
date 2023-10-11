@@ -25,6 +25,7 @@ export default eventHandler(async (event) => {
   const usersCount = await User.count()
   const users = allUsers.map((user) => {
     return {
+      _id: user._id,
       uuid: user.uuid,
       username: user.username,
       email: user.email,

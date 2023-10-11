@@ -77,6 +77,11 @@ onMounted(() => {
           href="/users"
         />
         <SidebarItem
+          title="Продажи и статистика"
+          icon="nimbus:stats"
+          href="/salesAndStatistics"
+        />
+        <SidebarItem
           :title="`Партнерская программа ${
             partnerStore.quantity > 0 ? partnerStore.quantity + '+' : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
           }`"
