@@ -3,7 +3,7 @@ import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
 import { User } from '@/server/lib/models/User'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
-let paymentPerPage = 500
+let paymentPerPage = 5000
 const runtimeConfig = useRuntimeConfig()
 
 const keys = Object.keys as <T>(
@@ -66,7 +66,6 @@ export default eventHandler(async (event) => {
       .sort({
         dataoperation: sortDate,
       })
-      .skip(paymentPerPage * (+page - 1))
       .limit(paymentPerPage)
 
     const statsCount: any = await paymenthistory.count()
