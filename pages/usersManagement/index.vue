@@ -231,6 +231,7 @@ async function selectUser(user: any) {
 }
 
 function changeTabs() {
+  curPage.value = 1
   selectedTab.value = tabs.value.find((tab: any) => {
     if (tab.title == tabOption.value) {
       return tab

@@ -14,6 +14,7 @@ export default async function getLikes(
       : { status: status }
 
   const user = await User.findById(userId)
+  
   const likes: any = await Like.find({ user })
     .sort({ createdAt: -1 })
     .skip((page - 1) * 50)
@@ -38,7 +39,7 @@ export default async function getLikes(
         return {
           ...like._doc,
           trueDate: formattedDate,
-          trueEndedDate : formattedEndedDate,
+          trueEndedDate: formattedEndedDate,
         }
       }
 
