@@ -8,6 +8,7 @@ const partnerSchema = new Schema({
 })
 const UserSchema = new Schema({
   username: { type: String, unique: true, required: true },
+  isBanned: { type: Boolean, default: false },
   firstName: { type: String, required: false },
   lastName: { type: String, required: false },
   email: { type: String, unique: false, required: false },

@@ -31,6 +31,7 @@ export default eventHandler(async (event) => {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      isBanned: user.isBanned ? user.isBanned : false,
     }
   })
 

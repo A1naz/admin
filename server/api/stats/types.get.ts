@@ -10,6 +10,7 @@ export default eventHandler(async (event) => {
 //   const user = await User.findOne({ uuid: session.uuid })
 //   if (!user)
 //     return sendRedirect(event, '/auth', 302)
+return []
   const allPaymentHistories = await paymenthistory.find()
   const types = <any>[]
   const format = allPaymentHistories.map((operation, index) => {

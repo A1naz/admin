@@ -146,7 +146,6 @@ const findSearchQuery = async () => {
 
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 async function selectUser(uuid: String, select: boolean) {
-  console.log(select)
 
   users.value.forEach((user: any) => {
     if (user._id === uuid) {

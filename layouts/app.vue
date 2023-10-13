@@ -82,14 +82,19 @@ onMounted(() => {
           href="/salesAndStatistics"
         />
         <SidebarItem
-          :title="`Партнерская программа ${
-            partnerStore.quantity > 0 ? partnerStore.quantity + '+' : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-          }`"
+        :title="`Партнерская программа ${
+          partnerStore.quantity > 0 ? partnerStore.quantity + '+' : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        }`"
           icon="fluent:people-team-24-filled"
           href="/partner"
-        >
+          >
           <template #title> Партнерская программа </template>
         </SidebarItem>
+        <SidebarItem
+          title="Управление пользователями"
+          icon="mdi:clipboard-account"
+          href="/usersManagement"
+        />
 
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
