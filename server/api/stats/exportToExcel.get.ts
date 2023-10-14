@@ -3,6 +3,8 @@ import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
 import { User } from '@/server/lib/models/User'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
+
 let paymentPerPage = 5000
 const runtimeConfig = useRuntimeConfig()
 
@@ -141,6 +143,14 @@ export default eventHandler(async (event) => {
     //   sheet.getRow(item!.place + 1).height = 100
     // }
     // // export table
+
+    await ActionHistory.create({
+      adminUser: user._id,
+      actionId: 32,
+      actionDescription: `Экспорт в эксель`,
+      date: new Date(),
+    })
+
     const buffer = await workbook.xlsx.writeBuffer()
     return buffer
   } catch (e) {

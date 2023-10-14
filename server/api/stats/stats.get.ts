@@ -1,6 +1,6 @@
 ﻿import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
-
+import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 
@@ -59,11 +59,8 @@ export default eventHandler(async (event) => {
     .limit(paymentPerPage)
 
   const statsCount: any = await paymenthistory.count()
-
   const statsUsersIds: any = stats.map((operation: any) => operation.user)
-
   const users = await User.find({ _id: { $in: statsUsersIds } })
-
   const format = <any>[]
 
   for (const stat of stats) {
@@ -74,6 +71,13 @@ export default eventHandler(async (event) => {
       userUuid: user ? user.uuid : '',
     })
   }
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    actionId: 31,
+    actionDescription: `Получение статистики`,
+    date: new Date(),
+  })
 
   return {
     stats: format,

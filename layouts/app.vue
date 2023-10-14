@@ -77,6 +77,11 @@ onMounted(() => {
           href="/users"
         />
         <SidebarItem
+          title="История действий"
+          icon="mdi:clipboard-text-clock"
+          href="/actionsHistory"
+        />
+        <SidebarItem
           title="Продажи и статистика"
           icon="nimbus:stats"
           href="/salesAndStatistics"

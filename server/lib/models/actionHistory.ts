@@ -6,6 +6,7 @@ const ActionHistoryModel = new Schema({
   actionId: { type: Number, required: true },
   actionDescription: { type: String, required: true },
   date: { type: Date, default: Date.now(), required: true },
+  userUuid: { type: String },
 })
 
 export const ActionHistory = model('ActionHistory', ActionHistoryModel)

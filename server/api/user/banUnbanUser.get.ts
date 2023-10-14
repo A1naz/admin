@@ -1,6 +1,7 @@
 ﻿import { User } from '@/server/lib/models/User'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -12,8 +13,8 @@ export default eventHandler(async (event) => {
   if (!user || !user.roles.includes('admin'))
     return sendRedirect(event, '/auth', 302)
 
-    console.log(userId);
-    
+  console.log(userId)
+
   const found = await User.findById(userId)
   if (!found) {
     return createError({
@@ -22,6 +23,18 @@ export default eventHandler(async (event) => {
     })
   }
   found.isBanned ? (found.isBanned = false) : (found.isBanned = true)
+
+  let description = ''
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    actionId: 91,
+    actionDescription: `Пользователь ${found.uuid} - ${found.username} ${
+      found.isBanned ? 'забанен' : 'разбанен'
+    } админом ${user.uuid}`,
+    userUuid: found.uuid,
+    date: new Date(),
+  })
 
   await found.save()
   return {

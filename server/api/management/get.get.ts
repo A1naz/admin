@@ -1,4 +1,5 @@
 ﻿import { User } from '@/server/lib/models/User'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import getBuyouts from '~/server/lib/helpers/getBuyouts'
@@ -19,6 +20,25 @@ export default eventHandler(async (event) => {
   const user = await AdminUser.findOne({ uuid: session.uuid })
   if (!user || !user.roles.includes('admin'))
     return sendRedirect(event, '/auth', 302)
+
+  const foundUser = await User.findById(userId)
+
+  if (!foundUser) {
+    throw createError({
+      message: 'Пользователь не найден',
+      statusCode: 404,
+    })
+  }
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    actionId: 91,
+    actionDescription: `Получение информации о ${item}, ${
+      status ? 'status - ' + status : ''
+    }, пользователя uuid - ${userId}`,
+    userUuid: foundUser.uuid,
+    date: new Date(),
+  })
 
   if (item == 'buyouts') {
     const { info, count } = await getBuyouts(userId, status, page)
@@ -57,5 +77,6 @@ export default eventHandler(async (event) => {
     const { info, count } = await getReports(userId, status, page)
     return { info, count }
   }
+
   return { info: [], count: 0 }
 })
