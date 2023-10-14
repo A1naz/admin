@@ -13,8 +13,6 @@ export default eventHandler(async (event) => {
   if (!user || !user.roles.includes('admin'))
     return sendRedirect(event, '/auth', 302)
 
-  console.log(userId)
-
   const found = await User.findById(userId)
   if (!found) {
     return createError({

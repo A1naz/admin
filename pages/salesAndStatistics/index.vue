@@ -78,8 +78,6 @@ async function getStats() {
     },
   })
   if (data.value) {
-    console.log(data.value)
-
     statsCount.value = data.value.statsCount
     stats.value = data.value.stats
     pages.value = Math.ceil(statsCount.value / elPerPage)

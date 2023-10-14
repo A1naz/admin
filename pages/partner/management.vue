@@ -94,7 +94,6 @@ async function openOptionsModal(user: any) {
 }
 
 function searchReferrals(searchValue: string) {
-  console.log(searchValue)
 
   filteredReferrals.value = referrals.value.filter(
     (el: any) =>
@@ -102,7 +101,7 @@ function searchReferrals(searchValue: string) {
       el.email.includes(searchValue) ||
       el.uuid.includes(searchValue)
   )
-  console.log(filteredReferrals.value)
+
 }
 </script>
 

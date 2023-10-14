@@ -29,7 +29,7 @@ export default eventHandler(async (event) => {
     userIds = { user: { $in: trueFilters.clients } }
   }
   // const users = await User.find({ _id: { $in: trueFilters.clients}})
-  // console.log(users);
+
 
   const trueTypeoperations =
     trueFilters.typeoperations == 'any'

@@ -16,7 +16,7 @@ export default eventHandler(async (event) => {
   const { page, sortDate, adminUserId, dateRange }: any = getQuery(event)
 
   // const users = await User.find({ _id: { $in: trueFilters.clients}})
-  // console.log(users);
+
 
   let trueDateRange = {}
   if (dateRange) {
