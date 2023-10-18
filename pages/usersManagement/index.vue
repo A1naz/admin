@@ -279,12 +279,12 @@ async function banUnbanUser() {
 }
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Продажи и статистика</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">Управление пользователями</h1>
   <div class="card p-fluid"></div>
   <div class="text-sm breadcrumbs ml-5">
     <ul>
       <li>
-        <NuxtLink to="/salesAndStatistics">Продажи и статистика</NuxtLink>
+        <NuxtLink to="/usersManagement">Управление пользователями</NuxtLink>
       </li>
       <!-- <li>
                     <NuxtLink to="/partner/management">Управление партнерами</NuxtLink>

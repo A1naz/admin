@@ -113,7 +113,7 @@ function sortByDate() {
 </script>
 <template>
   <div>
-    <h1 class="text-2xl font-bold ml-5 my-2">Продажи и статистика</h1>
+    <h1 class="text-2xl font-bold ml-5 my-2">История действии</h1>
     <div class="card p-fluid"></div>
     <div class="text-sm breadcrumbs ml-5">
       <ul>
@@ -224,7 +224,7 @@ function sortByDate() {
               style="max-width: 60px; min-width: 40px"
               class="overflow-x-auto"
             >
-              {{ $dayjs(act.date).format('DD.MM.YYYY HH:mm') }}
+              {{ defaultDate(act.date)}}
             </th>
           </tr>
         </tbody>

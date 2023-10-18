@@ -9,4 +9,10 @@ const ActionHistoryModel = new Schema({
   userUuid: { type: String },
 })
 
+ActionHistoryModel.pre('save', function (next) {
+  // Добавляем 3 часа к полю "date"
+  this.date.setHours(this.date.getHours() + 3);
+  next();
+});
+
 export const ActionHistory = model('ActionHistory', ActionHistoryModel)

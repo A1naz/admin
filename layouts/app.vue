@@ -82,7 +82,7 @@ onMounted(() => {
           href="/actionsHistory"
         />
         <SidebarItem
-          title="Продажи и статистика"
+          title="Финансовые операции"
           icon="nimbus:stats"
           href="/salesAndStatistics"
         />

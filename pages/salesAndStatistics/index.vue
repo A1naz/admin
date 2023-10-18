@@ -58,7 +58,7 @@ async function exportXLS() {
 definePageMeta({
   layout: 'app',
   auth: true,
-  title: 'Продажи и статистика',
+  title: 'Финансовые операции',
 })
 
 const products = ref([])
@@ -173,12 +173,12 @@ async function removeFromSelected(uuid: String) {
 getStats()
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Продажи и статистика</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">Финансовые операции</h1>
   <div class="card p-fluid"></div>
   <div class="text-sm breadcrumbs ml-5">
     <ul>
       <li>
-        <NuxtLink to="/salesAndStatistics">Продажи и статистика</NuxtLink>
+        <NuxtLink to="/salesAndStatistics">Финансовые операции</NuxtLink>
       </li>
       <!-- <li>
                     <NuxtLink to="/partner/management">Управление партнерами</NuxtLink>
