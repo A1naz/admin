@@ -144,7 +144,6 @@ const findSearchQuery = async () => {
 
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 async function selectUser(uuid: String, select: boolean) {
-
   users.value.forEach((user: any) => {
     if (user._id === uuid) {
       if (!select) {
@@ -244,7 +243,9 @@ getStats()
       <button class="btn btn-primary ml-3" @click="getStats">Применить</button>
     </div>
     <div>
-      <button class="btn btn-sm btn-primary mr-3" @click="exportXLS" >Экспорт</button>
+      <button class="btn btn-sm btn-primary mr-3" @click="exportXLS">
+        Экспорт
+      </button>
       <div class="join mr-2">
         <button
           class="join-item btn"
@@ -268,12 +269,15 @@ getStats()
     class="my-2 mx-2 overflow-y-auto"
     :style="{ 'max-height': height - 270 + 'px' }"
   >
-    <table class="table">
+    <table class="table table-pin-rows">
       <!-- head -->
       <thead>
         <tr>
           <th>ID</th>
           <th>userId</th>
+          <th>почта</th>
+          <th>никнейм</th>
+          <th>телеграм</th>
           <th>сумма</th>
           <th>тип операции</th>
           <th>базис</th>
@@ -292,25 +296,58 @@ getStats()
       <tbody>
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover">
-          <th style="max-width: 140px; min-width: 100px">
+          <th
+            style="max-width: 80px; min-width: 70px"
+            class="overflow-x-auto text-xs"
+          >
             {{ stat._id }}
           </th>
-          <th style="max-width: 145px; min-width: 140px" class="text-xs">
+          <th
+            style="max-width: 120px; min-width: 40px"
+            class="overflow-x-auto text-xs"
+          >
             {{ stat.userUuid }}
           </th>
-          <th style="max-width: 145px; min-width: 140px">
+          <th
+            style="max-width: 150px; min-width: 40px"
+            class="overflow-x-auto text-xs"
+          >
+            {{ stat.email }}
+          </th>
+          <th
+            style="max-width: 80px; min-width: 40px"
+            class="overflow-x-auto text-xs"
+          >
+            {{ stat.username }}
+          </th>
+          <th
+            style="max-width: 80px; min-width: 40px"
+            class="overflow-x-auto text-xs"
+          >
+            {{ stat.telegram }}
+          </th>
+          <th style="max-width: 50px; min-width: 40px">
             {{ stat.summ }}
           </th>
-          <th style="max-width: 40px; min-width: 35px" class="overflow-x-auto">
+          <th
+            style="max-width: 20px; min-width: 15px"
+            class="overflow-x-auto text-xs"
+          >
             {{ stat.typeoperations }}
           </th>
-          <th style="max-width: 200px" class="overflow-x-auto">
+          <th style="max-width: 140px" class="overflow-x-auto text-xs">
             {{ stat.basisoperation }}
           </th>
-          <th style="max-width: 80px; min-width: 75px" class="overflow-x-auto">
+          <th
+            style="max-width: 170px; min-width: 75px"
+            class="overflow-x-auto text-xs"
+          >
             {{ stat.comment }}
           </th>
-          <th style="max-width: 45px; min-width: 40px" class="overflow-x-auto">
+          <th
+            style="max-width: 15px; min-width: 10px"
+            class="overflow-x-auto text-xs"
+          >
             {{ stat.dataoperation.slice(0, 10) }}
           </th>
         </tr>
@@ -339,7 +376,7 @@ getStats()
               ><input
                 v-model="query"
                 type="text"
-                placeholder="Введите id или username или email"
+                placeholder="id, username, email, telegram"
                 class="input input-bordered input-l ml-4 w-80"
                 @input="onInput($event)"
               />
@@ -369,6 +406,7 @@ getStats()
                 <th>id</th>
                 <th>username</th>
                 <th>email</th>
+                <th>telegram</th>
                 <th>Выбрать</th>
               </tr>
             </thead>
@@ -383,6 +421,11 @@ getStats()
                 <td style="max-width: 150px" class="overflow-x-auto">
                   <div class="mx-1 overflow-x-auto">
                     {{ user.email }}
+                  </div>
+                </td>
+                <td style="max-width: 150px" class="overflow-x-auto">
+                  <div class="mx-1 overflow-x-auto">
+                    {{ user.telegram }}
                   </div>
                 </td>
                 <td style="max-width: 20px">
@@ -407,7 +450,7 @@ getStats()
 </template>
 <style scoped>
 ::-webkit-scrollbar {
-  height: 8px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {

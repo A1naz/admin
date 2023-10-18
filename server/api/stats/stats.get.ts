@@ -69,6 +69,9 @@ export default eventHandler(async (event) => {
     format.push({
       ...stat._doc,
       userUuid: user ? user.uuid : '',
+      email: user ? user.email : '',
+      username: user ? user.username : '',
+      telegram: user ? user.telegram : '',
     })
   }
 

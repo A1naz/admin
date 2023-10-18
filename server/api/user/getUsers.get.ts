@@ -17,6 +17,7 @@ export default eventHandler(async (event) => {
     $or: [
       { uuid: { $regex: searchValue, $options: 'i' } },
       { email: { $regex: searchValue, $options: 'i' } },
+      { telegram: { $regex: searchValue, $options: 'i' } },
       { username: { $regex: searchValue, $options: 'i' } },
     ],
   })
@@ -30,6 +31,7 @@ export default eventHandler(async (event) => {
       username: user.username,
       email: user.email,
       firstName: user.firstName,
+      telegram: user.telegram || '',
       lastName: user.lastName,
       isBanned: user.isBanned ? user.isBanned : false,
     }

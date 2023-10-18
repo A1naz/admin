@@ -25,6 +25,10 @@ async function logout() {
 onMounted(() => {
   theme.value = localStorage.getItem('theme') || 'light'
 })
+const drawerCloseOverlay:any = ref(null)
+function closeOverlay() {
+  drawerCloseOverlay.value?.click()
+}
 </script>
 
 <template>
@@ -60,7 +64,7 @@ onMounted(() => {
       <slot />
     </div>
     <div class="drawer-side z-30 shadow-sm">
-      <label for="my-drawer" class="drawer-overlay" />
+      <label for="my-drawer" ref="drawerCloseOverlay" class="drawer-overlay" />
       <ul
         class="menu h-full bg-base-200 w-80 text-base-content flex-nowrap overflow-auto scrollbar-none"
       >
