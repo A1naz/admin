@@ -5,7 +5,7 @@ import { User } from '@/server/lib/models/User'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 
-let paymentPerPage = 5000
+let limit  = 50000
 const runtimeConfig = useRuntimeConfig()
 
 const keys = Object.keys as <T>(
@@ -68,7 +68,7 @@ export default eventHandler(async (event) => {
       .sort({
         dataoperation: sortDate,
       })
-      .limit(paymentPerPage)
+      .limit(limit)
 
     const statsCount: any = await paymenthistory.count()
 
@@ -84,6 +84,9 @@ export default eventHandler(async (event) => {
       format.push({
         ...stat._doc,
         userUuid: user ? user.uuid : '',
+        email: user ? user.email : '',
+        username: user ? user.username : '',
+        telegram: user ? user.telegram : '',
       })
     }
 
@@ -95,7 +98,10 @@ export default eventHandler(async (event) => {
 
     sheet.columns = [
       { header: 'ID', key: '_id', width: 48, font: { bold: true } },
-      { header: 'userId', key: 'userUuid', width: 70, font: { bold: true } },
+      { header: 'userId', key: 'userUuid', width: 50, font: { bold: true } },
+      { header: 'email', key: 'email', width: 50, font: { bold: true } },
+      { header: 'username', key: 'username', width: 50, font: { bold: true } },
+      { header: 'telegram', key: 'telegram', width: 50, font: { bold: true } },
       {
         header: 'сумма',
         key: 'summ',
