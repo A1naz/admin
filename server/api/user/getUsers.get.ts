@@ -7,22 +7,36 @@ export default eventHandler(async (event) => {
 
   if (!session) return sendRedirect(event, '/auth', 302)
 
-  const { page, searchValue }: any = getQuery(event)
+  const { page, searchValue, sortDate, role }: any = getQuery(event)
 
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
-  if (!userAdmin || !userAdmin.roles.includes('admin'))
+  if (!userAdmin || !userAdmin.roles.includes('manager'))
     return sendRedirect(event, '/auth', 302)
 
-  const allUsers = await User.find({
-    $or: [
-      { uuid: { $regex: searchValue, $options: 'i' } },
-      { email: { $regex: searchValue, $options: 'i' } },
-      { telegram: { $regex: searchValue, $options: 'i' } },
-      { username: { $regex: searchValue, $options: 'i' } },
-    ],
-  })
-    .skip(usersPerPage * (+page - 1))
-    .limit(usersPerPage)
+  let rolesParam = role ? { roles: { $in: [role] } } : {}
+  let allUsers = []
+
+  if (searchValue && searchValue.length > 0) {
+    allUsers = await User.find({
+      ...rolesParam,
+      $or: [
+        { uuid: { $regex: searchValue, $options: 'i' } },
+        { email: { $regex: searchValue, $options: 'i' } },
+        { telegram: { $regex: searchValue, $options: 'i' } },
+        { username: { $regex: searchValue, $options: 'i' } },
+      ],
+    })
+      .skip(usersPerPage * (+page - 1))
+      .limit(usersPerPage)
+      .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? -1 : 1 })
+  } else {
+    allUsers = await User.find({
+      ...rolesParam,
+    })
+      .skip(usersPerPage * (+page - 1))
+      .limit(usersPerPage)
+      .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? 1 : -1 })
+  }
   const usersCount = await User.count()
   const users = allUsers.map((user) => {
     return {
@@ -31,9 +45,12 @@ export default eventHandler(async (event) => {
       username: user.username,
       email: user.email,
       firstName: user.firstName,
-      telegram: user.telegram || '',
       lastName: user.lastName,
+      telegram: user.telegram || '',
       isBanned: user.isBanned ? user.isBanned : false,
+      roles: user.roles,
+      registrationDate: user.registrationDate,
+      tabs: user.tabs ? user.tabs : [],
     }
   })
 

@@ -1,15 +1,14 @@
 import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
+import { AdminUser } from '~/server/lib/models/AdminUser'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
 
-  if (!session)
-    return sendRedirect(event, '/auth', 302)
+  if (!session) return sendRedirect(event, '/auth', 302)
 
-  const user = await User.findOne({ uuid: session.uuid })
-  if (!user)
-    return sendRedirect(event, '/auth', 302)
+  const user = await AdminUser.findOne({ uuid: session.uuid })
+  if (!user) return sendRedirect(event, '/auth', 302)
 
   if (!user.partner) {
     user.partner = {
@@ -19,6 +18,8 @@ export default eventHandler(async (event) => {
     }
     await user.save()
   }
+  console.log(user);
+  
   const client = {
     email: user.email,
     username: user.email === user.username ? undefined : user.username,
@@ -31,7 +32,10 @@ export default eventHandler(async (event) => {
     telegramUserId: user.telegramUserId,
     wbApiKeys: user.wbApiKeys.length ? user.wbApiKeys : [],
     partner: user.partner,
+    mainAdmin: user.mainAdmin,
+    tabs: user.tabs,
   }
+
   return {
     client,
     status: 'ok',

@@ -7,7 +7,7 @@ export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
   if (!session) return sendRedirect(event, '/auth', 302)
   const admin = await AdminUser.findOne({ uuid: session.uuid })
-  if (!admin || !admin.roles.includes('admin'))
+  if (!admin || !admin.roles.includes('manager'))
     return sendRedirect(event, '/auth', 302)
 
   const notificationCount = await PartnerWithdraw.count({ status: 'created' })

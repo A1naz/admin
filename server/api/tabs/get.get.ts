@@ -9,7 +9,7 @@ export default eventHandler(async (event) => {
 
   if (!session) return sendRedirect(event, '/auth', 302)
   const user = await AdminUser.findOne({ uuid: session.uuid })
-  if (!user || !user.roles.includes('admin'))
+  if (!user || !user.roles.includes('manager'))
     return sendRedirect(event, '/auth', 302)
 
 

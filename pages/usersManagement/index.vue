@@ -277,6 +277,14 @@ async function banUnbanUser() {
     })
   }
 }
+
+const store = useMainStore()
+if (
+  !store.client.mainAdmin &&
+  !store.client.tabs.includes('управление пользователями платформы')
+) {
+  navigateTo('/partner')
+}
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Управление пользователями</h1>

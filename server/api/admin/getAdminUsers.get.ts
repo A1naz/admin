@@ -9,7 +9,7 @@ export default eventHandler(async (event) => {
   const { page, searchValue }: any = getQuery(event)
 
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
-  if (!userAdmin || !userAdmin.roles.includes('admin'))
+  if (!userAdmin || !userAdmin.roles.includes('manager'))
     return sendRedirect(event, '/auth', 302)
 
   const allUsers = await AdminUser.find({

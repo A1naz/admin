@@ -170,6 +170,11 @@ async function removeFromSelected(uuid: String) {
 }
 
 getStats()
+
+const store = useMainStore()
+if (!store.client.mainAdmin && !store.client.tabs.includes('финансовые операции') ) {
+  navigateTo('/partner')
+}
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Финансовые операции</h1>

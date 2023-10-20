@@ -2,7 +2,7 @@
 import { notify } from '@kyvg/vue3-notification'
 const route = useRoute()
 const partnerStore = usePartnerStore()
-
+const { signOut } = useAuth()
 definePageMeta({
   layout: 'app',
   auth: true,
@@ -12,6 +12,17 @@ if (partnerStore.quantity) {
   navigateTo('/partner/withdrawsRequires')
 } else {
   navigateTo('/partner/withdraws')
+}
+
+const store = useMainStore()
+if (
+  !store.client.mainAdmin &&
+  !store.client.tabs.includes('управление партнеркой')
+) {
+  // await signOut({
+  //   callbackUrl: '/auth',
+  // })
+  // navigateTo('/auth')
 }
 </script>
 

@@ -23,6 +23,8 @@ const UserSchema = new Schema({
   tg2fa: { type: Boolean, required: false, default: false },
   balance: { type: Number, default: 0, required: true },
   registrationDate: { type: Date, default: Date.now },
+  tabs: [{ type: String }],
+  mainAdmin: { type: Boolean },
   partner: {
     type: partnerSchema,
     ref: 'Partner',

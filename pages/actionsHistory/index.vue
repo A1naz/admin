@@ -110,10 +110,18 @@ function sortByDate() {
   }
   getActs()
 }
+
+const store = useMainStore()
+if (
+  !store.client.mainAdmin &&
+  !store.client.tabs.includes('история действий')
+) {
+  navigateTo('/partner')
+}
 </script>
 <template>
   <div>
-    <h1 class="text-2xl font-bold ml-5 my-2">История действии</h1>
+    <h1 class="text-2xl font-bold ml-5 my-2">История действий</h1>
     <div class="card p-fluid"></div>
     <div class="text-sm breadcrumbs ml-5">
       <ul>
@@ -142,10 +150,13 @@ function sortByDate() {
         <button
           class="btn btn-circle"
           v-if="selectedAdminUser.username.length > 0"
-          @click="[
-            selectedAdminUser = {
-              username: '',
-            }, getActs()]
+          @click="
+            ;[
+              (selectedAdminUser = {
+                username: '',
+              }),
+              getActs(),
+            ]
           "
         >
           ✕
@@ -224,7 +235,7 @@ function sortByDate() {
               style="max-width: 60px; min-width: 40px"
               class="overflow-x-auto"
             >
-              {{ defaultDate(act.date)}}
+              {{ defaultDate(act.date) }}
             </th>
           </tr>
         </tbody>

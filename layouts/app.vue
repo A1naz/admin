@@ -25,7 +25,7 @@ async function logout() {
 onMounted(() => {
   theme.value = localStorage.getItem('theme') || 'light'
 })
-const drawerCloseOverlay:any = ref(null)
+const drawerCloseOverlay: any = ref(null)
 function closeOverlay() {
   drawerCloseOverlay.value?.click()
 }
@@ -76,30 +76,49 @@ function closeOverlay() {
           <div class="divider"></div>
         </div>
         <SidebarItem
+          v-if="store.client.mainAdmin"
           title="Пользователи и права"
           icon="mdi:user"
           href="/users"
         />
         <SidebarItem
+          v-if="
+            store.client.mainAdmin ||
+            store.client.tabs.includes('история действий')
+          "
           title="История действий"
           icon="mdi:clipboard-text-clock"
           href="/actionsHistory"
         />
         <SidebarItem
+          v-if="
+            store.client.mainAdmin ||
+            store.client.tabs.includes('финансовые операции')
+          "
           title="Финансовые операции"
           icon="nimbus:stats"
           href="/salesAndStatistics"
         />
         <SidebarItem
-        :title="`Партнерская программа ${
-          partnerStore.quantity > 0 ? partnerStore.quantity + '+' : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-        }`"
+          v-if="
+            store.client.mainAdmin ||
+            store.client.tabs.includes('управление партнеркой')
+          "
+          :title="`Партнерская программа ${
+            partnerStore.quantity > 0
+              ? partnerStore.quantity + '+'
+              : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+          }`"
           icon="fluent:people-team-24-filled"
           href="/partner"
-          >
+        >
           <template #title> Партнерская программа </template>
         </SidebarItem>
         <SidebarItem
+          v-if="
+            store.client.mainAdmin ||
+            store.client.tabs.includes('управление пользователями платформы')
+          "
           title="Управление пользователями"
           icon="mdi:clipboard-account"
           href="/usersManagement"

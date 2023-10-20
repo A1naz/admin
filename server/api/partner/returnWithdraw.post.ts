@@ -10,7 +10,7 @@ export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
   if (!session) return sendRedirect(event, '/auth', 302)
   const user = await AdminUser.findOne({ uuid: session.uuid })
-  if (!user || !user.roles.includes('admin'))
+  if (!user || !user.roles.includes('manager'))
     return sendRedirect(event, '/auth', 302)
   const { withdrawId }: any = getQuery(event)
   const foundWIthdraw = await PartnerWithdraw.findById(withdrawId)
