@@ -15,7 +15,6 @@ export default eventHandler(async (event) => {
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (
     !userAdmin ||
-    !userAdmin.roles.includes('manager') ||
     !userAdmin.mainAdmin
   )
     return sendRedirect(event, '/auth', 302)
@@ -74,7 +73,6 @@ export default eventHandler(async (event) => {
     await userToEdit.save()
   } else {
     let newUuid = unicalUuid()
-    console.log(newUuid)
 
     let newUser = await User.create({
       uuid: newUuid,

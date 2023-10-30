@@ -10,7 +10,6 @@ export default eventHandler(async (event) => {
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (
     !userAdmin ||
-    !userAdmin.roles.includes('manager') ||
     !userAdmin.mainAdmin
   )
     return

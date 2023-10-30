@@ -18,7 +18,6 @@ export default eventHandler(async (event) => {
     }
     await user.save()
   }
-  console.log(user);
   
   const client = {
     email: user.email,
