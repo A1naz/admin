@@ -13,6 +13,8 @@ const userEditForm = ref({
   roles: <any>['user'],
   tabs: <any>[],
 })
+const password = ref('')
+const repeatPassword = ref('')
 
 const isSelectedUserManager = computed(() => {
   return userEditForm.value.roles.includes('manager')
@@ -138,11 +140,34 @@ const tabs = ref<any>([
 ])
 
 async function saveUser() {
+
+  const body: any = userEditForm.value
+
+  if (createMode.value == true) {
+    if (password.value != repeatPassword.value) {
+      notify({
+        type: 'error',
+        title: 'Пароли не совпадают',
+      })
+      return
+    }
+
+    if (password.value.length < 8) {
+      notify({
+        type: 'error',
+        title: 'Пароль слишком короткий',
+      })
+      return
+    }
+
+    body.password = password.value
+  }
+
   const { data, error }: any = await useFetch('/api/manager/saveUser', {
     method: 'GET',
     params: {
       uuid: selectedUser.value.uuid,
-      strBody: userEditForm.value,
+      strBody: body,
     },
   })
 
@@ -352,6 +377,18 @@ if (!store.client.mainAdmin) {
           <input
             placeholder="Фамилия"
             v-model="userEditForm.lastName"
+            class="input input-bordered w-full"
+          />
+        </div>
+        <div class="flex mt-4 gap-4">
+          <input
+            placeholder="Пароль"
+            v-model="password"
+            class="input input-bordered w-full"
+          />
+          <input
+            placeholder="Повторите пароль"
+            v-model="repeatPassword"
             class="input input-bordered w-full"
           />
         </div>

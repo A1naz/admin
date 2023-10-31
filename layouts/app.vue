@@ -99,6 +99,7 @@ function closeOverlay() {
           icon="nimbus:stats"
           href="/salesAndStatistics"
         />
+        
         <SidebarItem
           v-if="
             store.client.mainAdmin ||
@@ -112,6 +113,7 @@ function closeOverlay() {
           icon="fluent:people-team-24-filled"
           href="/partner"
         >
+
           <template #title> Партнерская программа </template>
         </SidebarItem>
         <SidebarItem
@@ -123,7 +125,11 @@ function closeOverlay() {
           icon="mdi:clipboard-account"
           href="/usersManagement"
         />
-
+        <!-- <SidebarItem
+          icon="mdi:google-analytics"
+          title="Аналитика"
+          href="/stats?type=all&period=today"
+        /> -->
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between w-full items-center p-0 m-0">

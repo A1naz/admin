@@ -2,6 +2,7 @@
 import { User } from '~/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { v4 as unicalUuid } from 'uuid'
+import bcrypt from 'bcrypt'
 
 const usersPerPage = 25
 export default eventHandler(async (event) => {
@@ -42,6 +43,7 @@ export default eventHandler(async (event) => {
           await AdminUser.create({
             uuid: userToEdit.uuid,
             username: userToEdit.username,
+            password: userToEdit.password,
             email: userToEdit.email,
             roles: userToEdit.roles,
             tabs: userToEdit.tabs,
@@ -73,11 +75,13 @@ export default eventHandler(async (event) => {
     await userToEdit.save()
   } else {
     let newUuid = unicalUuid()
+    const hash = bcrypt.hashSync(body.password, 7)
 
     let newUser = await User.create({
       uuid: newUuid,
       username: body.username,
       email: body.email,
+      password: hash,
       roles: body.roles,
       tabs: body.tabs,
       emailConfirmed: true,
@@ -90,6 +94,7 @@ export default eventHandler(async (event) => {
         uuid: newUser.uuid,
         username: newUser.username,
         email: newUser.email,
+        password: newUser.password,
         roles: newUser.roles,
         tabs: newUser.tabs,
         emailConfirmed: true,
