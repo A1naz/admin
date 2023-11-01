@@ -14,10 +14,7 @@ export default eventHandler(async (event) => {
   if (!session) return sendRedirect(event, '/auth', 302)
 
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
-  if (
-    !userAdmin ||
-    !userAdmin.mainAdmin
-  )
+  if (!userAdmin || !userAdmin.mainAdmin)
     return sendRedirect(event, '/auth', 302)
 
   if (uuid) {
@@ -35,11 +32,21 @@ export default eventHandler(async (event) => {
       userToEdit.email = body.email ? body.email : userToEdit.email
       userToEdit.roles = body.roles ? body.roles : userToEdit.roles
       userToEdit.tabs = body.tabs
+      userToEdit.firstName = body.firstName
+        ? body.firstName
+        : userToEdit.firstName
+      userToEdit.lastName = body.lastName ? body.lastName : userToEdit.lastName
 
       if (body.roles.includes('manager')) {
         let adminUserToEdit = await AdminUser.findOne({ uuid: uuid })
+        let adminUserToEditByEmail: any = null
+        if (body.email) {
+          adminUserToEditByEmail = await AdminUser.findOne({
+            email: body.email,
+          })
+        }
 
-        if (!adminUserToEdit) {
+        if (!adminUserToEdit && !adminUserToEditByEmail) {
           await AdminUser.create({
             uuid: userToEdit.uuid,
             username: userToEdit.username,
@@ -51,7 +58,7 @@ export default eventHandler(async (event) => {
             firstName: userToEdit.firstName,
             lastName: userToEdit.lastName,
           })
-        } else {
+        } else if (adminUserToEdit) {
           adminUserToEdit.username = body.username
             ? body.username
             : adminUserToEdit.username
@@ -77,30 +84,41 @@ export default eventHandler(async (event) => {
     let newUuid = unicalUuid()
     const hash = bcrypt.hashSync(body.password, 7)
 
-    let newUser = await User.create({
-      uuid: newUuid,
-      username: body.username,
-      email: body.email,
-      password: hash,
-      roles: body.roles,
-      tabs: body.tabs,
-      emailConfirmed: true,
-      firstName: body.firstName,
-      lastName: body.lastName,
-    })
+    const isUserExist = await User.findOne({ email: body.email })
 
-    if (body.roles.includes('manager')) {
-      await AdminUser.create({
-        uuid: newUser.uuid,
-        username: newUser.username,
-        email: newUser.email,
-        password: newUser.password,
-        roles: newUser.roles,
-        tabs: newUser.tabs,
-        emailConfirmed: true,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
+    if (isUserExist) {
+      throw createError({
+        statusCode: 404,
+        message: 'Пользователь уже существует с таким email',
       })
+    }
+
+    if (!isUserExist) {
+      let newUser = await User.create({
+        uuid: newUuid,
+        username: body.username,
+        email: body.email,
+        password: hash,
+        roles: body.roles,
+        tabs: body.tabs,
+        emailConfirmed: true,
+        firstName: body.firstName,
+        lastName: body.lastName,
+      })
+
+      if (body.roles.includes('manager')) {
+        await AdminUser.create({
+          uuid: newUser.uuid,
+          username: newUser.username,
+          email: newUser.email,
+          password: newUser.password,
+          roles: newUser.roles,
+          tabs: newUser.tabs,
+          emailConfirmed: true,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+        })
+      }
     }
   }
 

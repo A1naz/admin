@@ -125,11 +125,11 @@ function closeOverlay() {
           icon="mdi:clipboard-account"
           href="/usersManagement"
         />
-        <!-- <SidebarItem
+        <SidebarItem
           icon="mdi:google-analytics"
           title="Аналитика"
           href="/stats?type=all&period=today"
-        /> -->
+        />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between w-full items-center p-0 m-0">

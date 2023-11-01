@@ -137,10 +137,10 @@ const tabs = ref<any>([
   'управление партнеркой',
   'управление выкупами',
   'управление пользователями платформы',
+  'аналитика',
 ])
 
 async function saveUser() {
-
   const body: any = userEditForm.value
 
   if (createMode.value == true) {
@@ -176,9 +176,19 @@ async function saveUser() {
       type: 'success',
       title: 'Успешно',
     })
+    location.reload()
   }
 
-  location.reload()
+  if (error.value) {
+    notify({
+      type: 'error',
+      title: 'Пользователь с такой почтой уже существует',
+    })
+
+    setTimeout(() => {
+      location.reload()
+    }, 2000)
+  }
 }
 
 const createMode = ref(false)
@@ -380,7 +390,7 @@ if (!store.client.mainAdmin) {
             class="input input-bordered w-full"
           />
         </div>
-        <div class="flex mt-4 gap-4">
+        <div class="flex mt-4 gap-4" v-if="createMode">
           <input
             placeholder="Пароль"
             v-model="password"
