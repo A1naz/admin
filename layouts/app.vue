@@ -99,7 +99,7 @@ function closeOverlay() {
           icon="nimbus:stats"
           href="/salesAndStatistics"
         />
-        
+
         <SidebarItem
           v-if="
             store.client.mainAdmin ||
@@ -113,7 +113,6 @@ function closeOverlay() {
           icon="fluent:people-team-24-filled"
           href="/partner"
         >
-
           <template #title> Партнерская программа </template>
         </SidebarItem>
         <SidebarItem
@@ -126,6 +125,10 @@ function closeOverlay() {
           href="/usersManagement"
         />
         <SidebarItem
+          v-if="
+            store.client.mainAdmin ||
+            store.client.tabs.includes('аналитика')
+          "
           icon="mdi:google-analytics"
           title="Аналитика"
           href="/stats?type=all&period=today"
