@@ -497,5 +497,9 @@ export default eventHandler(async (event) => {
     allUsers: usersCount,
   }
 
+  services[3].quantity = Math.floor(Number(services[3].expenses) / 5)
+  services[4].quantity = Math.floor(Number(services[4].expenses) / 5)
+
+
   return { data: format.data, labels: format.labels, services, pieGraphData }
 })
