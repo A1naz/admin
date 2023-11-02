@@ -58,7 +58,7 @@ export default eventHandler(async (event) => {
     case 'threeDays':
       const threeDaysAgo = new Date(currentDate)
       threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
-      threeDaysAgo.setHours(3, 0, 0, 0)
+      threeDaysAgo.setHours(0, 0, 0, 0)
       filter.dataoperation = {
         $gte: threeDaysAgo,
         $lt: currentDate,
@@ -67,7 +67,7 @@ export default eventHandler(async (event) => {
     case 'week':
       const oneWeekAgo = new Date(currentDate)
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-      oneWeekAgo.setHours(3, 0, 0, 0)
+      oneWeekAgo.setHours(0, 0, 0, 0)
       filter.dataoperation = {
         $gte: oneWeekAgo,
         $lt: currentDate,
@@ -137,7 +137,7 @@ export default eventHandler(async (event) => {
 
     const oneWeekAgo = new Date(currentDate)
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-    oneWeekAgo.setHours(3, 0, 0, 0)
+    oneWeekAgo.setHours(0, 0, 0, 0)
 
     const daysArray = []
     const date = new Date(oneWeekAgo)
@@ -160,7 +160,7 @@ export default eventHandler(async (event) => {
 
     const trueCurDate: any = new Date()
     trueCurDate.setDate(trueCurDate.getDate() + 1)
-    trueCurDate.setHours(3, 0, 0, 0)
+    trueCurDate.setHours(0, 0, 0, 0)
 
     for (const payment of newHistory) {
       const recordDate: any = new Date(payment.dataoperation)
@@ -193,7 +193,7 @@ export default eventHandler(async (event) => {
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
     }
 
-    oneMonthAgo.setHours(3, 0, 0, 0)
+    oneMonthAgo.setHours(0, 0, 0, 0)
 
     const year = currentDate.getFullYear()
     let month = new Date().getMonth()
@@ -218,7 +218,7 @@ export default eventHandler(async (event) => {
     }
 
     const sumByDayArray = new Array(numberOfDaysInMonth).fill(0)
-    currentMonth.setHours(3)
+    currentMonth.setHours(0, 0, 0, 0)
 
     for (const payment of history) {
       const recordDate: any = new Date(payment.dataoperation)
@@ -440,7 +440,7 @@ export default eventHandler(async (event) => {
   const usersCount = await User.countDocuments()
   const oneWeekAgoForAggregate = new Date(currentDate)
   oneWeekAgoForAggregate.setDate(oneWeekAgoForAggregate.getDate() - 7)
-  oneWeekAgoForAggregate.setHours(3, 0, 0, 0)
+  oneWeekAgoForAggregate.setHours(0, 0, 0, 0)
 
   const activeUsersAggregate = await paymenthistory.aggregate([
     {
