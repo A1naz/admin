@@ -125,9 +125,6 @@ export default NuxtAuthHandler({
         if (!user) {
           throw new Error('User not found')
         }
-        if (!user.roles.includes('manager')) {
-          throw new Error('Admin not found')
-        }
         if (runtimeConfig.env === 'developer') return user
         if (!user.password) throw new Error('Password not set')
 

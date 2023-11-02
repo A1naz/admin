@@ -19,10 +19,7 @@ if (
   !store.client.mainAdmin &&
   !store.client.tabs.includes('управление партнеркой')
 ) {
-  // await signOut({
-  //   callbackUrl: '/auth',
-  // })
-  // navigateTo('/auth')
+  navigateTo('/waitingRoom')
 }
 </script>
 

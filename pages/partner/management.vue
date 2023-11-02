@@ -15,6 +15,7 @@ const selectedUser = ref<any>({})
 const referralModalLoading = ref(false)
 const referrals = ref<any>([])
 const filteredReferrals = ref<any>([])
+const store = useMainStore()
 
 definePageMeta({
   layout: 'app',
@@ -102,6 +103,13 @@ function searchReferrals(searchValue: string) {
       el.uuid.includes(searchValue)
   )
 
+}
+
+if (
+  !store.client.mainAdmin &&
+  !store.client.tabs.includes('управление партнеркой')
+) {
+  navigateTo('/waitingRoom')
 }
 </script>
 

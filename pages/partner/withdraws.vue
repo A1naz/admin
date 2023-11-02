@@ -90,6 +90,15 @@ const findSearchQuery = async () => {
   inputLoading.value = false
 }
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
+
+const store = useMainStore()
+
+if (
+  !store.client.mainAdmin &&
+  !store.client.tabs.includes('управление партнеркой')
+) {
+ navigateTo('/waitingRoom')
+}
 </script>
 
 <template>
