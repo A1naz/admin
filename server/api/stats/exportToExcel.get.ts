@@ -5,7 +5,7 @@ import { User } from '@/server/lib/models/User'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 
-let limit  = 50000
+let limit = 50000
 const runtimeConfig = useRuntimeConfig()
 
 const keys = Object.keys as <T>(
@@ -23,13 +23,10 @@ export default eventHandler(async (event) => {
     const session = (await getServerSession(event)) as any
     if (!session) return sendRedirect(event, '/auth', 302)
     const user = await AdminUser.findOne({ uuid: session.uuid })
-    if (!user || !user.roles.includes('manager'))
+    if (!user || !user.tabs.includes('финансовые операции'))
       return sendRedirect(event, '/auth', 302)
 
     const { page, filters, sortDate }: any = getQuery(event)
-    const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
-    if (!userAdmin || !userAdmin.roles.includes('manager'))
-      return sendRedirect(event, '/auth', 302)
 
     const workbook = new ExcelJS.Workbook()
 
@@ -42,7 +39,6 @@ export default eventHandler(async (event) => {
       userIds = { user: { $in: trueFilters.clients } }
     }
     // const users = await User.find({ _id: { $in: trueFilters.clients}})
-
 
     const trueTypeoperations =
       trueFilters.typeoperations == 'any'

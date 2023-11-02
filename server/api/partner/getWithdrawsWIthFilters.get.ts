@@ -10,7 +10,7 @@ export default eventHandler(async (event) => {
 
   const { page, searchValue, filters, sort }: any = getQuery(event)
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
-  if (!userAdmin || !userAdmin.roles.includes('manager'))
+  if (!userAdmin || !userAdmin.tabs.includes('управление партнеркой'))
     return sendRedirect(event, '/auth', 302)
   const trueFilters = JSON.parse(filters)
   if (!trueFilters.sumTo) delete trueFilters.sumTo

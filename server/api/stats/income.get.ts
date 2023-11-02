@@ -10,7 +10,7 @@ export default eventHandler(async (event) => {
   const { type, period } = getQuery(event)
   if (!session) return sendRedirect(event, '/auth', 302)
   const user = await AdminUser.findOne({ uuid: session.uuid })
-  if (!user || !user.roles.includes('manager'))
+  if (!user || !user.tabs.includes('аналитика'))
     return sendRedirect(event, '/auth', 302)
 
   const currentDate = new Date() // Текущая дата
@@ -33,7 +33,7 @@ export default eventHandler(async (event) => {
           currentDate.getFullYear(),
           currentDate.getMonth(),
           currentDate.getDate()
-        ).setHours(3, 0, 0, 0),
+        ).setHours(0, 0, 0, 0),
         $lt: new Date(
           currentDate.getFullYear(),
           currentDate.getMonth(),

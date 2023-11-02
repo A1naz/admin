@@ -7,7 +7,7 @@ export default eventHandler(async (event) => {
   if (!session)
     return sendRedirect(event, '/auth', 302)
   const user = await User.findOne({ uuid: session.uuid })
-  if (!user)
+  if (!user || !user.tabs.includes('управление партнеркой'))
     return sendRedirect(event, '/auth', 302)
   const history = await PartnerWithdraw.find({ user }).sort({ _id: -1 }).limit(10)
   if (!history)

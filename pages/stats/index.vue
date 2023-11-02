@@ -1,15 +1,11 @@
 ﻿<script lang="ts" setup>
 const store = useMainStore()
-if (
-  !store.client.mainAdmin &&
-  !store.client.tabs.includes('аналитика')
-) {
+if (!store.client.mainAdmin && !store.client.tabs.includes('аналитика')) {
   navigateTo('/partner')
 }
 
 const { width, height } = useWindowSize()
 import { notify } from '@kyvg/vue3-notification'
-import { relative } from 'path'
 import { Bar } from 'vue-chartjs'
 const query = ref('')
 const currency = useCurrency()
@@ -58,16 +54,7 @@ async function onInput(event: Event) {
 let chartDataValue = ref<any>([])
 const services = ref<any>([])
 let chartLabels = ref<any>([])
-const buyoutsCount = ref<any>({
-  all: 0,
-  inAdvertisement: 0,
-})
-const deliveriesCount = ref<any>({
-  all: 0,
-  active: 0,
-  complited: 0,
-  penalty: 0,
-})
+
 async function getData() {
   services.value = []
 
@@ -113,22 +100,7 @@ async function getTop50() {
 }
 
 const withdrawsCount = ref(0)
-async function getSecondLevelReferrals() {
-  const { data }: any = await useFetch('/api/partner/getSecondLevelReferrals', {
-    method: 'GET',
-  })
-  if (data.value && data.value.status === 'ok') {
-    secondLevelReferrals.value = data.value.secondLevelReferralsCount
-  }
-}
-async function getPatnerWithdraws() {
-  const { data }: any = await useFetch('/api/stats/getPartnerWithdraws', {
-    method: 'GET',
-  })
-  if (data.value) {
-    withdrawsCount.value = data.value.withdrawsCount
-  }
-}
+
 await getTop50()
 await getData()
 
@@ -145,7 +117,6 @@ const barThickness = computed(() => {
   }
 })
 
-const type = route.query.type ? route.query.type : ''
 const chartBar: any = ref(null)
 
 const chartData = ref({

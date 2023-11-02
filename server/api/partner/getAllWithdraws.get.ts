@@ -10,7 +10,7 @@ export default eventHandler(async (event) => {
   const { page }: any = getQuery(event)
 
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
-  if (!userAdmin || !userAdmin.roles.includes('manager'))
+  if (!userAdmin|| !userAdmin.tabs.includes('управление партнеркой'))
     return sendRedirect(event, '/auth', 302)
 
   const withdraws = await PartnerWithdraw.find({})

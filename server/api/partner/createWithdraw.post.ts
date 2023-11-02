@@ -4,10 +4,9 @@ import { PartnerWithdraw } from '~/server/lib/models/PartnerWithdraw'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  if (!session)
-    return sendRedirect(event, '/auth', 302)
+  if (!session) return sendRedirect(event, '/auth', 302)
   const user = await User.findOne({ uuid: session.uuid })
-  if (!user)
+  if (!user || !user.tabs.includes('управление партнеркой'))
     return sendRedirect(event, '/auth', 302)
   const { amount, card, fio } = await readBody(event)
 
@@ -48,6 +47,7 @@ export default eventHandler(async (event) => {
     user.partner.balance -= Number(amount)
     await user.save()
     return { status: 'ok', document: withdraw, message: 'success' }
+  } else {
+    return { status: 'error', message: 'Не удалось создать вывод' }
   }
-  else { return { status: 'error', message: 'Не удалось создать вывод' } }
 })
