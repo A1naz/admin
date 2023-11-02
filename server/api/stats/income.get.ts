@@ -47,12 +47,12 @@ export default eventHandler(async (event) => {
           currentDate.getFullYear(),
           currentDate.getMonth(),
           currentDate.getDate() - 1
-        ).setHours(3, 0, 0, 0),
+        ).setHours(0, 0, 0, 0),
         $lt: new Date(
           currentDate.getFullYear(),
           currentDate.getMonth(),
           currentDate.getDate()
-        ).setHours(3, 0, 0, 0),
+        ).setHours(0, 0, 0, 0),
       }
       break
     case 'threeDays':
