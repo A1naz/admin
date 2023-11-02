@@ -4,8 +4,14 @@ const value = ref('')
 const isAllUsersSelected = computed(() => {
   return selectedUsers.value.length > 1 ? false : true
 })
+const productsCountInfo = ref({
+  count: 0,
+  sum: 0,
+})
+const currency = useCurrency()
 const type = ref('any')
 const service = ref('any')
+const articleQuery = ref('')
 const { $dayjs } = useNuxtApp()
 const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 const selectUsersClose: any = ref(null)
@@ -64,6 +70,7 @@ definePageMeta({
 const products = ref([])
 
 async function getStats() {
+  stats.value = []
   const { data }: any = await useFetch('/api/stats/stats', {
     method: 'GET',
     query: {
@@ -74,6 +81,7 @@ async function getStats() {
         typeoperations: type.value,
         type: service.value,
         dateRange: dateRange.value.length > 0 ? dateRange.value : null,
+        article: articleQuery.value,
       },
     },
   })
@@ -81,6 +89,7 @@ async function getStats() {
     statsCount.value = data.value.statsCount
     stats.value = data.value.stats
     pages.value = Math.ceil(statsCount.value / elPerPage)
+    productsCountInfo.value = data.value.productsCountInfo
   }
 }
 
@@ -112,6 +121,9 @@ function openUsersSelectModal() {
   selectUsersClose.value?.click()
 }
 
+async function onInputArticle(event: Event) {
+  findSearchQueryDebouncedArticle()
+}
 async function onInput(event: Event) {
   findSearchQueryDebounced()
 }
@@ -141,7 +153,16 @@ const findSearchQuery = async () => {
   await getUsers(query.value)
   inputLoading.value = false
 }
+const findSearchQueryArticle = async () => {
+  inputLoading.value = true
+  await getStats()
+  inputLoading.value = false
+}
 
+const findSearchQueryDebouncedArticle = useDebounceFn(
+  findSearchQueryArticle,
+  1000
+)
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 async function selectUser(uuid: String, select: boolean) {
   users.value.forEach((user: any) => {
@@ -172,7 +193,10 @@ async function removeFromSelected(uuid: String) {
 getStats()
 
 const store = useMainStore()
-if (!store.client.mainAdmin && !store.client.tabs.includes('финансовые операции') ) {
+if (
+  !store.client.mainAdmin &&
+  !store.client.tabs.includes('финансовые операции')
+) {
   navigateTo('/partner')
 }
 </script>
@@ -229,6 +253,21 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('финансовые
         <option value="buyouts service">услуги выкупов</option>
         <option value="deliveries">доставки</option>
       </select>
+      <div v-if="service == 'buyouts'">
+        <label
+          ><input
+            v-model="articleQuery"
+            type="number"
+            placeholder="Артикул"
+            class="input input-bordered input-l ml-4 w-44"
+            @input="onInputArticle($event)"
+          />
+        </label>
+        <span
+          v-if="inputLoading"
+          class="loading loading-spinner text-primary loading-large ml-4"
+        />
+      </div>
       <DateRangePicker
         class="w-46"
         v-model="dateRange"
@@ -279,14 +318,13 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('финансовые
       <thead>
         <tr>
           <th>ID</th>
-          <th>userId</th>
           <th>почта</th>
           <th>никнейм</th>
           <th>телеграм</th>
           <th>сумма</th>
-          <th>тип операции</th>
+          <th v-if="service == 'buyouts'">артикул</th>
+          <th v-if="service == 'buyouts'">наименование товара</th>
           <th>базис</th>
-          <th>комментарии</th>
           <th>
             <div @click="sortByDate" class="flex cursor-pointer">
               Дата операции
@@ -302,16 +340,10 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('финансовые
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover">
           <th
-            style="max-width: 80px; min-width: 70px"
+            style="max-width: 140px; min-width: 100px"
             class="overflow-x-auto text-xs"
           >
             {{ stat._id }}
-          </th>
-          <th
-            style="max-width: 120px; min-width: 40px"
-            class="overflow-x-auto text-xs"
-          >
-            {{ stat.userUuid }}
           </th>
           <th
             style="max-width: 150px; min-width: 40px"
@@ -320,13 +352,13 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('финансовые
             {{ stat.email }}
           </th>
           <th
-            style="max-width: 80px; min-width: 40px"
+            style="max-width: 100px; min-width: 40px"
             class="overflow-x-auto text-xs"
           >
             {{ stat.username }}
           </th>
           <th
-            style="max-width: 80px; min-width: 40px"
+            style="max-width: 100px; min-width: 40px"
             class="overflow-x-auto text-xs"
           >
             {{ stat.telegram }}
@@ -335,19 +367,21 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('финансовые
             {{ stat.summ }}
           </th>
           <th
-            style="max-width: 20px; min-width: 15px"
+            style="max-width: 40px"
+            v-if="service == 'buyouts'"
             class="overflow-x-auto text-xs"
           >
-            {{ stat.typeoperations }}
-          </th>
-          <th style="max-width: 140px" class="overflow-x-auto text-xs">
-            {{ stat.basisoperation }}
+            {{ stat.article }}
           </th>
           <th
-            style="max-width: 170px; min-width: 75px"
+            style="max-width: 160px"
+            v-if="service == 'buyouts'"
             class="overflow-x-auto text-xs"
           >
-            {{ stat.comment }}
+            {{ stat.productName }}
+          </th>
+          <th style="max-width: 160px" class="overflow-x-auto text-xs">
+            {{ stat.basisoperation }}
           </th>
           <th
             style="max-width: 15px; min-width: 10px"
@@ -358,6 +392,27 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('финансовые
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <div
+    class="mt-4 mr-6 mb-10 items-end flex justify-between"
+    v-if="service == 'buyouts'"
+  >
+  <div></div>
+    <div>
+      <div class="flex">
+        Выкуплено товаров:
+        <div class="ml-2 text-primary font-bold">
+          {{ productsCountInfo.count }} шт.
+        </div>
+      </div>
+      <div class="flex">
+        На сумму:
+        <div class="ml-2 text-primary font-bold">
+          {{ currency.format(productsCountInfo.sum) }}
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Put this part before </body> tag -->
@@ -447,7 +502,6 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('финансовые
             </tbody>
           </table>
         </div>
-
         <div class="modal-action"></div>
       </div>
     </div>

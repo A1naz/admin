@@ -3,6 +3,7 @@ import { getServerSession } from '#auth'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
+import { Buyout } from '~/server/lib/models/Buyout'
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -17,8 +18,35 @@ export default eventHandler(async (event) => {
   const { page, filters, sortDate, elPerPage }: any = getQuery(event)
 
   const trueFilters = JSON.parse(filters)
+  let productsCountInfo = {
+    count: 0,
+    sum: 0,
+  }
   if (!trueFilters.sumTo) delete trueFilters.sumTo
   if (!trueFilters.sumFrom) delete trueFilters.sumFrom
+  if (trueFilters.type !== 'buyouts') {
+    delete trueFilters.article
+  } else if (trueFilters.type == 'buyouts' && trueFilters.article) {
+    const buyoutsWithThisArticle = await Buyout.find({
+      article: trueFilters.article,
+    }).sort({
+      createdAt: sortDate,
+    })
+
+    const buyoutsUuids: string[] = []
+
+    if (buyoutsWithThisArticle && buyoutsWithThisArticle.length > 0) {
+      for (const buyout of buyoutsWithThisArticle) {
+        buyoutsUuids.push(`Выкуп #${buyout.uuid}`)
+      }
+      trueFilters.basisoperation = { basisoperation: { $in: buyoutsUuids } }
+    } else {
+      return {
+        stats: [],
+        statsCount: 0,
+      }
+    }
+  }
   if (elPerPage) {
     paymentPerPage = elPerPage
   }
@@ -27,7 +55,6 @@ export default eventHandler(async (event) => {
     userIds = { user: { $in: trueFilters.clients } }
   }
   // const users = await User.find({ _id: { $in: trueFilters.clients}})
-
 
   const trueTypeoperations =
     trueFilters.typeoperations == 'any'
@@ -45,6 +72,7 @@ export default eventHandler(async (event) => {
 
   let stats: any = await paymenthistory
     .find({
+      ...trueFilters.basisoperation,
       ...userIds,
       ...trueTypeoperations,
       ...trueType,
@@ -73,6 +101,50 @@ export default eventHandler(async (event) => {
     })
   }
 
+  if (trueFilters.type == 'buyouts') {
+    let buyoutsUuids: string[] = []
+
+    const paymentAggregate = await paymenthistory.aggregate([
+      {
+        $match: {
+          ...trueFilters.basisoperation,
+          ...userIds,
+          ...trueTypeoperations,
+          type: 'buyouts',
+          ...trueDateRange,
+        },
+      },
+      {
+        $group: {
+          _id: 'null',
+          sum: { $sum: '$summ' },
+          count: { $sum: 1 },
+        },
+      },
+    ])
+
+    if (paymentAggregate && paymentAggregate.length > 0) {
+      productsCountInfo = {
+        count: paymentAggregate[0].count,
+        sum: paymentAggregate[0].sum,
+      }
+    }
+
+    for (const buyout of format) {
+      buyoutsUuids.push(buyout.basisoperation.split(' ')[1].replace('#', ''))
+    }
+
+    const buyouts = await Buyout.find({ uuid: { $in: buyoutsUuids } })
+    format.forEach((stat: any) => {
+      const buyout = buyouts.find(
+        (buyout: any) =>
+          buyout.uuid == stat.basisoperation.split(' ')[1].replace('#', '')
+      )
+      stat.article = buyout ? buyout.article : ''
+      stat.productName = buyout ? buyout.product.name : ''
+    })
+  }
+
   await ActionHistory.create({
     adminUser: user._id,
     actionId: 31,
@@ -83,5 +155,6 @@ export default eventHandler(async (event) => {
   return {
     stats: format,
     statsCount,
+    productsCountInfo
   }
 })

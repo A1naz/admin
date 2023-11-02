@@ -91,7 +91,7 @@ async function getTop50() {
     top50pvz.value = data.value.top50pvz
     top50UsersByDeposit.value = data.value.top50UsersByDeposit
     if (topTitle.value != 'top50UsersByDeposit') {
-      selectedTop.value = data.value.top50Articles
+      selectedTop.value = data.value.top50Buyouts
     } else {
       selectedTop.value = data.value.top50UsersByDeposit
     }

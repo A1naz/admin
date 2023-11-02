@@ -37,7 +37,7 @@ export default eventHandler(async (event) => {
         : userToEdit.firstName
       userToEdit.lastName = body.lastName ? body.lastName : userToEdit.lastName
 
-      if (body.roles.includes('manager')) {
+      if (body.roles.includes('manager') || body.roles.includes('accountant')) {
         let adminUserToEdit = await AdminUser.findOne({ uuid: uuid })
         let adminUserToEditByEmail: any = null
         if (body.email) {
@@ -71,7 +71,7 @@ export default eventHandler(async (event) => {
           adminUserToEdit.tabs = body.tabs
           await adminUserToEdit.save()
         }
-      } else if (!body.roles.includes('manager')) {
+      } else if (!body.roles.includes('manager') && !body.roles.includes('accountant')) {
         const adminToRemove = await AdminUser.findOne({ uuid: uuid })
         if (adminToRemove) {
           await adminToRemove.deleteOne()
@@ -106,7 +106,7 @@ export default eventHandler(async (event) => {
         lastName: body.lastName,
       })
 
-      if (body.roles.includes('manager')) {
+      if (body.roles.includes('manager') || body.roles.includes('accountant')) {
         await AdminUser.create({
           uuid: newUser.uuid,
           username: newUser.username,

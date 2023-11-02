@@ -19,6 +19,9 @@ const repeatPassword = ref('')
 const isSelectedUserManager = computed(() => {
   return userEditForm.value.roles.includes('manager')
 })
+const isSelectedUserAccountant = computed(() => {
+  return userEditForm.value.roles.includes('accountant')
+})
 const selectedUserRole = ref('manager')
 import { notify } from '@kyvg/vue3-notification'
 const { height, width } = useWindowSize()
@@ -93,7 +96,7 @@ async function selectUser(user: any) {
   userEditForm.value.tabs = []
   selectAdminUserClose.value?.click()
 
-  if (isSelectedUserManager.value === true) {
+  if (isSelectedUserManager.value === true || isSelectedUserAccountant.value === true) {
     const { data, error } = await useFetch('/api/manager/getTabs', {
       method: 'GET',
       params: {
@@ -237,6 +240,7 @@ if (!store.client.mainAdmin) {
           <option selected value="">все роли</option>
           <option value="user">пользователь</option>
           <option value="manager">менеджер</option>
+          <option value="accountant">бухгалтер</option>
         </select>
         <button class="btn btn-primary ml-3" @click="getUsers">
           Применить
@@ -452,12 +456,30 @@ if (!store.client.mainAdmin) {
                 />
               </label>
             </div>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <span class="label-text mr-2">Бухгалтер</span>
+                <input
+                  type="checkbox"
+                  :checked="isSelectedUserAccountant"
+                  class="checkbox checkbox-primary"
+                  @change="
+                    isSelectedUserAccountant
+                      ? userEditForm.roles.splice(
+                          userEditForm.roles.indexOf('accountant'),
+                          1
+                        )
+                      : userEditForm.roles.push('accountant')
+                  "
+                />
+              </label>
+            </div>
           </div>
         </div>
       </div>
 
       <div
-        v-if="isSelectedUserManager"
+        v-if="isSelectedUserManager || isSelectedUserAccountant"
         class="collapse bg-base-200 collapse-arrow"
       >
         <input type="checkbox" />
