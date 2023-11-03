@@ -511,34 +511,34 @@ export default eventHandler(async (event) => {
   services[3].quantity = Math.floor(Number(services[3].expenses) / 5)
   services[4].quantity = Math.floor(Number(services[4].expenses) / 5)
 
-  const penaltyAggregate = await paymenthistory.aggregate([
-    {
-      $match: {
-        dataoperation: filter.dataoperation,
-        typeoperations: 'Расход',
-        type: 'deliveries',
-        comment: { $regex: 'Штраф', $options: 'i' },
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        summ: { $sum: '$summ' },
-        count: { $sum: 1 },
-      },
-    },
-  ])
+  // const penaltyAggregate = await paymenthistory.aggregate([
+  //   {
+  //     $match: {
+  //       dataoperation: filter.dataoperation,
+  //       typeoperations: 'Расход',
+  //       type: 'deliveries',
+  //       comment: { $regex: 'Штраф', $options: 'i' },
+  //     },
+  //   },
+  //   {
+  //     $group: {
+  //       _id: null,
+  //       summ: { $sum: '$summ' },
+  //       count: { $sum: 1 },
+  //     },
+  //   },
+  // ])
 
-  services.forEach((service: any) => {
-    if (service.value == 'penalty delivery') {
-      if (penaltyAggregate && penaltyAggregate[0] && penaltyAggregate[0].summ) {
-        service.expenses = penaltyAggregate[0].summ
-      }
-      if (penaltyAggregate && penaltyAggregate[0] &&penaltyAggregate[0].count) {
-        service.quantity = penaltyAggregate[0].count
-      }
-    }
-  })
+  // services.forEach((service: any) => {
+  //   if (service.value == 'penalty delivery') {
+  //     if (penaltyAggregate && penaltyAggregate[0] && penaltyAggregate[0].summ) {
+  //       service.expenses = penaltyAggregate[0].summ
+  //     }
+  //     if (penaltyAggregate && penaltyAggregate[0] &&penaltyAggregate[0].count) {
+  //       service.quantity = penaltyAggregate[0].count
+  //     }
+  //   }
+  // })
 
   return { data: format.data, labels: format.labels, services, pieGraphData }
 })
