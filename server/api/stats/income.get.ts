@@ -530,10 +530,10 @@ export default eventHandler(async (event) => {
 
   services.forEach((service: any) => {
     if (service.value == 'penalty delivery') {
-      if (penaltyAggregate[0].summ) {
+      if (penaltyAggregate && penaltyAggregate[0] && penaltyAggregate[0].summ) {
         service.expenses = penaltyAggregate[0].summ
       }
-      if (penaltyAggregate[0].count) {
+      if (penaltyAggregate && penaltyAggregate[0] &&penaltyAggregate[0].count) {
         service.quantity = penaltyAggregate[0].count
       }
     }
