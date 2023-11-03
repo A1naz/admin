@@ -52,7 +52,74 @@ async function onInput(event: Event) {
 }
 
 let chartDataValue = ref<any>([])
-const services = ref<any>([])
+const services = ref<any>([
+  {
+    value: 'all',
+    title: 'Всего',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'buyouts service',
+    title: 'Выкупы',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'reviews',
+    title: 'Отзывы',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'likes',
+    title: 'Лайки',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'productlikes',
+    title: 'Лайки на товар',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'questions',
+    title: 'Вопросы',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'carts',
+    title: 'Корзина',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'autoanswer',
+    title: 'Автоответчик',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'partner full',
+    title: 'Выплачено партнерам',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'partner active',
+    title: 'Активные выплаты',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'penalty delivery',
+    title: 'Штрафы за незабранные товары',
+    expenses: 0,
+    quantity: 0,
+  },
+])
 let chartLabels = ref<any>([])
 
 async function getData() {
