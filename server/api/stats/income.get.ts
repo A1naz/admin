@@ -4,7 +4,6 @@ import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { PartnerWithdraw } from '~/server/lib/models/PartnerWithdraw'
 
-
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
 
@@ -427,6 +426,33 @@ export default eventHandler(async (event) => {
     },
   ]
 
+  const penaltyAggregate = await paymenthistory.aggregate([
+    {
+      $match: {
+        dataoperation: filter.dataoperation,
+        typeoperations: 'Расход',
+        type: 'deliveries',
+        comment: { $regex: 'Штраф', $options: 'i' },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        summ: { $sum: '$summ' },
+        count: { $sum: 1 },
+      },
+    },
+  ])
+
+  if (penaltyAggregate && penaltyAggregate.length > 0) {
+    if (penaltyAggregate[0] && penaltyAggregate[0].summ) {
+      services[10].expenses = penaltyAggregate[0].summ
+    }
+    if (penaltyAggregate[0] && penaltyAggregate[0].count) {
+      services[10].quantity = penaltyAggregate[0].count
+    }
+  }
+
   if (completedPartnerWithdraws && completedPartnerWithdraws.length > 0) {
     services[8].expenses = completedPartnerWithdraws[0].summ
     services[8].quantity = completedPartnerWithdraws[0].quantity
@@ -511,34 +537,7 @@ export default eventHandler(async (event) => {
   services[3].quantity = Math.floor(Number(services[3].expenses) / 5)
   services[4].quantity = Math.floor(Number(services[4].expenses) / 5)
 
-  // const penaltyAggregate = await paymenthistory.aggregate([
-  //   {
-  //     $match: {
-  //       dataoperation: filter.dataoperation,
-  //       typeoperations: 'Расход',
-  //       type: 'deliveries',
-  //       comment: { $regex: 'Штраф', $options: 'i' },
-  //     },
-  //   },
-  //   {
-  //     $group: {
-  //       _id: null,
-  //       summ: { $sum: '$summ' },
-  //       count: { $sum: 1 },
-  //     },
-  //   },
-  // ])
-
-  // services.forEach((service: any) => {
-  //   if (service.value == 'penalty delivery') {
-  //     if (penaltyAggregate && penaltyAggregate[0] && penaltyAggregate[0].summ) {
-  //       service.expenses = penaltyAggregate[0].summ
-  //     }
-  //     if (penaltyAggregate && penaltyAggregate[0] &&penaltyAggregate[0].count) {
-  //       service.quantity = penaltyAggregate[0].count
-  //     }
-  //   }
-  // })
+  console.log(penaltyAggregate)
 
   return { data: format.data, labels: format.labels, services, pieGraphData }
 })
