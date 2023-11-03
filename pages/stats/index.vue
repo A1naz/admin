@@ -367,12 +367,12 @@ const headers = [
       <div class="flex flex-wrap mt-4">
         <div v-for="service in services">
           <div
-            class="card md:w-36 bg-base-100 shadow-md ml-2"
+            class="card md:w-40 bg-base-100 shadow-md ml-1 mb-1"
             style="min-width: 100px"
             v-if="service.value !== 'all'"
           >
             <div class="card-body">
-              <h2 class="text-center font-bold h-10">
+              <h2 class="text-center font-bold h-12 text-sm">
                 {{ service.title }}
               </h2>
               <div class="flex flex-col text-left justify-start mt-2">

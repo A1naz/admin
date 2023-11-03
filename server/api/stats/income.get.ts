@@ -4,6 +4,75 @@ import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { PartnerWithdraw } from '~/server/lib/models/PartnerWithdraw'
 
+const services = [
+  {
+    value: 'all',
+    title: 'Всего',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'buyouts service',
+    title: 'Выкупы',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'reviews',
+    title: 'Отзывы',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'likes',
+    title: 'Лайки',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'productlikes',
+    title: 'Лайки на товар',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'questions',
+    title: 'Вопросы',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'carts',
+    title: 'Корзина',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'autoanswer',
+    title: 'Автоответчик',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'partner full',
+    title: 'Выплачено партнерам',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'partner active',
+    title: 'Активные выплаты',
+    expenses: 0,
+    quantity: 0,
+  },
+  {
+    value: 'penalty delivery',
+    title: 'Штрафы за незабранные товары',
+    expenses: 0,
+    quantity: 0,
+  },
+]
+
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
 
@@ -57,11 +126,11 @@ export default eventHandler(async (event) => {
       break
     case 'threeDays':
       const threeDaysAgo = new Date(currentDate)
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3)
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 2)
       threeDaysAgo.setHours(0, 0, 0, 0)
       filter.dataoperation = {
         $gte: threeDaysAgo,
-        $lt: currentDate,
+        $lt: new Date(currentDate).setHours(23, 59, 59, 59),
       }
       break
     case 'week':
@@ -76,7 +145,11 @@ export default eventHandler(async (event) => {
     case 'month':
       filter.dataoperation = {
         $gte: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
-        $lt: new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1),
+        $lt: new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth() + 1,
+          1
+        ).setHours(0, 0, 0, 0),
       }
       break
     case 'lastMonth':
@@ -353,69 +426,6 @@ export default eventHandler(async (event) => {
     },
   ])
 
-  const services = [
-    {
-      value: 'all',
-      title: 'Всего',
-      expenses: 0,
-      quantity: 0,
-    },
-    {
-      value: 'buyouts service',
-      title: 'Выкупы',
-      expenses: 0,
-      quantity: 0,
-    },
-    {
-      value: 'reviews',
-      title: 'Отзывы',
-      expenses: 0,
-      quantity: 0,
-    },
-    {
-      value: 'likes',
-      title: 'Лайки',
-      expenses: 0,
-      quantity: 0,
-    },
-    {
-      value: 'productlikes',
-      title: 'Лайки на товар',
-      expenses: 0,
-      quantity: 0,
-    },
-    {
-      value: 'questions',
-      title: 'Вопросы',
-      expenses: 0,
-      quantity: 0,
-    },
-    {
-      value: 'carts',
-      title: 'Корзина',
-      expenses: 0,
-      quantity: 0,
-    },
-    {
-      value: 'autoanswer',
-      title: 'Автоответчик',
-      expenses: 0,
-      quantity: 0,
-    },
-    {
-      value: 'partner full',
-      title: 'Выплачено партнерам',
-      expenses: 0,
-      quantity: 0,
-    },
-    {
-      value: 'partner active',
-      title: 'Активные выплаты',
-      expenses: 0,
-      quantity: 0,
-    },
-  ]
-
   if (completedPartnerWithdraws && completedPartnerWithdraws.length > 0) {
     services[8].expenses = completedPartnerWithdraws[0].summ
     services[8].quantity = completedPartnerWithdraws[0].quantity
@@ -500,6 +510,30 @@ export default eventHandler(async (event) => {
   services[3].quantity = Math.floor(Number(services[3].expenses) / 5)
   services[4].quantity = Math.floor(Number(services[4].expenses) / 5)
 
+  const penaltyAggregate = await paymenthistory.aggregate([
+    {
+      $match: {
+        dataoperation: filter.dataoperation,
+        typeoperations: 'Расход',
+        type: 'deliveries',
+        comment: { $regex: 'Штраф', $options: 'i' },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        summ: { $sum: '$summ' },
+        count: { $sum: 1 },
+      },
+    },
+  ])
+
+  services.forEach((service: any) => {
+    if (service.value == 'penalty delivery') {
+      service.expenses = penaltyAggregate[0].summ
+      service.quantity = penaltyAggregate[0].count
+    }
+  })
 
   return { data: format.data, labels: format.labels, services, pieGraphData }
 })
