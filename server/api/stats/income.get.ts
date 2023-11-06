@@ -3,6 +3,7 @@ import { getServerSession } from '#auth'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { PartnerWithdraw } from '~/server/lib/models/PartnerWithdraw'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -12,6 +13,13 @@ export default eventHandler(async (event) => {
   const user = await AdminUser.findOne({ uuid: session.uuid })
   if (!user || !user.tabs.includes('аналитика'))
     return sendRedirect(event, '/auth', 302)
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    actionId: 51,
+    actionDescription: `Получена статистика за ${period}`,
+    date: new Date(),
+  })
 
   const currentDate = new Date() // Текущая дата
   let filter: any = {} // Начинаем с пустого фильтраD
@@ -482,9 +490,12 @@ export default eventHandler(async (event) => {
   const activeUsersAggregate = await paymenthistory.aggregate([
     {
       $match: {
-        dataoperation: {
-          $gte: oneWeekAgoForAggregate,
-        },
+        dataoperation:
+          period == 'yesterday' || period == 'today' || period == 'threeDays'
+            ? filter.dataoperation
+            : {
+                $gte: oneWeekAgoForAggregate,
+              },
         type: {
           $in: types,
         },
@@ -507,6 +518,7 @@ export default eventHandler(async (event) => {
     {
       $match: {
         type: 'deposit',
+        dataoperation: filter.dataoperation,
       },
     },
     {
@@ -522,22 +534,36 @@ export default eventHandler(async (event) => {
       },
     },
   ])
-  const activeUsers = activeUsersAggregate[0].count
-    ? activeUsersAggregate[0].count
-    : 0
-  const paidUsers = paidUsersAggregate[0].count
-  const inActiveUsers = usersCount - activeUsers
+  let activeUsers = 0
+  let paidUsers = 0
+  if (activeUsersAggregate && activeUsersAggregate.length > 0) {
+    activeUsers = activeUsersAggregate[0].count
+      ? activeUsersAggregate[0].count
+      : 0
+  }
+  if (paidUsersAggregate && paidUsersAggregate.length > 0) {
+    paidUsers = paidUsersAggregate[0].count
+  }
+  const inActiveUsers = usersCount - activeUsers - 1
+  const signedUp = await User.countDocuments({ registrationDate: filter.dataoperation })
+
 
   const pieGraphData = {
     data: [inActiveUsers, paidUsers, activeUsers],
-    labels: ['Неактивные', 'Пополняли', 'Активные последнюю неделю'],
-    allUsers: usersCount,
+    labels: [
+      'Неактивные',
+      'Пополняли',
+      `${
+        period == 'yesterday' || period == 'today' || period == 'threeDays'
+          ? 'Активные'
+          : 'Активные последнюю неделю'
+      }`,
+    ],
+  signedUp,
   }
 
   services[3].quantity = Math.floor(Number(services[3].expenses) / 5)
   services[4].quantity = Math.floor(Number(services[4].expenses) / 5)
-
-  console.log(penaltyAggregate)
 
   return { data: format.data, labels: format.labels, services, pieGraphData }
 })

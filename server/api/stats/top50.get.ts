@@ -14,7 +14,8 @@ export default eventHandler(async (event) => {
 
   const { searchValue }: any = getQuery(event)
 
-  const top50Buyouts = await Buyout.aggregate([
+  let top50Buyouts: any[] = []
+  top50Buyouts = await Buyout.aggregate([
     {
       $group: {
         _id: '$article',
@@ -29,7 +30,8 @@ export default eventHandler(async (event) => {
     },
   ])
 
-  const top50Articles = await Buyout.aggregate([
+  let top50Articles: any[] = []
+  top50Articles = await Buyout.aggregate([
     {
       $group: {
         _id: '$article',
@@ -44,7 +46,8 @@ export default eventHandler(async (event) => {
     },
   ])
 
-  const top50pvz = await Buyout.aggregate([
+  let top50pvz: any[] = []
+  top50pvz = await Buyout.aggregate([
     {
       $group: {
         _id: '$point',

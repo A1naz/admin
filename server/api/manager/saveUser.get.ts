@@ -3,6 +3,7 @@ import { User } from '~/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { v4 as unicalUuid } from 'uuid'
 import bcrypt from 'bcrypt'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
 
 const usersPerPage = 25
 export default eventHandler(async (event) => {
@@ -58,6 +59,16 @@ export default eventHandler(async (event) => {
             firstName: userToEdit.firstName,
             lastName: userToEdit.lastName,
           })
+
+          await ActionHistory.create({
+            adminUser: userAdmin._id,
+            actionId: 13,
+            actionDescription: `Админ ${userToEdit.uuid} - ${userToEdit.username} создан`,
+            date: new Date(),
+            userUuid: userToEdit.uuid,
+          })
+
+          
         } else if (adminUserToEdit) {
           adminUserToEdit.username = body.username
             ? body.username
@@ -75,11 +86,26 @@ export default eventHandler(async (event) => {
         const adminToRemove = await AdminUser.findOne({ uuid: uuid })
         if (adminToRemove) {
           await adminToRemove.deleteOne()
+          await ActionHistory.create({
+            adminUser: userAdmin._id,
+            actionId: 15,
+            actionDescription: `Админ ${adminToRemove.uuid} - ${adminToRemove.username} удален`,
+            date: new Date(),
+          })
         }
       }
     }
 
     await userToEdit.save()
+
+    await ActionHistory.create({
+      adminUser: userAdmin._id,
+      actionId: 11,
+      actionDescription: `Пользователь ${userToEdit.uuid} - ${userToEdit.username} изменен`,
+      date: new Date(),
+      userUuid: userToEdit.uuid,
+    })
+
   } else {
     let newUuid = unicalUuid()
     const hash = bcrypt.hashSync(body.password, 7)
@@ -106,6 +132,14 @@ export default eventHandler(async (event) => {
         lastName: body.lastName,
       })
 
+      await ActionHistory.create({
+        adminUser: userAdmin._id,
+        actionId: 12,
+        actionDescription: `Пользователь ${newUser.uuid} - ${newUser.username} создан`,
+        date: new Date(),
+        userUuid: newUser.uuid,
+      })
+
       if (body.roles.includes('manager') || body.roles.includes('accountant')) {
         await AdminUser.create({
           uuid: newUser.uuid,
@@ -118,6 +152,15 @@ export default eventHandler(async (event) => {
           firstName: newUser.firstName,
           lastName: newUser.lastName,
         })
+
+        await ActionHistory.create({
+          adminUser: userAdmin._id,
+          actionId: 13,
+          actionDescription: `Админ ${newUser.uuid} - ${newUser.username} создан`,
+          userUuid: newUser.uuid,
+          date: new Date(),
+        })
+
       }
     }
   }

@@ -155,6 +155,6 @@ export default eventHandler(async (event) => {
   return {
     stats: format,
     statsCount,
-    productsCountInfo
+    productsCountInfo,
   }
 })

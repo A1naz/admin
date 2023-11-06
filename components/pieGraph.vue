@@ -55,13 +55,13 @@ const chartPieOptions = {
           total: {
             show: true,
             showAlways: true,
-            label: 'Всего',
-            fontSize: '22px',
+            label: 'Зарегестрировалось',
+            fontSize: '14px',
             fontFamily: 'Poppins, sans-serif',
             fontWeight: 600,
             color: colorMode.value == 'light' ? '#272935' : '#f8f8f2',
             formatter: function (w: any) {
-              return info.allUsers
+              return info.signedUp
             },
           },
         },
@@ -92,6 +92,9 @@ const chartPieOptions = {
       colors: colorMode.value == 'light' ? '#272935' : '#f8f8f2',
       useSeriesColors: false,
     },
+    formatter: function (seriesName: any, opts: any) {
+      return [seriesName, " ", opts.w.globals.series[opts.seriesIndex]]
+    }
   },
   responsive: [
     {

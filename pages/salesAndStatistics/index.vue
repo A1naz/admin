@@ -226,7 +226,7 @@ if (
 
       <select
         class="select select-bordered w-50 ml-3"
-        @change="getStats"
+        @change="[(curPage = 1), getStats()]"
         v-model="type"
       >
         <option selected value="any">все типы операции</option>
@@ -235,7 +235,7 @@ if (
       </select>
       <select
         class="select select-bordered w-50 ml-3"
-        @change="getStats"
+        @change=";[(curPage = 1), getStats()]"
         v-model="service"
       >
         <option selected value="any">все услуги</option>
@@ -284,7 +284,12 @@ if (
           }}
         </button>
       </DateRangePicker>
-      <button class="btn btn-primary ml-3" @click="getStats">Применить</button>
+      <button
+        class="btn btn-primary ml-3"
+        @click=";[(curPage = 1), getStats()]"
+      >
+        Применить
+      </button>
     </div>
     <div>
       <button class="btn btn-sm btn-primary mr-3" @click="exportXLS">
@@ -398,7 +403,7 @@ if (
     class="mt-4 mr-6 mb-10 items-end flex justify-between"
     v-if="service == 'buyouts'"
   >
-  <div></div>
+    <div></div>
     <div>
       <div class="flex">
         Выкуплено товаров:
