@@ -518,7 +518,7 @@ if (
           class="btn btn-primary mt-3 px-10"
           @click="createTransactionRequest"
         >
-          Создать запрос
+          Отправить на проверку
         </button>
       </div>
     </div>
