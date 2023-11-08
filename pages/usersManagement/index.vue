@@ -18,6 +18,7 @@ const items = ref<any>([
   { label: 'Item 3', value: 'Item 3' },
 ])
 const query = ref('')
+const serviceId = ref('')
 const users = ref<any>([])
 const inputLoading = ref(false)
 const curPage = ref(1)
@@ -170,6 +171,7 @@ async function getInfo() {
       item: tabOption.value,
       status: statusOption.value,
       userId: selectedUser.value._id,
+      serviceId: serviceId.value,
     },
   })
   if (data.value) {
@@ -199,6 +201,10 @@ function openUsersSelectModal() {
   selectUserClose.value?.click()
 }
 
+async function onInputService(event: Event) {
+  findSearchQueryDebouncedService()
+}
+
 async function onInput(event: Event) {
   findSearchQueryDebounced()
 }
@@ -223,7 +229,17 @@ const findSearchQuery = async () => {
   inputLoading.value = false
 }
 
+const findSearchQueryService = async () => {
+  if (query.value.replaceAll(' ', '') == '') {
+    return
+  }
+  inputLoading.value = true
+  await getInfo()
+  inputLoading.value = false
+}
+
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
+const findSearchQueryDebouncedService = useDebounceFn(findSearchQueryService, 1000)
 async function selectUser(user: any) {
   selectedUser.value = user
   getInfo()
@@ -319,6 +335,23 @@ if (
         <option value="Приход">приход</option>
         <option value="Расход">расход</option>
       </select> -->
+      <div
+        v-if="tabOption == 'buyouts' ||  tabOption == 'deliveries'"
+      >
+        <label
+          ><input
+            v-model="serviceId"
+            type="text"
+            placeholder="_id услуги"
+            class="input input-bordered input-l ml-4"
+            @input="onInputService($event)"
+          />
+        </label>
+        <span
+          v-if="inputLoading"
+          class="loading loading-spinner text-primary loading-large ml-4"
+        />
+      </div>
       <select
         class="select select-bordered w-50 ml-3"
         @change="changeTabs"

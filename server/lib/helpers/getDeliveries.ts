@@ -4,12 +4,20 @@ import { User } from '../models/User'
 export default async function getDeliveries(
   userId: string,
   status: string,
-  page: any
+  page: any,
+  serviceId: any
 ) {
   const statusObj = status == 'any' ? {} : { status: status }
 
+  let serviceIdFilter: any = {}
+  if (serviceId) {
+    const trueServiceId = serviceId.replaceAll('#', '')
+    serviceIdFilter = {
+      uuidbuyout: trueServiceId
+    }
+  }
   const user = await User.findById(userId)
-  const deliveries: any = await Delivery.find({ user, ...statusObj })
+  const deliveries: any = await Delivery.find({ user, ...statusObj, ...serviceIdFilter })
     .sort({ createdAt: -1 })
     .skip((page - 1) * 50)
     .limit(50)

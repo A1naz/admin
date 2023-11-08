@@ -296,11 +296,11 @@ if (
           </th>
           <th>
             <div class="flex max-w-lg overflow-x-auto justify-center">
-              <div v-for="img in stat.screenshots">
+              <div>
                 <img
-                  :src="img"
+                  :src="stat.img"
                   class="cursor-pointer rounded w-16 ml-1"
-                  @click="openImageModal(img)"
+                  @click="openImageModal(stat.img)"
                 />
               </div>
             </div>

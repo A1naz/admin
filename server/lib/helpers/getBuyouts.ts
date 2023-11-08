@@ -4,11 +4,21 @@ import { User } from '../models/User'
 export default async function getBuyouts(
   userId: string,
   status: string,
-  page: any
+  page: any,
+  serviceId: any
 ) {
+
+  let serviceIdFilter: any = {}
+  if (serviceId) {
+    const trueServiceId = serviceId.replaceAll('#', '')
+    serviceIdFilter = {
+      uuid: trueServiceId
+    }
+  }
+  
   const statusObj = status == 'any' ? {} : { status: status }
   const user = await User.findById(userId)
-  const buyouts: any = await Buyout.find({ user, ...statusObj })
+  const buyouts: any = await Buyout.find({ user, ...statusObj, ...serviceIdFilter })
     .sort({ createdAt: -1 })
     .skip((page - 1) * 50)
     .limit(50)

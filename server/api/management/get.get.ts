@@ -14,7 +14,7 @@ import getReports from '~/server/lib/helpers/getReports'
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
 
-  const { userId, status, item, page }: any = getQuery(event)
+  const { userId, status, item, page, serviceId }: any = getQuery(event)
 
   if (!session) return sendRedirect(event, '/auth', 302)
   const user = await AdminUser.findOne({ uuid: session.uuid })
@@ -41,11 +41,11 @@ export default eventHandler(async (event) => {
   })
 
   if (item == 'buyouts') {
-    const { info, count } = await getBuyouts(userId, status, page)
+    const { info, count } = await getBuyouts(userId, status, page, serviceId)
     return { info, count }
   }
   if (item == 'deliveries') {
-    const { info, count } = await getDeliveries(userId, status, page)
+    const { info, count } = await getDeliveries(userId, status, page, serviceId)
     return { info, count }
   }
   if (item == 'reviews') {
