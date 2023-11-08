@@ -342,7 +342,7 @@ if (
           ><input
             v-model="serviceId"
             type="text"
-            placeholder="_id услуги"
+            placeholder="Id услуги"
             class="input input-bordered input-l ml-4"
             @input="onInputService($event)"
           />
