@@ -19,6 +19,20 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
+  const isTransactionExist = await TransactionRequest.findOne({
+    transactionNumber,
+    status: {
+        $in: ['created', 'active']
+    },
+  })
+
+  if (isTransactionExist) {
+    return {
+      status: 'error',
+      message: 'Такая транзакция уже создана',
+    }
+  }
+
   const newTransactionRequest = await TransactionRequest.create({
     adminUser: user._id,
     transaction,
@@ -36,5 +50,6 @@ export default eventHandler(async (event) => {
 
   return {
     status: 'ok',
+    message: 'Запрос успешно создан',
   }
 })

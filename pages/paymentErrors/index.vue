@@ -150,7 +150,6 @@ const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 
 getStats()
 
-
 function openFileInput() {
   screenshotInput.value?.click()
 }
@@ -175,11 +174,11 @@ async function searchTransaction() {
     })
     return
   }
-  
+
   searchTransactionLoading.value = true
   isSearchInputDisabled.value = true
   isSearchBtnDisabled.value = true
-  
+
   const { data, error }: any = await useFetch(
     '/api/paymentErrors/createSearch',
     {
@@ -188,27 +187,27 @@ async function searchTransaction() {
         transaction: transaction.value,
       },
     }
-    )
-    
-    if (data.value) {
-      const intervalId = setInterval(async () => {
-        const response = await getSearchStatus(data.value.id)
+  )
+
+  if (data.value) {
+    const intervalId = setInterval(async () => {
+      const response = await getSearchStatus(data.value.id)
       if (response === 'found' || response === 'notFound') {
         transactionStatus.value = response
-        
+
         isSearchInputDisabled.value = false
         if (response === 'notFound') {
           isSearchBtnDisabled.value = false
         }
-        
+
         searchBtnText.value = response === 'found' ? 'Найдена' : 'Поиск'
         searchTransactionLoading.value = false
         notify({
           type: response === 'found' ? 'success' : 'error',
           title:
-          response === 'found'
-          ? 'Транзакция успешно найдена'
-          : 'Транзакция не найдена',
+            response === 'found'
+              ? 'Транзакция успешно найдена'
+              : 'Транзакция не найдена',
         })
         clearInterval(intervalId)
       }
@@ -228,65 +227,66 @@ async function createTransactionRequest() {
     transaction.value.length < 5 ||
     transactionNumber.value.length < 5 ||
     client.value.length < 2
-    ) {
-      notify({
-        type: 'error',
-        title: 'Заполните все данные',
-      })
-      return
+  ) {
+    notify({
+      type: 'error',
+      title: 'Заполните все данные',
+    })
+    return
+  }
+
+  const { data, error }: any = await useFetch(
+    '/api/paymentErrors/createRequest',
+    {
+      method: 'POST',
+      body: {
+        screenshot: screenshot.value.public,
+        transaction: transaction.value,
+        transactionNumber: transactionNumber.value,
+        client: client.value,
+      },
     }
-    
-    const { data, error }: any = await useFetch(
-      '/api/paymentErrors/createRequest',
-      {
-        method: 'POST',
-        body: {
-          screenshot: screenshot.value.public,
-          transaction: transaction.value,
-          transactionNumber: transactionNumber.value,
-          client: client.value,
-        },
-      }
-      )
-      if (data.value) {
-        notify({
-          type: 'success',
-          title: 'Заявка создана',
-        })
-        
-        closeCreateModalButton.value?.click()
-        client.value = ''
-        transaction.value = ''
-        transactionNumber.value = ''
-        searchBtnText.value = 'Поиск'
-        screenshot.value = {
-          url: '',
-          public: '',
-        }
-      }
-      
-      if (error.value) {
-        notify({
-          type: 'error',
-          title: 'Что-то пошло не так',
-        })
+  )
+  if (data.value) {
+    if (data.value.status == 'ok') {
+      notify({
+        type: 'success',
+        title: data.value.message,
+      })
+
+      closeCreateModalButton.value?.click()
+      transactionStatus.value = 'notFound'
+      client.value = ''
+      transaction.value = ''
+      transactionNumber.value = ''
+      searchBtnText.value = 'Поиск'
+      screenshot.value = {
+        url: '',
+        public: '',
       }
       await getStats()
+    } else {
+      notify({
+        type: 'error',
+        title: data.value.message,
+      })
     }
-    
-    function resetStatus() {
-      transactionStatus.value = 'notFound'
-      isSearchBtnDisabled.value = false
-      searchBtnText.value = 'Поиск'
-    }
-    
-    const store = useMainStore()
-    if (
-      !store.client.mainAdmin &&
-      !store.client.tabs.includes('ошибки финаносвых операции')
-    ) {
-      navigateTo('/partner')
-    }
+  }
+}
+
+function resetStatus() {
+  transactionStatus.value = 'notFound'
+  isSearchBtnDisabled.value = false
+  searchBtnText.value = 'Поиск'
+}
+
+const store = useMainStore()
+if (
+  !store.client.mainAdmin &&
+  !store.client.tabs.includes('ошибки финаносвых операции')
+) {
+  navigateTo('/partner')
+}
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Ошибки финаносвых операции</h1>
