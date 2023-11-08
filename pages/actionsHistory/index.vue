@@ -118,6 +118,8 @@ if (
 ) {
   navigateTo('/partner')
 }
+
+await getActs()
 </script>
 <template>
   <div>

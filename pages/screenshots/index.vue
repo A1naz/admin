@@ -310,26 +310,6 @@ if (
     </table>
   </div>
 
-  <div
-    class="mt-4 mr-6 mb-10 items-end flex justify-between"
-    v-if="service == 'buyouts'"
-  >
-    <div></div>
-    <div>
-      <div class="flex">
-        Выкуплено товаров:
-        <div class="ml-2 text-primary font-bold">
-          {{ productsCountInfo.count }} шт.
-        </div>
-      </div>
-      <div class="flex">
-        На сумму:
-        <div class="ml-2 text-primary font-bold">
-          {{ currency.format(productsCountInfo.sum) }}
-        </div>
-      </div>
-    </div>
-  </div>
   <dialog id="createRequireModal" class="modal">
     <div class="modal-box">
       <h3 class="font-bold text-lg"></h3>

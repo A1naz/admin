@@ -5,7 +5,9 @@ const productsCountInfo = ref({
   count: 0,
   sum: 0,
 })
+const { upload, getPublicUrl, remove } = useS3Object()
 const isCreateButtonDisabled = ref(false)
+const searchBtnText = ref('Поиск')
 const closeCreateModalButton: any = ref(null)
 const createType = ref('deliveries')
 const sortDateType = ref('requireDate')
@@ -19,22 +21,38 @@ import { notify } from '@kyvg/vue3-notification'
 const dateSortIcon = ref('mdi-arrow-down')
 const query = ref('+7')
 const account = ref('+7')
+const client = ref('')
+const transaction = ref('')
+const transactionStatus = ref('notFound')
+const fileInput = ref()
+const url = ref('')
+const transactionNumber = ref('')
 const inputLoading = ref(false)
+const searchTransactionLoading = ref(false)
 const curPage = ref(1)
 const stats = ref<any>([])
 const pages = ref(0)
 const isPageBtnsDisabled = ref(false)
 const dateRange = ref([])
+const loadingIndex = ref(false)
+const screenshotInput: any = ref(null)
+const isSearchBtnDisabled = ref(false)
+const isSearchInputDisabled = ref(false)
+
+const screenshot = ref({
+  url: 'null',
+  public: 'null',
+})
 
 definePageMeta({
   layout: 'app',
   auth: true,
-  title: 'Запросы скриншотов',
+  title: 'Ошибки финансовых операций',
 })
 
 async function getStats() {
   stats.value = []
-  const { data }: any = await useFetch('/api/screenshots/get', {
+  const { data }: any = await useFetch('/api/paymentErrors/get', {
     method: 'GET',
     query: {
       page: curPage.value,
@@ -46,35 +64,34 @@ async function getStats() {
     },
   })
   if (data.value) {
-    stats.value = data.value.screenshots
+    stats.value = data.value.transactionRequests
   }
 }
 
-async function createRequire() {
-  isCreateButtonDisabled.value = true
-  const { data, error }: any = await useFetch('/api/screenshots/create', {
-    method: 'POST',
-    body: {
-      account: account.value,
-      typeOperation: createType.value,
-    },
+async function uploadToS3(event: Event) {
+  loadingIndex.value = true
+  const fileList = (event.target! as HTMLInputElement).files
+  const files = Array.from(fileList!)
+  if (!files) return
+  const { data, error } = await upload({
+    files,
+    url: null,
   })
-  if (data.value) {
-    notify({
-      type: 'success',
-      title: 'Заявка создана',
-    })
-    isCreateButtonDisabled.value = false
-    closeCreateModalButton.value?.click()
-  }
   if (error.value) {
     notify({
-      type: 'error',
       title: 'Что-то пошло не так',
+      text: 'Не удалось загрузить фото',
+      type: 'error',
+      duration: 3000,
     })
-    isCreateButtonDisabled.value = false
-    closeCreateModalButton.value?.click()
   }
+  if (data.value)
+    screenshot.value = {
+      url: data.value[0].url,
+      public: getPublicUrl(data.value[0].url),
+    }
+
+  loadingIndex.value = false
 }
 
 const selectedImage: any = ref('null')
@@ -88,9 +105,7 @@ function closeImageModal() {
   imageModalClose.value?.click()
 }
 
-function sortByDate(sortType: string) {
-  sortDateType.value = sortType
-
+function sortByDate() {
   if (dateSortIcon.value == 'mdi-arrow-up') {
     dateSortIcon.value = 'mdi-arrow-down'
   } else {
@@ -135,21 +150,151 @@ const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 
 getStats()
 
-const store = useMainStore()
-if (
-  !store.client.mainAdmin &&
-  !store.client.tabs.includes('запросы скриншотов')
-) {
-  navigateTo('/partner')
+
+function openFileInput() {
+  screenshotInput.value?.click()
 }
+
+async function getSearchStatus(id: any) {
+  const { data, error }: any = await useFetch('/api/paymentErrors/getStatus', {
+    method: 'GET',
+    params: {
+      id: id,
+    },
+  })
+  if (data.value) {
+    return data.value.status
+  }
+}
+
+async function searchTransaction() {
+  if (transaction.value.length < 5) {
+    notify({
+      type: 'error',
+      title: 'Введите дату и время транзакции',
+    })
+    return
+  }
+  
+  searchTransactionLoading.value = true
+  isSearchInputDisabled.value = true
+  isSearchBtnDisabled.value = true
+  
+  const { data, error }: any = await useFetch(
+    '/api/paymentErrors/createSearch',
+    {
+      method: 'POST',
+      body: {
+        transaction: transaction.value,
+      },
+    }
+    )
+    
+    if (data.value) {
+      const intervalId = setInterval(async () => {
+        const response = await getSearchStatus(data.value.id)
+      if (response === 'found' || response === 'notFound') {
+        transactionStatus.value = response
+        
+        isSearchInputDisabled.value = false
+        if (response === 'notFound') {
+          isSearchBtnDisabled.value = false
+        }
+        
+        searchBtnText.value = response === 'found' ? 'Найдена' : 'Поиск'
+        searchTransactionLoading.value = false
+        notify({
+          type: response === 'found' ? 'success' : 'error',
+          title:
+          response === 'found'
+          ? 'Транзакция успешно найдена'
+          : 'Транзакция не найдена',
+        })
+        clearInterval(intervalId)
+      }
+    }, 3000)
+  }
+}
+
+async function createTransactionRequest() {
+  if (screenshot.value.public === 'null') {
+    notify({
+      type: 'error',
+      title: 'Нужно загрузить скриншот',
+    })
+    return
+  }
+  if (
+    transaction.value.length < 5 ||
+    transactionNumber.value.length < 5 ||
+    client.value.length < 2
+    ) {
+      notify({
+        type: 'error',
+        title: 'Заполните все данные',
+      })
+      return
+    }
+    
+    const { data, error }: any = await useFetch(
+      '/api/paymentErrors/createRequest',
+      {
+        method: 'POST',
+        body: {
+          screenshot: screenshot.value.public,
+          transaction: transaction.value,
+          transactionNumber: transactionNumber.value,
+          client: client.value,
+        },
+      }
+      )
+      if (data.value) {
+        notify({
+          type: 'success',
+          title: 'Заявка создана',
+        })
+        
+        closeCreateModalButton.value?.click()
+        client.value = ''
+        transaction.value = ''
+        transactionNumber.value = ''
+        searchBtnText.value = 'Поиск'
+        screenshot.value = {
+          url: '',
+          public: '',
+        }
+      }
+      
+      if (error.value) {
+        notify({
+          type: 'error',
+          title: 'Что-то пошло не так',
+        })
+      }
+      await getStats()
+    }
+    
+    function resetStatus() {
+      transactionStatus.value = 'notFound'
+      isSearchBtnDisabled.value = false
+      searchBtnText.value = 'Поиск'
+    }
+    
+    const store = useMainStore()
+    if (
+      !store.client.mainAdmin &&
+      !store.client.tabs.includes('ошибки финаносвых операции')
+    ) {
+      navigateTo('/partner')
+    }
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Запросы скриншотов</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">Ошибки финаносвых операции</h1>
   <div class="card p-fluid"></div>
   <div class="text-sm breadcrumbs ml-5">
     <ul>
       <li>
-        <NuxtLink to="/screenshots">Запросы скриншотов</NuxtLink>
+        <NuxtLink to="/paymentErrors">Ошибки финансовых операции</NuxtLink>
       </li>
       <!-- <li>
                     <NuxtLink to="/partner/management">Управление партнерами</NuxtLink>
@@ -159,7 +304,7 @@ if (
   <div class="divider"></div>
   <div class="flex justify-between">
     <div class="flex">
-      <div>
+      <!-- <div>
         <label
           ><input
             v-model="query"
@@ -173,16 +318,8 @@ if (
           v-if="inputLoading"
           class="loading loading-spinner text-primary loading-large ml-4"
         />
-      </div>
+      </div> -->
 
-      <select
-        class="select select-bordered w-50 ml-3"
-        @change=";[(curPage = 1), getStats()]"
-        v-model="type"
-      >
-        <option selected value="any">все типы операции</option>
-        <option value="deliveries">Доставки</option>
-      </select>
       <DateRangePicker
         class="w-46"
         v-model="dateRange"
@@ -210,7 +347,6 @@ if (
       <button
         class="btn btn-primary mr-3"
         onclick="createRequireModal.showModal()"
-        :disable="isCreateButtonDisabled"
       >
         Создать запрос
       </button>
@@ -242,65 +378,42 @@ if (
       <!-- head -->
       <thead>
         <tr>
-          <th>Тип операции</th>
+          <th>менеджер</th>
+          <th>клиент</th>
+          <th>сумма</th>
           <th>
-            <div
-              @click="sortByDate('requireDate')"
-              class="flex cursor-pointer"
-              style="width: 100px"
-            >
-              Дата запроса
+            <div @click="sortByDate()" class="flex cursor-pointer">
+              Дата
               <Icon
-                v-if="sortDateType == 'requireDate'"
                 class="swap-on fill-current ml-1 w-6 h-5"
                 :name="dateSortIcon"
               />
             </div>
           </th>
-          <th>
-            <div
-              @click="sortByDate('responseDate')"
-              class="flex cursor-pointer"
-              style="width: 100px"
-            >
-              Дата ответа
-              <Icon
-                v-if="sortDateType == 'responseDate'"
-                class="swap-on fill-current ml-1 w-6 h-5"
-                :name="dateSortIcon"
-              />
-            </div>
-          </th>
-          <th>Аккаунт</th>
-          <th>Статус</th>
-          <th class="text-center">Скриншоты</th>
+          <th>номер операции из чека</th>
+          <th>подтверждение</th>
+          <th>статус заявки</th>
+          <th class="text-center">скриншот</th>
         </tr>
       </thead>
       <tbody>
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover">
-          <th class="overflow-x-auto text-xs">
-            {{ stat.typeOperation }}
-          </th>
-          <th class="overflow-x-auto text-xs">
-            {{ stat.requireDate.slice(0, 10) }}
-          </th>
-          <th class="overflow-x-auto text-xs">
-            {{ stat.responseDate ? stat.responseDate.slice(0, 10) : '' }}
-          </th>
-          <th class="overflow-x-auto text-xs">
-            {{ stat.account }}
-          </th>
-          <th>
-            {{ stat.status == 'created' ? 'создан' : stat.status == 'rejected' ? 'нет доступа к аккаунту' : 'получен' }} 
-          </th>
+          <th>{{ stat.adminUser }}</th>
+          <th>{{ stat.client }}</th>
+          <th>{{ stat.sum }}</th>
+          <th>{{ stat.requestDate }}</th>
+          <th>{{ stat.transactionNumber }}</th>
+          <th>{{ stat.acception }}</th>
+          <th>{{ stat.status }}</th>
+
           <th>
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>
                 <img
-                  :src="stat.img"
+                  :src="stat.screenshot"
                   class="cursor-pointer rounded w-16 ml-1"
-                  @click="openImageModal(stat.img)"
+                  @click="openImageModal(stat.screenshot)"
                 />
               </div>
             </div>
@@ -310,42 +423,101 @@ if (
     </table>
   </div>
 
-  <div
-    class="mt-4 mr-6 mb-10 items-end flex justify-between"
-    v-if="service == 'buyouts'"
-  >
-    <div></div>
-    <div>
-      <div class="flex">
-        Выкуплено товаров:
-        <div class="ml-2 text-primary font-bold">
-          {{ productsCountInfo.count }} шт.
-        </div>
-      </div>
-      <div class="flex">
-        На сумму:
-        <div class="ml-2 text-primary font-bold">
-          {{ currency.format(productsCountInfo.sum) }}
-        </div>
-      </div>
-    </div>
-  </div>
   <dialog id="createRequireModal" class="modal">
-    <div class="modal-box">
+    <div class="modal-box w-6/12 max-w-xl">
       <h3 class="font-bold text-lg"></h3>
       <div class="flex flex-col">
-        <select class="select select-bordered w-50 my-2" v-model="createType">
-          <option value="deliveries">Доставки</option>
-        </select>
         <input
-          v-model="account"
+          v-model="client"
           type="text"
-          placeholder="Номер телефона"
-          class="input input-bordered input-l"
+          placeholder="Укажите клиента"
+          class="input input-bordered input-l mb-2"
         />
+
+        <div class="flex">
+          <label class="w-full">
+            <input
+              v-model="transaction"
+              @input="resetStatus"
+              type="text"
+              placeholder="Сумма, дата и время транзакции (точно как в чеке)"
+              class="input w-full input-bordered input-l mb-1"
+              :disabled="isSearchInputDisabled"
+            />
+          </label>
+          <button
+            :disabled="isSearchBtnDisabled"
+            class="btn btn-primary ml-1"
+            @click="searchTransaction"
+          >
+            {{ searchBtnText }}
+          </button>
+          <span
+            v-if="searchTransactionLoading"
+            class="loading loading-spinner"
+          ></span>
+        </div>
       </div>
+
+      <div v-if="transactionStatus == 'found'">
+        <input
+          v-model="transactionNumber"
+          type="text"
+          placeholder="Укажите номер операции (точно как в чеке)"
+          class="input input-bordered input-l mb-2 w-full"
+        />
+        <div class="text-center font-bold mt-1 mb-3">
+          Приложите скриншот чека операции клиента
+        </div>
+        <div class="flex justify-center" style="min-height: 200px">
+          <div
+            @click="openFileInput"
+            :class="`cursor-pointer flex justify-center border-neutral ${
+              screenshot.public === 'null' ? 'border-2' : ''
+            } rounded-lg`"
+            style="width: 200px; height: 300px"
+          >
+            <nuxt-img
+              v-if="screenshot.public !== 'null'"
+              class="max-w-lg rounded-lg my-2 px-1"
+              style="display: block; max-height: 300px"
+              :src="screenshot.public"
+            />
+            <span
+              v-if="loadingIndex && screenshot.public === 'null'"
+              class="loading loading-spinner text-primary absolute mt-32"
+            />
+            <IconCSS
+              style="max-height: 300px"
+              v-show="screenshot.public === 'null'"
+              class="mt-28"
+              :name="
+                loadingIndex == true
+                  ? ''
+                  : 'material-symbols:add-photo-alternate-outline'
+              "
+              size="70"
+            />
+          </div>
+        </div>
+        <ClientOnly>
+          <div>
+            <input
+              type="file"
+              accept="image/png, image/gif, image/jpeg"
+              ref="screenshotInput"
+              class="hidden"
+              @change="(e: Event) => uploadToS3(e)"
+            />
+          </div>
+        </ClientOnly>
+      </div>
+
       <div class="flex justify-center">
-        <button class="btn btn-primary mt-3 px-10" @click="createRequire">
+        <button
+          class="btn btn-primary mt-3 px-10"
+          @click="createTransactionRequest"
+        >
           Создать запрос
         </button>
       </div>
