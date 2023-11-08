@@ -62,12 +62,12 @@ export default eventHandler(async (event) => {
     .limit(elPerPage)
     .skip((page - 1) * elPerPage)
 
-    // await ActionHistory.create({
-    //   adminUser: user._id,
-    //   actionId: 61,
-    //   actionDescription: `Получение скриншотов`,
-    //   date: new Date(),
-    // })
+    await ActionHistory.create({
+      adminUser: user._id,
+      actionId: 61,
+      actionDescription: `Получение скриншотов`,
+      date: new Date(),
+    })
 
   return {
     screenshots: format,
