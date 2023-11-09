@@ -20,8 +20,11 @@ const createClose: any = ref(null)
 import { notify } from '@kyvg/vue3-notification'
 const dateSortIcon = ref('mdi-arrow-down')
 const query = ref('+7')
+const userQuery = ref('')
 const account = ref('+7')
-const client = ref('')
+const client: any = ref({
+  username: '',
+})
 const transaction = ref('')
 const transactionStatus = ref('notFound')
 const fileInput = ref()
@@ -38,6 +41,10 @@ const loadingIndex = ref(false)
 const screenshotInput: any = ref(null)
 const isSearchBtnDisabled = ref(false)
 const isSearchInputDisabled = ref(false)
+const selectUserClose: any = ref(null)
+const now = new Date()
+const date = ref(now)
+const users = ref<any>([])
 
 const screenshot = ref({
   url: 'null',
@@ -133,6 +140,18 @@ function openCreateModal() {
   createClose.value?.click()
 }
 
+async function getUsers(searchValue: string = '') {
+  const { data }: any = await useFetch('/api/user/getUsers', {
+    method: 'GET',
+    params: {
+      page: 1,
+      searchValue,
+    },
+  })
+
+  users.value = data.value.users
+}
+
 async function onInput(event: Event) {
   findSearchQueryDebounced()
 }
@@ -142,7 +161,7 @@ const findSearchQuery = async () => {
     return
   }
   inputLoading.value = true
-  await getStats()
+  await getUsers(userQuery.value)
   inputLoading.value = false
 }
 
@@ -167,10 +186,18 @@ async function getSearchStatus(id: any) {
 }
 
 async function searchTransaction() {
-  if (transaction.value.length < 5) {
+  if (transaction.value.length < 1) {
     notify({
       type: 'error',
       title: 'Введите дату и время транзакции',
+    })
+    return
+  }
+
+  if (client.value.username.length < 2) {
+    notify({
+      type: 'error',
+      title: 'Выберите клиента',
     })
     return
   }
@@ -184,7 +211,9 @@ async function searchTransaction() {
     {
       method: 'POST',
       body: {
+        client: client.value._id,
         transaction: transaction.value,
+        date: date.value,
       },
     }
   )
@@ -224,9 +253,9 @@ async function createTransactionRequest() {
     return
   }
   if (
-    transaction.value.length < 5 ||
+    transaction.value.length < 1 ||
     transactionNumber.value.length < 5 ||
-    client.value.length < 2
+    client.value.username.length < 2
   ) {
     notify({
       type: 'error',
@@ -243,7 +272,8 @@ async function createTransactionRequest() {
         screenshot: screenshot.value.public,
         transaction: transaction.value,
         transactionNumber: transactionNumber.value,
-        client: client.value,
+        client: client.value._id,
+        date: date.value,
       },
     }
   )
@@ -256,7 +286,7 @@ async function createTransactionRequest() {
 
       closeCreateModalButton.value?.click()
       transactionStatus.value = 'notFound'
-      client.value = ''
+      client.value = { username: '' }
       transaction.value = ''
       transactionNumber.value = ''
       searchBtnText.value = 'Поиск'
@@ -272,6 +302,13 @@ async function createTransactionRequest() {
       })
     }
   }
+
+  if (error.value) {
+    notify({
+      type: 'error',
+      title: error.value.data.message,
+    })
+  }
 }
 
 function resetStatus() {
@@ -286,6 +323,15 @@ if (
   !store.client.tabs.includes('ошибки финаносвых операции')
 ) {
   navigateTo('/partner')
+}
+
+function openUsersSelectModal() {
+  selectUserClose.value?.click()
+}
+
+function selectUser(user: any) {
+  client.value = user
+  selectUserClose.value?.click()
 }
 </script>
 <template>
@@ -344,12 +390,9 @@ if (
       </button>
     </div>
     <div>
-      <button
-        class="btn btn-primary mr-3"
-        onclick="createRequireModal.showModal()"
-      >
+      <label class="btn btn-primary mr-3" for="createRequireModal">
         Создать запрос
-      </button>
+      </label>
 
       <div class="join mr-2">
         <button
@@ -383,13 +426,14 @@ if (
           <th>сумма</th>
           <th>
             <div @click="sortByDate()" class="flex cursor-pointer">
-              Дата
+              Дата и время создания
               <Icon
                 class="swap-on fill-current ml-1 w-6 h-5"
                 :name="dateSortIcon"
               />
             </div>
           </th>
+          <th>Дата и время из чека</th>
           <th>номер операции из чека</th>
           <th>подтверждение</th>
           <th>статус заявки</th>
@@ -399,10 +443,11 @@ if (
       <tbody>
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover">
-          <th>{{ stat.adminUser }}</th>
-          <th>{{ stat.client }}</th>
+          <th class="text-xs overflow-x-auto" style="max-width: 150px;">{{ stat.adminUserUuid }}</th>
+          <th class="text-xs overflow-x-auto" style="max-width: 150px;">{{ stat.clientUuid }}</th>
           <th>{{ stat.sum }}</th>
-          <th>{{ stat.requestDate }}</th>
+          <th>{{ defaultDate(stat.transactionDate) }}</th>
+          <th>{{ defaultDate(stat.requestDate) }}</th>
           <th>{{ stat.transactionNumber }}</th>
           <th>{{ stat.acception }}</th>
           <th>{{ stat.status }}</th>
@@ -423,16 +468,34 @@ if (
     </table>
   </div>
 
-  <dialog id="createRequireModal" class="modal">
-    <div class="modal-box w-6/12 max-w-xl">
+  <input type="checkbox" id="createRequireModal" class="modal-toggle" />
+  <div id="createRequireModal" class="modal">
+    <div class="modal-box">
       <h3 class="font-bold text-lg"></h3>
       <div class="flex flex-col">
-        <input
+        <!-- <input
           v-model="client"
           type="text"
           placeholder="Укажите клиента"
           class="input input-bordered input-l mb-2"
-        />
+        /> -->
+        <button class="btn max-w-xl my-1 w-xl" @click="openUsersSelectModal">
+          {{ client.username == '' ? 'Выбрать клиента' : client.username }}
+        </button>
+        <div>
+          <div class="relative w-full p-2 mb-2 input input-bordered rounded-lg">
+            <div class="absolute left-3 bottom-3">
+              {{
+                date === now
+                  ? 'Установите дату и время (как в чеке)'
+                  : defaultDate(date)
+              }}
+            </div>
+            <div class="right-2" style="z-index: 9999">
+              <DatePicker :min-date="null" v-model="date" />
+            </div>
+          </div>
+        </div>
 
         <div class="flex">
           <label class="w-full">
@@ -440,11 +503,12 @@ if (
               v-model="transaction"
               @input="resetStatus"
               type="text"
-              placeholder="Сумма, дата и время транзакции (точно как в чеке)"
+              placeholder="Сумма транзакции (точно как в чеке)"
               class="input w-full input-bordered input-l mb-1"
               :disabled="isSearchInputDisabled"
             />
           </label>
+
           <button
             :disabled="isSearchBtnDisabled"
             class="btn btn-primary ml-1"
@@ -452,6 +516,7 @@ if (
           >
             {{ searchBtnText }}
           </button>
+
           <span
             v-if="searchTransactionLoading"
             class="loading loading-spinner"
@@ -523,9 +588,9 @@ if (
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-      <button ref="closeCreateModalButton">close</button>
+      <label for="createRequireModal" ref="closeCreateModalButton">close</label>
     </form>
-  </dialog>
+  </div>
 
   <input type="checkbox" id="imageModal" class="modal-toggle" />
   <div class="modal cursor-pointer" @click="closeImageModal">
@@ -544,6 +609,84 @@ if (
       </div>
     </div>
   </div>
+
+  <input type="checkbox" id="selectUser" class="modal-toggle" />
+  <div class="modal cursor-pointer" @click="openUsersSelectModal">
+    <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
+      <form method="dialog">
+        <label
+          for="selectUser"
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          ref="selectUserClose"
+        >
+          ✕
+        </label>
+      </form>
+
+      <div>
+        <div class="justify-between flex">
+          <div>
+            <label
+              ><input
+                v-model="userQuery"
+                type="text"
+                placeholder="Введите id или username или email"
+                class="input input-bordered input-l ml-4 w-80"
+                @input="onInput($event)"
+              />
+            </label>
+            <span
+              v-if="inputLoading"
+              class="loading loading-spinner text-primary loading-large ml-4"
+            />
+          </div>
+        </div>
+
+        <div
+          class="my-2 mx-2 overflow-y-auto"
+          :style="{ 'max-height': 500 + 'px' }"
+        >
+          <table class="table my-3">
+            <!-- head -->
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>username</th>
+                <th>email</th>
+                <th>Выбрать</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="hover" v-for="user in users" :key="user.uuid">
+                <td style="max-width: 130px">{{ user.uuid }}</td>
+                <td style="max-width: 150px">
+                  <div class="mx-1 overflow-x-auto">
+                    {{ user.username }}
+                  </div>
+                </td>
+                <td style="max-width: 150px" class="overflow-x-auto">
+                  <div class="mx-1 overflow-x-auto">
+                    {{ user.email }}
+                  </div>
+                </td>
+                <td style="max-width: 20px">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    @click="selectUser(user)"
+                  >
+                    Выбрать
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="modal-action"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Put this part before </body> tag -->
 </template>
 <style scoped>

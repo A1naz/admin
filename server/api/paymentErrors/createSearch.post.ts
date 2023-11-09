@@ -3,10 +3,11 @@ import { AdminUser } from '~/server/lib/models/AdminUser'
 import { ScreenshotsRequire } from '~/server/lib/models/ScreenshotsRequire'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { TransactionSearch } from '~/server/lib/models/TransactionSearch'
+import { User } from '~/server/lib/models/User'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { transaction } = await readBody(event)
+  const { transaction, date, client } = await readBody(event)
 
   if (!session) return sendRedirect(event, '/auth', 302)
 
@@ -17,9 +18,22 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
-  const newTransaction = await TransactionSearch.create({
+  const userForReq = await User.findById(client)
+
+  if (!userForReq) {
+    return {
+      status: 'error',
+      message: 'Пользователь не найден',
+    }
+  }
+
+  console.log(date);
+  
+  const newTransactionSearch = await TransactionSearch.create({
     adminUser: user._id,
+    client: userForReq._id,
     transaction: transaction,
+    transactionDate: new Date(date),
   })
 
   await ActionHistory.create({
@@ -31,6 +45,6 @@ export default eventHandler(async (event) => {
 
   return {
     status: 'ok',
-    id: newTransaction._id,
+    id: newTransactionSearch._id,
   }
 })

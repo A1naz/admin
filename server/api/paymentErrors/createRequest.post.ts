@@ -3,10 +3,11 @@ import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { ScreenshotsRequire } from '~/server/lib/models/ScreenshotsRequire'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
+import { User } from '~/server/lib/models/User'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { transaction, transactionNumber, client, screenshot } = await readBody(
+  const { transaction, transactionNumber, client, screenshot, date } = await readBody(
     event
   )
 
@@ -33,12 +34,24 @@ export default eventHandler(async (event) => {
     }
   }
 
+  const userForReq = await User.findById(client)
+
+  if (!userForReq) {
+    return {
+      status: 'error',
+      message: 'Пользователь не найден',
+    }
+  }
+
   const newTransactionRequest = await TransactionRequest.create({
     adminUser: user._id,
+    client: userForReq._id,
+    adminUserUuid: user.uuid,
+    clientUuid: userForReq.uuid,
     transaction,
     transactionNumber,
-    client,
     screenshot,
+    transactionDate: new Date(date),
   })
 
   await ActionHistory.create({
