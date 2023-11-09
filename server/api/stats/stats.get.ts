@@ -101,7 +101,7 @@ export default eventHandler(async (event) => {
     })
   }
 
-  if (trueFilters.type == 'buyouts') {
+  if (trueFilters.type == 'buyouts' || trueFilters.type == 'any') {
     let buyoutsUuids: string[] = []
 
     const paymentAggregate = await paymenthistory.aggregate([
@@ -110,7 +110,7 @@ export default eventHandler(async (event) => {
           ...trueFilters.basisoperation,
           ...userIds,
           ...trueTypeoperations,
-          type: 'buyouts',
+          type: {$in : ['buyouts', 'buyouts service']},
           ...trueDateRange,
         },
       },
@@ -131,17 +131,26 @@ export default eventHandler(async (event) => {
     }
 
     for (const buyout of format) {
-      buyoutsUuids.push(buyout.basisoperation.split(' ')[1].replace('#', ''))
+      if (
+        (buyout.type == 'buyouts' || buyout.type == 'buyouts service') &&
+        buyout.basisoperation &&
+        buyout.basisoperation.includes('Выкуп #')
+      ) {
+        buyoutsUuids.push(buyout.basisoperation.split(' ')[1].replace('#', ''))
+      }
     }
 
     const buyouts = await Buyout.find({ uuid: { $in: buyoutsUuids } })
+
     format.forEach((stat: any) => {
-      const buyout = buyouts.find(
-        (buyout: any) =>
-          buyout.uuid == stat.basisoperation.split(' ')[1].replace('#', '')
-      )
-      stat.article = buyout ? buyout.article : ''
-      stat.productName = buyout ? buyout.product.name : ''
+      if (stat.type == 'buyouts' || stat.type == 'buyouts service') {
+        const buyout = buyouts.find(
+          (buyout: any) =>
+            buyout.uuid == stat.basisoperation.split(' ')[1].replace('#', '')
+        )
+        stat.article = buyout ? buyout.article : ''
+        stat.productName = buyout ? buyout.product.name : ''
+      }
     })
   }
 
@@ -150,6 +159,15 @@ export default eventHandler(async (event) => {
     actionId: 31,
     actionDescription: `Получение статистики`,
     date: new Date(),
+  })
+
+  const trueFormat = format.map((el: any) => {
+    if (el.type == 'buyouts' || el.type == 'buyouts service') {
+      return el
+    } else {
+      el.article = ''
+      return el
+    }
   })
 
   return {

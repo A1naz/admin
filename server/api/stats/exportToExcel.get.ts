@@ -4,6 +4,7 @@ import { getServerSession } from '#auth'
 import { User } from '@/server/lib/models/User'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
+import { Buyout } from '~/server/lib/models/Buyout'
 
 let limit = 50000
 const runtimeConfig = useRuntimeConfig()
@@ -31,8 +32,35 @@ export default eventHandler(async (event) => {
     const workbook = new ExcelJS.Workbook()
 
     const trueFilters = JSON.parse(filters)
+    let productsCountInfo = {
+      count: 0,
+      sum: 0,
+    }
     if (!trueFilters.sumTo) delete trueFilters.sumTo
     if (!trueFilters.sumFrom) delete trueFilters.sumFrom
+    if (trueFilters.type !== 'buyouts') {
+      delete trueFilters.article
+    } else if (trueFilters.type == 'buyouts' && trueFilters.article) {
+      const buyoutsWithThisArticle = await Buyout.find({
+        article: trueFilters.article,
+      }).sort({
+        createdAt: sortDate,
+      })
+
+      const buyoutsUuids: string[] = []
+
+      if (buyoutsWithThisArticle && buyoutsWithThisArticle.length > 0) {
+        for (const buyout of buyoutsWithThisArticle) {
+          buyoutsUuids.push(`Выкуп #${buyout.uuid}`)
+        }
+        trueFilters.basisoperation = { basisoperation: { $in: buyoutsUuids } }
+      } else {
+        return {
+          stats: [],
+          statsCount: 0,
+        }
+      }
+    }
 
     let userIds = {}
     if (trueFilters.clients !== null) {
@@ -56,6 +84,7 @@ export default eventHandler(async (event) => {
 
     let stats: any = await paymenthistory
       .find({
+        ...trueFilters.basisoperation,
         ...userIds,
         ...trueTypeoperations,
         ...trueType,
@@ -64,14 +93,10 @@ export default eventHandler(async (event) => {
       .sort({
         dataoperation: sortDate,
       })
-      .limit(limit)
 
     const statsCount: any = await paymenthistory.count()
-
     const statsUsersIds: any = stats.map((operation: any) => operation.user)
-
     const users = await User.find({ _id: { $in: statsUsersIds } })
-
     const format = <any>[]
 
     for (const stat of stats) {
@@ -86,13 +111,82 @@ export default eventHandler(async (event) => {
       })
     }
 
-    const ready = format
+    if (trueFilters.type == 'buyouts' || trueFilters.type == 'any') {
+      let buyoutsUuids: string[] = []
+
+      const paymentAggregate = await paymenthistory.aggregate([
+        {
+          $match: {
+            ...trueFilters.basisoperation,
+            ...userIds,
+            ...trueTypeoperations,
+            type: { $in: ['buyouts', 'buyouts service'] },
+            ...trueDateRange,
+          },
+        },
+        {
+          $group: {
+            _id: 'null',
+            sum: { $sum: '$summ' },
+            count: { $sum: 1 },
+          },
+        },
+      ])
+
+      if (paymentAggregate && paymentAggregate.length > 0) {
+        productsCountInfo = {
+          count: paymentAggregate[0].count,
+          sum: paymentAggregate[0].sum,
+        }
+      }
+
+      for (const buyout of format) {
+        if (
+          (buyout.type == 'buyouts' || buyout.type == 'buyouts service') &&
+          buyout.basisoperation &&
+          buyout.basisoperation.includes('Выкуп #')
+        ) {
+          buyoutsUuids.push(
+            buyout.basisoperation.split(' ')[1].replace('#', '')
+          )
+        }
+      }
+
+      const buyouts = await Buyout.find({ uuid: { $in: buyoutsUuids } })
+
+      format.forEach((stat: any) => {
+        if (stat.type == 'buyouts' || stat.type == 'buyouts service') {
+          const buyout = buyouts.find(
+            (buyout: any) =>
+              buyout.uuid == stat.basisoperation.split(' ')[1].replace('#', '')
+          )
+
+          stat.article = buyout ? buyout.article : ''
+          stat.productName = buyout ? buyout.product.name : ''
+        }
+      })
+    }
+
+    const ready = format.map((el: any) => {
+      if (el.type == 'buyouts' || el.type == 'buyouts service') {
+        return {
+          ...el,
+          summ: Number(el.summ),
+        }
+      } else {
+        return {
+          ...el,
+          summ: Number(el.summ),
+          article: '',
+        }
+      }
+    })
 
     const sheet = workbook.addWorksheet('Отчет о платежах', {
       headerFooter: { firstHeader: `Всего: ${ready.length}` },
     })
 
-    sheet.columns = [
+    const columns = [
       { header: 'ID', key: '_id', width: 48, font: { bold: true } },
       { header: 'userId', key: 'userUuid', width: 50, font: { bold: true } },
       { header: 'email', key: 'email', width: 50, font: { bold: true } },
@@ -103,6 +197,7 @@ export default eventHandler(async (event) => {
         key: 'summ',
         width: 16,
         font: { bold: true },
+        numFmt: '0.00',
       },
       {
         header: 'тип операции',
@@ -129,6 +224,23 @@ export default eventHandler(async (event) => {
         font: { bold: true },
       },
     ]
+
+    if (trueFilters.type == 'buyouts' || trueFilters.type == 'any') {
+      columns.splice(8, 0, {
+        header: 'Товар',
+        key: 'productName',
+        width: 60,
+        font: { bold: true },
+      })
+      columns.splice(9, 0, {
+        header: 'Артикул',
+        key: 'article',
+        width: 16,
+        font: { bold: true },
+      })
+    }
+
+    sheet.columns = columns
 
     sheet.addRows(ready)
     // add qr codes to sheet

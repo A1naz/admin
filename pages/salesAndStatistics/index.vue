@@ -327,8 +327,8 @@ if (
           <th>никнейм</th>
           <th>телеграм</th>
           <th>сумма</th>
-          <th v-if="service == 'buyouts'">артикул</th>
-          <th v-if="service == 'buyouts'">наименование товара</th>
+          <th v-if="service == 'buyouts' || service == 'any'">артикул</th>
+          <th v-if="service == 'buyouts' || service == 'any'">наименование товара</th>
           <th>базис</th>
           <th>
             <div @click="sortByDate" class="flex cursor-pointer">
@@ -373,14 +373,14 @@ if (
           </th>
           <th
             style="max-width: 40px"
-            v-if="service == 'buyouts'"
+            v-if="service == 'buyouts' || service == 'any'"
             class="overflow-x-auto text-xs"
           >
             {{ stat.article }}
           </th>
           <th
             style="max-width: 160px"
-            v-if="service == 'buyouts'"
+            v-if="service == 'buyouts' || service == 'any'"
             class="overflow-x-auto text-xs"
           >
             {{ stat.productName }}
