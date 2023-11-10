@@ -7,7 +7,7 @@ import { User } from '~/server/lib/models/User'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { transaction, date, client } = await readBody(event)
+  const { transaction, date, client, phoneNumber } = await readBody(event)
 
   if (!session) return sendRedirect(event, '/auth', 302)
 
@@ -26,11 +26,12 @@ export default eventHandler(async (event) => {
       message: 'Пользователь не найден',
     }
   }
- 
+
   const newTransactionSearch = await TransactionSearch.create({
     adminUser: user._id,
     client: userForReq._id,
     sum: Number(transaction),
+    phoneNumber,
     transactionDate: new Date(date),
   })
 

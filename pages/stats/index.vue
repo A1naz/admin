@@ -14,17 +14,29 @@ const secondLevelReferrals = ref(0)
 const route = useRoute()
 const router = useRouter()
 const topTitle = ref('top50Buyouts')
-const top50Buyouts = ref<any>([])
-const top50Articles = ref<any>([])
-const top50pvz = ref<any>([])
-const top50UsersByDeposit = ref<any>([])
+const topForm: any = ref({
+  top50Buyouts: [],
+  top50Articles: [],
+  top50pvz: [],
+  top50UsersByDeposit: [],
+  top100UsersByPartnerBalance: [],
+  top100UsersByPartnerPayments: [],
+})
+
+// const top50Buyouts = ref<any>([])
+// const top50Articles = ref<any>([])
+// const top50pvz = ref<any>([])
+// const top50UsersByDeposit = ref<any>([])
+// const top100UsersByPartnerBalance = ref<any>([])
 const inputLoading = ref(false)
 const selectedHeaders = ref<any>({
   value: 'top50Buyouts',
   headers: ['Артикул', 'Количество'],
   title: 'Топ 50 артикулов по выкупам',
 })
-const selectedTop = ref<any>([])
+const selectedTop = computed(() => {
+  return topForm.value[topTitle.value]
+})
 const periodFromRoute = route.query.period
 const lastElements = ref<any>([])
 const pieGraphData = ref<any>({
@@ -119,6 +131,12 @@ const services = ref<any>([
     expenses: 0,
     quantity: 0,
   },
+  {
+    value: 'partners ref balance summ',
+    title: 'Партнерский баланс',
+    expenses: 0,
+    quantity: 0,
+  },
 ])
 let chartLabels = ref<any>([])
 
@@ -150,18 +168,18 @@ async function getTop50() {
     method: 'GET',
     params: {
       searchValue: query.value,
+      selectedTop: selectedHeaders.value.value,
     },
   })
   if (data.value) {
-    top50Articles.value = data.value.top50Articles
-    top50Buyouts.value = data.value.top50Buyouts
-    top50pvz.value = data.value.top50pvz
-    top50UsersByDeposit.value = data.value.top50UsersByDeposit
-    if (topTitle.value != 'top50UsersByDeposit') {
-      selectedTop.value = data.value.top50Buyouts
-    } else {
-      selectedTop.value = data.value.top50UsersByDeposit
-    }
+    topForm.value.top50Articles = data.value.top50Articles
+    topForm.value.top50Buyouts = data.value.top50Buyouts
+    topForm.value.top50pvz = data.value.top50pvz
+    topForm.value.top50UsersByDeposit = data.value.top50UsersByDeposit
+    topForm.value.top100UsersByPartnerBalance =
+      data.value.top100UsersByPartnerBalance
+    topForm.value.top100UsersByPartnerPayments =
+      data.value.top100UsersByPartnerPayments
   }
   inputLoading.value = false
 }
@@ -277,26 +295,14 @@ const periods = [
 ]
 
 function changeTop(event: any) {
-  query.value = ''
   topTitle.value = event.target.value
+
   headers.forEach((el: any) => {
     if (el.value === event.target.value) {
       selectedHeaders.value = el
     }
   })
-
-  if (event.target.value === 'top50Buyouts') {
-    selectedTop.value = top50Buyouts.value
-  }
-  if (event.target.value === 'top50Articles') {
-    selectedTop.value = top50Articles.value
-  }
-  if (event.target.value === 'top50pvz') {
-    selectedTop.value = top50pvz.value
-  }
-  if (event.target.value === 'top50UsersByDeposit') {
-    selectedTop.value = top50UsersByDeposit.value
-  }
+  getTop50()
 }
 
 const headers = [
@@ -319,6 +325,16 @@ const headers = [
     value: 'top50UsersByDeposit',
     title: 'Топ 50 пользователей по пополнениям',
     headers: ['ID', 'Никнейм', 'Email', 'Сумма пополнений'],
+  },
+  {
+    value: 'top100UsersByPartnerBalance',
+    title: 'Топ 100 пользователей по балансу партнерки',
+    headers: ['ID', 'Никнейм', 'Email', 'Баланс'],
+  },
+  {
+    value: 'top100UsersByPartnerPayments',
+    title: 'Топ 100 пользователей по балансу партнерки',
+    headers: ['ID', 'Никнейм', 'Email', 'Сумма вознаграждений'],
   },
 ]
 </script>
@@ -461,13 +477,19 @@ const headers = [
       <div class="mt-6 flex justify-between">
         <div>
           <div class="flex my-5 gap-3">
-            <div v-if="topTitle === 'top50UsersByDeposit'">
+            <div
+              v-if="
+                topTitle === 'top50UsersByDeposit' ||
+                topTitle === 'top100UsersByPartnerBalance' ||
+                topTitle === 'top100UsersByPartnerPayments'
+              "
+            >
               <label
                 ><input
                   v-model="query"
                   type="text"
                   placeholder="id, username, email, telegram"
-                  class="input input-bordered input-sm ml-4 w-60"
+                  class="input input-bordered input-sm ml-4 -mr-5 w-60"
                   @input="onInput($event)"
                 />
               </label>
@@ -478,14 +500,20 @@ const headers = [
             </div>
             <select
               class="select select-sm select-bordered w-42 ml-4"
-              @change="changeTop($event)"
               v-model="topTitle"
+              @change="changeTop($event)"
             >
               <option selected value="top50Buyouts">артикулы по выкупам</option>
               <option value="top50Articles">артикулы по кол-ву</option>
               <option value="top50pvz">пункты выдачи</option>
               <option value="top50UsersByDeposit">
                 пользователи по пополнениям
+              </option>
+              <option value="top100UsersByPartnerBalance">
+                пользователи по балансу партнерки
+              </option>
+              <option value="top100UsersByPartnerPayments">
+                пользователи по вознаграждениям партнерки
               </option>
             </select>
             <p class="text-lg font-bold text-center">
@@ -514,19 +542,29 @@ const headers = [
                   </td>
                   <td
                     style="min-width: 150px; max-width: 150px"
-                    v-if="topTitle == 'top50UsersByDeposit'"
+                    v-if="
+                      topTitle == 'top50UsersByDeposit' ||
+                      topTitle == 'top100UsersByPartnerBalance' ||
+                      topTitle == 'top100UsersByPartnerPayments'
+                    "
                   >
                     {{ element.username }}
                   </td>
                   <td
                     style="min-width: 250px; max-width: 250px"
-                    v-if="topTitle == 'top50UsersByDeposit'"
+                    v-if="
+                      topTitle == 'top50UsersByDeposit' ||
+                      topTitle == 'top100UsersByPartnerBalance' ||
+                      topTitle == 'top100UsersByPartnerPayments'
+                    "
                   >
                     {{ element.email }}
                   </td>
                   <td style="min-width: 100px">
                     {{
-                      topTitle !== 'top50UsersByDeposit'
+                      topTitle !== 'top50UsersByDeposit' &&
+                      topTitle !== 'top100UsersByPartnerBalance' &&
+                      topTitle !== 'top100UsersByPartnerPayments'
                         ? element.quantity
                         : currency.format(element.quantity)
                     }}

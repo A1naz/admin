@@ -195,6 +195,14 @@ async function searchTransaction() {
     return
   }
 
+  if (phoneNumber.value.length < 10) {
+    notify({
+      type: 'error',
+      title: 'Введите номер телефона',
+    })
+    return
+  }
+
   if (client.value.username.length < 2) {
     notify({
       type: 'error',
@@ -215,6 +223,7 @@ async function searchTransaction() {
         client: client.value._id,
         transaction: transaction.value,
         date: date.value,
+        phoneNumber: phoneNumber.value,
       },
     }
   )
@@ -445,8 +454,12 @@ function selectUser(user: any) {
       <tbody>
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover">
-          <th class="text-xs overflow-x-auto" style="max-width: 150px;">{{ stat.adminUserUuid }}</th>
-          <th class="text-xs overflow-x-auto" style="max-width: 150px;">{{ stat.clientUuid }}</th>
+          <th class="text-xs overflow-x-auto" style="max-width: 150px">
+            {{ stat.adminUserUuid }}
+          </th>
+          <th class="text-xs overflow-x-auto" style="max-width: 150px">
+            {{ stat.clientUuid }}
+          </th>
           <th>{{ stat.sum }}</th>
           <th>{{ defaultDate(stat.transactionDate) }}</th>
           <th>{{ defaultDate(stat.requestDate) }}</th>
@@ -498,6 +511,13 @@ function selectUser(user: any) {
             </div>
           </div>
         </div>
+        <input
+          v-model="phoneNumber"
+          @input="resetStatus"
+          type="text"
+          placeholder="Укажите номер телефона (точно как в чеке)"
+          class="input input-bordered input-l mb-2 w-full"
+        />
 
         <div class="flex">
           <label class="w-full">
@@ -509,7 +529,6 @@ function selectUser(user: any) {
               class="input w-full input-bordered input-l mb-1"
               :disabled="isSearchInputDisabled"
             />
-    
           </label>
 
           <button
@@ -532,12 +551,6 @@ function selectUser(user: any) {
           v-model="transactionNumber"
           type="text"
           placeholder="Укажите номер операции (точно как в чеке)"
-          class="input input-bordered input-l mb-2 w-full"
-        />
-        <input
-          v-model="phoneNumber"
-          type="text"
-          placeholder="Укажите номер телефона (точно как в чеке)"
           class="input input-bordered input-l mb-2 w-full"
         />
         <div class="text-center font-bold mt-1 mb-3">

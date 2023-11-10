@@ -7,9 +7,14 @@ import { User } from '~/server/lib/models/User'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { transaction, transactionNumber, client, screenshot, date, phoneNumber } = await readBody(
-    event
-  )
+  const {
+    transaction,
+    transactionNumber,
+    client,
+    screenshot,
+    date,
+    phoneNumber,
+  } = await readBody(event)
 
   if (!session) return sendRedirect(event, '/auth', 302)
 
@@ -23,7 +28,7 @@ export default eventHandler(async (event) => {
   const isTransactionExist = await TransactionRequest.findOne({
     transactionNumber,
     status: {
-        $in: ['created', 'active']
+      $in: ['created', 'active'],
     },
   })
 
@@ -43,6 +48,13 @@ export default eventHandler(async (event) => {
     }
   }
 
+  if (phoneNumber.length < 11) {
+    return {
+      status: 'error',
+      message: 'Некорректный номер телефона',
+    }
+  }
+
   const newTransactionRequest = await TransactionRequest.create({
     adminUser: user._id,
     client: userForReq._id,
@@ -51,7 +63,7 @@ export default eventHandler(async (event) => {
     summ: Number(transaction),
     transactionNumber,
     screenshot,
-    phoneNumber: phoneNumber.length < 7 ? null : phoneNumber,
+    phoneNumber: phoneNumber,
     transactionDate: new Date(date),
   })
 

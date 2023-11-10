@@ -432,6 +432,12 @@ export default eventHandler(async (event) => {
       expenses: 0,
       quantity: 0,
     },
+    {
+      value: 'partners ref balance summ',
+      title: 'Партнерский баланс',
+      expenses: 0,
+      quantity: 0,
+    },
   ]
 
   const penaltyAggregate = await paymenthistory.aggregate([
@@ -451,6 +457,31 @@ export default eventHandler(async (event) => {
       },
     },
   ])
+
+  const partnersIncomeAggregate = await User.aggregate([
+    {
+      $match: {
+        'partner.refCount': { $gt: 0 } // Выбираем пользователей с refCount > 0
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        summ: { $sum: '$partner.balance' },
+        count: { $sum: 1 },
+      },
+    },
+  ])
+  
+
+  if (partnersIncomeAggregate && partnersIncomeAggregate.length > 0) {
+    if (partnersIncomeAggregate[0] && partnersIncomeAggregate[0].summ) {
+      services[11].expenses = partnersIncomeAggregate[0].summ
+    }
+    if (partnersIncomeAggregate[0] && partnersIncomeAggregate[0].count) {
+      services[11].quantity = partnersIncomeAggregate[0].count
+    }
+  }
 
   if (penaltyAggregate && penaltyAggregate.length > 0) {
     if (penaltyAggregate[0] && penaltyAggregate[0].summ) {

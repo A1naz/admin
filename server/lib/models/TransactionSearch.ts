@@ -8,6 +8,7 @@ const TransactionSearchSchema = new Schema({
     sum: { type: Number, required: true },
     transactionDate: { type: Date, required: true },
     status: { type: String, default: 'created' },
+    phoneNumber: { type: String, required: true },
     requestDate: { type: Date, default: new Date() },
 })
 
