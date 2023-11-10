@@ -45,6 +45,7 @@ const selectUserClose: any = ref(null)
 const now = new Date()
 const date = ref(now)
 const users = ref<any>([])
+const phoneNumber = ref('+7')
 
 const screenshot = ref({
   url: 'null',
@@ -189,7 +190,7 @@ async function searchTransaction() {
   if (transaction.value.length < 1) {
     notify({
       type: 'error',
-      title: 'Введите дату и время транзакции',
+      title: 'Введите сумму транзакции',
     })
     return
   }
@@ -274,6 +275,7 @@ async function createTransactionRequest() {
         transactionNumber: transactionNumber.value,
         client: client.value._id,
         date: date.value,
+        phoneNumber: phoneNumber.value,
       },
     }
   )
@@ -502,11 +504,12 @@ function selectUser(user: any) {
             <input
               v-model="transaction"
               @input="resetStatus"
-              type="text"
+              type="number"
               placeholder="Сумма транзакции (точно как в чеке)"
               class="input w-full input-bordered input-l mb-1"
               :disabled="isSearchInputDisabled"
             />
+    
           </label>
 
           <button
@@ -529,6 +532,12 @@ function selectUser(user: any) {
           v-model="transactionNumber"
           type="text"
           placeholder="Укажите номер операции (точно как в чеке)"
+          class="input input-bordered input-l mb-2 w-full"
+        />
+        <input
+          v-model="phoneNumber"
+          type="text"
+          placeholder="Укажите номер телефона (точно как в чеке)"
           class="input input-bordered input-l mb-2 w-full"
         />
         <div class="text-center font-bold mt-1 mb-3">

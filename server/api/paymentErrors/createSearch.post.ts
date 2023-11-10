@@ -26,13 +26,11 @@ export default eventHandler(async (event) => {
       message: 'Пользователь не найден',
     }
   }
-
-  console.log(date);
-  
+ 
   const newTransactionSearch = await TransactionSearch.create({
     adminUser: user._id,
     client: userForReq._id,
-    transaction: transaction,
+    sum: Number(transaction),
     transactionDate: new Date(date),
   })
 

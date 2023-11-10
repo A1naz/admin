@@ -7,7 +7,7 @@ import { User } from '~/server/lib/models/User'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { transaction, transactionNumber, client, screenshot, date } = await readBody(
+  const { transaction, transactionNumber, client, screenshot, date, phoneNumber } = await readBody(
     event
   )
 
@@ -48,9 +48,10 @@ export default eventHandler(async (event) => {
     client: userForReq._id,
     adminUserUuid: user.uuid,
     clientUuid: userForReq.uuid,
-    transaction,
+    summ: Number(transaction),
     transactionNumber,
     screenshot,
+    phoneNumber: phoneNumber.length < 7 ? null : phoneNumber,
     transactionDate: new Date(date),
   })
 
