@@ -304,7 +304,8 @@ if (transactionStatus.value !== 'found') {
         type: 'success',
         title: data.value.message,
       })
-
+      
+      getStats()
       closeCreateModalButton.value?.click()
       transactionStatus.value = 'notFount'
       client.value = { username: '' }
@@ -315,7 +316,6 @@ if (transactionStatus.value !== 'found') {
         url: '',
         public: '',
       }
-      await getStats()
     } else {
       notify({
         type: 'error',
@@ -341,7 +341,7 @@ function resetStatus() {
 const store = useMainStore()
 if (
   !store.client.mainAdmin &&
-  !store.client.tabs.includes('ошибки финаносвых операции')
+  !store.client.tabs.includes('ошибки финансовых операции')
 ) {
   navigateTo('/partner')
 }
@@ -356,7 +356,7 @@ function selectUser(user: any) {
 }
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Ошибки финаносвых операции</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">Ошибки финансовых операции</h1>
   <div class="card p-fluid"></div>
   <div class="text-sm breadcrumbs ml-5">
     <ul>

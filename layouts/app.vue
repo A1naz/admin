@@ -145,10 +145,10 @@ function closeOverlay() {
         <SidebarItem
           v-if="
             store.client.mainAdmin ||
-            store.client.tabs.includes('ошибки поступления средств')
+            store.client.tabs.includes('ошибки финансовых операции')
           "
           icon="mdi:money-off"
-          title="Ошибки поступления средств"
+          title="Ошибки финансовых операции"
           href="/paymentErrors"
         />
         <div class="mt-auto">

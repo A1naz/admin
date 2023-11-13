@@ -21,7 +21,7 @@ export default eventHandler(async (event) => {
   const user = await AdminUser.findOne({ uuid: session.uuid })
   if (
     !user ||
-    (!user.mainAdmin && !user.tabs.includes('ошибки финаносвых операции'))
+    (!user.mainAdmin && !user.tabs.includes('ошибки финансовых операции'))
   )
     return sendRedirect(event, '/auth', 302)
 
@@ -55,6 +55,8 @@ export default eventHandler(async (event) => {
     }
   }
 
+  const mskDate = new Date()
+  mskDate.setHours(mskDate.getHours() + 3)
   const newTransactionRequest = await TransactionRequest.create({
     adminUser: user._id,
     client: userForReq._id,
@@ -65,6 +67,7 @@ export default eventHandler(async (event) => {
     screenshot,
     phoneNumber: phoneNumber,
     transactionDate: new Date(date),
+    requestDate: mskDate,
   })
 
   await ActionHistory.create({

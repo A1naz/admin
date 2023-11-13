@@ -12,7 +12,7 @@ export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
   if (!session) return sendRedirect(event, '/auth', 302)
   const user = await AdminUser.findOne({ uuid: session.uuid })
-  if (!user || (!user.mainAdmin && !user.tabs.includes('ошибки финаносвых операции')))
+  if (!user || (!user.mainAdmin && !user.tabs.includes('ошибки финансовых операции')))
     return sendRedirect(event, '/auth', 302)
 
   const { id }: any = getQuery(event)

@@ -13,11 +13,13 @@ export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
   if (!session) return sendRedirect(event, '/auth', 302)
   const user = await AdminUser.findOne({ uuid: session.uuid })
-  if (!user || (!user.mainAdmin && !user.tabs.includes('ошибки финаносвых операции')))
+  if (
+    !user ||
+    (!user.mainAdmin && !user.tabs.includes('ошибки финансовых операции'))
+  )
     return sendRedirect(event, '/auth', 302)
 
-  const { page, account, sortDate, dateRange }: any =
-    getQuery(event)
+  const { page, account, sortDate, dateRange }: any = getQuery(event)
 
   let trueDateRange = {}
   if (dateRange) {
@@ -28,7 +30,6 @@ export default eventHandler(async (event) => {
       },
     }
   }
-
 
   const accountOperation =
     account.length > 5
@@ -46,18 +47,16 @@ export default eventHandler(async (event) => {
     ...accountOperation,
     ...trueDateRange,
   })
-    .sort({requestDate: sortDate})
+    .sort({ requestDate: Number(sortDate) === -1 ? -1 : 1 })
     .limit(elPerPage)
     .skip((page - 1) * elPerPage)
 
-    await ActionHistory.create({
-      adminUser: user._id,
-      actionId: 71,
-      actionDescription: `Получение запросов транзакции`,
-      date: new Date(),
-    })
-
-
+  await ActionHistory.create({
+    adminUser: user._id,
+    actionId: 71,
+    actionDescription: `Получение запросов транзакции`,
+    date: new Date(),
+  })
 
   return {
     transactionRequests: format,
