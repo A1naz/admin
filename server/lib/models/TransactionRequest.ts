@@ -10,7 +10,6 @@ const TransactionRequestSchema = new Schema({
   client: { type: Schema.Types.ObjectId, ref: User, required: true },
   clientUuid: { type: String, required: true },
   status: { type: String, default: 'created' },
-  sum: { type: Number, default: 0 },
   acception: { type: String, default: '0/2' },
   screenshot: { type: String, required: true },
   transactionDate: { type: Date, required: true },

@@ -255,6 +255,16 @@ async function searchTransaction() {
 }
 
 async function createTransactionRequest() {
+if (transactionStatus.value !== 'found') {
+  notify({
+    type: 'error',
+    title: 'Сначала необходимо выполнить поиск транзакцию',
+  })
+
+  return
+}
+
+
   if (screenshot.value.public === 'null') {
     notify({
       type: 'error',
@@ -460,7 +470,7 @@ function selectUser(user: any) {
           <th class="text-xs overflow-x-auto" style="max-width: 150px">
             {{ stat.clientUuid }}
           </th>
-          <th>{{ stat.sum }}</th>
+          <th>{{ stat.summ }}</th>
           <th>{{ defaultDate(stat.transactionDate) }}</th>
           <th>{{ defaultDate(stat.requestDate) }}</th>
           <th>{{ stat.transactionNumber }}</th>
