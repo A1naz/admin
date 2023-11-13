@@ -43,6 +43,8 @@ export default eventHandler(async (event) => {
         }
       : {}
 
+
+
   const format = await TransactionRequest.find({
     ...accountOperation,
     ...trueDateRange,
@@ -50,6 +52,22 @@ export default eventHandler(async (event) => {
     .sort({ requestDate: Number(sortDate) === -1 ? -1 : 1 })
     .limit(elPerPage)
     .skip((page - 1) * elPerPage)
+    .lean()
+
+    const managerIds: Array<any> = format.map((el) => {
+      return el.adminUser
+    })
+
+    const managers = await AdminUser.find({
+      _id: { $in: managerIds },
+    })
+
+    format.forEach((el: any) => {
+      
+      el.managerUsername = managers.find((manager) => {
+        return manager._id.valueOf() === el.adminUser.valueOf()
+      })?.username
+    })       
 
   await ActionHistory.create({
     adminUser: user._id,

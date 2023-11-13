@@ -465,7 +465,7 @@ function selectUser(user: any) {
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover">
           <th class="text-xs overflow-x-auto" style="max-width: 150px">
-            {{ stat.adminUserUuid }}
+            {{ stat.managerUsername }}
           </th>
           <th class="text-xs overflow-x-auto" style="max-width: 150px">
             {{ stat.clientUuid }}
