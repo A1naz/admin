@@ -301,6 +301,7 @@ if (!store.client.mainAdmin) {
           <tr>
             <th>ID</th>
             <th>Никнейм</th>
+            <th>ФИО</th>
             <th>Telegram</th>
             <th>Роли</th>
             <th>
@@ -323,6 +324,9 @@ if (!store.client.mainAdmin) {
             </th>
             <th style="max-width: 150px; min-width: 90px" class="text-xs">
               {{ user.username }}
+            </th>
+            <th style="max-width: 150px; min-width: 90px" class="text-xs">
+              {{ user.firstName }} {{ user.lastName }}
             </th>
             <th style="max-width: 120px; min-width: 100px">
               {{ user.telegram }}
