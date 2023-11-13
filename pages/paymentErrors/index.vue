@@ -471,8 +471,8 @@ function selectUser(user: any) {
             {{ stat.clientUuid }}
           </th>
           <th>{{ stat.summ }}</th>
-          <th>{{ defaultDate(stat.transactionDate) }}</th>
           <th>{{ defaultDate(stat.requestDate) }}</th>
+          <th>{{ defaultDate(stat.transactionDate) }}</th>
           <th>{{ stat.transactionNumber }}</th>
           <th>{{ stat.acception }}</th>
           <th>{{ stat.status }}</th>
