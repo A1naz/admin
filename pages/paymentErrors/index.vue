@@ -26,7 +26,7 @@ const client: any = ref({
   username: '',
 })
 const transaction = ref('')
-const transactionStatus = ref('notFound')
+const transactionStatus = ref('notFount')
 const fileInput = ref()
 const url = ref('')
 const transactionNumber = ref('')
@@ -231,11 +231,11 @@ async function searchTransaction() {
   if (data.value) {
     const intervalId = setInterval(async () => {
       const response = await getSearchStatus(data.value.id)
-      if (response === 'found' || response === 'notFound') {
+      if (response === 'found' || response === 'notFount') {
         transactionStatus.value = response
 
         isSearchInputDisabled.value = false
-        if (response === 'notFound') {
+        if (response === 'notFount') {
           isSearchBtnDisabled.value = false
         }
 
@@ -306,7 +306,7 @@ if (transactionStatus.value !== 'found') {
       })
 
       closeCreateModalButton.value?.click()
-      transactionStatus.value = 'notFound'
+      transactionStatus.value = 'notFount'
       client.value = { username: '' }
       transaction.value = ''
       transactionNumber.value = ''
@@ -333,7 +333,7 @@ if (transactionStatus.value !== 'found') {
 }
 
 function resetStatus() {
-  transactionStatus.value = 'notFound'
+  transactionStatus.value = 'notFount'
   isSearchBtnDisabled.value = false
   searchBtnText.value = 'Поиск'
 }

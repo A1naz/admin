@@ -61,7 +61,6 @@ export default eventHandler(async (event) => {
     .sort(trueSortDate)
     .limit(elPerPage)
     .skip((page - 1) * elPerPage)
-console.log(trueSortDate);
 
     await ActionHistory.create({
       adminUser: user._id,
