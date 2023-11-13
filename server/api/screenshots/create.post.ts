@@ -14,6 +14,7 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   await ScreenshotsRequire.create({
+    requireDate: new Date(),
     adminUser: user._id,
     typeOperation,
     account,

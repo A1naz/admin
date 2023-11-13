@@ -21,7 +21,7 @@ export default eventHandler(async (event) => {
 
   let trueSortDate: any = {}
   if (typeof sortDateType == 'string') {
-    trueSortDate[`${sortDateType}`] = sortDate
+    trueSortDate[`${sortDateType}`] = Number(sortDate)
   }
 
   let trueDateRange = {}
@@ -61,6 +61,7 @@ export default eventHandler(async (event) => {
     .sort(trueSortDate)
     .limit(elPerPage)
     .skip((page - 1) * elPerPage)
+console.log(trueSortDate);
 
     await ActionHistory.create({
       adminUser: user._id,
