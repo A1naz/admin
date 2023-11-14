@@ -70,6 +70,7 @@ export default eventHandler(async (event) => {
   let top50UsersByDeposit: any[] = []
   let top100UsersByPartnerBalance: any[] = []
   let top100UsersByPartnerPayments: any[] = []
+  let lastDates: any[] = []
 
   if (!searchValue) {
     if (selectedTop === 'top50UsersByDeposit') {
@@ -92,6 +93,26 @@ export default eventHandler(async (event) => {
           $limit: 50, // Ограничение до топ-50
         },
       ])
+
+      lastDates = await paymenthistory.aggregate([
+        {
+          $match: {
+            user: { $in: top50UsersByDeposit.map((user: any) => user._id) },
+          },
+        },
+        {
+          $sort: {
+            dataoperation: -1, // Сортируем в порядке убывания, чтобы первым был самый последний dataoperation
+          },
+        },
+        {
+          $group: {
+            _id: '$user',
+            lastDataOperation: { $first: '$dataoperation' }, // Берем первый элемент (самый последний)
+            // Добавьте другие поля, которые вам нужны
+          },
+        },
+      ])
     }
 
     if (selectedTop === 'top100UsersByPartnerPayments') {
@@ -109,6 +130,29 @@ export default eventHandler(async (event) => {
           $limit: 100, // Ограничение до топ-50
         },
       ])
+
+      lastDates = await paymenthistory.aggregate([
+        {
+          $match: {
+            user: {
+              $in: top100UsersByPartnerPayments.map((user: any) => user._id),
+            },
+          },
+        },
+        {
+          $sort: {
+            dataoperation: -1, // Сортируем в порядке убывания, чтобы первым был самый последний dataoperation
+          },
+        },
+        {
+          $group: {
+            _id: '$user',
+            lastDataOperation: { $first: '$dataoperation' }, // Берем первый элемент (самый последний)
+            // Добавьте другие поля, которые вам нужны
+          },
+        },
+      ])
+
     }
 
     if (selectedTop === 'top100UsersByPartnerBalance') {
@@ -131,6 +175,29 @@ export default eventHandler(async (event) => {
           $limit: 100, // Ограничение до топ-50
         },
       ])
+
+      lastDates = await paymenthistory.aggregate([
+        {
+          $match: {
+            user: {
+              $in: top100UsersByPartnerBalance.map((user: any) => user._id),
+            },
+          },
+        },
+        {
+          $sort: {
+            dataoperation: -1, // Сортируем в порядке убывания, чтобы первым был самый последний dataoperation
+          },
+        },
+        {
+          $group: {
+            _id: '$user',
+            lastDataOperation: { $first: '$dataoperation' }, // Берем первый элемент (самый последний)
+            // Добавьте другие поля, которые вам нужны
+          },
+        },
+      ])     
+
     }
   } else {
     const foundUsers = await User.find({
@@ -142,14 +209,32 @@ export default eventHandler(async (event) => {
       ],
     }).limit(10)
 
-    console.log(foundUsers)
+    lastDates = await paymenthistory.aggregate([
+      {
+        $match: {
+          user: { $in: foundUsers.map((user: any) => user._id) },
+        },
+      },
+      {
+        $sort: {
+          dataoperation: -1, // Сортируем в порядке убывания, чтобы первым был самый последний dataoperation
+        },
+      },
+      {
+        $group: {
+          _id: '$user',
+          lastDataOperation: { $first: '$dataoperation' }, // Берем первый элемент (самый последний)
+          // Добавьте другие поля, которые вам нужны
+        },
+      },
+    ])
 
     if (selectedTop === 'top100UsersByPartnerPayments') {
       top100UsersByPartnerPayments = await PartnerPaymentHistory.aggregate([
         {
           $match: {
             user: { $in: foundUsers.map((user: any) => user._id) },
-          }
+          },
         },
         {
           $group: {
@@ -209,19 +294,30 @@ export default eventHandler(async (event) => {
           $limit: 100, // Ограничение до топ-50
         },
       ])
+
+      
+      
     }
   }
 
   const userIDS = top50UsersByDeposit.map((user: any) => user._id)
   const users = await User.find({ _id: { $in: userIDS } })
+
   const usersFormat = users.map((user: any) => {
+    const lastDate = lastDates.find(
+      (item: any) => item._id.valueOf() == user._id.valueOf()
+    )?.lastDataOperation
+
+    const quantity = top50UsersByDeposit.find(
+      (item: any) => item._id.valueOf() == user._id.valueOf()
+    ).quantity
+
     return {
       _id: user.uuid,
       username: user.username,
       email: user.email,
-      quantity: top50UsersByDeposit.find(
-        (item: any) => item._id.valueOf() == user._id.valueOf()
-      ).quantity,
+      quantity: quantity ? quantity : 0,
+      lastDataOperation: lastDate ? lastDate : null,
     }
   })
   usersFormat.sort((a, b) => b.quantity - a.quantity)
@@ -234,13 +330,21 @@ export default eventHandler(async (event) => {
   })
 
   const partnerByPaymentFormat = partnersByPayment.map((user: any) => {
+    const lastDate = lastDates.find(
+      (item: any) => item._id.valueOf() == user._id.valueOf()
+    )?.lastDataOperation
+
+
+    const quantity = top100UsersByPartnerPayments.find(
+      (item: any) => item._id.valueOf() == user._id.valueOf()
+    ).quantity
+
     return {
       _id: user.uuid,
       username: user.username,
       email: user.email,
-      quantity: top100UsersByPartnerPayments.find(
-        (item: any) => item._id.valueOf() == user._id.valueOf()
-      ).quantity,
+      quantity:  quantity ? quantity : 0,
+      lastDataOperation: lastDate ? lastDate : null,
     }
   })
 
@@ -250,13 +354,20 @@ export default eventHandler(async (event) => {
   const partners = await User.find({ _id: { $in: partnerIDS } })
 
   const partnersFormat = partners.map((partner: any) => {
+    const lastDate = lastDates.find(
+      (item: any) => item._id.valueOf() == partner._id.valueOf()
+    )?.lastDataOperation
+
+    const quantity = top100UsersByPartnerBalance.find(
+      (item: any) => item._id.valueOf() == partner._id.valueOf()
+    ).quantity
+
     return {
       _id: partner._id,
       username: partner.username,
       email: partner.email,
-      quantity: top100UsersByPartnerBalance.find(
-        (item: any) => item._id.valueOf() == partner._id.valueOf()
-      ).quantity,
+      quantity: quantity ? quantity : 0,
+      lastDataOperation: lastDate ? lastDate : null,
     }
   })
 

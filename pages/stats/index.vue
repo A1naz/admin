@@ -324,17 +324,29 @@ const headers = [
   {
     value: 'top50UsersByDeposit',
     title: 'Топ 50 пользователей по пополнениям',
-    headers: ['ID', 'Никнейм', 'Email', 'Сумма пополнений'],
+    headers: [
+      'ID',
+      'Никнейм',
+      'Email',
+      'Сумма пополнений',
+      'Последняя активность',
+    ],
   },
   {
     value: 'top100UsersByPartnerBalance',
     title: 'Топ 100 пользователей по балансу партнерки',
-    headers: ['ID', 'Никнейм', 'Email', 'Баланс'],
+    headers: ['ID', 'Никнейм', 'Email', 'Баланс', 'Последняя активность'],
   },
   {
     value: 'top100UsersByPartnerPayments',
-    title: 'Топ 100 пользователей по балансу партнерки',
-    headers: ['ID', 'Никнейм', 'Email', 'Сумма вознаграждений'],
+    title: 'Топ 100 пользователей по вознаграждениям партнерки',
+    headers: [
+      'ID',
+      'Никнейм',
+      'Email',
+      'Сумма вознаграждений',
+      'Последняя активность',
+    ],
   },
 ]
 </script>
@@ -537,11 +549,11 @@ const headers = [
               <tbody>
                 <tr v-for="(element, index) in selectedTop" class="hover">
                   <td style="min-width: 50px">{{ index + 1 }}</td>
-                  <td style="min-width: 150px; max-width: 150px">
+                  <td style="min-width: 200px; max-width: 200px">
                     {{ element._id }}
                   </td>
                   <td
-                    style="min-width: 150px; max-width: 150px"
+                    style="min-width: 190px; max-width: 200px"
                     v-if="
                       topTitle == 'top50UsersByDeposit' ||
                       topTitle == 'top100UsersByPartnerBalance' ||
@@ -567,6 +579,20 @@ const headers = [
                       topTitle !== 'top100UsersByPartnerPayments'
                         ? element.quantity
                         : currency.format(element.quantity)
+                    }}
+                  </td>
+                  <td
+                    v-if="
+                      topTitle == 'top50UsersByDeposit' ||
+                      topTitle == 'top100UsersByPartnerBalance' ||
+                      topTitle == 'top100UsersByPartnerPayments'
+                    "
+                    style="min-width: 100px"
+                  >
+                    {{
+                      element.lastDataOperation
+                        ? defaultDate(element.lastDataOperation)
+                        : ''
                     }}
                   </td>
                 </tr>
