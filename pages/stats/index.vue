@@ -4,6 +4,8 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('аналитика')
   navigateTo('/partner')
 }
 
+const curPage = ref(1)
+const dateSortIcon = ref('mdi-arrow-down')
 const { width, height } = useWindowSize()
 import { notify } from '@kyvg/vue3-notification'
 import { Bar } from 'vue-chartjs'
@@ -13,6 +15,7 @@ const chartDataVisible = ref(false)
 const secondLevelReferrals = ref(0)
 const route = useRoute()
 const router = useRouter()
+const isPageBtnsDisabled = ref(false)
 const topTitle = ref('top50Buyouts')
 const topForm: any = ref({
   top50Buyouts: [],
@@ -21,6 +24,7 @@ const topForm: any = ref({
   top50UsersByDeposit: [],
   top100UsersByPartnerBalance: [],
   top100UsersByPartnerPayments: [],
+  usersWithLastActivity: [],
 })
 
 // const top50Buyouts = ref<any>([])
@@ -53,7 +57,11 @@ definePageMeta({
 
 const findSearchQuery = async () => {
   inputLoading.value = true
-  await getTop50()
+  if (topTitle.value === 'usersWithLastActivity') {
+    await getUsersWithLastActivity()
+  } else {
+    await getTop50()
+  }
   inputLoading.value = false
 }
 
@@ -183,6 +191,24 @@ async function getTop50() {
   }
   inputLoading.value = false
 }
+async function getUsersWithLastActivity() {
+  inputLoading.value = true
+  const { data, error }: any = await useFetch(
+    '/api/stats/usersWithLastActivity',
+    {
+      method: 'GET',
+      params: {
+        searchValue: query.value,
+        sortDate: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
+        pageNumber: curPage.value,
+      },
+    }
+  )
+  if (data.value) {
+    topForm.value.usersWithLastActivity = data.value
+  }
+  inputLoading.value = false
+}
 
 const withdrawsCount = ref(0)
 
@@ -302,7 +328,12 @@ function changeTop(event: any) {
       selectedHeaders.value = el
     }
   })
-  getTop50()
+
+  if (topTitle.value === 'usersWithLastActivity') {
+    getUsersWithLastActivity()
+  } else {
+    getTop50()
+  }
 }
 
 const headers = [
@@ -348,7 +379,29 @@ const headers = [
       'Последняя активность',
     ],
   },
+  {
+    value: 'usersWithLastActivity',
+    title: 'Последняя активность пользователей',
+    headers: ['ID', 'Никнейм', 'Email'],
+  },
 ]
+
+function sortByDate() {
+  if (dateSortIcon.value == 'mdi-arrow-up') {
+    dateSortIcon.value = 'mdi-arrow-down'
+  } else {
+    dateSortIcon.value = 'mdi-arrow-up'
+  }
+  getUsersWithLastActivity()
+}
+
+async function swapPage(destination: number) {
+  if (destination < 0 && curPage.value <= 1) return
+  curPage.value += destination
+  isPageBtnsDisabled.value = true
+  await getUsersWithLastActivity()
+  isPageBtnsDisabled.value = false
+}
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Аналитика</h1>
@@ -493,9 +546,30 @@ const headers = [
               v-if="
                 topTitle === 'top50UsersByDeposit' ||
                 topTitle === 'top100UsersByPartnerBalance' ||
-                topTitle === 'top100UsersByPartnerPayments'
+                topTitle === 'top100UsersByPartnerPayments' ||
+                topTitle === 'usersWithLastActivity'
               "
             >
+              <div
+                class="join -mr-2 -mt-2"
+                v-if="topTitle === 'usersWithLastActivity'"
+              >
+                <button
+                  class="join-item btn"
+                  @click="swapPage(-1)"
+                  :disabled="isPageBtnsDisabled"
+                >
+                  «
+                </button>
+                <button class="join-item btn">{{ curPage }}</button>
+                <button
+                  class="join-item btn"
+                  @click="swapPage(1)"
+                  :disabled="isPageBtnsDisabled"
+                >
+                  »
+                </button>
+              </div>
               <label
                 ><input
                   v-model="query"
@@ -515,8 +589,10 @@ const headers = [
               v-model="topTitle"
               @change="changeTop($event)"
             >
-              <option selected value="top50Buyouts">артикулы по выкупам</option>
-              <option value="top50Articles">артикулы по кол-ву</option>
+              <option v-for="header in headers" :value="header.value">
+                {{ header.title }}
+              </option>
+              <!-- <option value="top50Articles">артикулы по кол-ву</option>
               <option value="top50pvz">пункты выдачи</option>
               <option value="top50UsersByDeposit">
                 пользователи по пополнениям
@@ -526,7 +602,7 @@ const headers = [
               </option>
               <option value="top100UsersByPartnerPayments">
                 пользователи по вознаграждениям партнерки
-              </option>
+              </option> -->
             </select>
             <p class="text-lg font-bold text-center">
               {{ selectedHeaders.title }}
@@ -544,6 +620,15 @@ const headers = [
                   <th v-for="header in selectedHeaders.headers">
                     {{ header }}
                   </th>
+                  <th v-if="topTitle === 'usersWithLastActivity'">
+                    <div @click="sortByDate()" class="flex cursor-pointer">
+                      Дата последней активности
+                      <Icon
+                        class="swap-on fill-current ml-1 w-6 h-5"
+                        :name="dateSortIcon"
+                      />
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -557,7 +642,8 @@ const headers = [
                     v-if="
                       topTitle == 'top50UsersByDeposit' ||
                       topTitle == 'top100UsersByPartnerBalance' ||
-                      topTitle == 'top100UsersByPartnerPayments'
+                      topTitle == 'top100UsersByPartnerPayments' ||
+                      topTitle == 'usersWithLastActivity'
                     "
                   >
                     {{ element.username }}
@@ -567,12 +653,13 @@ const headers = [
                     v-if="
                       topTitle == 'top50UsersByDeposit' ||
                       topTitle == 'top100UsersByPartnerBalance' ||
-                      topTitle == 'top100UsersByPartnerPayments'
+                      topTitle == 'top100UsersByPartnerPayments' ||
+                      topTitle == 'usersWithLastActivity'
                     "
                   >
                     {{ element.email }}
                   </td>
-                  <td style="min-width: 100px">
+                  <td style="min-width: 100px" v-if="topTitle !== 'usersWithLastActivity'">
                     {{
                       topTitle !== 'top50UsersByDeposit' &&
                       topTitle !== 'top100UsersByPartnerBalance' &&
@@ -585,7 +672,8 @@ const headers = [
                     v-if="
                       topTitle == 'top50UsersByDeposit' ||
                       topTitle == 'top100UsersByPartnerBalance' ||
-                      topTitle == 'top100UsersByPartnerPayments'
+                      topTitle == 'top100UsersByPartnerPayments' ||
+                      topTitle == 'usersWithLastActivity'
                     "
                     style="min-width: 100px"
                   >
