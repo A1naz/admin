@@ -13,15 +13,76 @@ const userEditForm = ref({
   roles: <any>['user'],
   tabs: <any>[],
 })
+const roles = ref<any>([
+  {
+    value: 'user',
+    text: 'Пользователь',
+    disabled: true,
+  },
+  {
+    value: 'manager',
+    text: 'Менеджер',
+  },
+  {
+    value: 'accountant',
+    text: 'Бухгалтер',
+  },
+  {
+    value: 'investor current account',
+    text: 'Инвестор расчетный счет',
+  },
+  {
+    value: 'project manager',
+    text: 'Проджект менеджер',
+  },
+  {
+    value: 'ceo',
+    text: 'CEO',
+  },
+  {
+    value: 'financier',
+    text: 'Финансист',
+  },
+  {
+    value: 'marketolog',
+    text: 'Маркетолог',
+  },
+  {
+    value: 'assistant',
+    text: 'Ассистент',
+  },
+  {
+    value: 'hr',
+    text: 'HR',
+  },
+  {
+    value: 'organazer',
+    text: 'Органайзер',
+  },
+  {
+    value: 'jurist',
+    text: 'Юрист',
+  },
+  {
+    value: 'smm',
+    text: 'SMM',
+  },
+  {
+    value: 'targetolog',
+    text: 'Таргетолог',
+  },
+  {
+    value: 'tech support',
+    text: 'Тех.поддержка (Менеджер)',
+  },
+])
 const password = ref('')
 const repeatPassword = ref('')
 
-const isSelectedUserManager = computed(() => {
-  return userEditForm.value.roles.includes('manager')
+const isSelectedUserAdmin = computed(() => {
+  return userEditForm.value.roles.length > 1
 })
-const isSelectedUserAccountant = computed(() => {
-  return userEditForm.value.roles.includes('accountant')
-})
+
 const selectedUserRole = ref('manager')
 import { notify } from '@kyvg/vue3-notification'
 const { height, width } = useWindowSize()
@@ -96,7 +157,9 @@ async function selectUser(user: any) {
   userEditForm.value.tabs = []
   selectAdminUserClose.value?.click()
 
-  if (isSelectedUserManager.value === true || isSelectedUserAccountant.value === true) {
+  if (
+    isSelectedUserAdmin.value === true
+  ) {
     const { data, error } = await useFetch('/api/manager/getTabs', {
       method: 'GET',
       params: {
@@ -142,7 +205,7 @@ const tabs = ref<any>([
   'управление пользователями платформы',
   'аналитика',
   'запросы скриншотов',
-  'ошибки финансовых операции'
+  'ошибки финансовых операции',
 ])
 
 async function saveUser() {
@@ -240,9 +303,9 @@ if (!store.client.mainAdmin) {
           v-model="selectedUserRole"
         >
           <option selected value="">все роли</option>
-          <option value="user">пользователь</option>
-          <option value="manager">менеджер</option>
-          <option value="accountant">бухгалтер</option>
+          <option v-for="role in roles" :value="role.value">
+            {{ role.text }}
+          </option>
         </select>
         <button class="btn btn-primary ml-3" @click="getUsers">
           Применить
@@ -432,50 +495,23 @@ if (!store.client.mainAdmin) {
         <input type="checkbox" />
         <div class="collapse-title text-xl font-medium">Настроить роли</div>
         <div class="collapse-content">
-          <div class="flex">
-            <div class="form-control">
+          <div class="flex flex-col">
+            {{ userEditForm.roles }}
+            <div class="form-control" v-for="role in roles">
               <label class="label cursor-pointer">
-                <span class="label-text mr-2">Пользователь</span>
+                <span class="label-text mr-2">{{ role.text }}</span>
                 <input
                   type="checkbox"
-                  :checked="true"
-                  disabled
-                  class="checkbox checkbox-primary"
-                />
-              </label>
-            </div>
-            <div class="form-control">
-              <label class="label cursor-pointer">
-                <span class="label-text mr-2">Менеджер</span>
-                <input
-                  type="checkbox"
-                  :checked="isSelectedUserManager"
+                  :checked="userEditForm.roles.includes(role.value)"
+                  :disabled="role.disabled"
                   class="checkbox checkbox-primary"
                   @change="
-                    isSelectedUserManager
+                    userEditForm.roles.includes(role.value)
                       ? userEditForm.roles.splice(
-                          userEditForm.roles.indexOf('manager'),
+                          userEditForm.roles.indexOf(role.value),
                           1
                         )
-                      : userEditForm.roles.push('manager')
-                  "
-                />
-              </label>
-            </div>
-            <div class="form-control">
-              <label class="label cursor-pointer">
-                <span class="label-text mr-2">Бухгалтер</span>
-                <input
-                  type="checkbox"
-                  :checked="isSelectedUserAccountant"
-                  class="checkbox checkbox-primary"
-                  @change="
-                    isSelectedUserAccountant
-                      ? userEditForm.roles.splice(
-                          userEditForm.roles.indexOf('accountant'),
-                          1
-                        )
-                      : userEditForm.roles.push('accountant')
+                      : userEditForm.roles.push(role.value)
                   "
                 />
               </label>
@@ -485,7 +521,7 @@ if (!store.client.mainAdmin) {
       </div>
 
       <div
-        v-if="isSelectedUserManager || isSelectedUserAccountant"
+        v-if="isSelectedUserAdmin"
         class="collapse bg-base-200 collapse-arrow"
       >
         <input type="checkbox" />

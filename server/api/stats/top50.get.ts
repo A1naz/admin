@@ -15,9 +15,6 @@ export default eventHandler(async (event) => {
 
   const { searchValue, selectedTop }: any = getQuery(event)
 
-console.log(selectedTop);
-
-
   let top50Buyouts: any[] = []
   if (selectedTop === 'top50Buyouts') {
     top50Buyouts = await Buyout.aggregate([

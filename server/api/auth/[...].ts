@@ -122,7 +122,7 @@ export default NuxtAuthHandler({
         const user =
           (await AdminUser.findOne({ email })) ||
           (await AdminUser.findOne({ username: email }))
-        if (!user) {
+        if (!user || user.roles.length <= 1) {
           throw new Error('User not found')
         }
         if (runtimeConfig.env === 'developer') return user

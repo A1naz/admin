@@ -38,7 +38,7 @@ export default eventHandler(async (event) => {
         : userToEdit.firstName
       userToEdit.lastName = body.lastName ? body.lastName : userToEdit.lastName
 
-      if (body.roles.includes('manager') || body.roles.includes('accountant')) {
+      if (body.roles.length > 1) {
         let adminUserToEdit = await AdminUser.findOne({ uuid: uuid })
         let adminUserToEditByEmail: any = null
         if (body.email) {
@@ -67,8 +67,6 @@ export default eventHandler(async (event) => {
             date: new Date(),
             userUuid: userToEdit.uuid,
           })
-
-          
         } else if (adminUserToEdit) {
           adminUserToEdit.username = body.username
             ? body.username
@@ -82,7 +80,7 @@ export default eventHandler(async (event) => {
           adminUserToEdit.tabs = body.tabs
           await adminUserToEdit.save()
         }
-      } else if (!body.roles.includes('manager') && !body.roles.includes('accountant')) {
+      } else if (body.roles.length <= 1) {
         const adminToRemove = await AdminUser.findOne({ uuid: uuid })
         if (adminToRemove) {
           await adminToRemove.deleteOne()
@@ -105,7 +103,6 @@ export default eventHandler(async (event) => {
       date: new Date(),
       userUuid: userToEdit.uuid,
     })
-
   } else {
     let newUuid = unicalUuid()
     const hash = bcrypt.hashSync(body.password, 7)
@@ -140,7 +137,7 @@ export default eventHandler(async (event) => {
         userUuid: newUser.uuid,
       })
 
-      if (body.roles.includes('manager') || body.roles.includes('accountant')) {
+      if (body.roles.length > 1) {
         await AdminUser.create({
           uuid: newUser.uuid,
           username: newUser.username,
@@ -160,7 +157,6 @@ export default eventHandler(async (event) => {
           userUuid: newUser.uuid,
           date: new Date(),
         })
-
       }
     }
   }
