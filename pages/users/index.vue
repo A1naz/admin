@@ -496,7 +496,6 @@ if (!store.client.mainAdmin) {
         <div class="collapse-title text-xl font-medium">Настроить роли</div>
         <div class="collapse-content">
           <div class="flex flex-col">
-            {{ userEditForm.roles }}
             <div class="form-control" v-for="role in roles">
               <label class="label cursor-pointer">
                 <span class="label-text mr-2">{{ role.text }}</span>
