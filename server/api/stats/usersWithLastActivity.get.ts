@@ -46,7 +46,6 @@ export default eventHandler(async (event) => {
         $group: {
           _id: '$user',
           lastDataOperation: { $last: '$dataoperation' }, // Теперь используем $last для получения последнего элемента
-          // Добавьте другие поля, которые вам нужны
         },
       },
       {
@@ -75,7 +74,6 @@ export default eventHandler(async (event) => {
         $group: {
           _id: '$user',
           lastDataOperation: { $last: '$dataoperation' }, // Теперь используем $last для получения последнего элемента
-          // Добавьте другие поля, которые вам нужны
         },
       },
       {
