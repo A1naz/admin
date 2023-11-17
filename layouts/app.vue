@@ -151,6 +151,15 @@ function closeOverlay() {
           title="Ошибки финансовых операции"
           href="/paymentErrors"
         />
+        <SidebarItem
+          v-if="
+            store.client.mainAdmin ||
+            store.client.tabs.includes('переводы с аккаунта на аккаунт')
+          "
+          icon="mdi:account-credit-card-outline"
+          title="Переводы с аккаунта на аккаунт"
+          href="/balanceTransfer"
+        />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between w-full items-center p-0 m-0">

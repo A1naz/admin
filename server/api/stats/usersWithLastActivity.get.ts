@@ -2,6 +2,7 @@
 import { User } from '@/server/lib/models/User'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
 const itemsPerPage = 100
 
 export default eventHandler(async (event) => {
@@ -115,6 +116,13 @@ export default eventHandler(async (event) => {
       (a: any, b: any) => a.lastDataOperation - b.lastDataOperation
     )
   }
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    actionId: 32,
+    actionDescription: `Админ ${user.uuid} - ${user.username} получил информацию о последних активных пользователях`,
+    date: new Date(),
+  })
 
   return sorted
 })
