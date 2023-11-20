@@ -343,6 +343,8 @@ function selectUser(user: any) {
           <th>отправитель</th>
           <th>получатель</th>
           <th>сумма</th>
+          <th>статус</th>
+
           <th>
             <div @click="sortByDate()" class="flex cursor-pointer">
               Дата и время создания
@@ -369,6 +371,15 @@ function selectUser(user: any) {
             {{ stat.recipientUsername }}
           </th>
           <th>{{ stat.summ }}</th>
+          <th>
+            {{
+              stat.status == 'created'
+                ? 'создано'
+                : stat.status == 'completed'
+                ? 'завершено'
+                : 'отменено'
+            }}
+          </th>
           <th>{{ defaultDate(stat.requestDate) }}</th>
           <th>{{ stat.acception }}</th>
 

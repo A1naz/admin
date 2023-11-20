@@ -87,6 +87,21 @@ async function getReferralsInfo() {
   }
 }
 
+async function getRefStats() {
+  const { data } = await useFetch('/api/partner/getRefStats', {
+    method: 'GET',
+    params: {
+      userId: '64d498f222ffa91983950a18',
+    },
+  })
+  // if (data.value) {
+  //   selectedUser.value.refStats = data.value
+  // }
+  
+}
+
+getRefStats()
+
 async function openOptionsModal(user: any) {
   selectedUser.value = user
   referralModalLoading.value = true
