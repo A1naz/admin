@@ -17,11 +17,11 @@ export default eventHandler(async (event) => {
 
   const { page, filters, sortDate, elPerPage }: any = getQuery(event)
 
-  const trueFilters = JSON.parse(filters)
   let productsCountInfo = {
     count: 0,
     sum: 0,
   }
+  const trueFilters = JSON.parse(filters)
   if (!trueFilters.sumTo) delete trueFilters.sumTo
   if (!trueFilters.sumFrom) delete trueFilters.sumFrom
   if (trueFilters.type !== 'buyouts') {
