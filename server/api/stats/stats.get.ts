@@ -44,6 +44,7 @@ export default eventHandler(async (event) => {
       return {
         stats: [],
         statsCount: 0,
+        productsCountInfo,
       }
     }
   }
