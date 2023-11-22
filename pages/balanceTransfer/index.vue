@@ -382,7 +382,6 @@ function selectUser(user: any) {
           </th>
           <th>{{ defaultDate(stat.requestDate) }}</th>
           <th>{{ stat.acception }}</th>
-
           <th>
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>

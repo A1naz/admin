@@ -13,7 +13,12 @@ export default eventHandler(async (event) => {
   if (!admin || !admin.tabs.includes('управление партнеркой'))
     return sendRedirect(event, '/auth', 302)
 
-  const { userId }: any = getQuery(event)  
+  const { userId, page, sortType, sort }: any = getQuery(event)
+
+  const sortFilter: any = {}
+  if (sortFilter == 'totalSum') {
+    sortFilter[`${sortType}`] = sort
+  }
 
   const user = await User.findById(userId)
 
@@ -21,7 +26,7 @@ export default eventHandler(async (event) => {
     return []
   }
 
-  const referrals = await Referral.aggregate([
+  const refAgg: any = [
     {
       $match: {
         user: new ObjectId(userId),
@@ -59,10 +64,28 @@ export default eventHandler(async (event) => {
         'referralUser.email': 1,
         'referralUser.telegram': 1,
         'referralUser.partner': 1,
+        'referralUser.registrationDate': 1,
       },
     },
-  ]) 
+  ]
 
+  if (sortType === 'registrationDate') {
+    refAgg.push(
+      {
+        $sort: {
+          'referralUser.registrationDate': Number(sort),
+        },
+      },
+      {
+        $skip: (page - 1) * 5,
+      },
+      {
+        $limit: 5,
+      }
+    )
+  }
+
+  const referrals = await Referral.aggregate(refAgg)
 
   if (!referrals[0]) return []
 
@@ -76,32 +99,57 @@ export default eventHandler(async (event) => {
           email: ref.referralUser[0].email,
           telegram: ref.referralUser[0].telegram,
           refCount: ref.referralUser[0].partner.refCount,
+          rewardPercent: ref.referralUser[0].partner.rewardPercent,
+          registrationDate: ref.referralUser[0].registrationDate,
         }
       }
       return
     })
     .filter((ref) => ref !== undefined)
 
-    
-    const refsIncomeInfo = await PartnerPaymentHistory.aggregate([
-        {
-            $match: {
-                referral: { $in: refsInfo.map((ref: any) => ref._id) },
-            },
-        },
-        {
-            $group: {
-                _id: '$referral',
-                totalSum: { $sum: '$amount' },
-                totalCount: { $sum: 1 },
-            },
-        },
-    ])
-    
-  const data: any[] = []      
+  const refsIncomeAgg: any = [
+    {
+      $match: {
+        referral: { $in: refsInfo.map((ref: any) => ref._id) },
+      },
+    },
+    {
+      $group: {
+        _id: '$referral',
+        totalSum: { $sum: '$amount' },
+        totalCount: { $sum: 1 },
+      },
+    },
+  ]
+
+  if (sortType === 'totalSum') {
+    refsIncomeAgg.splice(2, 0, {
+      $sort: {
+        totalSum: Number(sort),
+      },
+    })
+    refsIncomeAgg.push(
+      {
+        $skip: (page - 1) * 5,
+      },
+      {
+      $limit: 5,
+    })
+  }
+
+
+
+  
+  const refsIncomeInfo = await PartnerPaymentHistory.aggregate(refsIncomeAgg)
+  console.log(refsIncomeInfo);
+
+  const data: any[] = []
 
   refsInfo.forEach((ref: any) => {
-    const refIncome = refsIncomeInfo.find((refIncome: any) => refIncome._id.valueOf() === ref._id.valueOf())
+    const refIncome = refsIncomeInfo.find(
+      (refIncome: any) => refIncome._id.valueOf() === ref._id.valueOf()
+    )
+
     data.push({
       _id: ref._id,
       username: ref.username,
@@ -111,11 +159,28 @@ export default eventHandler(async (event) => {
       refCount: ref.refCount,
       totalSum: refIncome ? refIncome.totalSum : 0,
       totalCount: refIncome ? refIncome.totalCount : 0,
+      rewardPercent: ref.rewardPercent,
+      registrationDate: ref.registrationDate,
+      // serviceId: refsIncomeInfo.serviceID,
     })
   })
 
-  console.log(data);
-  
+  data.sort((a: any, b: any) => {
+    if (sortType === 'username') {
+      if (sort === '-1') {
+        return a.username.localeCompare(b.username)
+      } else {
+        return b.username.localeCompare(a.username)
+      }
+    }
+    if (sortType === 'totalSum') {
+      if (sort === '1') {
+        return a.totalSum - b.totalSum
+      } else {
+        return b.totalSum - a.totalSum
+      }
+    }
+  })
 
   return data
 })

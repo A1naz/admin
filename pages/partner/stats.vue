@@ -11,8 +11,13 @@ const inputLoading = ref(false)
 const curPage = ref(1)
 const isPageBtnsDisabled = ref(false)
 const query = ref('')
-const selectedUser = ref<any>({})
-const referralModalLoading = ref(false)
+const sortDateType = ref('registrationDate:')
+const dateSortIcon = ref('mdi-arrow-down')
+const selectedUser = ref<any>({
+  username: '',
+})
+const currency = useCurrency()
+const stats = ref<any>()
 const referrals = ref<any>([])
 const filteredReferrals = ref<any>([])
 const store = useMainStore()
@@ -53,7 +58,7 @@ async function swapPage(destination: number) {
   }
   curPage.value += destination
   isPageBtnsDisabled.value = true
-  await getUsers()
+  await getRefStats()
   isPageBtnsDisabled.value = false
 }
 async function onInput(event: Event) {
@@ -70,39 +75,29 @@ const findSearchQuery = async () => {
 }
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 
-function openReferralModal(user: any) {
-  selectedUser.value = user
-}
-
-async function getReferralsInfo() {
-  const { data } = await useFetch('/api/partner/getReferralsInfo', {
+async function getRefStats() {
+  stats.value = []
+  const { data } = await useFetch('/api/partner/getRefStats', {
     method: 'GET',
     params: {
-      userId: selectedUser.value.uuid,
+      userId: selectedUser.value._id,
+      page: curPage.value,
+      sort: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
+      sortType: sortDateType.value,
     },
   })
   if (data.value) {
-    referrals.value = data.value
-    filteredReferrals.value = data.value
+    stats.value = data.value
   }
 }
 
-async function openOptionsModal(user: any) {
-  selectedUser.value = user
-  referralModalLoading.value = true
-  await getReferralsInfo()
-  referralModalLoading.value = false
-}
-
 function searchReferrals(searchValue: string) {
-
   filteredReferrals.value = referrals.value.filter(
     (el: any) =>
       el.username.includes(searchValue) ||
       el.email.includes(searchValue) ||
       el.uuid.includes(searchValue)
   )
-
 }
 
 if (
@@ -111,22 +106,44 @@ if (
 ) {
   navigateTo('/waitingRoom')
 }
+
+const selectUserClose: any = ref(null)
+function openUsersSelectModal() {
+  selectUserClose.value?.click()
+}
+
+async function selectUser(user: any) {
+  selectedUser.value = user
+  // getInfo()
+  selectUserClose.value?.click()
+}
+
+function sortByDate(sortType: string) {
+  sortDateType.value = sortType
+
+  if (dateSortIcon.value == 'mdi-arrow-up') {
+    dateSortIcon.value = 'mdi-arrow-down'
+  } else {
+    dateSortIcon.value = 'mdi-arrow-up'
+  }
+  getRefStats()
+}
 </script>
 
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Партнерская программа</h1>
   <div class="text-sm breadcrumbs ml-5">
     <ul>
-      <li><NuxtLink to="/partner">Партнерская программа</NuxtLink></li>
       <li>
-        <NuxtLink to="/partner/management">Управление партнерами</NuxtLink>
+        <NuxtLink to="/partner">Управление партнерами</NuxtLink>
       </li>
+      <li><NuxtLink to="/partner/stats">Статистика</NuxtLink></li>
     </ul>
   </div>
   <PartnerDivider />
   <div class="divider"></div>
   <div class="flex w-full justify-between">
-    <div>
+    <!-- <div>
       <label tabindex="10"
         ><input
           v-model="query"
@@ -140,8 +157,13 @@ if (
         v-if="inputLoading"
         class="loading loading-spinner text-primary loading-large ml-4"
       />
-    </div>
+    </div> -->
 
+    <div>
+      <selectUserModal
+        @selectUser=";[(selectedUser = $event), getRefStats()]"
+      />
+    </div>
     <div class="join mr-2">
       <button
         class="join-item btn"
@@ -171,62 +193,86 @@ if (
           <th>id</th>
           <th>username</th>
           <th>email</th>
-          <th>Управление</th>
+          <th>телеграм</th>
+          <th>число рефералов</th>
+          <th>
+            <div
+              @click="sortByDate('totalSum')"
+              class="flex cursor-pointer"
+              style="width: 110px"
+            >
+              комиссионные
+              <Icon
+                v-if="sortDateType == 'totalSum'"
+                class="swap-on fill-current ml-1 w-6 h-5"
+                :name="dateSortIcon"
+              />
+            </div>
+          </th>
+          <th>% наград</th>
+          <th>
+            <div
+              @click="sortByDate('registrationDate')"
+              class="flex cursor-pointer"
+              style="width: 130px"
+            >
+              Дата регистрации
+              <Icon
+                v-if="sortDateType == 'registrationDate'"
+                class="swap-on fill-current ml-1 w-6 h-5"
+                :name="dateSortIcon"
+              />
+            </div>
+          </th>
           <!-- <th></th> -->
         </tr>
       </thead>
       <tbody>
         <!-- row 1 -->
-        <tr v-for="user in users" class="hover">
-          <th style="max-width: 300px; min-width: 250px">
-            <div class="py-2 overflow-x-auto text-xs">
-              {{ user.uuid }}
+        <tr v-for="stat in stats" class="hover">
+          <td style="max-width: 130px">{{ stat.uuid }}</td>
+          <td style="max-width: 150px">
+            <div class="mx-1 overflow-x-auto text-x">
+              {{ stat.username }}
             </div>
-          </th>
-          <th style="max-width: 300px; min-width: 250px">
-            <div class="py-2 overflow-x-auto">
-              {{ user.username }}
+          </td>
+          <td style="max-width: 150px" class="overflow-x-auto text-xs">
+            <div class="mx-1 overflow-x-auto">
+              {{ stat.email }}
             </div>
-          </th>
-          <th style="max-width: 300px; min-width: 250px">
-            <div class="py-2 overflow-x-auto">
-              {{ user.email }}
+          </td>
+          <td style="max-width: 100px" class="overflow-x-auto text-x">
+            <div class="mx-1 overflow-x-auto">
+              {{ stat.telegram }}
             </div>
-          </th>
-          <th style="width: 190px" class="flex">
-            <label
-              for="referral_modal"
-              class="btn btn-primary btn-sm mr-1"
-              @click="openReferralModal(user)"
-              >Добавить реферала</label
-            >
-            <label
-              for="referral_options_modal"
-              class="btn btn-primary btn-sm"
-              @click="openOptionsModal(user)"
-              >Рефералы</label
-            >
-          </th>
-          <!-- <th style="width: 140px;">
-          </th> -->
+          </td>
+          <td style="max-width: 150px" class="overflow-x-auto">
+            <div class="mx-1 overflow-x-auto">
+              {{ stat.refCount }}
+            </div>
+          </td>
+          <td style="max-width: 150px" class="overflow-x-auto">
+            <div class="mx-1 overflow-x-auto">
+              {{ currency.format(stat.totalSum) }}
+            </div>
+          </td>
+          <td style="max-width: 150px" class="overflow-x-auto">
+            <div class="mx-1 overflow-x-auto">{{ stat.rewardPercent }}%</div>
+          </td>
+          <td style="max-width: 50px" class="overflow-x-auto">
+            <div class="mx-1 overflow-x-auto">
+              {{ stat.registrationDate.slice(0, 10) }}
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
-
-  <PartnerReferralModal :user="selectedUser" :loading="referralModalLoading" />
-  <PartnerOptionsModal
-    :user="selectedUser"
-    :loading="referralModalLoading"
-    :referrals="referrals"
-    :filteredReferrals="filteredReferrals"
-    @searchReferrals="searchReferrals"
-  />
 </template>
 
 <style scoped>
 ::-webkit-scrollbar {
-  height: 8px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {

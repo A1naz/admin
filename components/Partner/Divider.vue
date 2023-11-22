@@ -27,6 +27,12 @@ const partnerStore = usePartnerStore()
           Управление партнерами
         </NuxtLink>
       </li>
+      <li>
+        <NuxtLink to="/partner/stats">
+          <Icon name="mdi:google-analytics" size="24" />
+          Статистика
+        </NuxtLink>
+      </li>
     </ul>
   </div>
 </template>
