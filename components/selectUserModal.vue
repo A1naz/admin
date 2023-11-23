@@ -5,7 +5,7 @@ const selectedUser = ref<any>({
   username: '',
 })
 const selectUserClose: any = ref(null)
-const query = ref('89052008759')
+const query = ref('')
 const users = ref<any>([])
 
 async function onInput(event: Event) {

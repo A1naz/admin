@@ -1,5 +1,4 @@
 ﻿<script setup lang="ts">
-import Paginator from 'primevue/paginator'
 import { notify } from '@kyvg/vue3-notification'
 
 const { height, width } = useWindowSize()
@@ -7,15 +6,23 @@ const users = ref<any>([])
 const usersCount = ref(0)
 const elPerPage = 25
 const pages = ref(0)
+const isPageBtnsDisabled = ref(false)
 const inputLoading = ref(false)
 const curPage = ref(1)
-const isPageBtnsDisabled = ref(false)
+const referralModalRef: any = ref(false)
 const query = ref('')
-const sortDateType = ref('registrationDate:')
+const sortDateType = ref('registrationDate')
 const dateSortIcon = ref('mdi-arrow-down')
+const referralsHistory = ref<any>([])
 const selectedUser = ref<any>({
   username: '',
 })
+const loadingRefHistoryModal = ref(false)
+const selectedReferral = ref<any>({
+  username: '',
+  _id: 0,
+})
+const referralModalLoading = ref(false)
 const currency = useCurrency()
 const stats = ref<any>()
 const referrals = ref<any>([])
@@ -28,34 +35,9 @@ definePageMeta({
   title: 'Партнерская программа',
 })
 
-async function getUsers(searchValue: string = '') {
-  if (searchValue.length > 1) {
-    curPage.value = 1
-  }
-  const { data }: any = await useFetch('/api/user/getUsers', {
-    method: 'GET',
-    params: {
-      page: curPage.value,
-      searchValue,
-    },
-  })
-
-  usersCount.value = data.value.usersCount
-  users.value = data.value.users
-  pages.value = Math.ceil(usersCount.value / elPerPage)
-}
-
-await getUsers()
-
 async function swapPage(destination: number) {
   if (destination < 0 && curPage.value <= 1) return
-  if (curPage.value >= pages.value && destination > 0) {
-    notify({
-      type: 'error',
-      title: 'Последняя страница',
-    })
-    return
-  }
+
   curPage.value += destination
   isPageBtnsDisabled.value = true
   await getRefStats()
@@ -70,9 +52,10 @@ const findSearchQuery = async () => {
     return
   }
   inputLoading.value = true
-  await getUsers(query.value)
+  await getRefStats()
   inputLoading.value = false
 }
+
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 
 async function getRefStats() {
@@ -84,20 +67,12 @@ async function getRefStats() {
       page: curPage.value,
       sort: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
       sortType: sortDateType.value,
+      searchValue: query.value.replaceAll(' ', ''),
     },
   })
   if (data.value) {
     stats.value = data.value
   }
-}
-
-function searchReferrals(searchValue: string) {
-  filteredReferrals.value = referrals.value.filter(
-    (el: any) =>
-      el.username.includes(searchValue) ||
-      el.email.includes(searchValue) ||
-      el.uuid.includes(searchValue)
-  )
 }
 
 if (
@@ -127,6 +102,27 @@ function sortByDate(sortType: string) {
     dateSortIcon.value = 'mdi-arrow-up'
   }
   getRefStats()
+}
+
+// async function getReferralHistory() {
+//   const { data } = await useFetch('/api/partner/getReferralHistory', {
+//     method: 'GET',
+//     params: {
+//       refId: selectedReferral.value.id,
+//     },
+//   })
+//   if (data.value) {
+//     referralsHistory.value = data.value
+//   }
+// }
+
+async function openOptionsModal(user: any) {
+  selectedReferral.value = user
+  referralModalLoading.value = true
+  setTimeout(async () => {
+    await referralModalRef.value.getReferralHistory()
+    referralModalLoading.value = false
+  }, 200)
 }
 </script>
 
@@ -159,10 +155,27 @@ function sortByDate(sortType: string) {
       />
     </div> -->
 
-    <div>
-      <selectUserModal
-        @selectUser=";[(selectedUser = $event), getRefStats()]"
-      />
+    <div class="flex">
+      <div>
+        <selectUserModal
+          @selectUser=";[(selectedUser = $event), getRefStats()]"
+        />
+      </div>
+      <div v-if="selectedUser.username != ''">
+        <label
+          ><input
+            v-model="query"
+            type="text"
+            placeholder="id/username/email реферала"
+            class="input input-bordered input-l ml-2 w-80"
+            @input="onInput($event)"
+          />
+        </label>
+        <span
+          v-if="inputLoading"
+          class="loading loading-spinner text-primary loading-large ml-4"
+        />
+      </div>
     </div>
     <div class="join mr-2">
       <button
@@ -194,7 +207,21 @@ function sortByDate(sortType: string) {
           <th>username</th>
           <th>email</th>
           <th>телеграм</th>
-          <th>число рефералов</th>
+          <th>
+            <div
+              @click="sortByDate('refCount')"
+              class="flex cursor-pointer"
+              style="width: 110px"
+            >
+              рефералы
+              <Icon
+                v-if="sortDateType == 'refCount'"
+                class="swap-on fill-current ml-1 w-6 h-5"
+                :name="dateSortIcon"
+              />
+            </div>
+          </th>
+
           <th>
             <div
               @click="sortByDate('totalSum')"
@@ -209,6 +236,21 @@ function sortByDate(sortType: string) {
               />
             </div>
           </th>
+
+          <th>
+            <div
+              @click="sortByDate('quantity')"
+              class="flex cursor-pointer"
+              style="width: 110px"
+            >
+              услуг
+              <Icon
+                v-if="sortDateType == 'quantity'"
+                class="swap-on fill-current ml-1 w-6 h-5"
+                :name="dateSortIcon"
+              />
+            </div>
+          </th>
           <th>% наград</th>
           <th>
             <div
@@ -216,7 +258,7 @@ function sortByDate(sortType: string) {
               class="flex cursor-pointer"
               style="width: 130px"
             >
-              Дата регистрации
+              дата регистрации
               <Icon
                 v-if="sortDateType == 'registrationDate'"
                 class="swap-on fill-current ml-1 w-6 h-5"
@@ -224,39 +266,44 @@ function sortByDate(sortType: string) {
               />
             </div>
           </th>
-          <!-- <th></th> -->
+          <th>история</th>
         </tr>
       </thead>
       <tbody>
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover">
-          <td style="max-width: 130px">{{ stat.uuid }}</td>
-          <td style="max-width: 150px">
+          <td style="max-width: 150px">{{ stat.uuid }}</td>
+          <td>
             <div class="mx-1 overflow-x-auto text-x">
               {{ stat.username }}
             </div>
           </td>
-          <td style="max-width: 150px" class="overflow-x-auto text-xs">
+          <td class="overflow-x-auto text-xs">
             <div class="mx-1 overflow-x-auto">
               {{ stat.email }}
             </div>
           </td>
-          <td style="max-width: 100px" class="overflow-x-auto text-x">
+          <td class="overflow-x-auto text-x">
             <div class="mx-1 overflow-x-auto">
               {{ stat.telegram }}
             </div>
           </td>
-          <td style="max-width: 150px" class="overflow-x-auto">
+          <td style="max-width: 50px" class="overflow-x-auto">
             <div class="mx-1 overflow-x-auto">
               {{ stat.refCount }}
             </div>
           </td>
-          <td style="max-width: 150px" class="overflow-x-auto">
+          <td style="max-width: 50px" class="overflow-x-auto">
             <div class="mx-1 overflow-x-auto">
               {{ currency.format(stat.totalSum) }}
             </div>
           </td>
-          <td style="max-width: 150px" class="overflow-x-auto">
+          <td style="max-width: 50px" class="overflow-x-auto">
+            <div class="mx-1 overflow-x-auto">
+              {{ stat.quantity }}
+            </div>
+          </td>
+          <td style="max-width: 50px" class="overflow-x-auto">
             <div class="mx-1 overflow-x-auto">{{ stat.rewardPercent }}%</div>
           </td>
           <td style="max-width: 50px" class="overflow-x-auto">
@@ -264,10 +311,24 @@ function sortByDate(sortType: string) {
               {{ stat.registrationDate.slice(0, 10) }}
             </div>
           </td>
+          <td>
+            <label
+              for="ref_history_modal"
+              @click="openOptionsModal(stat)"
+              class="btn btn-primary btn-sm"
+              >история</label
+            >
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
+
+  <PartnerRefHistoryModal
+    :loading="referralModalLoading"
+    :referral="selectedReferral"
+    ref="referralModalRef"
+  />
 </template>
 
 <style scoped>
