@@ -1,14 +1,16 @@
 import { Schema, model } from 'mongoose'
 import { v4 as uuid } from 'uuid'
+import { Tariff } from './Tariff'
 
 const partnerSchema = new Schema({
   balance: { type: Number, default: 0 },
   refCount: { type: Number, default: 0 },
   rewardPercent: { type: Number, default: 10 },
 })
+
 const UserSchema = new Schema({
-  username: { type: String, unique: true, required: true },
   isBanned: { type: Boolean, default: false },
+  username: { type: String, unique: true, required: true },
   firstName: { type: String, required: false },
   lastName: { type: String, required: false },
   email: { type: String, unique: false, required: false },
@@ -16,8 +18,16 @@ const UserSchema = new Schema({
   wbApiKeys: { type: Array, required: false },
   password: { type: String, required: false },
   uuid: { type: String, unique: true, required: true, default: uuid() },
+  currentCabinet: { type: Schema.Types.ObjectId },
+
+  uuidCompany: { type: String, unique: false },
+  acesses: [{ type: String, required: false }],
+
   roles: [{ type: String, ref: 'Role' }],
+  tariff: { type: Tariff.schema, required: true },
+
   tabs: [{ type: String }],
+  newEmail: { type: String, required: false },
   emailConfirmed: { type: Boolean, default: false },
   telegram: { type: String, required: false },
   telegramUserId: { type: String, required: false },
@@ -31,9 +41,15 @@ const UserSchema = new Schema({
     default: {
       balance: 0,
       refCount: 0,
-      rewardPercent: 0,
+      rewardPercent: 10,
     },
   },
+})
+
+UserSchema.pre('save', function (next) {
+  // Добавляем 3 часа к полю "date"
+  this.registrationDate.setHours(this.registrationDate.getHours() + 3)
+  next()
 })
 
 export const User = model('User', UserSchema)

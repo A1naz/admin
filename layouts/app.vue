@@ -160,6 +160,15 @@ function closeOverlay() {
           title="Переводы с аккаунта на аккаунт"
           href="/balanceTransfer"
         />
+        <SidebarItem
+          v-if="
+            store.client.mainAdmin ||
+            store.client.tabs.includes('управления тарифами')
+          "
+          icon="mdi:account-details"
+          title="Управление тарифами"
+          href="/tariff"
+        />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between w-full items-center p-0 m-0">

@@ -1,6 +1,12 @@
 ﻿<script lang="ts" setup>
 const inputLoading = ref(false)
-const emit = defineEmits(['selectUser'])
+const props = defineProps({
+  selectAll: {
+    type: Boolean,
+    default: false,
+  },
+})
+const emit = defineEmits(['selectUser', 'selectAllUsers'])
 const selectedUser = ref<any>({
   username: '',
 })
@@ -43,13 +49,27 @@ async function selectUser(user: any) {
   selectUserClose.value?.click()
 }
 
+function selectAllUsers() {
+  emit('selectUser', {
+    uuid: 'all',
+    username: 'all',
+  })
+  selectedUser.value = {
+    uuid: 'all',
+    username: 'all',
+  }
+  selectUserClose.value?.click()
+}
+
 getUsers()
 </script>
 
 <template>
   <button class="ml-2 btn max-w-xl w-xl" @click="openUsersSelectModal">
     {{
-      selectedUser.username == ''
+      selectedUser.uuid == 'all'
+        ? 'Выбраны все пользователи'
+        : selectedUser.username == ''
         ? 'Выбрать пользователя'
         : selectedUser.username
     }}
@@ -84,6 +104,13 @@ getUsers()
               v-if="inputLoading"
               class="loading loading-spinner text-primary loading-large ml-4"
             />
+            <button
+              v-if="props.selectAll"
+              class="btn btn-primary normal-case text-white ml-1"
+              @click="selectAllUsers"
+            >
+              Выбрать всех
+            </button>
           </div>
         </div>
 
