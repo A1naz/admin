@@ -1,16 +1,39 @@
 ﻿<script setup lang="ts">
+import { notify } from '@kyvg/vue3-notification'
 definePageMeta({
   layout: 'app',
   auth: true,
   title: 'Партнерская программа',
 })
 
+const store = useMainStore()
+if (
+  !store.client.mainAdmin &&
+  !store.client.tabs.includes('управление тарифами')
+) {
+  navigateTo('/partner')
+}
+
 const selectedUser = ref<any>({
   username: '',
 })
 const curPage = ref(1)
 const isPageBtnsDisabled = ref(false)
+const tariffsHistory = ref<any>([])
 const { height, width } = useWindowSize()
+
+async function getTariffHistory() {
+  const { data } = await useFetch('/api/tariff/getTariffChangeHistory', {
+    method: 'GET',
+    params: {
+      page: curPage.value,
+    },
+  })
+  if (data.value) {
+    tariffsHistory.value = data.value
+  }
+}
+await getTariffHistory()
 
 async function swapPage(destination: number) {
   if (destination < 0 && curPage.value <= 1) return
@@ -56,6 +79,27 @@ const tariffs = ref<any>({
   },
 })
 
+function getServiceNameByKey(key: string) {
+  switch (key) {
+    case 'buyouts':
+      return 'Выкупы'
+    case 'deliveryStorage':
+      return 'Доставки'
+    case 'review':
+      return 'Отзывы'
+    case 'likeReview':
+      return 'Лайки отзывов'
+    case 'likeProduct':
+      return 'Лайки продуктов'
+    case 'questionProduct':
+      return 'Вопросы продуктов'
+    case 'cart':
+      return 'Корзина'
+    case 'autoAnswer':
+      return 'Автоответчик'
+  }
+}
+
 function setTariffs() {
   if (selectedUser.value.tariffs) {
     console.log(selectedUser.value.tariffs)
@@ -70,11 +114,51 @@ function setTariffs() {
       }
     })
   }
+
+  if (selectedUser.value.uuid == 'all') {
+    notify({
+      title: 'Внимание',
+      text: 'Выбраны все пользователи, будьте внимательны при изменении тарифов',
+    })
+  }
 }
 
 async function saveTariffs() {
+  for (const tariffKey in tariffs.value) {
+    console.log(tariffs.value[tariffKey])
+
+    if (
+      tariffs.value[tariffKey].value <= 0 ||
+      tariffs.value[tariffKey].value >= 99999
+    ) {
+      notify({
+        type: 'error',
+        title: 'Введите корректные значения тарифов',
+      })
+      return
+    }
+  }
+
   const { data }: any = await useFetch('/api/tariff/save', {
+    method: 'POST',
+    body: {
+      userUuid: selectedUser.value.uuid,
+      tariffs: tariffs.value,
+    },
+    watch: false,
   })
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Тарифы сохранены',
+    })
+    location.reload()
+  } else {
+    notify({
+      type: 'error',
+      title: 'Произошла ошибка',
+    })
+  }
 }
 </script>
 <template>
@@ -138,18 +222,26 @@ async function saveTariffs() {
       </thead>
       <tbody>
         <!-- row 1 -->
-        <tr class="hover">
-          <td>
-            <div class="mx-1 overflow-x-auto text-x"></div>
+        <tr class="hover" v-for="history in tariffsHistory">
+          <td class="overflow-x-auto text-xs" style="max-width: 150px">
+            <div class="mx-1 overflow-x-auto text-x">
+              {{ history.adminUserUuid }}
+            </div>
+          </td>
+          <td class="overflow-x-auto text-xs" style="max-width: 150px">
+            <div class="mx-1 overflow-x-auto">
+              {{ history.userUuid }}
+            </div>
           </td>
           <td class="overflow-x-auto text-xs">
-            <div class="mx-1 overflow-x-auto"></div>
+            <div class="mx-1 overflow-x-auto">
+              {{ history.actionDescription }}
+            </div>
           </td>
           <td class="overflow-x-auto text-xs">
-            <div class="mx-1 overflow-x-auto"></div>
-          </td>
-          <td class="overflow-x-auto text-xs">
-            <div class="mx-1 overflow-x-auto"></div>
+            <div class="mx-1 overflow-x-auto">
+              {{ history.date.substring(0, 10) }}
+            </div>
           </td>
         </tr>
       </tbody>
@@ -159,22 +251,38 @@ async function saveTariffs() {
     <div class="modal-box max-w-md">
       <h3 class="font-bold text-lg"></h3>
       <div class="flex flex-col">
+        <div class="text-center mb-3 text-lg font-bold">
+          {{
+            selectedUser.username == 'all'
+              ? 'Все пользователи'
+              : selectedUser.username
+          }}
+        </div>
+
         <div
           v-for="(tariff, tariffKey) in tariffs"
           class="flex justify-between"
         >
           <div class="mt-3">
-            {{ tariffKey }}
+            {{ getServiceNameByKey(tariffKey.toString()) }}
           </div>
           <input
-            type="text"
+            type="number"
             v-model="tariffs[tariffKey].value"
             class="input input-bordered my-1"
           />
         </div>
       </div>
+      <div
+        v-if="selectedUser.uuid === 'all'"
+        class="text-center text-lg font-extrabold text-warning"
+      >
+        Выбраны все пользователи!
+      </div>
       <div class="flex justify-center">
-        <button class="btn btn-primary mt-3 px-10" @click="saveTariffs">Сохранить</button>
+        <button class="btn btn-primary mt-3 px-10" @click="saveTariffs">
+          Сохранить
+        </button>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">

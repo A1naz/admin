@@ -163,7 +163,7 @@ function closeOverlay() {
         <SidebarItem
           v-if="
             store.client.mainAdmin ||
-            store.client.tabs.includes('управления тарифами')
+            store.client.tabs.includes('управление тарифами')
           "
           icon="mdi:account-details"
           title="Управление тарифами"

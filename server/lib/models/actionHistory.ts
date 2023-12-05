@@ -3,6 +3,7 @@ import { AdminUser } from './AdminUser'
 
 const ActionHistoryModel = new Schema({
   adminUser: { type: Schema.Types.ObjectId, ref: AdminUser, required: true },
+  adminUserUuid: { type: String },
   actionId: { type: Number, required: true },
   actionDescription: { type: String, required: true },
   date: { type: Date, default: Date.now(), required: true },

@@ -24,7 +24,44 @@ const UserSchema = new Schema({
   acesses: [{ type: String, required: false }],
 
   roles: [{ type: String, ref: 'Role' }],
-  tariff: { type: Tariff.schema, required: true },
+  tariff: {
+    type: Tariff.schema,
+    required: true,
+    default: {
+      buyouts: {
+        type: 'price',
+        value: 100,
+      },
+      deliveryStorage: {
+        type: 'price',
+        value: 25,
+      },
+      review: {
+        type: 'price',
+        value: 40,
+      },
+      likeReview: {
+        type: 'price',
+        value: 5,
+      },
+      likeProduct: {
+        type: 'price',
+        value: 5,
+      },
+      questionProduct: {
+        type: 'price',
+        value: 7,
+      },
+      cart: {
+        type: 'price',
+        value: 5,
+      },
+      autoAnswer: {
+        type: 'price',
+        value: 100,
+      },
+    },
+  },
 
   tabs: [{ type: String }],
   newEmail: { type: String, required: false },

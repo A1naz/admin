@@ -1,4 +1,6 @@
 ﻿<script lang="ts" setup>
+import { notify } from '@kyvg/vue3-notification';
+
 const inputLoading = ref(false)
 const props = defineProps({
   selectAll: {
@@ -50,6 +52,10 @@ async function selectUser(user: any) {
 }
 
 function selectAllUsers() {
+  notify({
+    title: 'Внимание',
+    text: 'Выбраны все пользователи, будьте внимательны при изменении тарифов',
+  })
   emit('selectUser', {
     uuid: 'all',
     username: 'all',
