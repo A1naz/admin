@@ -26,7 +26,31 @@ export default eventHandler(async (event) => {
     date: new Date(),
   })
 
-  console.log(tatiffsChangeHistory)
+  const userUuids = new Map()
+  tatiffsChangeHistory.forEach((item: any) => {
+    if (item.userUuid && !userUuids.has(item.userUuid))
+      userUuids.set(item.userUuid, 1)
+  })
 
-  return tatiffsChangeHistory
+  const users = await User.find({
+    uuid: { $in: Array.from(userUuids.keys()) },
+  })
+
+  const format = tatiffsChangeHistory.map((item: any) => {
+    const username = users.find((user: any) => {
+      if (user.uuid === item.userUuid) {
+        return user.username
+      }
+    })
+
+    return {
+      adminUserUuid: item.adminUserUuid,
+      username: username ? username.username : '',
+      actionDescription: item.actionDescription,
+      date: item.date,
+      userUuid: item.userUuid,
+    }
+  })
+
+  return format
 })

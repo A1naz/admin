@@ -102,15 +102,12 @@ function getServiceNameByKey(key: string) {
 
 function setTariffs() {
   if (selectedUser.value.tariffs) {
-    console.log(selectedUser.value.tariffs)
-
     const userTariffs = selectedUser.value.tariffs
 
     Object.keys(userTariffs).forEach((tariffType) => {
-      console.log(tariffType)
-
       if (tariffs.value[tariffType]) {
         tariffs.value[tariffType].value = userTariffs[tariffType].value
+        tariffs.value[tariffType].type = userTariffs[tariffType].type
       }
     })
   }
@@ -125,8 +122,6 @@ function setTariffs() {
 
 async function saveTariffs() {
   for (const tariffKey in tariffs.value) {
-    console.log(tariffs.value[tariffKey])
-
     if (
       tariffs.value[tariffKey].value <= 0 ||
       tariffs.value[tariffKey].value >= 99999
@@ -158,6 +153,14 @@ async function saveTariffs() {
       type: 'error',
       title: 'Произошла ошибка',
     })
+  }
+}
+
+function changeServiceType(key: string, event: Event) {
+  if ((event.target as HTMLInputElement).checked) {
+    tariffs.value[key].type = 'percent'
+  } else {
+    tariffs.value[key].type = 'price'
   }
 }
 </script>
@@ -215,7 +218,8 @@ async function saveTariffs() {
       <thead>
         <tr>
           <th>id админа</th>
-          <th>id пользователи</th>
+          <th>id пользователя</th>
+          <th>username пользователя</th>
           <th>комментарий</th>
           <th>Дата</th>
         </tr>
@@ -231,6 +235,11 @@ async function saveTariffs() {
           <td class="overflow-x-auto text-xs" style="max-width: 150px">
             <div class="mx-1 overflow-x-auto">
               {{ history.userUuid }}
+            </div>
+          </td>
+          <td class="overflow-x-auto text-xs">
+            <div class="mx-1 overflow-x-auto">
+              {{ history.username }}
             </div>
           </td>
           <td class="overflow-x-auto text-xs">
@@ -266,11 +275,24 @@ async function saveTariffs() {
           <div class="mt-3">
             {{ getServiceNameByKey(tariffKey.toString()) }}
           </div>
-          <input
-            type="number"
-            v-model="tariffs[tariffKey].value"
-            class="input input-bordered my-1"
-          />
+          <div>
+            <div class="form-control" v-if="tariffKey.toString() === 'buyouts'">
+              <label class="label cursor-pointer mt-1">
+                Проценты
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary ml-1"
+                  :checked="tariffs[tariffKey].type === 'percent'"
+                  @change="changeServiceType(tariffKey.toString(), $event)"
+                />
+              </label>
+            </div>
+            <input
+              type="number"
+              v-model="tariffs[tariffKey].value"
+              class="input input-bordered my-1"
+            />
+          </div>
         </div>
       </div>
       <div
