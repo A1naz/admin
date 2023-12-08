@@ -1,4 +1,4 @@
-﻿import { TransactionRequest } from '~/server/lib/models/TransactionRequest'
+﻿﻿import { TransactionRequest } from '~/server/lib/models/TransactionRequest'
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { ScreenshotsRequire } from '~/server/lib/models/ScreenshotsRequire'
@@ -25,11 +25,35 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
+  const curDate = new Date()
+  const dateToFilter = curDate.setHours(curDate.getHours() - 72)
+
   const isTransactionExist = await TransactionRequest.findOne({
     transactionNumber,
-    status: {
-      $in: ['created', 'active'],
-    },
+    $or: [
+      {
+        status: {
+          $in: ['created', 'active'],
+        },
+      },
+      {
+        status: 'accepted',
+        acception: {
+          $in: ['0/2', '1/2'],
+        },
+        requestDate: {
+          $gte: dateToFilter,
+        },
+      },
+      {
+        status: {
+          $in: ['accepted'],
+        },
+        acception: {
+          $in: ['2/2'],
+        },
+      },
+    ],
   })
 
   if (isTransactionExist) {
