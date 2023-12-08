@@ -1,4 +1,4 @@
-﻿﻿<script setup lang="ts">
+﻿<script setup lang="ts">
 const { height, width } = useWindowSize()
 const value = ref('')
 const productsCountInfo = ref({
