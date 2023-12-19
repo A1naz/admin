@@ -1,19 +1,9 @@
-﻿<script setup lang="ts">
+﻿﻿<script setup lang="ts">
 definePageMeta({
   layout: 'app',
   auth: true,
   title: 'Пользователи и права',
 })
-
-const selectedUsers = ref<any>([])
-const isAllUsersSelected = computed(() => {
-  return selectedUsers.value.length > 1 ? false : true
-})
-const selectUserClose: any = ref(null)
-
-function openUsersSelectModal() {
-  selectUserClose.value?.click()
-}
 
 const userEditForm = ref({
   firstName: '',
@@ -595,96 +585,7 @@ if (!store.client.mainAdmin) {
       </div>
     </div>
   </div>
-  <input type="checkbox" id="selectUsers" class="modal-toggle" />
-  <div class="modal cursor-pointer" @click="openUsersSelectModal">
-    <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
-      <form method="dialog">
-        <label
-          for="selectUsers"
-          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          ref="selectUsersClose"
-        >
-          ✕
-        </label>
-      </form>
-
-      <div>
-        <div class="justify-between flex">
-          <div>
-            <label
-              ><input
-                v-model="query"
-                type="text"
-                placeholder="id, username, email, telegram"
-                class="input input-bordered input-l ml-4 w-80"
-                @input="onInput($event)"
-              />
-            </label>
-            <span
-              v-if="inputLoading"
-              class="loading loading-spinner text-primary loading-large ml-4"
-            />
-          </div>
-          <label
-            class="btn btn-primary mr-4 btn-sm mt-4"
-            @click="
-              ;[(users = []), openUsersSelectModal(), (selectedUsers = [])]
-            "
-            >Выбрать всех</label
-          >
-        </div>
-
-        <div
-          class="my-2 mx-2 overflow-y-auto"
-          :style="{ 'max-height': 500 + 'px' }"
-        >
-          <table class="table my-3">
-            <!-- head -->
-            <thead>
-              <tr>
-                <th>id</th>
-                <th>username</th>
-                <th>email</th>
-                <th>telegram</th>
-                <th>Выбрать</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="hover" v-for="user in users" :key="user.uuid">
-                <td style="max-width: 130px">{{ user.uuid }}</td>
-                <td style="max-width: 150px">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ user.username }}
-                  </div>
-                </td>
-                <td style="max-width: 150px" class="overflow-x-auto">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ user.email }}
-                  </div>
-                </td>
-                <td style="max-width: 150px" class="overflow-x-auto">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ user.telegram }}
-                  </div>
-                </td>
-                <td style="max-width: 20px">
-                  <div>
-                    <input
-                      type="checkbox"
-                      :checked="user.isSelected"
-                      class="checkbox checkbox-primary"
-                      @click="selectUser(user._id, user.isSelected)"
-                    />
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="modal-action"></div>
-      </div>
-    </div>
-  </div>
+  <allowedUsersModal />
 </template>
 <style scoped>
 ::-webkit-scrollbar {

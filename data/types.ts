@@ -32,6 +32,7 @@ export interface IUser extends Entity {
   tariff: ITariff
   currentCabinet: ObjectId
   cabinets: any[]
+  allowedUsersModal: Boolean
 }
 
 export interface Partner {

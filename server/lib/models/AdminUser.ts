@@ -34,6 +34,8 @@ const UserSchema = new Schema({
       rewardPercent: 0,
     },
   },
+  allowedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  isAllUsersAllowed: { type: Boolean, default: false },
 })
 
 export const AdminUser = model('AdminUser', UserSchema)
