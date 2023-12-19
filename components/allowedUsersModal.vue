@@ -1,19 +1,19 @@
 ﻿<script lang="ts" setup>
-import { notify } from '@kyvg/vue3-notification';
+import { notify } from '@kyvg/vue3-notification'
 
 const store = useMainStore()
 const inputLoading = ref(false)
 const props = defineProps({
-  selectAll: {
-    type: Boolean,
-    default: false,
+  selectedUsers: {
+    type: Array,
+    required: true,
   },
 })
-const emit = defineEmits(['selectUser', 'selectAllUsers'])
+const emit = defineEmits(['selectUser', 'selectAllUsers', 'clearUsers'])
 const selectedUser = ref<any>({
   username: '',
 })
-const selectedUsers = ref<any>([])
+const selectedUsers = toRef(props, 'selectedUsers')
 const selectUserClose: any = ref(null)
 const query = ref('')
 const users = ref<any>([])
@@ -28,14 +28,23 @@ function openUsersSelectModal() {
 async function getUsers(searchValue: string = '') {
   const { data }: any = await useFetch('/api/user/getUsers', {
     method: 'GET',
+    watch: false,
     params: {
       page: 1,
       searchValue,
     },
   })
-  if (data.value) {
-    users.value = data.value.users
-  }
+
+  users.value = data.value.users
+
+  users.value.forEach((user: any) => {
+    if (selectedUsers.value.includes(user._id.valueOf())) {
+      user.isSelected = true
+    }
+    // if (store.client.allowedUsers.includes(user._id.valueOf()) && !user.isSelected) {
+      // user.isSelected = true
+    // }
+  })
 }
 const findSearchQuery = async () => {
   if (query.value.replaceAll(' ', '') == '') {
@@ -65,44 +74,37 @@ async function selectUser(uuid: String, select: boolean) {
   })
 }
 
-function selectAllUsers() {
-  notify({
-    title: 'Внимание',
-    text: 'Выбраны все пользователи, будьте внимательны при изменении тарифов',
-  })
-  emit('selectUser', {
-    uuid: 'all',
-    username: 'all',
-  })
-  selectedUser.value = {
-    uuid: 'all',
-    username: 'all',
-  }
-  selectUserClose.value?.click()
+async function clearUsers() {
+  users.value = []
+  emit('clearUsers')
 }
 
 getUsers()
 </script>
 
 <template>
-  <button class="ml-2 btn max-w-xl w-xl" @click="store.allowedUsersModal = true">
+  <button
+    class="ml-2 btn max-w-xl w-xl"
+    @click="store.allowedUsersModal = true"
+  >
     {{
-      selectedUser.uuid == 'all'
+      selectedUsers.length <= 0
         ? 'Выбраны все пользователи'
         : selectedUser.username == ''
-        ? 'Выбрать пользователя'
-        : selectedUser.username
+        ? 'Выбрано клиентов ' + selectedUsers.length
+        : ''
     }}
   </button>
 
   <input type="checkbox" id="selectUser" class="modal-toggle" />
-  <div 
-  :class="{
+  <div
+    :class="{
       'modal-open': store.allowedUsersModal,
     }"
-  class="modal cursor-pointer" 
-  @click="store.allowedUsersModal = false">
-  <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
+    class="modal cursor-pointer"
+    @click="store.allowedUsersModal = false"
+  >
+    <div class="modal-box w-12/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
         <label
           for="selectUsers"
@@ -112,7 +114,6 @@ getUsers()
           ✕
         </label>
       </form>
-
       <div>
         <div class="justify-between flex">
           <div>
@@ -133,12 +134,14 @@ getUsers()
           <label
             class="btn btn-primary mr-4 btn-sm mt-4"
             @click="
-              ;[(users = []), openUsersSelectModal(), (selectedUsers = [])]
+              ;[
+                clearUsers(),
+                (store.allowedUsersModal = false),
+              ]
             "
             >Выбрать всех</label
           >
         </div>
-
         <div
           class="my-2 mx-2 overflow-y-auto"
           :style="{ 'max-height': 500 + 'px' }"

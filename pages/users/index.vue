@@ -12,6 +12,7 @@ const userEditForm = ref({
   email: '',
   roles: <any>['user'],
   tabs: <any>[],
+  allowedUsers: <any>[],
 })
 const roles = ref<any>([
   {
@@ -105,6 +106,7 @@ const selectedUser: any = ref({
 async function getUsers() {
   const { data, error }: any = await useFetch('/api/user/getUsers', {
     method: 'GET',
+    watch: false,
     params: {
       page: curPage.value,
       sortDate: dateSortIcon.value,
@@ -160,6 +162,7 @@ async function selectUser(user: any) {
   if (isSelectedUserAdmin.value === true) {
     const { data, error } = await useFetch('/api/manager/getTabs', {
       method: 'GET',
+      watch: false,
       params: {
         uuid: selectedUser.value.uuid,
       },
@@ -232,6 +235,7 @@ async function saveUser() {
 
   const { data, error }: any = await useFetch('/api/manager/saveUser', {
     method: 'GET',
+    watch: false,
     params: {
       uuid: selectedUser.value.uuid,
       strBody: body,
@@ -262,6 +266,12 @@ const createMode = ref(false)
 const store = useMainStore()
 if (!store.client.mainAdmin) {
   navigateTo('/partner')
+}
+
+function addUser(user: any) {
+  console.log(user);
+
+  userEditForm.value.allowedUsers.push(user)
 }
 </script>
 <template>
@@ -323,6 +333,7 @@ if (!store.client.mainAdmin) {
                 email: '',
                 roles: ['user'],
                 tabs: [],
+                allowedUsers: [],
               }),
               (selectedUser = {
                 username: '',
@@ -423,7 +434,7 @@ if (!store.client.mainAdmin) {
   </div>
   <input type="checkbox" id="editUsersModal" class="modal-toggle" />
   <div class="modal cursor-pointer" @click="openEditUsersModal">
-    <div class="modal-box w-6/12 max-w-full cursor-auto" @click.stop>
+    <div class="modal-box w-7/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
         <label
           for="editUsersModal"
@@ -490,6 +501,16 @@ if (!store.client.mainAdmin) {
           {{ 'Настроить' }}
         </button>
       </div> -->
+      <div class="mb-3 flex">
+        <span class="mt-2"> Разрешенные пользователи </span>
+        <allowedUsersModal
+          :selectedUsers="userEditForm.allowedUsers"
+          @clearUsers="userEditForm.allowedUsers = []"
+          @selectUser="addUser($event)"
+        />
+        {{ userEditForm.allowedUsers }}
+      </div>
+      <div class="divider"></div>
       <div class="collapse bg-base-200 collapse-arrow mb-2">
         <input type="checkbox" />
         <div class="collapse-title text-xl font-medium">Настроить роли</div>
@@ -562,6 +583,7 @@ if (!store.client.mainAdmin) {
                 email: '',
                 roles: ['user'],
                 tabs: [],
+                allowedUsers: [],
               }
             "
           >
@@ -585,7 +607,6 @@ if (!store.client.mainAdmin) {
       </div>
     </div>
   </div>
-  <allowedUsersModal />
 </template>
 <style scoped>
 ::-webkit-scrollbar {
