@@ -1,10 +1,11 @@
-﻿﻿<script setup lang="ts">
+﻿<script setup lang="ts">
 definePageMeta({
   layout: 'app',
   auth: true,
   title: 'Пользователи и права',
 })
 
+const allowedUsersModalRef = ref<any>()
 const userEditForm = ref({
   firstName: '',
   lastName: '',
@@ -149,6 +150,22 @@ const findSearchQuery = async () => {
 }
 
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
+
+async function getAllowedUsers() {
+  const { data, error }: any = await useFetch('/api/manager/getAllowedUsers', {
+    method: 'GET',
+    watch: false,
+    params: {
+      uuid: selectedUser.value.uuid,
+    },
+  })
+
+  if (data.value) {
+    userEditForm.value.allowedUsers = data.value.map((user: any) => user._id)
+    allowedUsersModalRef.value?.setUsers(data.value)
+  }
+}
+
 async function selectUser(user: any) {
   selectedUser.value = user
   userEditForm.value.email = user.email
@@ -167,9 +184,11 @@ async function selectUser(user: any) {
         uuid: selectedUser.value.uuid,
       },
     })
+
     if (data.value) {
       userEditForm.value.tabs = data.value.tabs
     }
+    await getAllowedUsers()
   }
 }
 
@@ -266,12 +285,6 @@ const createMode = ref(false)
 const store = useMainStore()
 if (!store.client.mainAdmin) {
   navigateTo('/partner')
-}
-
-function addUser(user: any) {
-  console.log(user);
-
-  userEditForm.value.allowedUsers.push(user)
 }
 </script>
 <template>
@@ -501,16 +514,22 @@ function addUser(user: any) {
           {{ 'Настроить' }}
         </button>
       </div> -->
-      <div class="mb-3 flex">
-        <span class="mt-2"> Разрешенные пользователи </span>
-        <allowedUsersModal
-          :selectedUsers="userEditForm.allowedUsers"
-          @clearUsers="userEditForm.allowedUsers = []"
-          @selectUser="addUser($event)"
-        />
-        {{ userEditForm.allowedUsers }}
+      <div v-if="isSelectedUserAdmin">
+        <div class="mb-3 flex">
+          <span class="mt-2"> Разрешенные пользователи </span>
+          <button
+            class="ml-2 btn max-w-xl w-xl"
+            @click="store.allowedUsersModal = true"
+          >
+            {{
+              userEditForm.allowedUsers.length <= 0
+                ? 'Выбраны все пользователи'
+                : 'Выбрано клиентов ' + userEditForm.allowedUsers.length
+            }}
+          </button>
+        </div>
+        <div class="divider"></div>
       </div>
-      <div class="divider"></div>
       <div class="collapse bg-base-200 collapse-arrow mb-2">
         <input type="checkbox" />
         <div class="collapse-title text-xl font-medium">Настроить роли</div>
@@ -607,6 +626,11 @@ function addUser(user: any) {
       </div>
     </div>
   </div>
+  <allowedUsersModal
+    ref="allowedUsersModalRef"
+    :selectedUsers="userEditForm.allowedUsers"
+    @clearUsers="userEditForm.allowedUsers = []"
+  />
 </template>
 <style scoped>
 ::-webkit-scrollbar {

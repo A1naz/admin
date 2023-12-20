@@ -13,7 +13,6 @@ export default eventHandler(async (event) => {
   if (!userAdmin) return sendRedirect(event, '/auth', 302)
 
   let allowedUsersParam = userAdmin.isAllUsersAllowed ? {} : { _id: { $in: userAdmin.allowedUsers.map((id: any) => id) }}
-  console.log(allowedUsersParam);
   
   let rolesParam = role ? { roles: { $in: [role] } } : {}
   let allUsers = []

@@ -17,6 +17,12 @@ const selectedUsers = toRef(props, 'selectedUsers')
 const selectUserClose: any = ref(null)
 const query = ref('')
 const users = ref<any>([])
+const setUsers = (data: any[]) => {
+  users.value = data
+}
+defineExpose({
+  setUsers,
+})
 
 async function onInput(event: Event) {
   findSearchQueryDebounced()
@@ -42,7 +48,7 @@ async function getUsers(searchValue: string = '') {
       user.isSelected = true
     }
     // if (store.client.allowedUsers.includes(user._id.valueOf()) && !user.isSelected) {
-      // user.isSelected = true
+    // user.isSelected = true
     // }
   })
 }
@@ -78,12 +84,10 @@ async function clearUsers() {
   users.value = []
   emit('clearUsers')
 }
-
-getUsers()
 </script>
 
 <template>
-  <button
+  <!-- <button
     class="ml-2 btn max-w-xl w-xl"
     @click="store.allowedUsersModal = true"
   >
@@ -94,7 +98,7 @@ getUsers()
         ? 'Выбрано клиентов ' + selectedUsers.length
         : ''
     }}
-  </button>
+  </button> -->
 
   <input type="checkbox" id="selectUser" class="modal-toggle" />
   <div
@@ -104,7 +108,7 @@ getUsers()
     class="modal cursor-pointer"
     @click="store.allowedUsersModal = false"
   >
-    <div class="modal-box w-12/12 max-w-full cursor-auto" @click.stop>
+    <div class="modal-box w-8/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
         <label
           for="selectUsers"
@@ -133,12 +137,7 @@ getUsers()
           </div>
           <label
             class="btn btn-primary mr-4 btn-sm mt-4"
-            @click="
-              ;[
-                clearUsers(),
-                (store.allowedUsersModal = false),
-              ]
-            "
+            @click=";[clearUsers(), (store.allowedUsersModal = false)]"
             >Выбрать всех</label
           >
         </div>
