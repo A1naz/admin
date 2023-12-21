@@ -10,8 +10,9 @@ export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
   const { uuid, strBody }: any = getQuery(event)
 
+ 
   const body = JSON.parse(strBody)
-
+  
   if (!session) return sendRedirect(event, '/auth', 302)
 
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
@@ -58,6 +59,8 @@ export default eventHandler(async (event) => {
             emailConfirmed: true,
             firstName: userToEdit.firstName,
             lastName: userToEdit.lastName,
+            allowedUsers: body.allowedUsers,
+            isAllUsersAllowed: body.allowedUsers.length > 0 ? false : true,
           })
 
           await ActionHistory.create({
@@ -78,6 +81,9 @@ export default eventHandler(async (event) => {
             ? body.roles
             : adminUserToEdit.roles
           adminUserToEdit.tabs = body.tabs
+
+          adminUserToEdit.allowedUsers = body.allowedUsers
+          adminUserToEdit.isAllUsersAllowed = body.allowedUsers.length > 0 ? false : true
           await adminUserToEdit.save()
         }
       } else if (body.roles.length <= 1) {
@@ -148,6 +154,8 @@ export default eventHandler(async (event) => {
           emailConfirmed: true,
           firstName: newUser.firstName,
           lastName: newUser.lastName,
+          allowedUsers: body.allowedUsers,
+          isAllUsersAllowed: body.allowedUsers.length > 0 ? false : true,
         })
 
         await ActionHistory.create({

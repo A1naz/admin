@@ -1,12 +1,15 @@
 ﻿import { paymenthistory } from '../../models/Paymenthistory'
 import { User } from '../../models/User'
 import { PartnerPaymentHistory } from '../../models/PartnerPaymentHistory'
-export default async function getTopUsersByPartnerPayments(searchValue: any) {
+export default async function getTopUsersByPartnerPayments(searchValue: any, allowedUsersParam: any, allowedUsersParamForUser: any) {
   let top100UsersByPartnerPayments: any[] = []
   let lastDates: any[] = []
 
   if (!searchValue) {
     top100UsersByPartnerPayments = await PartnerPaymentHistory.aggregate([
+      {
+        $match: allowedUsersParam,
+      },
       {
         $group: {
           _id: '$user',
@@ -43,6 +46,7 @@ export default async function getTopUsersByPartnerPayments(searchValue: any) {
     ])
   } else {
     const foundUsers = await User.find({
+      ...allowedUsersParamForUser,
       $or: [
         { uuid: { $regex: searchValue, $options: 'i' } },
         { email: { $regex: searchValue, $options: 'i' } },

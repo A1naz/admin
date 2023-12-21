@@ -15,11 +15,23 @@ export default eventHandler(async (event) => {
 
   const { searchValue, sortDate, pageNumber }: any = getQuery(event)
 
+  const allowedUsersParamForUser = user.isAllUsersAllowed
+    ? {}
+    : {
+        _id: { $in: user.allowedUsers.map((id: any) => id) },
+      }
+  const allowedUsersParam = user.isAllUsersAllowed
+    ? {}
+    : {
+        user: { $in: user.allowedUsers.map((id: any) => id) },
+      }
+      
   let lastDates: any[] = []
   let matchFilter = null
   let aggregatePipeline: any[] = []
   if (searchValue) {
     const foundUsers = await User.find({
+      ...allowedUsersParamForUser,
       $or: [
         { username: { $regex: searchValue, $options: 'i' } },
         { email: { $regex: searchValue, $options: 'i' } },
@@ -33,6 +45,11 @@ export default eventHandler(async (event) => {
         user: { $in: foundUsers.map((user: any) => user._id) },
       },
     })
+  } else {
+    aggregatePipeline.unshift({
+      $match: allowedUsersParam,
+    })
+
   }
 
   if (sortDate == '1') {

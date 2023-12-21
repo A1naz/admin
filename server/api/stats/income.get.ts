@@ -14,6 +14,13 @@ export default eventHandler(async (event) => {
   if (!user || !user.tabs.includes('аналитика'))
     return sendRedirect(event, '/auth', 302)
 
+    const allowedUsersParam = user.isAllUsersAllowed
+    ? {}
+    : { user: { $in: user.allowedUsers.map((id: any) => id) } }
+
+    const allowedUsersParamForPartner = user.isAllUsersAllowed ? {}
+    : { _id: { $in: user.allowedUsers.map((id: any) => id) } }
+
   await ActionHistory.create({
     adminUser: user._id,
     actionId: 51,
@@ -127,6 +134,7 @@ export default eventHandler(async (event) => {
   }
 
   const history: any = await paymenthistory.find({
+    ...allowedUsersParam,
     ...filter,
   })
 
@@ -163,6 +171,7 @@ export default eventHandler(async (event) => {
     }
 
     const newHistory: any = await paymenthistory.find({
+      ...allowedUsersParam,
       type: filter.type,
       dataoperation: {
         $gte: oneWeekAgo,
@@ -267,6 +276,7 @@ export default eventHandler(async (event) => {
       .aggregate([
         {
           $match: {
+            ...allowedUsersParam,
             type: filter.type,
             dataoperation: {
               $gte: new Date(thisYear, 0, 1),
@@ -301,6 +311,7 @@ export default eventHandler(async (event) => {
   paymentsForSumm = await paymenthistory.aggregate([
     {
       $match: {
+        ...allowedUsersParam,
         dataoperation: filter.dataoperation,
         type: {
           $in: types,
@@ -328,6 +339,7 @@ export default eventHandler(async (event) => {
   const completedPartnerWithdraws = await PartnerWithdraw.aggregate([
     {
       $match: {
+        ...allowedUsersParam,
         date: filter.dataoperation,
         status: 'completed',
       },
@@ -348,6 +360,7 @@ export default eventHandler(async (event) => {
   const activePartnerWithdraws = await PartnerWithdraw.aggregate([
     {
       $match: {
+        ...allowedUsersParam,
         date: filter.dataoperation,
         status: 'work',
       },
@@ -443,6 +456,7 @@ export default eventHandler(async (event) => {
   const penaltyAggregate = await paymenthistory.aggregate([
     {
       $match: {
+        ...allowedUsersParam,
         dataoperation: filter.dataoperation,
         typeoperations: 'Расход',
         type: 'deliveries',
@@ -461,6 +475,7 @@ export default eventHandler(async (event) => {
   const partnersIncomeAggregate = await User.aggregate([
     {
       $match: {
+        ...allowedUsersParamForPartner,
         'partner.refCount': { $gt: 0 } // Выбираем пользователей с refCount > 0
       }
     },
@@ -521,6 +536,7 @@ export default eventHandler(async (event) => {
   const activeUsersAggregate = await paymenthistory.aggregate([
     {
       $match: {
+        ...allowedUsersParam,
         dataoperation:
           period == 'yesterday' || period == 'today' || period == 'threeDays'
             ? filter.dataoperation
@@ -548,6 +564,7 @@ export default eventHandler(async (event) => {
   const paidUsersAggregate = await paymenthistory.aggregate([
     {
       $match: {
+        ...allowedUsersParam,
         type: 'deposit',
         dataoperation: filter.dataoperation,
       },
@@ -576,7 +593,7 @@ export default eventHandler(async (event) => {
     paidUsers = paidUsersAggregate[0].count
   }
   const inActiveUsers = usersCount - activeUsers - 1
-  const signedUp = await User.countDocuments({ registrationDate: filter.dataoperation })
+  const signedUp = await User.countDocuments({ ...allowedUsersParamForPartner, registrationDate: filter.dataoperation })
 
 
   const pieGraphData = {

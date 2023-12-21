@@ -5,6 +5,7 @@ definePageMeta({
   title: 'Пользователи и права',
 })
 
+const allowedUsersModalRef = ref<any>()
 const userEditForm = ref({
   firstName: '',
   lastName: '',
@@ -12,6 +13,7 @@ const userEditForm = ref({
   email: '',
   roles: <any>['user'],
   tabs: <any>[],
+  allowedUsers: <any>[],
 })
 const roles = ref<any>([
   {
@@ -105,6 +107,7 @@ const selectedUser: any = ref({
 async function getUsers() {
   const { data, error }: any = await useFetch('/api/user/getUsers', {
     method: 'GET',
+    watch: false,
     params: {
       page: curPage.value,
       sortDate: dateSortIcon.value,
@@ -147,6 +150,22 @@ const findSearchQuery = async () => {
 }
 
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
+
+async function getAllowedUsers() {
+  const { data, error }: any = await useFetch('/api/manager/getAllowedUsers', {
+    method: 'GET',
+    watch: false,
+    params: {
+      uuid: selectedUser.value.uuid,
+    },
+  })
+
+  if (data.value) {
+    userEditForm.value.allowedUsers = data.value.map((user: any) => user._id)
+    allowedUsersModalRef.value?.setUsers(data.value)
+  }
+}
+
 async function selectUser(user: any) {
   selectedUser.value = user
   userEditForm.value.email = user.email
@@ -157,18 +176,19 @@ async function selectUser(user: any) {
   userEditForm.value.tabs = []
   selectAdminUserClose.value?.click()
 
-  if (
-    isSelectedUserAdmin.value === true
-  ) {
+  if (isSelectedUserAdmin.value === true) {
     const { data, error } = await useFetch('/api/manager/getTabs', {
       method: 'GET',
+      watch: false,
       params: {
         uuid: selectedUser.value.uuid,
       },
     })
+
     if (data.value) {
       userEditForm.value.tabs = data.value.tabs
     }
+    await getAllowedUsers()
   }
 }
 
@@ -234,6 +254,7 @@ async function saveUser() {
 
   const { data, error }: any = await useFetch('/api/manager/saveUser', {
     method: 'GET',
+    watch: false,
     params: {
       uuid: selectedUser.value.uuid,
       strBody: body,
@@ -325,6 +346,7 @@ if (!store.client.mainAdmin) {
                 email: '',
                 roles: ['user'],
                 tabs: [],
+                allowedUsers: [],
               }),
               (selectedUser = {
                 username: '',
@@ -425,7 +447,7 @@ if (!store.client.mainAdmin) {
   </div>
   <input type="checkbox" id="editUsersModal" class="modal-toggle" />
   <div class="modal cursor-pointer" @click="openEditUsersModal">
-    <div class="modal-box w-6/12 max-w-full cursor-auto" @click.stop>
+    <div class="modal-box w-7/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
         <label
           for="editUsersModal"
@@ -492,6 +514,22 @@ if (!store.client.mainAdmin) {
           {{ 'Настроить' }}
         </button>
       </div> -->
+      <div v-if="isSelectedUserAdmin">
+        <div class="mb-3 flex">
+          <span class="mt-2"> Разрешенные пользователи </span>
+          <button
+            class="ml-2 btn max-w-xl w-xl"
+            @click="store.allowedUsersModal = true"
+          >
+            {{
+              userEditForm.allowedUsers.length <= 0
+                ? 'Выбраны все пользователи'
+                : 'Выбрано клиентов ' + userEditForm.allowedUsers.length
+            }}
+          </button>
+        </div>
+        <div class="divider"></div>
+      </div>
       <div class="collapse bg-base-200 collapse-arrow mb-2">
         <input type="checkbox" />
         <div class="collapse-title text-xl font-medium">Настроить роли</div>
@@ -564,6 +602,7 @@ if (!store.client.mainAdmin) {
                 email: '',
                 roles: ['user'],
                 tabs: [],
+                allowedUsers: [],
               }
             "
           >
@@ -587,6 +626,11 @@ if (!store.client.mainAdmin) {
       </div>
     </div>
   </div>
+  <allowedUsersModal
+    ref="allowedUsersModalRef"
+    :selectedUsers="userEditForm.allowedUsers"
+    @clearUsers="userEditForm.allowedUsers = []"
+  />
 </template>
 <style scoped>
 ::-webkit-scrollbar {

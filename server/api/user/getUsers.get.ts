@@ -12,11 +12,14 @@ export default eventHandler(async (event) => {
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (!userAdmin) return sendRedirect(event, '/auth', 302)
 
+  let allowedUsersParam = userAdmin.isAllUsersAllowed ? {} : { _id: { $in: userAdmin.allowedUsers.map((id: any) => id) }}
+  
   let rolesParam = role ? { roles: { $in: [role] } } : {}
   let allUsers = []
 
   if (searchValue && searchValue.length > 0) {
     allUsers = await User.find({
+      ...allowedUsersParam,
       ...rolesParam,
       $or: [
         { uuid: { $regex: searchValue, $options: 'i' } },
@@ -31,6 +34,7 @@ export default eventHandler(async (event) => {
   } else {
     allUsers = await User.find({
       ...rolesParam,
+    ...allowedUsersParam,
     })
       .skip(usersPerPage * (+page - 1))
       .limit(usersPerPage)

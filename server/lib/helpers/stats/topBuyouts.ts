@@ -1,7 +1,11 @@
 ﻿import { Buyout } from '../../models/Buyout'
 
-export default async function getTopBuyouts() {
+export default async function getTopBuyouts(allowedUsersParam: any) {
+
   const top50Buyouts = await Buyout.aggregate([
+    {
+      $match: allowedUsersParam,
+    },
     {
       $group: {
         _id: '$article',

@@ -18,6 +18,13 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
+  const allowedUsersParam = user.isAllUsersAllowed
+    ? {}
+    : {
+        sender: { $in: user.allowedUsers.map((id: any) => id) },
+        recipient: { $in: user.allowedUsers.map((id: any) => id) },
+      }
+
   const { page, sortDate, dateRange }: any = getQuery(event)
 
   let trueDateRange = {}
@@ -42,16 +49,16 @@ export default eventHandler(async (event) => {
   //       }
   //     : {}
 
-
-
-  const format = await balanceTransferRequest.find({
-    // ...accountOperation,
-    ...trueDateRange,
-  })
+  const format = await balanceTransferRequest
+    .find({
+      // ...accountOperation,
+      ...allowedUsersParam,
+      ...trueDateRange,
+    })
     .sort({ requestDate: Number(sortDate) === -1 ? -1 : 1 })
     .limit(elPerPage)
     .skip((page - 1) * elPerPage)
-    .lean()    
+    .lean()
 
   await ActionHistory.create({
     adminUser: user._id,
@@ -60,7 +67,6 @@ export default eventHandler(async (event) => {
     date: new Date(),
   })
 
-  
   return {
     balanceTransferRequest: format,
   }

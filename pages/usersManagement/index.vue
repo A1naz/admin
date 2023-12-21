@@ -219,6 +219,7 @@ async function getUsers(searchValue: string = '') {
 
   users.value = data.value.users
 }
+getUsers()
 
 const findSearchQuery = async () => {
   if (query.value.replaceAll(' ', '') == '') {

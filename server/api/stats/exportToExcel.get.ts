@@ -27,6 +27,10 @@ export default eventHandler(async (event) => {
     if (!user || !user.tabs.includes('финансовые операции'))
       return sendRedirect(event, '/auth', 302)
 
+    const allowedUsersParam = user.isAllUsersAllowed
+      ? {}
+      : { user: { $in: user.allowedUsers.map((id: any) => id) } }
+
     const { page, filters, sortDate }: any = getQuery(event)
 
     const workbook = new ExcelJS.Workbook()
@@ -84,6 +88,7 @@ export default eventHandler(async (event) => {
 
     let stats: any = await paymenthistory
       .find({
+        ...allowedUsersParam,
         ...trueFilters.basisoperation,
         ...userIds,
         ...trueTypeoperations,
@@ -117,6 +122,7 @@ export default eventHandler(async (event) => {
       const paymentAggregate = await paymenthistory.aggregate([
         {
           $match: {
+            ...allowedUsersParam,
             ...trueFilters.basisoperation,
             ...userIds,
             ...trueTypeoperations,
@@ -155,7 +161,12 @@ export default eventHandler(async (event) => {
       const buyouts = await Buyout.find({ uuid: { $in: buyoutsUuids } })
 
       format.forEach((stat: any) => {
-        if (stat.type == 'buyouts' || stat.type == 'buyouts service') {
+        if (
+          (stat.type == 'buyouts' && stat.basisoperation.includes('Выкуп #')) ||
+          (stat.type == 'buyouts service' &&
+            stat.basisoperation.includes('Выкуп #'))
+        ) {
+
           const buyout = buyouts.find(
             (buyout: any) =>
               buyout.uuid == stat.basisoperation.split(' ')[1].replace('#', '')

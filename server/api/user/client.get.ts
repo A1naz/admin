@@ -33,6 +33,8 @@ export default eventHandler(async (event) => {
     partner: user.partner,
     mainAdmin: user.mainAdmin,
     tabs: user.tabs,
+    allowedUsers: user.allowedUsers,
+    isAllUsersAllowed: user.isAllUsersAllowed,
   }
 
   return {

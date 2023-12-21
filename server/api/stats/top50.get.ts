@@ -28,70 +28,116 @@ export default eventHandler(async (event) => {
   if (!user || !user.tabs.includes('аналитика'))
     return sendRedirect(event, '/auth', 302)
 
+  const allowedUsersParam = user.isAllUsersAllowed
+    ? {}
+    : {
+        user: { $in: user.allowedUsers.map((id: any) => id) },
+      }
+  const allowedUsersParamForUser = user.isAllUsersAllowed
+    ? {}
+    : {
+        _id: { $in: user.allowedUsers.map((id: any) => id) },
+      }
+
   const { searchValue, selectedTop }: any = getQuery(event)
 
   if (selectedTop === 'top50Buyouts') {
-    top50Buyouts = await getTopBuyouts()
+    top50Buyouts = await getTopBuyouts(allowedUsersParam)
 
     await ActionHistory.create({
       adminUser: user._id,
       actionId: 33,
-      actionDescription: `Админ ${user.uuid} - ${user.username} получил топ 50 артикулов по выкупам${searchValue ? `, по запросу ${searchValue}` : ''}`,
+      actionDescription: `Админ ${user.uuid} - ${
+        user.username
+      } получил топ 50 артикулов по выкупам${
+        searchValue ? `, по запросу ${searchValue}` : ''
+      }`,
       date: new Date(),
     })
-
   }
 
   if (selectedTop === 'top50Articles') {
-    top50Articles = await getTopArticles()
+    top50Articles = await getTopArticles(allowedUsersParam)
 
     await ActionHistory.create({
       adminUser: user._id,
       actionId: 34,
-      actionDescription: `Админ ${user.uuid} - ${user.username} получил топ 50 артикулов по покупкам${searchValue ? `, по запросу ${searchValue}` : ''}`,
+      actionDescription: `Админ ${user.uuid} - ${
+        user.username
+      } получил топ 50 артикулов по покупкам${
+        searchValue ? `, по запросу ${searchValue}` : ''
+      }`,
       date: new Date(),
     })
   }
   if (selectedTop === 'top50pvz') {
-    top50pvz = await getTopPVZ()
+    top50pvz = await getTopPVZ(allowedUsersParam)
 
     await ActionHistory.create({
       adminUser: user._id,
       actionId: 35,
-      actionDescription: `Админ ${user.uuid} - ${user.username} получил топ 50 пунктов выдачи${searchValue ? `, по запросу ${searchValue}` : ''}`,
+      actionDescription: `Админ ${user.uuid} - ${
+        user.username
+      } получил топ 50 пунктов выдачи${
+        searchValue ? `, по запросу ${searchValue}` : ''
+      }`,
       date: new Date(),
     })
   }
 
   if (selectedTop === 'top50UsersByDeposit') {
-    top50UsersByDeposit = await getTopUsersByDeposit(searchValue)
+    top50UsersByDeposit = await getTopUsersByDeposit(
+      searchValue,
+      allowedUsersParam,
+      allowedUsersParamForUser
+    )
 
     await ActionHistory.create({
       adminUser: user._id,
       actionId: 36,
-      actionDescription: `Админ ${user.uuid} - ${user.username} получил топ 50 пользователей по пополнениям${searchValue ? `, по запросу ${searchValue}` : ''}`,
+      actionDescription: `Админ ${user.uuid} - ${
+        user.username
+      } получил топ 50 пользователей по пополнениям${
+        searchValue ? `, по запросу ${searchValue}` : ''
+      }`,
       date: new Date(),
     })
   }
 
   if (selectedTop === 'top100UsersByPartnerPayments') {
-    top100UsersByPartnerPayments = await getTopUsersByPartnerPayments(searchValue)
+    top100UsersByPartnerPayments = await getTopUsersByPartnerPayments(
+      searchValue,
+      allowedUsersParam,
+      allowedUsersParamForUser
+    )
 
     await ActionHistory.create({
       adminUser: user._id,
       actionId: 37,
-      actionDescription: `Админ ${user.uuid} - ${user.username} получил топ 100 пользователей по вознаграждениям партнерки${searchValue ? `, по запросу ${searchValue}` : ''}`,
+      actionDescription: `Админ ${user.uuid} - ${
+        user.username
+      } получил топ 100 пользователей по вознаграждениям партнерки${
+        searchValue ? `, по запросу ${searchValue}` : ''
+      }`,
       date: new Date(),
     })
   }
 
   if (selectedTop === 'top100UsersByPartnerBalance') {
-    top100UsersByPartnerBalance = await getTopUsersByPartnerBalance(searchValue)
+    top100UsersByPartnerBalance = await getTopUsersByPartnerBalance(
+      searchValue,
+      allowedUsersParam,
+      allowedUsersParamForUser
+    )
 
     await ActionHistory.create({
       adminUser: user._id,
       actionId: 38,
-      actionDescription: `Админ ${user.uuid} - ${user.username} получил топ 100 пользователей по балансу партнерки${searchValue ? `, по запросу ${searchValue}` : ''}`,
+      actionDescription: `Админ ${user.uuid} - ${
+        user.username
+      } получил топ 100 пользователей по балансу партнерки${
+        searchValue ? `, по запросу ${searchValue}` : ''
+      }`,
       date: new Date(),
     })
   }

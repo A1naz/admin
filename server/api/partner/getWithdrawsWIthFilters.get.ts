@@ -12,11 +12,17 @@ export default eventHandler(async (event) => {
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (!userAdmin || !userAdmin.tabs.includes('управление партнеркой'))
     return sendRedirect(event, '/auth', 302)
+
+  const allowedUsersParam = userAdmin.isAllUsersAllowed
+    ? {}
+    : { user: { $in: userAdmin.allowedUsers.map((id: any) => id) } }
+
   const trueFilters = JSON.parse(filters)
   if (!trueFilters.sumTo) delete trueFilters.sumTo
   if (!trueFilters.sumFrom) delete trueFilters.sumFrom
 
   const withdraws = await PartnerWithdraw.find({
+    ...allowedUsersParam,
     amount: {
       $gte: Number(trueFilters.sumFrom) || 0,
       $lte: Number(trueFilters.sumTo) || 999999,
