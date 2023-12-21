@@ -1,7 +1,7 @@
 ﻿import { paymenthistory } from '../../models/Paymenthistory'
 import { User } from '../../models/User'
 import { PartnerPaymentHistory } from '../../models/PartnerPaymentHistory'
-export default async function getTopUsersByPartnerBalance(searchValue: any) {
+export default async function getTopUsersByPartnerBalance(searchValue: any, allowedUsersParam: any, allowedUsersParamForUser: any) {
   let top100UsersByPartnerBalance: any[] = []
   let lastDates: any[] = []
 
@@ -9,6 +9,7 @@ export default async function getTopUsersByPartnerBalance(searchValue: any) {
     top100UsersByPartnerBalance = await User.aggregate([
       {
         $match: {
+          ...allowedUsersParamForUser,
           'partner.refCount': { $gt: 0 }, // Выбираем пользователей с refCount > 0
         },
       },
@@ -48,6 +49,7 @@ export default async function getTopUsersByPartnerBalance(searchValue: any) {
     ])
   } else {
     const foundUsers = await User.find({
+      ...allowedUsersParamForUser,
       $or: [
         { uuid: { $regex: searchValue, $options: 'i' } },
         { email: { $regex: searchValue, $options: 'i' } },

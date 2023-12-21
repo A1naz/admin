@@ -1,7 +1,7 @@
 ﻿import { paymenthistory } from '../../models/Paymenthistory'
 import { User } from '../../models/User'
 
-export default async function getTopUsersByDeposit(searchValue: any) {
+export default async function getTopUsersByDeposit(searchValue: any, allowedUsersParam: any, allowedUsersParamForUsers: any) {
 
 let top50UsersByDeposit: any[] = []
 let lastDates: any[] = []
@@ -10,6 +10,7 @@ let lastDates: any[] = []
     top50UsersByDeposit = await paymenthistory.aggregate([
       {
         $match: {
+          ...allowedUsersParam,
           type: 'deposit',
         },
       },
@@ -48,6 +49,7 @@ let lastDates: any[] = []
   } else {
 
     const foundUsers = await User.find({
+      ...allowedUsersParamForUsers,
       $or: [
         { uuid: { $regex: searchValue, $options: 'i' } },
         { email: { $regex: searchValue, $options: 'i' } },

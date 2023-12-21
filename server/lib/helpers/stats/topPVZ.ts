@@ -1,7 +1,10 @@
 ﻿import { Buyout } from '../../models/Buyout'
 
-export default async function getTopPVZ() {
+export default async function getTopPVZ(allowedUsersParam: any) {
   const top50PVZ = await Buyout.aggregate([
+    {
+      $match: allowedUsersParam,
+    },
     {
       $group: {
         _id: '$point',

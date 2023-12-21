@@ -12,7 +12,6 @@ export default eventHandler(async (event) => {
 
  
   const body = JSON.parse(strBody)
- console.log(body);
   
   if (!session) return sendRedirect(event, '/auth', 302)
 

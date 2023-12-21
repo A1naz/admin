@@ -31,7 +31,6 @@ export default eventHandler(async (event) => {
     .skip(withdrawsPerPage * (+page - 1))
     .limit(withdrawsPerPage)
   const withdrawsCount = await PartnerWithdraw.count({ ...allowedUsersParam, status: 'created' })
-  console.log(withdrawsCount)
 
   return {
     withdraws,

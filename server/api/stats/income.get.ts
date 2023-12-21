@@ -18,6 +18,9 @@ export default eventHandler(async (event) => {
     ? {}
     : { user: { $in: user.allowedUsers.map((id: any) => id) } }
 
+    const allowedUsersParamForPartner = user.isAllUsersAllowed ? {}
+    : { _id: { $in: user.allowedUsers.map((id: any) => id) } }
+
   await ActionHistory.create({
     adminUser: user._id,
     actionId: 51,
@@ -336,6 +339,7 @@ export default eventHandler(async (event) => {
   const completedPartnerWithdraws = await PartnerWithdraw.aggregate([
     {
       $match: {
+        ...allowedUsersParam,
         date: filter.dataoperation,
         status: 'completed',
       },
@@ -356,6 +360,7 @@ export default eventHandler(async (event) => {
   const activePartnerWithdraws = await PartnerWithdraw.aggregate([
     {
       $match: {
+        ...allowedUsersParam,
         date: filter.dataoperation,
         status: 'work',
       },
@@ -470,6 +475,7 @@ export default eventHandler(async (event) => {
   const partnersIncomeAggregate = await User.aggregate([
     {
       $match: {
+        ...allowedUsersParamForPartner,
         'partner.refCount': { $gt: 0 } // Выбираем пользователей с refCount > 0
       }
     },
@@ -587,7 +593,7 @@ export default eventHandler(async (event) => {
     paidUsers = paidUsersAggregate[0].count
   }
   const inActiveUsers = usersCount - activeUsers - 1
-  const signedUp = await User.countDocuments({ registrationDate: filter.dataoperation })
+  const signedUp = await User.countDocuments({ ...allowedUsersParamForPartner, registrationDate: filter.dataoperation })
 
 
   const pieGraphData = {

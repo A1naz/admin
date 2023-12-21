@@ -34,7 +34,7 @@ const UserSchema = new Schema({
       rewardPercent: 0,
     },
   },
-  allowedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  allowedUsers: [{ type: Schema.Types.ObjectId, ref: 'User', default: [] }],
   isAllUsersAllowed: { type: Boolean, default: false },
 })
 

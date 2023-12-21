@@ -121,7 +121,6 @@ export default NuxtAuthHandler({
 
         if (runtimeConfig.env === 'developer') {
           const user = await AdminUser.findOne({ email })
-          console.log(email);
           
           if (!user) return null
           return user
