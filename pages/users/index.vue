@@ -459,6 +459,7 @@ if (!store.client.mainAdmin) {
       </form>
 
       <div class="text-center">
+        {{ selectedUser }}
         {{ selectedUser.username }}
       </div>
       <div>

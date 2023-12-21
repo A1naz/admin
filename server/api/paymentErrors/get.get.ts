@@ -19,6 +19,10 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
+  const allowedUsersParam = user.isAllUsersAllowed
+    ? {}
+    : { client: { $in: user.allowedUsers.map((id: any) => id) } }
+
   const { page, account, sortDate, dateRange }: any = getQuery(event)
 
   let trueDateRange = {}
@@ -43,9 +47,8 @@ export default eventHandler(async (event) => {
         }
       : {}
 
-
-
   const format = await TransactionRequest.find({
+    ...allowedUsersParam,
     ...accountOperation,
     ...trueDateRange,
   })
@@ -54,20 +57,19 @@ export default eventHandler(async (event) => {
     .skip((page - 1) * elPerPage)
     .lean()
 
-    const managerIds: Array<any> = format.map((el) => {
-      return el.adminUser
-    })
+  const managerIds: Array<any> = format.map((el) => {
+    return el.adminUser
+  })
 
-    const managers = await AdminUser.find({
-      _id: { $in: managerIds },
-    })
+  const managers = await AdminUser.find({
+    _id: { $in: managerIds },
+  })
 
-    format.forEach((el: any) => {
-      
-      el.managerUsername = managers.find((manager) => {
-        return manager._id.valueOf() === el.adminUser.valueOf()
-      })?.username
-    })       
+  format.forEach((el: any) => {
+    el.managerUsername = managers.find((manager) => {
+      return manager._id.valueOf() === el.adminUser.valueOf()
+    })?.username
+  })
 
   await ActionHistory.create({
     adminUser: user._id,

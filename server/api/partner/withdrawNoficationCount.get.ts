@@ -10,6 +10,14 @@ export default eventHandler(async (event) => {
   if (!admin || !admin.tabs.includes('управление партнеркой'))
     return sendRedirect(event, '/auth', 302)
 
-  const notificationCount = await PartnerWithdraw.count({ status: 'created' })
+  const allowedUsersParam = admin.isAllUsersAllowed
+    ? {}
+    : { user: { $in: admin.allowedUsers.map((id: any) => id) } }
+
+  const notificationCount = await PartnerWithdraw.count({
+    ...allowedUsersParam,
+    status: 'created',
+  })
+
   return { quantity: notificationCount }
 })

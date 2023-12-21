@@ -14,7 +14,12 @@ export default eventHandler(async (event) => {
   if (!userAdmin || !userAdmin.tabs.includes('управление партнеркой'))
     return sendRedirect(event, '/auth', 302)
 
+  const allowedUsersParam = userAdmin.isAllUsersAllowed
+    ? {}
+    : { user: { $in: userAdmin.allowedUsers.map((id: any) => id) } }
+
   const withdraws = await PartnerWithdraw.find({
+    ...allowedUsersParam,
     $or: [
       { _id: ObjectId.isValid(searchValue) ? new ObjectId(searchValue) : null },
       { userUuid: { $regex: searchValue, $options: 'i' } },
@@ -25,7 +30,8 @@ export default eventHandler(async (event) => {
   })
     .skip(withdrawsPerPage * (+page - 1))
     .limit(withdrawsPerPage)
-  const withdrawsCount = await PartnerWithdraw.count()
+  const withdrawsCount = await PartnerWithdraw.count({ ...allowedUsersParam, status: 'created' })
+  console.log(withdrawsCount)
 
   return {
     withdraws,
