@@ -71,8 +71,6 @@ export default eventHandler(async (event) => {
     }
   })
 
-  console.log(restrickedFormat)
-
   return {
     allowedUsers: format,
     restrictedUsers: restrickedFormat,

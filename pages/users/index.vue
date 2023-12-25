@@ -79,6 +79,10 @@ const roles = ref<any>([
     value: 'tech support',
     text: 'Тех.поддержка (Менеджер)',
   },
+  {
+    value: 'investor qiwi',
+    text: 'Инвестор Qiwi'
+  }
 ])
 const password = ref('')
 const repeatPassword = ref('')
