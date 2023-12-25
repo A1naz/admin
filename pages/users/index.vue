@@ -15,7 +15,7 @@ const userEditForm = ref({
   roles: <any>['user'],
   tabs: <any>[],
   allowedUsers: <any>[],
-    restrictedUsers: <any>[],
+  restrictedUsers: <any>[],
 })
 const roles = ref<any>([
   {
@@ -81,8 +81,8 @@ const roles = ref<any>([
   },
   {
     value: 'investor qiwi',
-    text: 'Инвестор Qiwi'
-  }
+    text: 'Инвестор Qiwi',
+  },
 ])
 const password = ref('')
 const repeatPassword = ref('')
@@ -167,8 +167,12 @@ async function getAllowedUsers() {
   })
 
   if (data.value) {
-    userEditForm.value.allowedUsers = data.value.allowedUsers.map((user: any) => user._id)
-    userEditForm.value.restrictedUsers = data.value.restrictedUsers.map((user: any) => user._id)
+    userEditForm.value.allowedUsers = data.value.allowedUsers.map(
+      (user: any) => user._id
+    )
+    userEditForm.value.restrictedUsers = data.value.restrictedUsers.map(
+      (user: any) => user._id
+    )
     allowedUsersModalRef.value?.setUsers(data.value.allowedUsers)
     restrictedUsersModalRef.value?.setUsers(data.value.restrictedUsers)
   }
@@ -240,7 +244,7 @@ const tabs = ref<any>([
 async function saveUser() {
   const body: any = userEditForm.value
 
-  if (createMode.value == true) {
+  if (createMode.value == true || password.value.length > 0) {
     if (password.value != repeatPassword.value) {
       notify({
         type: 'error',
@@ -259,6 +263,7 @@ async function saveUser() {
 
     body.password = password.value
   }
+  body.email = body.email.replaceAll(' ', '')
 
   const { data, error }: any = await useFetch('/api/manager/saveUser', {
     method: 'GET',
@@ -495,7 +500,7 @@ if (!store.client.mainAdmin) {
             class="input input-bordered w-full"
           />
         </div>
-        <div class="flex mt-4 gap-4" v-if="createMode">
+        <div class="flex mt-4 gap-4">
           <input
             placeholder="Пароль"
             v-model="password"
@@ -547,7 +552,8 @@ if (!store.client.mainAdmin) {
               {{
                 userEditForm.restrictedUsers.length <= 0
                   ? 'Нет недоступных клиентов'
-                  : 'Недоступных клиентов ' + userEditForm.restrictedUsers.length
+                  : 'Недоступных клиентов ' +
+                    userEditForm.restrictedUsers.length
               }}
             </button>
           </div>

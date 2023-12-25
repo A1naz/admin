@@ -38,6 +38,10 @@ export default eventHandler(async (event) => {
         ? body.firstName
         : userToEdit.firstName
       userToEdit.lastName = body.lastName ? body.lastName : userToEdit.lastName
+      
+      if (body.password && body.password.length > 8) {
+        userToEdit.password = await bcrypt.hash(body.password, 7)
+      }
 
       if (body.roles.length > 1) {
         let adminUserToEdit = await AdminUser.findOne({ uuid: uuid })
@@ -86,6 +90,7 @@ export default eventHandler(async (event) => {
           adminUserToEdit.allowedUsers = body.allowedUsers
           adminUserToEdit.restrictedUsers = body.restrictedUsers
           adminUserToEdit.isAllUsersAllowed = body.allowedUsers.length > 0 ? false : true
+          adminUserToEdit.password = userToEdit.password
           await adminUserToEdit.save()
         }
       } else if (body.roles.length <= 1) {
