@@ -6,6 +6,7 @@ definePageMeta({
 })
 
 const allowedUsersModalRef = ref<any>()
+const restrictedUsersModalRef = ref<any>()
 const userEditForm = ref({
   firstName: '',
   lastName: '',
@@ -14,6 +15,7 @@ const userEditForm = ref({
   roles: <any>['user'],
   tabs: <any>[],
   allowedUsers: <any>[],
+    restrictedUsers: <any>[],
 })
 const roles = ref<any>([
   {
@@ -161,8 +163,10 @@ async function getAllowedUsers() {
   })
 
   if (data.value) {
-    userEditForm.value.allowedUsers = data.value.map((user: any) => user._id)
-    allowedUsersModalRef.value?.setUsers(data.value)
+    userEditForm.value.allowedUsers = data.value.allowedUsers.map((user: any) => user._id)
+    userEditForm.value.restrictedUsers = data.value.restrictedUsers.map((user: any) => user._id)
+    allowedUsersModalRef.value?.setUsers(data.value.allowedUsers)
+    restrictedUsersModalRef.value?.setUsers(data.value.restrictedUsers)
   }
 }
 
@@ -347,6 +351,7 @@ if (!store.client.mainAdmin) {
                 roles: ['user'],
                 tabs: [],
                 allowedUsers: [],
+                restrictedUsers: [],
               }),
               (selectedUser = {
                 username: '',
@@ -515,18 +520,33 @@ if (!store.client.mainAdmin) {
         </button>
       </div> -->
       <div v-if="isSelectedUserAdmin">
-        <div class="mb-3 flex">
-          <span class="mt-2"> Разрешенные пользователи </span>
-          <button
-            class="ml-2 btn max-w-xl w-xl"
-            @click="store.allowedUsersModal = true"
-          >
-            {{
-              userEditForm.allowedUsers.length <= 0
-                ? 'Выбраны все пользователи'
-                : 'Выбрано клиентов ' + userEditForm.allowedUsers.length
-            }}
-          </button>
+        <div class="mb-3 flex flex-col">
+          <div class="mb-2">
+            <span class="my-2 ml-2"> Разрешенные пользователи </span>
+            <button
+              class="btn max-w-xl w-xl"
+              @click="store.allowedUsersModal = true"
+            >
+              {{
+                userEditForm.allowedUsers.length <= 0
+                  ? 'Выбраны все пользователи'
+                  : 'Выбрано клиентов ' + userEditForm.allowedUsers.length
+              }}
+            </button>
+          </div>
+          <div>
+            <span class="mt-2 ml-2"> Недоступные пользователи </span>
+            <button
+              class="ml-2 btn max-w-xs w-xl"
+              @click="store.restrictedUsersModal = true"
+            >
+              {{
+                userEditForm.restrictedUsers.length <= 0
+                  ? 'Нет недоступных клиентов'
+                  : 'Недоступных клиентов ' + userEditForm.restrictedUsers.length
+              }}
+            </button>
+          </div>
         </div>
         <div class="divider"></div>
       </div>
@@ -603,6 +623,7 @@ if (!store.client.mainAdmin) {
                 roles: ['user'],
                 tabs: [],
                 allowedUsers: [],
+                restrictedUsers: [],
               }
             "
           >
@@ -630,6 +651,11 @@ if (!store.client.mainAdmin) {
     ref="allowedUsersModalRef"
     :selectedUsers="userEditForm.allowedUsers"
     @clearUsers="userEditForm.allowedUsers = []"
+  />
+  <restrickedUsersModal
+    ref="restrictedUsersModalRef"
+    :selectedUsers="userEditForm.restrictedUsers"
+    @clearUsers="userEditForm.restrictedUsers = []"
   />
 </template>
 <style scoped>

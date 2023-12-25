@@ -19,11 +19,23 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const allowedUsersParam = user.isAllUsersAllowed
-    ? {}
-    : {
-        sender: { $in: user.allowedUsers.map((id: any) => id) },
-        recipient: { $in: user.allowedUsers.map((id: any) => id) },
+    ? {
+        sender: { $nin: user.restrictedUsers.map((id: any) => id) },
+        recipient: { $nin: user.restrictedUsers.map((id: any) => id) },
       }
+    : {
+        $and: [
+          {
+            sender: { $in: user.allowedUsers.map((id: any) => id) },
+            recipient: { $in: user.allowedUsers.map((id: any) => id) },
+          },
+          {
+            sender: { $nin: user.restrictedUsers.map((id: any) => id) },
+            recipient: { $nin: user.restrictedUsers.map((id: any) => id) },
+          },
+        ],
+      }
+
 
   const { page, sortDate, dateRange }: any = getQuery(event)
 

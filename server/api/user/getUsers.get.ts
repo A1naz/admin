@@ -12,8 +12,17 @@ export default eventHandler(async (event) => {
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (!userAdmin) return sendRedirect(event, '/auth', 302)
 
-  let allowedUsersParam = userAdmin.isAllUsersAllowed ? {} : { _id: { $in: userAdmin.allowedUsers.map((id: any) => id) }}
-  
+  let allowedUsersParam = userAdmin.isAllUsersAllowed
+    ? {
+        _id: { $nin: userAdmin.restrictedUsers.map((id: any) => id) },
+      }
+    : {
+        $and: [
+          { _id: { $in: userAdmin.allowedUsers.map((id: any) => id) } },
+          { _id: { $nin: userAdmin.restrictedUsers.map((id: any) => id) } },
+        ],
+      }
+
   let rolesParam = role ? { roles: { $in: [role] } } : {}
   let allUsers = []
 
@@ -34,7 +43,7 @@ export default eventHandler(async (event) => {
   } else {
     allUsers = await User.find({
       ...rolesParam,
-    ...allowedUsersParam,
+      ...allowedUsersParam,
     })
       .skip(usersPerPage * (+page - 1))
       .limit(usersPerPage)

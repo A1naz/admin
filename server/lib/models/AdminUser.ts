@@ -35,6 +35,7 @@ const UserSchema = new Schema({
     },
   },
   allowedUsers: [{ type: Schema.Types.ObjectId, ref: 'User', default: [] }],
+  restrictedUsers: [{ type: Schema.Types.ObjectId, ref: 'User', default: [] }],
   isAllUsersAllowed: { type: Boolean, default: false },
 })
 

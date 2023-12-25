@@ -60,6 +60,7 @@ export default eventHandler(async (event) => {
             firstName: userToEdit.firstName,
             lastName: userToEdit.lastName,
             allowedUsers: body.allowedUsers,
+            restrictedUsers: body.restrictedUsers,
             isAllUsersAllowed: body.allowedUsers.length > 0 ? false : true,
           })
 
@@ -83,6 +84,7 @@ export default eventHandler(async (event) => {
           adminUserToEdit.tabs = body.tabs
 
           adminUserToEdit.allowedUsers = body.allowedUsers
+          adminUserToEdit.restrictedUsers = body.restrictedUsers
           adminUserToEdit.isAllUsersAllowed = body.allowedUsers.length > 0 ? false : true
           await adminUserToEdit.save()
         }
@@ -156,6 +158,7 @@ export default eventHandler(async (event) => {
           lastName: newUser.lastName,
           allowedUsers: body.allowedUsers,
           isAllUsersAllowed: body.allowedUsers.length > 0 ? false : true,
+          restrictedUsers: body.restrictedUsers,
         })
 
         await ActionHistory.create({

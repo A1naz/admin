@@ -29,15 +29,25 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const allowedUsersParam = user.isAllUsersAllowed
-    ? {}
-    : {
-        user: { $in: user.allowedUsers.map((id: any) => id) },
-      }
+  ? {
+      user: { $nin: user.restrictedUsers.map((id: any) => id) },
+    }
+  : {
+      $and: [
+        { user: { $in: user.allowedUsers.map((id: any) => id) } },
+        { user: { $nin: user.restrictedUsers.map((id: any) => id) } },
+      ],
+    }
   const allowedUsersParamForUser = user.isAllUsersAllowed
-    ? {}
-    : {
-        _id: { $in: user.allowedUsers.map((id: any) => id) },
-      }
+  ? {
+      _id: { $nin: user.restrictedUsers.map((id: any) => id) },
+    }
+  : {
+      $and: [
+        { _id: { $in: user.allowedUsers.map((id: any) => id) } },
+        { _id: { $nin: user.restrictedUsers.map((id: any) => id) } },
+      ],
+    }
 
   const { searchValue, selectedTop }: any = getQuery(event)
 
