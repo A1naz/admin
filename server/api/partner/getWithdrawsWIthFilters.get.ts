@@ -14,8 +14,15 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const allowedUsersParam = userAdmin.isAllUsersAllowed
-    ? {}
-    : { user: { $in: userAdmin.allowedUsers.map((id: any) => id) } }
+  ? {
+      user: { $nin: userAdmin.restrictedUsers.map((id: any) => id) },
+    }
+  : {
+      $and: [
+        { user: { $in: userAdmin.allowedUsers.map((id: any) => id) } },
+        { user: { $nin: userAdmin.restrictedUsers.map((id: any) => id) } },
+      ],
+    }
 
   const trueFilters = JSON.parse(filters)
   if (!trueFilters.sumTo) delete trueFilters.sumTo

@@ -11,8 +11,15 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const allowedUsersParam = admin.isAllUsersAllowed
-    ? {}
-    : { user: { $in: admin.allowedUsers.map((id: any) => id) } }
+  ? {
+      user: { $nin: admin.restrictedUsers.map((id: any) => id) },
+    }
+  : {
+      $and: [
+        { user: { $in: admin.allowedUsers.map((id: any) => id) } },
+        { user: { $nin: admin.restrictedUsers.map((id: any) => id) } },
+      ],
+    }
 
   const notificationCount = await PartnerWithdraw.count({
     ...allowedUsersParam,

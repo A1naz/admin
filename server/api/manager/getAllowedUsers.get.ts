@@ -14,14 +14,24 @@ export default eventHandler(async (event) => {
   const adminWithAllowedUsers = await AdminUser.findOne({ uuid: uuid })
 
   if (!adminWithAllowedUsers) {
-    return []
+    return {
+      allowedUsers: [],
+      restrickedUsers: [],
+    }
   }
 
+  const restrictedUsersId = adminWithAllowedUsers.restrictedUsers
   const allowedUsersId = adminWithAllowedUsers.allowedUsers
 
   const users = await User.find({
     _id: {
       $in: allowedUsersId,
+    },
+  })
+
+  const restrickedUsers = await User.find({
+    _id: {
+      $in: restrictedUsersId,
     },
   })
 
@@ -43,5 +53,28 @@ export default eventHandler(async (event) => {
     }
   })
 
-  return format
+  const restrickedFormat = restrickedUsers.map((user: any) => {
+    return {
+      _id: user._id,
+      uuid: user.uuid,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      telegram: user.telegram || '',
+      isBanned: user.isBanned ? user.isBanned : false,
+      roles: user.roles,
+      registrationDate: user.registrationDate,
+      tabs: user.tabs ? user.tabs : [],
+      tariffs: user.tariff,
+      isSelected: true,
+    }
+  })
+
+  console.log(restrickedFormat)
+
+  return {
+    allowedUsers: format,
+    restrictedUsers: restrickedFormat,
+  }
 })

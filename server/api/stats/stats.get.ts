@@ -17,8 +17,15 @@ export default eventHandler(async (event) => {
 
 
   const allowedUsersParam = user.isAllUsersAllowed
-    ? {}
-    : { user: { $in: user.allowedUsers.map((id: any) => id) } }
+  ? {
+      user: { $nin: user.restrictedUsers.map((id: any) => id) },
+    }
+  : {
+      $and: [
+        { user: { $in: user.allowedUsers.map((id: any) => id) } },
+        { user: { $nin: user.restrictedUsers.map((id: any) => id) } },
+      ],
+    }
 
 
   const { page, filters, sortDate, elPerPage }: any = getQuery(event)

@@ -30,6 +30,17 @@ export default eventHandler(async (event) => {
     })
   }
 
+  if (!user.isAllUsersAllowed && !user.allowedUsers.includes(foundUser._id)) {
+    await ActionHistory.create({
+      adminUser: user._id,
+      actionId: 401,
+      actionDescription: `Попытка получения информации о ${item}, пользователя uuid - ${userId}, недостаточно прав`,
+      userUuid: foundUser.uuid,
+      date: new Date(),
+    })
+    return sendRedirect(event, '/auth', 302)
+  }
+
   await ActionHistory.create({
     adminUser: user._id,
     actionId: 91,
