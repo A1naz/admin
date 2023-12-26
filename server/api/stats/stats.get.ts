@@ -15,18 +15,16 @@ export default eventHandler(async (event) => {
   if (!user || !user.tabs.includes('финансовые операции'))
     return sendRedirect(event, '/auth', 302)
 
-
   const allowedUsersParam = user.isAllUsersAllowed
-  ? {
-      user: { $nin: user.restrictedUsers.map((id: any) => id) },
-    }
-  : {
-      $and: [
-        { user: { $in: user.allowedUsers.map((id: any) => id) } },
-        { user: { $nin: user.restrictedUsers.map((id: any) => id) } },
-      ],
-    }
-
+    ? {
+        user: { $nin: user.restrictedUsers.map((id: any) => id) },
+      }
+    : {
+        $and: [
+          { user: { $in: user.allowedUsers.map((id: any) => id) } },
+          { user: { $nin: user.restrictedUsers.map((id: any) => id) } },
+        ],
+      }
 
   const { page, filters, sortDate, elPerPage }: any = getQuery(event)
 
@@ -35,12 +33,18 @@ export default eventHandler(async (event) => {
     sum: 0,
   }
   const trueFilters = JSON.parse(filters)
+  let commentRegex = {}
+  if ( trueFilters.type == 'penalty') {
+    commentRegex = {
+      comment: { $regex: 'Штраф', $options: 'i' },
+    }
+  }
+ 
   if (!trueFilters.sumTo) delete trueFilters.sumTo
   if (!trueFilters.sumFrom) delete trueFilters.sumFrom
   if (trueFilters.type !== 'buyouts') {
     delete trueFilters.article
   } else if (trueFilters.type == 'buyouts' && trueFilters.article) {
-
     const buyoutsWithThisArticle = await Buyout.find({
       article: trueFilters.article,
     }).sort({
@@ -75,7 +79,7 @@ export default eventHandler(async (event) => {
     trueFilters.typeoperations == 'any'
       ? {}
       : { typeoperations: trueFilters.typeoperations }
-  const trueType = trueFilters.type == 'any' ? {} : { type: trueFilters.type }
+  const trueType = trueFilters.type == 'any' || trueFilters.type == 'penalty' ? {} : { type: trueFilters.type }
   const trueDateRange = trueFilters.dateRange
     ? {
         dataoperation: {
@@ -87,6 +91,7 @@ export default eventHandler(async (event) => {
 
   let stats: any = await paymenthistory
     .find({
+      ...commentRegex,
       ...allowedUsersParam,
       ...trueFilters.basisoperation,
       ...userIds,

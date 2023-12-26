@@ -253,6 +253,7 @@ if (
         <option value="other">другое</option>
         <option value="buyouts service">услуги выкупов</option>
         <option value="deliveries">доставки</option>
+        <option value="penalty">штрафы</option>
       </select>
       <div v-if="service == 'buyouts'">
         <label
