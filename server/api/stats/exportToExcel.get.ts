@@ -43,6 +43,12 @@ export default eventHandler(async (event) => {
     const workbook = new ExcelJS.Workbook()
 
     const trueFilters = JSON.parse(filters)
+    let commentRegex = {}
+    if ( trueFilters.type == 'penalty') {
+      commentRegex = {
+        comment: { $regex: 'Штраф', $options: 'i' },
+      }
+    }
     let productsCountInfo = {
       count: 0,
       sum: 0,
@@ -83,7 +89,7 @@ export default eventHandler(async (event) => {
       trueFilters.typeoperations == 'any'
         ? {}
         : { typeoperations: trueFilters.typeoperations }
-    const trueType = trueFilters.type == 'any' ? {} : { type: trueFilters.type }
+        const trueType = trueFilters.type == 'any' || trueFilters.type == 'penalty' ? {} : { type: trueFilters.type }
     const trueDateRange = trueFilters.dateRange
       ? {
           dataoperation: {
@@ -95,6 +101,7 @@ export default eventHandler(async (event) => {
 
     let stats: any = await paymenthistory
       .find({
+        ...commentRegex,
         ...allowedUsersParam,
         ...trueFilters.basisoperation,
         ...userIds,
