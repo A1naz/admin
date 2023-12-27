@@ -223,7 +223,7 @@ async function searchTransaction() {
         client: client.value._id,
         transaction: transaction.value,
         date: date.value,
-        phoneNumber: phoneNumber.value.replace(/[\+\(\)\-\s]/g, ''),
+        phoneNumber: phoneNumber.value.replace(/[\(\)\-\s]/g, ''),
       },
     }
   )
@@ -293,7 +293,7 @@ async function createTransactionRequest() {
         transactionNumber: transactionNumber.value,
         client: client.value._id,
         date: date.value,
-        phoneNumber: phoneNumber.value.replace(/[\+\(\)\-\s]/g, ''),
+        phoneNumber: phoneNumber.value.replace(/[\(\)\-\s]/g, ''),
       },
     }
   )
