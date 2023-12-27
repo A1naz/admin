@@ -52,6 +52,7 @@
     "validator": "^13.11.0",
     "vue-chartjs": "^5.2.0",
     "vue-currency-input": "^3.0.5",
+    "vue-the-mask": "^0.11.1",
     "vue-yandex-maps": "^1.1.0",
     "vue3-apexcharts": "^1.4.4",
     "vue3-html2pdf": "^1.1.2",

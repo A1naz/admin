@@ -45,7 +45,7 @@ const selectUserClose: any = ref(null)
 const now = new Date()
 const date = ref(now)
 const users = ref<any>([])
-const phoneNumber = ref('+7')
+const phoneNumber = ref('')
 
 const screenshot = ref({
   url: 'null',
@@ -223,7 +223,7 @@ async function searchTransaction() {
         client: client.value._id,
         transaction: transaction.value,
         date: date.value,
-        phoneNumber: phoneNumber.value,
+        phoneNumber: phoneNumber.value.replace(/[\+\(\)\-\s]/g, ''),
       },
     }
   )
@@ -255,15 +255,14 @@ async function searchTransaction() {
 }
 
 async function createTransactionRequest() {
-if (transactionStatus.value !== 'found') {
-  notify({
-    type: 'error',
-    title: 'Сначала необходимо выполнить поиск транзакцию',
-  })
+  if (transactionStatus.value !== 'found') {
+    notify({
+      type: 'error',
+      title: 'Сначала необходимо выполнить поиск транзакцию',
+    })
 
-  return
-}
-
+    return
+  }
 
   if (screenshot.value.public === 'null') {
     notify({
@@ -294,7 +293,7 @@ if (transactionStatus.value !== 'found') {
         transactionNumber: transactionNumber.value,
         client: client.value._id,
         date: date.value,
-        phoneNumber: phoneNumber.value,
+        phoneNumber: phoneNumber.value.replace(/[\+\(\)\-\s]/g, ''),
       },
     }
   )
@@ -304,7 +303,7 @@ if (transactionStatus.value !== 'found') {
         type: 'success',
         title: data.value.message,
       })
-      
+
       location.reload()
       getStats()
       closeCreateModalButton.value?.click()
@@ -526,6 +525,8 @@ function selectUser(user: any) {
           v-model="phoneNumber"
           @input="resetStatus"
           type="text"
+          v-maska
+          data-maska="+7 (###) ###-##-##"
           placeholder="Укажите номер телефона (точно как в чеке)"
           class="input input-bordered input-l mb-2 w-full"
         />
