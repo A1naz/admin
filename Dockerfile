@@ -55,4 +55,4 @@ ENV PORT 5000
 
 EXPOSE 5000
 
-ENTRYPOINT ["node", ".output/server/index.mjs"]
+ENTRYPOINT ["node","--max-old-space-size=4096", ".output/server/index.mjs"]
