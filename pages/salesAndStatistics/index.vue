@@ -8,6 +8,7 @@ const productsCountInfo = ref({
   count: 0,
   sum: 0,
 })
+const isExportBtnDisabled = ref(false)
 const currency = useCurrency()
 const type = ref('any')
 const service = ref('any')
@@ -39,6 +40,7 @@ const search = (event: any) => {
 }
 
 async function exportXLS() {
+  isExportBtnDisabled.value = true
   const { data } = await useFetch('/api/stats/exportToExcel', {
     responseType: 'blob',
     method: 'GET',
@@ -59,6 +61,7 @@ async function exportXLS() {
   fileLink.setAttribute('download', 'Готовы к выдаче.xlsx')
   document.body.appendChild(fileLink)
   fileLink.click()
+  isExportBtnDisabled.value = false
 }
 
 definePageMeta({
@@ -227,7 +230,7 @@ if (
 
       <select
         class="select select-bordered w-50 ml-3"
-        @change="[(curPage = 1), getStats()]"
+        @change=";[(curPage = 1), getStats()]"
         v-model="type"
       >
         <option selected value="any">все типы операции</option>
@@ -249,7 +252,6 @@ if (
         <option value="autoanswers">автоответчик</option>
         <option value="refund">возврат</option>
         <option value="productlikes">лайки на товаров</option>
-        <option value="payments">оплата</option>
         <option value="other">другое</option>
         <option value="buyouts service">услуги выкупов</option>
         <option value="deliveries">доставки</option>
@@ -294,7 +296,11 @@ if (
       </button>
     </div>
     <div>
-      <button class="btn btn-sm btn-primary mr-3" @click="exportXLS">
+      <button
+        class="btn btn-sm btn-primary mr-3"
+        @click="exportXLS"
+        :disabled="isExportBtnDisabled"
+      >
         Экспорт
       </button>
       <div class="join mr-2">
@@ -330,7 +336,9 @@ if (
           <th>телеграм</th>
           <th>сумма</th>
           <th v-if="service == 'buyouts' || service == 'any'">артикул</th>
-          <th v-if="service == 'buyouts' || service == 'any'">наименование товара</th>
+          <th v-if="service == 'buyouts' || service == 'any'">
+            наименование товара
+          </th>
           <th>базис</th>
           <th>
             <div @click="sortByDate" class="flex cursor-pointer">

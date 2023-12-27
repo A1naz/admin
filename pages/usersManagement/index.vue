@@ -50,7 +50,7 @@ const tabs = ref([
       { key: 'rules', title: 'правила' },
       { key: 'sizeParam', title: 'размер' },
       { key: 'gender', title: 'пол' },
-      { key: 'dateRange', title: 'даты' },
+      { key: 'dateRange', title: 'даты выкупов' },
       { key: 'trueDate', title: 'дата' },
     ],
     statuses: [

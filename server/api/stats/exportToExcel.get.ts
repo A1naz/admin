@@ -6,7 +6,7 @@ import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { Buyout } from '~/server/lib/models/Buyout'
 
-let limit = 50000
+let limit = 20000
 const runtimeConfig = useRuntimeConfig()
 
 const keys = Object.keys as <T>(
@@ -28,15 +28,15 @@ export default eventHandler(async (event) => {
       return sendRedirect(event, '/auth', 302)
 
     const allowedUsersParam = user.isAllUsersAllowed
-    ? {
-        client: { $nin: user.restrictedUsers.map((id: any) => id) },
-      }
-    : {
-        $and: [
-          { client: { $in: user.allowedUsers.map((id: any) => id) } },
-          { client: { $nin: user.restrictedUsers.map((id: any) => id) } },
-        ],
-      }
+      ? {
+          client: { $nin: user.restrictedUsers.map((id: any) => id) },
+        }
+      : {
+          $and: [
+            { client: { $in: user.allowedUsers.map((id: any) => id) } },
+            { client: { $nin: user.restrictedUsers.map((id: any) => id) } },
+          ],
+        }
 
     const { page, filters, sortDate }: any = getQuery(event)
 
@@ -44,7 +44,7 @@ export default eventHandler(async (event) => {
 
     const trueFilters = JSON.parse(filters)
     let commentRegex = {}
-    if ( trueFilters.type == 'penalty') {
+    if (trueFilters.type == 'penalty') {
       commentRegex = {
         comment: { $regex: 'Штраф', $options: 'i' },
       }
@@ -89,7 +89,10 @@ export default eventHandler(async (event) => {
       trueFilters.typeoperations == 'any'
         ? {}
         : { typeoperations: trueFilters.typeoperations }
-        const trueType = trueFilters.type == 'any' || trueFilters.type == 'penalty' ? {} : { type: trueFilters.type }
+    const trueType =
+      trueFilters.type == 'any' || trueFilters.type == 'penalty'
+        ? {}
+        : { type: trueFilters.type }
     const trueDateRange = trueFilters.dateRange
       ? {
           dataoperation: {
@@ -99,7 +102,46 @@ export default eventHandler(async (event) => {
         }
       : {}
 
-    let stats: any = await paymenthistory
+      let stats: any = []
+      
+      // const statsCount: any = await paymenthistory.count({
+      //   ...commentRegex,
+      //   ...allowedUsersParam,
+      //   ...trueFilters.basisoperation,
+      //   ...userIds,
+      //   ...trueTypeoperations,
+      //   ...trueType,
+      //   ...trueDateRange,
+      // })
+    // const cycleCount = Math.ceil(statsCount / limit)
+    // let skip = 0
+
+    // for (let i = 0; i < cycleCount; i++) {
+    //   skip = i * limit
+    //   const newStats: any = await paymenthistory
+    //     .find({
+    //       ...commentRegex,
+    //       ...allowedUsersParam,
+    //       ...trueFilters.basisoperation,
+    //       ...userIds,
+    //       ...trueTypeoperations,
+    //       ...trueType,
+    //       ...trueDateRange,
+    //     })
+    //     .allowDiskUse(true)
+    //     // .sort({
+    //     //   dataoperation: sortDate,
+    //     // })
+    //     .skip(skip)
+    //     .limit(limit)
+    //     .lean()
+
+    //   stats.push(...newStats)
+
+    //   console.log(stats.length)
+    // }
+
+    stats = await paymenthistory
       .find({
         ...commentRegex,
         ...allowedUsersParam,
@@ -109,11 +151,10 @@ export default eventHandler(async (event) => {
         ...trueType,
         ...trueDateRange,
       })
-      .sort({
-        dataoperation: sortDate,
-      })
+      // .sort({
+      //   dataoperation: sortDate,
+      // })
 
-    const statsCount: any = await paymenthistory.count()
     const statsUsersIds: any = stats.map((operation: any) => operation.user)
     const users = await User.find({ _id: { $in: statsUsersIds } })
     const format = <any>[]
@@ -130,7 +171,10 @@ export default eventHandler(async (event) => {
       })
     }
 
-    if (trueFilters.type == 'buyouts' || trueFilters.type == 'any') {
+    if (
+      trueFilters.type == 'buyouts'
+      //  || trueFilters.type == 'any'
+    ) {
       let buyoutsUuids: string[] = []
 
       const paymentAggregate = await paymenthistory.aggregate([
@@ -180,7 +224,6 @@ export default eventHandler(async (event) => {
           (stat.type == 'buyouts service' &&
             stat.basisoperation.includes('Выкуп #'))
         ) {
-
           const buyout = buyouts.find(
             (buyout: any) =>
               buyout.uuid == stat.basisoperation.split(' ')[1].replace('#', '')
