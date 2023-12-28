@@ -45,7 +45,5 @@ export default async function getBuyouts(
     }
   })
 
-  console.log(format)
-
   return { info: format, count }
 }
