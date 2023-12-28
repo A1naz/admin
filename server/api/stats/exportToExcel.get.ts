@@ -6,7 +6,7 @@ import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { Buyout } from '~/server/lib/models/Buyout'
 
-let limit = 20000
+let limit = 100000
 const runtimeConfig = useRuntimeConfig()
 
 const keys = Object.keys as <T>(
@@ -104,42 +104,6 @@ export default eventHandler(async (event) => {
 
       let stats: any = []
       
-      // const statsCount: any = await paymenthistory.count({
-      //   ...commentRegex,
-      //   ...allowedUsersParam,
-      //   ...trueFilters.basisoperation,
-      //   ...userIds,
-      //   ...trueTypeoperations,
-      //   ...trueType,
-      //   ...trueDateRange,
-      // })
-    // const cycleCount = Math.ceil(statsCount / limit)
-    // let skip = 0
-
-    // for (let i = 0; i < cycleCount; i++) {
-    //   skip = i * limit
-    //   const newStats: any = await paymenthistory
-    //     .find({
-    //       ...commentRegex,
-    //       ...allowedUsersParam,
-    //       ...trueFilters.basisoperation,
-    //       ...userIds,
-    //       ...trueTypeoperations,
-    //       ...trueType,
-    //       ...trueDateRange,
-    //     })
-    //     .allowDiskUse(true)
-    //     // .sort({
-    //     //   dataoperation: sortDate,
-    //     // })
-    //     .skip(skip)
-    //     .limit(limit)
-    //     .lean()
-
-    //   stats.push(...newStats)
-
-    //   console.log(stats.length)
-    // }
 
     stats = await paymenthistory
       .find({
@@ -150,7 +114,7 @@ export default eventHandler(async (event) => {
         ...trueTypeoperations,
         ...trueType,
         ...trueDateRange,
-      })
+      }).limit(limit)
       // .sort({
       //   dataoperation: sortDate,
       // })
