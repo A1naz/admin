@@ -6,7 +6,6 @@ import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { Buyout } from '~/server/lib/models/Buyout'
 
-let limit = 100000
 const runtimeConfig = useRuntimeConfig()
 
 const keys = Object.keys as <T>(
@@ -84,7 +83,7 @@ export default eventHandler(async (event) => {
       userIds = { user: { $in: trueFilters.clients } }
     }
     // const users = await User.find({ _id: { $in: trueFilters.clients}})
-
+    let limit = trueFilters.type == 'buyouts' ? 20000 : 100000
     const trueTypeoperations =
       trueFilters.typeoperations == 'any'
         ? {}
