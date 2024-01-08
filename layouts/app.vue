@@ -82,6 +82,12 @@ function closeOverlay() {
           href="/users"
         />
         <SidebarItem
+          v-if="store.client.mainAdmin"
+          title="Ручные переводы"
+          icon="mdi:account-credit-card"
+          href="/manualTransfer"
+        />
+        <SidebarItem
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('история действий')
