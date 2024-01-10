@@ -1,4 +1,10 @@
 ﻿<script setup lang="ts">
+definePageMeta({
+  layout: 'app',
+  auth: true,
+  title: 'Ручные пополнения средств',
+})
+
 const { height, width } = useWindowSize()
 const { upload, getPublicUrl } = useS3Object()
 const searchBtnText = ref('Поиск')
@@ -13,6 +19,7 @@ const dateSortIcon = ref('mdi-arrow-down')
 const query = ref('+7')
 const userQuery = ref('')
 const account = ref('+7')
+const clientPC = ref(false)
 const selectedUser: any = ref({
   username: '',
 })
@@ -38,12 +45,6 @@ const summ = ref(100)
 const screenshot = ref({
   url: 'null',
   public: 'null',
-})
-
-definePageMeta({
-  layout: 'app',
-  auth: true,
-  title: 'Переводы с аккаунта на аккаунт',
 })
 
 async function getStats() {
@@ -182,6 +183,7 @@ async function createBalanceTransferRequest() {
         summ: Number(summ.value),
         operationNumber: operationNumber.value,
         operationDate: date.value,
+        clientPC: clientPC.value,
       },
     }
   )
@@ -228,14 +230,12 @@ function selectUser(user: any) {
 }
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Ручные переводы средств</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">Ручные пополнения средств</h1>
   <div class="card p-fluid"></div>
   <div class="text-sm breadcrumbs ml-5">
     <ul>
       <li>
-        <NuxtLink to="/manualTransfer">
-          Ручные переводы средств</NuxtLink
-        >
+        <NuxtLink to="/manualTransfer"> Ручные пополнения средств</NuxtLink>
       </li>
       <!-- <li>
                     <NuxtLink to="/partner/management">Управление партнерами</NuxtLink>
@@ -429,6 +429,18 @@ function selectUser(user: any) {
             class="input w-full input-bordered input-l mb-1"
           />
         </label>
+        <div class="flex justify-start ml-1 mb-2">
+          <div class="form-control">
+            <label class="cursor-pointer label w-36">
+              <span class="label-text font-bold">Клиент PC</span>
+              <input
+                type="checkbox"
+                class="toggle toggle-primary"
+                v-model="clientPC"
+              />
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="text-center font-bold mt-1 mb-3">

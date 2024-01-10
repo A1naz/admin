@@ -83,7 +83,7 @@ function closeOverlay() {
         />
         <SidebarItem
           v-if="store.client.mainAdmin"
-          title="Ручные переводы"
+          title="Ручные пополнения средств"
           icon="mdi:account-credit-card"
           href="/manualTransfer"
         />

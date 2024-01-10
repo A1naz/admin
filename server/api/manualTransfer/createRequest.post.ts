@@ -6,7 +6,7 @@ import { User } from '~/server/lib/models/User'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { userId, operationNumber, screenshot, summ, operationDate } =
+  const { userId, operationNumber, screenshot, summ, operationDate, clientPC } =
     await readBody(event)
 
   if (!session) return sendRedirect(event, '/auth', 302)
@@ -34,6 +34,7 @@ export default eventHandler(async (event) => {
     acception: '0/2',
     createdAt: mskDate,
     operationDate: operationDate,
+    clientPC,
   })
 
   await ActionHistory.create({

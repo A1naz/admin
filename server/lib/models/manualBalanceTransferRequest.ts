@@ -12,6 +12,7 @@ const manualBalanceTransferRequestSchema = new Schema({
   screenshot: { type: String, required: true },
   operationDate: { type: Date, default: new Date() },
   createdAt: { type: Date, default: new Date() },
+  clientPC: { type: Boolean, default: false },
 })
 
 export const manualBalanceTransferRequest = model(
