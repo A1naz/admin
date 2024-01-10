@@ -34,9 +34,6 @@ export default eventHandler(async (event) => {
 
   const { page, sortDate, dateRange }: any = getQuery(event)
 
-  console.log(sortDate);
-  
-
   let trueDateRange = {}
   if (dateRange) {
     trueDateRange = {
