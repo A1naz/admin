@@ -346,11 +346,14 @@ function selectUser(user: any) {
           </th>
           <th class="text-xs overflow-x-auto">{{ stat.operationNumber }}</th>
           <th>{{ stat.summ }}</th>
+          
           <th>
             {{
               stat.status == 'created'
                 ? 'создано'
                 : stat.status == 'completed'
+                ? 'завершено'
+                : stat.status == 'accepted'
                 ? 'завершено'
                 : 'отменено'
             }}
