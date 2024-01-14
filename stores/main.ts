@@ -13,6 +13,7 @@ export const useMainStore = defineStore('main', {
     allowedUsersModal: false,
     restrictedUsersModal: false,
     refundsOperationsModal: false,
+    refundsPaymentOperationsModal: false,
   }),
   // optional actions
 

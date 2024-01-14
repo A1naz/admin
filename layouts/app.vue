@@ -180,7 +180,7 @@ function closeOverlay() {
             store.client.mainAdmin ||
             store.client.tabs.includes('возвраты средств клиентам')
           "
-          icon="mdi:account-details"
+          icon="mdi:credit-card-refund"
           title="Возвраты средств клиентам"
           href="/refunds"
         />

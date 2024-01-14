@@ -6,9 +6,18 @@ definePageMeta({
 })
 
 const store = useMainStore()
+
+if (
+  !store.client.mainAdmin &&
+  !store.client.tabs.includes('возвраты средств клиентам')
+) {
+  navigateTo('/partner')
+}
+
+const currency = useCurrency()
+
 const { height, width } = useWindowSize()
 const { upload, getPublicUrl } = useS3Object()
-const searchBtnText = ref('Поиск')
 const closeCreateModalButton: any = ref(null)
 const sortDateType = ref('requireDate')
 const type = ref('any')
@@ -23,6 +32,7 @@ const selectedUser: any = ref({
   username: '',
 })
 const selectedOperation: any = ref('')
+const selectedOperationMongoId: any = ref('')
 const inputLoading = ref(false)
 const curPage = ref(1)
 const stats = ref<any>([])
@@ -32,17 +42,46 @@ const dateRange = ref([])
 const loadingIndex = ref(false)
 const screenshotInput: any = ref(null)
 const selectUserClose: any = ref(null)
-const now = new Date()
 const users = ref<any>([])
+const refundsOperationsModal = ref()
+const isCreateButtonDisabled = ref(false)
 
 const screenshot = ref({
   url: 'null',
   public: 'null',
 })
+const paymentOperations = ref<any>([])
+
+const selectedPaymentOperationsCount = computed(() => {
+  let count = 0
+  paymentOperations.value.forEach((el: any) => {
+    if (el.selected) {
+      count++
+    }
+  })
+  return count
+})
+
+const allPaymentOperationsSumm = computed(() => {
+  let summ = 0
+  paymentOperations.value.forEach((el: any) => {
+    summ += el.summ
+  })
+  return summ
+})
+const selectedPaymentOperationsSumm = computed(() => {
+  let summ = 0
+  paymentOperations.value.forEach((el: any) => {
+    if (el.selected) {
+      summ += el.summ
+    }
+  })
+  return summ
+})
 
 async function getStats() {
   stats.value = []
-  const { data }: any = await useFetch('/api/manualTransfer/get', {
+  const { data }: any = await useFetch('/api/refunds/get', {
     method: 'GET',
     query: {
       page: curPage.value,
@@ -52,9 +91,10 @@ async function getStats() {
       type: type.value,
       dateRange: dateRange.value.length > 0 ? dateRange.value : null,
     },
+    watch: false,
   })
   if (data.value) {
-    stats.value = data.value.balanceTransferRequest
+    stats.value = data.value
   }
 }
 
@@ -156,26 +196,42 @@ function openFileInput() {
   screenshotInput.value?.click()
 }
 
-async function createBalanceTransferRequest() {
+async function createRefundRequest() {
+  isCreateButtonDisabled.value = true
   if (screenshot.value.public === 'null') {
     notify({
       type: 'error',
       title: 'Нужно загрузить скриншот',
     })
+    isCreateButtonDisabled.value = false
     return
   }
 
-  const { data, error }: any = await useFetch(
-    '/api/manualTransfer/createRequest',
-    {
-      watch: false,
-      method: 'POST',
-      body: {
-        userId: selectedUser.value._id,
-        screenshot: screenshot.value.public,
-      },
-    }
+  if (selectedPaymentOperationsCount.value < 1) {
+    notify({
+      type: 'error',
+      title: 'Нужно выбрать хотя бы одну операцию',
+    })
+    isCreateButtonDisabled.value = false
+    return
+  }
+
+  const selectedPaymentOperations = paymentOperations.value.filter(
+    (el: any) => el.selected
   )
+
+  const { data, error }: any = await useFetch('/api/refunds/createRequest', {
+    watch: false,
+    method: 'POST',
+    body: {
+      userId: selectedUser.value._id,
+      screenshot: screenshot.value.public,
+      mainOperation: selectedOperationMongoId.value,
+      paymentOperations: selectedPaymentOperations,
+      mainOperationSumm: allPaymentOperationsSumm.value,
+      selectedPaymentOperationsSumm: selectedPaymentOperationsSumm.value,
+    },
+  })
   if (data.value) {
     if (data.value.status == 'ok') {
       notify({
@@ -189,6 +245,7 @@ async function createBalanceTransferRequest() {
         type: 'error',
         title: data.value.message,
       })
+      isCreateButtonDisabled.value = false
     }
   }
 
@@ -200,10 +257,6 @@ async function createBalanceTransferRequest() {
   }
 }
 
-if (!store.client.mainAdmin) {
-  navigateTo('/partner')
-}
-
 function openUsersSelectModal() {
   selectUserClose.value?.click()
 }
@@ -212,9 +265,41 @@ function selectUser(user: any) {
   selectedUser.value = user
 
   selectUserClose.value?.click()
+  selectedOperation.value = ''
+  paymentOperations.value = []
 
   userQuery.value = ''
   users.value = []
+}
+
+function openRefundsModal() {
+  refundsOperationsModal.value?.getInfo()
+  store.refundsOperationsModal = true
+}
+
+function openRefundsPaymentModal() {
+  store.refundsPaymentOperationsModal = true
+}
+
+async function selectOperation(operationId: string, operationMongoId: string) {
+  selectedOperation.value = operationId
+  selectedOperationMongoId.value = operationMongoId
+
+  const { data, error } = await useFetch('/api/refunds/paymentOperations', {
+    method: 'GET',
+    query: {
+      operationId,
+    },
+    watch: false,
+  })
+  if (data.value) {
+    paymentOperations.value = data.value
+  } else {
+    notify({
+      type: 'error',
+      title: 'Произошла ошибка',
+    })
+  }
 }
 </script>
 <template>
@@ -248,7 +333,6 @@ function selectUser(user: any) {
           class="loading loading-spinner text-primary loading-large ml-4"
         />
       </div> -->
-
       <DateRangePicker
         class="w-46"
         v-model="dateRange"
@@ -306,12 +390,11 @@ function selectUser(user: any) {
         <tr>
           <th>ник менеджера</th>
           <th>ник пользователя</th>
-          <th>дополнительные операции</th>
+          <th>основная операция</th>
+          <!-- <th>дополнительные операции</th> -->
           <th>общая сумма</th>
-          <th>стстус поиска</th>
-          <th>номер операции</th>
-          <th>сумма</th>
-          <th>статус</th>
+          <th>сумма доп. операций</th>
+          <th>статус поиска</th>
 
           <th>
             <div @click="sortByDate()" class="flex cursor-pointer">
@@ -322,7 +405,7 @@ function selectUser(user: any) {
               />
             </div>
           </th>
-          <th>подтверждение операции</th>
+          <th>подтверждение</th>
           <th class="text-center">скриншот</th>
         </tr>
       </thead>
@@ -330,14 +413,22 @@ function selectUser(user: any) {
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover">
           <th class="text-xs overflow-x-auto">
-            {{ stat.userUuid }}
+            {{ stat.adminUsername }}
           </th>
           <th class="text-xs overflow-x-auto">
-            {{ stat.username }}
+            {{ stat.userUsername }}
           </th>
-          <th class="text-xs overflow-x-auto">{{ stat.operationNumber }}</th>
-          <th>{{ stat.summ }}</th>
+          <th class="text-xs overflow-x-auto">{{ stat.mainOperation }}</th>
+          <!-- <th>
+            <div
+              v-for="selectedPaymentOperation in stat.selectedPaymentOperations"
+            >
+              {{ selectedPaymentOperation }}
+            </div>
+          </th> -->
 
+          <th>{{ currency.format(stat.mainOperationSumm) }}</th>
+          <th>{{ currency.format(stat.selectedPaymentOperationsSumm) }}</th>
           <th>
             {{
               stat.status == 'created'
@@ -349,7 +440,7 @@ function selectUser(user: any) {
                 : 'отменено'
             }}
           </th>
-          <th>{{ defaultDate(stat.createdAt) }}</th>
+          <th>{{ defaultDate(stat.requestDate) }}</th>
           <th>{{ stat.acception }}</th>
           <th>
             <div class="flex max-w-lg overflow-x-auto justify-center">
@@ -385,14 +476,49 @@ function selectUser(user: any) {
               : selectedUser.username
           }}
         </button>
-        <button class="btn max-w-xl my-1 w-xl" @click="store.refundsOperationsModal = true">
+        <button
+          class="btn max-w-xl my-1 w-xl"
+          @click="openRefundsModal"
+          :disabled="selectedUser.username == ''"
+        >
           {{
             selectedOperation == ''
               ? 'Выберите основную операцию для возврата'
-              : selectedOperation
+              : 'Операция выбрана'
           }}
         </button>
-        <div></div>
+        <div class="stats -mb-2">
+          <div class="stat flex justify-between">
+            <div class="stat-title text-center font-bold">
+              Сумма основной операции
+            </div>
+            <div class="stat-value text-2xl -mt-0.5 text-center">
+              {{ currency.format(allPaymentOperationsSumm) }}
+            </div>
+          </div>
+        </div>
+        <button
+          class="btn max-w-xl my-1 w-xl"
+          @click="openRefundsPaymentModal"
+          :disabled="selectedOperation == ''"
+        >
+          {{
+            selectedPaymentOperationsCount < 1
+              ? 'Выберите дополнительные операции для возврата'
+              : `Выбрано дополнительных операций: ${selectedPaymentOperationsCount}`
+          }}
+        </button>
+
+        <div class="stats -mb-2">
+          <div class="stat flex justify-between">
+            <div class="stat-title text-center font-bold">
+              Сумма дополнительных операции
+            </div>
+            <div class="stat-value text-2xl -mt-0.5 text-center">
+              {{ currency.format(selectedPaymentOperationsSumm) }}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="text-center font-bold mt-1 mb-3">
@@ -444,7 +570,8 @@ function selectUser(user: any) {
       <div class="flex justify-center">
         <button
           class="btn btn-primary mt-3 px-10"
-          @click="createBalanceTransferRequest"
+          :disabled="isCreateButtonDisabled"
+          @click="createRefundRequest"
         >
           Отправить на проверку
         </button>
@@ -551,7 +678,13 @@ function selectUser(user: any) {
   </div>
 
   <div>
-    <RefundsOperationsModal :selected-user="selectedUser" />
+    <RefundsOperationsModal
+      :selected-operation="selectedOperation"
+      :selected-user="selectedUser"
+      @select-operation="selectOperation"
+      ref="refundsOperationsModal"
+    />
+    <RefundsPaymentOperationsModal :payment-operations="paymentOperations" />
   </div>
 
   <!-- Put this part before </body> tag -->

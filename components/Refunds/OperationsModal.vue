@@ -8,7 +8,10 @@ const props = defineProps({
       username: '',
     },
   },
+  selectedOperation: String,
 })
+
+const emit = defineEmits(['selectOperation'])
 
 const { height, width } = useWindowSize()
 const value = ref('')
@@ -33,12 +36,12 @@ const serviceId = ref('')
 const users = ref<any>([])
 const inputLoading = ref(false)
 const curPage = ref(1)
-
+const selectedOperation = toRef(props, 'selectedOperation')
 const infoCount = ref(0)
 const elPerPage = 50
 const pages = ref(0)
 const isPageBtnsDisabled = ref(false)
-const selectedUser= toRef(props, 'selectedUser')
+const selectedUser = toRef(props, 'selectedUser')
 const dateRange = ref([])
 
 const tabs = ref([
@@ -49,10 +52,6 @@ const tabs = ref([
       { key: 'article', title: 'артикул' },
       { key: 'status', title: 'статус' },
       { key: 'quantity', title: 'количество' },
-      { key: 'point', title: 'адрес' },
-      { key: 'rules', title: 'правила' },
-      { key: 'sizeParam', title: 'размер' },
-      { key: 'gender', title: 'пол' },
       { key: 'dateRange', title: 'даты выкупов' },
       { key: 'trueDate', title: 'дата' },
     ],
@@ -62,23 +61,6 @@ const tabs = ref([
       { key: 'archived', title: 'В архиве' },
       { key: 'completed', title: 'Завершенные' },
       { key: 'paused', title: 'На пазуе' },
-    ],
-  },
-  {
-    title: 'deliveries',
-    headers: [
-      { key: 'uuidbuyout', title: 'ID выкупа' },
-      { key: 'article', title: 'артикул' },
-      { key: 'status', title: 'статус' },
-      { key: 'recipient', title: 'получатель' },
-      { key: 'point', title: 'адрес' },
-      { key: 'recipientphone', title: 'телефон' },
-      { key: 'trueDate', title: 'обновлено' },
-    ],
-    statuses: [
-      { key: 'any', title: 'Все' },
-      { key: 'active', title: 'Активные' },
-      { key: 'completed', title: 'Завершенные' },
     ],
   },
   {
@@ -146,14 +128,6 @@ const tabs = ref([
       { key: 'status', title: 'статус' },
       { key: 'trueDate', title: 'дата создания' },
       { key: 'trueEndedDate', title: 'дата публикации' },
-    ],
-  },
-  {
-    title: 'reports',
-    headers: [
-      { key: 'uuidbuyout', title: 'ID выкупа' },
-      { key: 'card', title: 'корзина' },
-      { key: 'trueDate', title: 'дата создания' },
     ],
   },
 ])
@@ -300,6 +274,13 @@ async function banUnbanUser() {
     })
   }
 }
+
+function selectOperation(operationId: string, operationMongoId: string) {
+  emit('selectOperation', operationId, operationMongoId)
+  store.refundsOperationsModal = false
+}
+
+defineExpose({ getInfo })
 </script>
 
 <template>
@@ -310,7 +291,7 @@ async function banUnbanUser() {
     }"
     class="modal"
   >
-    <div class="modal-box max-w-7xl">
+    <div class="modal-box max-w-[70%]">
       <label
         class="btn btn-sm btn-circle absolute right-2 top-2 btn-ghost"
         @click="store.refundsOperationsModal = false"
@@ -350,13 +331,11 @@ async function banUnbanUser() {
             v-model="tabOption"
           >
             <option selected value="buyouts">выкупы</option>
-            <option value="deliveries">доставки</option>
             <option value="reviews">отзывы</option>
             <option value="likes">лайки на отзывы</option>
             <option value="questions">вопросы</option>
             <option value="productLikes">лайки на товары</option>
             <option value="cart">корзина</option>
-            <option value="reports">отчеты по выкупам</option>
           </select>
           <select
             v-if="
@@ -395,20 +374,7 @@ async function banUnbanUser() {
           <button class="btn btn-primary ml-3" @click="getInfo">
             Применить
           </button>
-          <button
-            class="btn btn-error bg-red-400 ml-3"
-            v-if="selectedUser.username.length > 2 && !selectedUser.isBanned"
-            @click="banUnbanUser"
-          >
-            Заблокировать
-          </button>
-          <button
-            class="btn btn-primary ml-3"
-            v-if="selectedUser.isBanned"
-            @click="banUnbanUser"
-          >
-            Разблокировать
-          </button>
+   
         </div>
         <div>
           <div class="join mr-2">
@@ -527,88 +493,19 @@ async function banUnbanUser() {
                   </div>
                 </div>
               </th>
+              <th>
+                <button
+                  class="btn btn-sm btn-primary"
+                  @click="selectOperation(tabOption == 'buyouts' ? item.uuid : item._id, item._id)"
+                >
+                  Выбрать
+                </button>
+              </th>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Put this part before </body> tag -->
-      <input type="checkbox" id="selectUser" class="modal-toggle" />
-      <div class="modal cursor-pointer" @click="openUsersSelectModal">
-        <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
-          <form method="dialog">
-            <label
-              for="selectUser"
-              class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              ref="selectUserClose"
-            >
-              ✕
-            </label>
-          </form>
-
-          <div>
-            <div class="justify-between flex">
-              <div>
-                <label
-                  ><input
-                    v-model="query"
-                    type="text"
-                    placeholder="Введите id или username или email"
-                    class="input input-bordered input-l ml-4 w-80"
-                    @input="onInput($event)"
-                  />
-                </label>
-                <span
-                  v-if="inputLoading"
-                  class="loading loading-spinner text-primary loading-large ml-4"
-                />
-              </div>
-            </div>
-
-            <div
-              class="my-2 mx-2 overflow-y-auto"
-              :style="{ 'max-height': 500 + 'px' }"
-            >
-              <table class="table my-3">
-                <!-- head -->
-                <thead>
-                  <tr>
-                    <th>id</th>
-                    <th>username</th>
-                    <th>email</th>
-                    <th>Выбрать</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="hover" v-for="user in users" :key="user.uuid">
-                    <td style="max-width: 130px">{{ user.uuid }}</td>
-                    <td style="max-width: 150px">
-                      <div class="mx-1 overflow-x-auto">
-                        {{ user.username }}
-                      </div>
-                    </td>
-                    <td style="max-width: 150px" class="overflow-x-auto">
-                      <div class="mx-1 overflow-x-auto">
-                        {{ user.email }}
-                      </div>
-                    </td>
-                    <td style="max-width: 20px">
-                      <button
-                        class="btn btn-primary btn-sm"
-                        @click="selectUser(user)"
-                      >
-                        Выбрать
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="modal-action"></div>
-          </div>
-        </div>
-      </div>
       <input type="checkbox" id="imageModal" class="modal-toggle" />
       <div class="modal cursor-pointer" @click="closeImageModal">
         <div class="modal-box w-fit max-w-full cursor-pointer">

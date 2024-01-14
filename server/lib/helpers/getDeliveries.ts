@@ -24,7 +24,7 @@ export default async function getDeliveries(
 
   const count = await Delivery.count({ user })
 
-  const format = deliveries.map((delivery: any) => {
+  const format: any = deliveries.map((delivery: any) => {
     const date = new Date(delivery.updatedAt)
     const day = date.getDate().toString().padStart(2, '0')
     const month = (date.getMonth() + 1).toString().padStart(2, '0') // Месяцы в JavaScript начинаются с 0, поэтому прибавляем 1
