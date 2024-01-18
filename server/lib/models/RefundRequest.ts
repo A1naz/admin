@@ -7,6 +7,7 @@ const RefundRequestSchema = new Schema({
   adminUserUuid: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: User, required: true },
   screenshot: { type: String, required: true },
+  comment: { type: String, required: true, default: '' },
   mainOperation: { type: Schema.Types.ObjectId, required: true },
   selectedPaymentOperations: [{ type: Schema.Types.ObjectId, required: true }],
   mainOperationSumm: { type: Number, required: true },

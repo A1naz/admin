@@ -31,6 +31,7 @@ const userQuery = ref('')
 const selectedUser: any = ref({
   username: '',
 })
+const comment = ref('')
 const selectedOperation: any = ref('')
 const selectedOperationMongoId: any = ref('')
 const inputLoading = ref(false)
@@ -230,6 +231,7 @@ async function createRefundRequest() {
       paymentOperations: selectedPaymentOperations,
       mainOperationSumm: allPaymentOperationsSumm.value,
       selectedPaymentOperationsSumm: selectedPaymentOperationsSumm.value,
+      comment: comment.value,
     },
   })
   if (data.value) {
@@ -241,11 +243,11 @@ async function createRefundRequest() {
 
       location.reload()
     } else {
+      isCreateButtonDisabled.value = false
       notify({
         type: 'error',
         title: data.value.message,
       })
-      isCreateButtonDisabled.value = false
     }
   }
 
@@ -519,10 +521,16 @@ async function selectOperation(operationId: string, operationMongoId: string) {
             </div>
           </div>
         </div>
+        <input
+          v-model="comment"
+          type="text"
+          placeholder="Основание операции"
+          class="input input-bordered w-full mr-3"
+        />
       </div>
 
       <div class="text-center font-bold mt-1 mb-3">
-        Скриншот чека операции клиента
+        Скриншот запроса клиента на возврат (диалог)
       </div>
       <div class="flex justify-center" style="min-height: 200px">
         <div

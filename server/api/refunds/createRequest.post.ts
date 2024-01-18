@@ -13,7 +13,15 @@ export default eventHandler(async (event) => {
     paymentOperations,
     mainOperationSumm,
     selectedPaymentOperationsSumm,
+    comment,
   } = await readBody(event)
+
+  if (!comment) {
+    return {
+      status: 400,
+      message: 'Комментарий не может быть пустым',
+    }
+  }
 
   if (!session) return sendRedirect(event, '/auth', 302)
   const user = await AdminUser.findOne({ uuid: session.uuid })
@@ -30,6 +38,7 @@ export default eventHandler(async (event) => {
     screenshot,
     mainOperation,
     selectedPaymentOperations: paymentOperations,
+    comment,
     mainOperationSumm,
     selectedPaymentOperationsSumm,
   })
