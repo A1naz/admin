@@ -64,6 +64,12 @@ export default eventHandler(async (event) => {
       registrationDate: user.registrationDate,
       tabs: user.tabs ? user.tabs : [],
       tariffs: user.tariff,
+      partnerRewardPercent: user.partner?.rewardPercent
+        ? user.partner?.rewardPercent
+        : 10,
+      partnerSecondLevelPercent: user.partner?.secondLevelPercent
+        ? user.partner?.secondLevelPercent
+        : 5,
     }
   })
 

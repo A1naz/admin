@@ -18,6 +18,22 @@ export default eventHandler(async (event) => {
     (item: any) => ' ' + item.value
   )
 
+  const trueTariffs: any = {}
+
+  Object.keys(tariffs).forEach((tariffType) => {
+    if (
+      tariffType != 'partnerRewardPercent' &&
+      tariffType != 'partnerSecondLevelPercent:'
+    ) {
+      trueTariffs[tariffType] = {
+        value: 0,
+        type: '',
+      }
+      trueTariffs[tariffType].value = tariffs[tariffType].value
+      trueTariffs[tariffType].type = tariffs[tariffType].type
+    }
+  })
+
   if (userUuid !== 'all') {
     const foundUser = await User.findOne({ uuid: userUuid })
     if (!foundUser) {
@@ -27,7 +43,11 @@ export default eventHandler(async (event) => {
       })
     }
 
-    foundUser.tariff = tariffs
+    foundUser.tariff = trueTariffs
+    foundUser.partner.rewardPercent = tariffs.partnerRewardPercent.value
+    foundUser.partner.secondLevelPercent =
+      tariffs.partnerSecondLevelPercent.value
+
     await foundUser.save()
 
     await ActionHistory.create({
@@ -39,7 +59,16 @@ export default eventHandler(async (event) => {
       userUuid: foundUser.uuid,
     })
   } else {
-    await User.updateMany({}, { $set: { tariff: tariffs } })
+    await User.updateMany(
+      {},
+      {
+        $set: {
+          tariff: trueTariffs,
+          'partner.rewardPercent': tariffs.partnerRewardPercent.value,
+          'partner.secondLevelPercent': tariffs.partnerSecondLevelPercent.value,
+        },
+      }
+    )
 
     await ActionHistory.create({
       adminUser: user._id,

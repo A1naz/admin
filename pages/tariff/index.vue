@@ -77,6 +77,14 @@ const tariffs = ref<any>({
     type: 'price',
     value: 100,
   },
+  partnerRewardPercent: {
+    type: 'percent',
+    value: 10,
+  },
+  partnerSecondLevelPercent: {
+    type: 'percent',
+    value: 5,
+  },
 })
 
 function getServiceNameByKey(key: string) {
@@ -97,6 +105,10 @@ function getServiceNameByKey(key: string) {
       return 'Корзина'
     case 'autoAnswer':
       return 'Автоответчик'
+    case 'partnerRewardPercent':
+      return 'Бонус партнерки %'
+    case 'partnerSecondLevelPercent':
+      return 'Бонус партнерки 2 уровня %'
   }
 }
 
@@ -110,6 +122,15 @@ function setTariffs() {
         tariffs.value[tariffType].type = userTariffs[tariffType].type
       }
     })
+
+    selectedUser.value.partnerRewardPercent
+      ? (tariffs.value.partnerRewardPercent.value =
+          selectedUser.value.partnerRewardPercent)
+      : (tariffs.value.partnerRewardPercent.type = 'percent')
+    selectedUser.value.partnerSecondLevelPercent
+      ? (tariffs.value.partnerSecondLevelPercent.value =
+          selectedUser.value.partnerSecondLevelPercent)
+      : (tariffs.value.partnerSecondLevelPercent.type = 'percent')
   }
 
   if (selectedUser.value.uuid == 'all') {
@@ -257,7 +278,7 @@ function changeServiceType(key: string, event: Event) {
     </table>
   </div>
   <dialog id="createRequireModal" class="modal">
-    <div class="modal-box max-w-md">
+    <div class="modal-box max-w-lg">
       <h3 class="font-bold text-lg"></h3>
       <div class="flex flex-col">
         <div class="text-center mb-3 text-lg font-bold">

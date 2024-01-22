@@ -6,6 +6,7 @@ const partnerSchema = new Schema({
   balance: { type: Number, default: 0 },
   refCount: { type: Number, default: 0 },
   rewardPercent: { type: Number, default: 10 },
+  secondLevelPercent: { type: Number, default: 5 },
 })
 
 const UserSchema = new Schema({
