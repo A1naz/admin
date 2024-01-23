@@ -14,6 +14,10 @@ export default eventHandler(async (event) => {
     mainOperationSumm,
     selectedPaymentOperationsSumm,
     comment,
+    handleOperationSumm,
+    accountScreenshot,
+    refundType,
+    phoneNumber
   } = await readBody(event)
 
   if (!comment) {
@@ -40,7 +44,10 @@ export default eventHandler(async (event) => {
     selectedPaymentOperations: paymentOperations,
     comment,
     mainOperationSumm,
-    selectedPaymentOperationsSumm,
+    selectedPaymentOperationsSumm: handleOperationSumm ? handleOperationSumm : selectedPaymentOperationsSumm,
+    accountScreenshot: accountScreenshot,
+    refundType,
+    phoneNumber
   })
 
   await ActionHistory.create({

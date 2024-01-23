@@ -18,6 +18,7 @@ const currency = useCurrency()
 
 const { height, width } = useWindowSize()
 const { upload, getPublicUrl } = useS3Object()
+const handleOperationSumm = ref()
 const closeCreateModalButton: any = ref(null)
 const sortDateType = ref('requireDate')
 const type = ref('any')
@@ -31,6 +32,8 @@ const userQuery = ref('')
 const selectedUser: any = ref({
   username: '',
 })
+const selectedScreenshot: any = ref('dialog')
+const refundType = ref('Возврат за неоплаченный товар')
 const comment = ref('')
 const selectedOperation: any = ref('')
 const selectedOperationMongoId: any = ref('')
@@ -46,8 +49,13 @@ const selectUserClose: any = ref(null)
 const users = ref<any>([])
 const refundsOperationsModal = ref()
 const isCreateButtonDisabled = ref(false)
+const phoneNumber = ref('')
 
 const screenshot = ref({
+  url: 'null',
+  public: 'null',
+})
+const accountScreenshot = ref({
   url: 'null',
   public: 'null',
 })
@@ -99,7 +107,7 @@ async function getStats() {
   }
 }
 
-async function uploadToS3(event: Event) {
+async function uploadToS3(event: Event, screen: string = 'dialog') {
   loadingIndex.value = true
   const fileList = (event.target! as HTMLInputElement).files
   const files = Array.from(fileList!)
@@ -116,11 +124,19 @@ async function uploadToS3(event: Event) {
       duration: 3000,
     })
   }
-  if (data.value)
-    screenshot.value = {
-      url: data.value[0].url,
-      public: getPublicUrl(data.value[0].url),
+  if (data.value) {
+    if (selectedScreenshot.value == 'account') {
+      accountScreenshot.value = {
+        url: data.value[0].url,
+        public: getPublicUrl(data.value[0].url),
+      }
+    } else {
+      screenshot.value = {
+        url: data.value[0].url,
+        public: getPublicUrl(data.value[0].url),
+      }
     }
+  }
 
   loadingIndex.value = false
 }
@@ -193,25 +209,34 @@ const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 
 getStats()
 
-function openFileInput() {
+function openFileInput(screenType: string = 'dialog') {
+  selectedScreenshot.value = screenType
   screenshotInput.value?.click()
 }
 
 async function createRefundRequest() {
   isCreateButtonDisabled.value = true
-  if (screenshot.value.public === 'null') {
+  if (
+    screenshot.value.public === 'null' ||
+    accountScreenshot.value.public === 'null'
+  ) {
     notify({
       type: 'error',
-      title: 'Нужно загрузить скриншот',
+      title: 'Необходимо загрузить скриншоты',
     })
     isCreateButtonDisabled.value = false
     return
   }
 
-  if (selectedPaymentOperationsCount.value < 1) {
+  if (
+    !selectedOperationMongoId.value ||
+    (selectedPaymentOperationsCount.value < 1 &&
+      !handleOperationSumm.value &&
+      handleOperationSumm.value < 1)
+  ) {
     notify({
       type: 'error',
-      title: 'Нужно выбрать хотя бы одну операцию',
+      title: 'Нужно выбрать хотя бы одну операцию или ввести сумму вручную',
     })
     isCreateButtonDisabled.value = false
     return
@@ -225,13 +250,17 @@ async function createRefundRequest() {
     watch: false,
     method: 'POST',
     body: {
+      phoneNumber: phoneNumber.value.replace(/[\(\)\-\s]/g, ''),
+      handleOperationSumm: handleOperationSumm.value,
       userId: selectedUser.value._id,
       screenshot: screenshot.value.public,
+      accountScreenshot: accountScreenshot.value.public,
       mainOperation: selectedOperationMongoId.value,
       paymentOperations: selectedPaymentOperations,
       mainOperationSumm: allPaymentOperationsSumm.value,
       selectedPaymentOperationsSumm: selectedPaymentOperationsSumm.value,
       comment: comment.value,
+      refundType: refundType.value,
     },
   })
   if (data.value) {
@@ -408,6 +437,7 @@ async function selectOperation(operationId: string, operationMongoId: string) {
             </div>
           </th>
           <th>подтверждение</th>
+          <th>комментарий отмены</th>
           <th class="text-center">скриншот</th>
         </tr>
       </thead>
@@ -439,11 +469,21 @@ async function selectOperation(operationId: string, operationMongoId: string) {
                 ? 'завершено'
                 : stat.status == 'accepted'
                 ? 'завершено'
+                : stat.status == 'fundWaiting'
+                ? 'ожидание возврата средств'
                 : 'отменено'
             }}
           </th>
           <th>{{ defaultDate(stat.requestDate) }}</th>
           <th>{{ stat.acception }}</th>
+          <th>
+            <div
+              style="max-width: 250px; max-height: 150px"
+              class="overflow-y-auto"
+            >
+              {{ stat.cancelationComment }}
+            </div>
+          </th>
           <th>
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>
@@ -462,7 +502,7 @@ async function selectOperation(operationId: string, operationMongoId: string) {
 
   <input type="checkbox" id="createRequireModal" class="modal-toggle" />
   <div id="createRequireModal" class="modal">
-    <div class="modal-box">
+    <div class="modal-box max-w-2xl">
       <button
         class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
         @click="closeCreateModalButton.click()"
@@ -521,48 +561,123 @@ async function selectOperation(operationId: string, operationMongoId: string) {
             </div>
           </div>
         </div>
+        <div class="divider">или введите сумму для возврата от руки</div>
+
+        <input
+          v-model="handleOperationSumm"
+          type="number"
+          placeholder="Сумма возврата"
+          class="input input-bordered w-full mr-3"
+        />
+        <div class="divider my-2" />
+        <select
+          v-model="refundType"
+          class="select select-bordered w-full mb-2 text-[16px]"
+        >
+          <option disabled>Тип возврата за товар</option>
+          <option value="Возврат за неоплаченный товар">
+            Возврат за неоплаченный товар
+          </option>
+          <option value="Другой возврат">Другой возврат</option>
+        </select>
         <input
           v-model="comment"
           type="text"
           placeholder="Основание операции"
-          class="input input-bordered w-full mr-3"
+          class="input input-bordered w-full mr-3 mb-2"
+        />
+        <input
+          v-model="phoneNumber"
+          type="text"
+          v-maska
+          data-maska="+7 (###) ###-##-##"
+          placeholder="Номер телефона"
+          class="input input-bordered input-l mb-2 w-full"
         />
       </div>
-
-      <div class="text-center font-bold mt-1 mb-3">
-        Скриншот запроса клиента на возврат (диалог)
-      </div>
-      <div class="flex justify-center" style="min-height: 200px">
-        <div
-          @click="openFileInput"
-          :class="`cursor-pointer flex justify-center border-neutral ${
-            screenshot.public === 'null' ? 'border-2' : ''
-          } rounded-lg`"
-          style="width: 200px; height: 300px"
-        >
-          <nuxt-img
-            v-if="screenshot.public !== 'null'"
-            class="max-w-lg rounded-lg my-2 px-1"
-            style="display: block; max-height: 300px"
-            :src="screenshot.public"
-          />
-          <span
-            v-if="loadingIndex && screenshot.public === 'null'"
-            class="loading loading-spinner text-primary absolute mt-32"
-          />
-          <IconCSS
-            style="max-height: 300px"
-            v-show="screenshot.public === 'null'"
-            class="mt-28"
-            :name="
-              loadingIndex == true
-                ? ''
-                : 'material-symbols:add-photo-alternate-outline'
-            "
-            size="70"
-          />
+      <div class="flex flex-col justify-center gap-2">
+        <div>
+          <div class="text-center font-bold mt-1 mb-3">
+            Скриншот запроса клиента
+          </div>
+          <div class="flex justify-center" style="min-height: 200px">
+            <div
+              @click="openFileInput('dialog')"
+              :class="`cursor-pointer flex justify-center border-neutral ${
+                screenshot.public === 'null' ? 'border-2' : ''
+              } rounded-lg`"
+              style="width: 250px; height: 300px"
+            >
+              <nuxt-img
+                v-if="screenshot.public !== 'null'"
+                class="max-w-lg rounded-lg my-2 px-1"
+                style="display: block; max-height: 300px"
+                :src="screenshot.public"
+              />
+              <span
+                v-if="
+                  loadingIndex &&
+                  screenshot.public === 'null' &&
+                  selectedScreenshot == 'dialog'
+                "
+                class="loading loading-spinner text-primary absolute mt-32"
+              />
+              <IconCSS
+                style="max-height: 300px"
+                v-show="screenshot.public === 'null'"
+                class="mt-28"
+                :name="
+                  loadingIndex == true
+                    ? ''
+                    : 'material-symbols:add-photo-alternate-outline'
+                "
+                size="70"
+              />
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="text-center font-bold mt-1 mb-3">
+            Скриншот аккаунта клиента
+          </div>
+          <div class="flex justify-center" style="min-height: 200px">
+            <div
+              @click="openFileInput('account')"
+              :class="`cursor-pointer flex justify-center border-neutral ${
+                accountScreenshot.public === 'null' ? 'border-2' : ''
+              } rounded-lg`"
+              style="width: 250px; height: 300px"
+            >
+              <nuxt-img
+                v-if="accountScreenshot.public !== 'null'"
+                class="max-w-lg rounded-lg my-2 px-1"
+                style="display: block; max-height: 300px"
+                :src="accountScreenshot.public"
+              />
+              <span
+                v-if="
+                  loadingIndex &&
+                  accountScreenshot.public === 'null' &&
+                  selectedScreenshot == 'account'
+                "
+                class="loading loading-spinner text-primary absolute mt-32"
+              />
+              <IconCSS
+                style="max-height: 300px"
+                v-show="accountScreenshot.public == 'null'"
+                class="mt-28"
+                :name="
+                  loadingIndex == true
+                    ? ''
+                    : 'material-symbols:add-photo-alternate-outline'
+                "
+                size="70"
+              />
+            </div>
+          </div>
         </div>
       </div>
+
       <ClientOnly>
         <div>
           <input
@@ -586,7 +701,12 @@ async function selectOperation(operationId: string, operationMongoId: string) {
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-      <label for="createRequireModal" ref="closeCreateModalButton">close</label>
+      <label
+        class="cursor-pointer"
+        for="createRequireModal"
+        ref="closeCreateModalButton"
+        >close</label
+      >
     </form>
   </div>
   <!-- ==================================================================== -->
@@ -700,14 +820,16 @@ async function selectOperation(operationId: string, operationMongoId: string) {
 <style scoped>
 ::-webkit-scrollbar {
   height: 4px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
   background-color: #f1f1f1;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
   background-color: #888;
-  border-radius: 0px;
+  border-radius: 2px;
 }
 </style>

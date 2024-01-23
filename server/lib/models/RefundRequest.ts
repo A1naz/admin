@@ -15,10 +15,10 @@ const RefundRequestSchema = new Schema({
   status: { type: String, default: 'created' },
   acception: { type: String, default: '0/2' },
   requestDate: { type: Date, default: new Date() },
-
+  accountScreenshot: { type: String },
+  refundType: { type: String },
+  phoneNumber: { type: String },
+  cancelationComment: { type: String, default: '' }
 })
 
-export const RefundRequest = model(
-  'RefundRequest',
-  RefundRequestSchema
-)
+export const RefundRequest = model('RefundRequest', RefundRequestSchema)
