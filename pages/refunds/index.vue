@@ -50,6 +50,7 @@ const users = ref<any>([])
 const refundsOperationsModal = ref()
 const isCreateButtonDisabled = ref(false)
 const phoneNumber = ref('')
+const selectedTabOption = ref('')
 
 const screenshot = ref({
   url: 'null',
@@ -312,7 +313,12 @@ function openRefundsPaymentModal() {
   store.refundsPaymentOperationsModal = true
 }
 
-async function selectOperation(operationId: string, operationMongoId: string) {
+async function selectOperation(
+  operationId: string,
+  operationMongoId: string,
+  tabOption: string
+) {
+  selectedTabOption.value = tabOption
   selectedOperation.value = operationId
   selectedOperationMongoId.value = operationMongoId
 
@@ -561,16 +567,20 @@ async function selectOperation(operationId: string, operationMongoId: string) {
             </div>
           </div>
         </div>
-        <div class="divider">или введите сумму для возврата от руки</div>
+        <div v-if="selectedTabOption == 'buyouts'" class="divider">
+          или введите сумму для возврата от руки
+        </div>
 
         <input
+          v-if="selectedTabOption == 'buyouts'"
           v-model="handleOperationSumm"
           type="number"
           placeholder="Сумма возврата"
           class="input input-bordered w-full mr-3"
         />
-        <div class="divider my-2" />
+        <div class="divider my-2" v-if="selectedTabOption == 'buyouts'" />
         <select
+          v-if="selectedTabOption == 'buyouts'"
           v-model="refundType"
           class="select select-bordered w-full mb-2 text-[16px]"
         >
@@ -587,6 +597,7 @@ async function selectOperation(operationId: string, operationMongoId: string) {
           class="input input-bordered w-full mr-3 mb-2"
         />
         <input
+          v-if="selectedTabOption == 'buyouts'"
           v-model="phoneNumber"
           type="text"
           v-maska

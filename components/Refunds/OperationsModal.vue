@@ -276,7 +276,7 @@ async function banUnbanUser() {
 }
 
 function selectOperation(operationId: string, operationMongoId: string) {
-  emit('selectOperation', operationId, operationMongoId)
+  emit('selectOperation', operationId, operationMongoId, tabOption.value)
   store.refundsOperationsModal = false
 }
 
@@ -297,7 +297,6 @@ defineExpose({ getInfo })
         @click="store.refundsOperationsModal = false"
         >✕</label
       >
-
       <div class="flex justify-between">
         <div class="flex">
           <!-- 
