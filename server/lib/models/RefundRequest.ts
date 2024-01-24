@@ -9,6 +9,7 @@ const RefundRequestSchema = new Schema({
   screenshot: { type: String, required: true },
   comment: { type: String, required: true, default: '' },
   mainOperation: { type: Schema.Types.ObjectId, required: true },
+  mainOperationType: { type: String, required: true },
   selectedPaymentOperations: [{ type: Schema.Types.ObjectId, required: true }],
   mainOperationSumm: { type: Number, required: true },
   selectedPaymentOperationsSumm: { type: Number, required: true },
@@ -18,7 +19,8 @@ const RefundRequestSchema = new Schema({
   accountScreenshot: { type: String },
   refundType: { type: String },
   phoneNumber: { type: String },
-  cancelationComment: { type: String, default: '' }
+  cancelationComment: { type: String, default: '' },
+  handleOperationSumm: { type: Number,  },
 })
 
 export const RefundRequest = model('RefundRequest', RefundRequestSchema)

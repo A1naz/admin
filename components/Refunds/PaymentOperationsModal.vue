@@ -7,15 +7,40 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  refundType: {
+    type: String,
+    default: '',
+  },
 })
 
+const refundType = toRef(props, 'refundType')
 const paymentOperations: any = toRef(props, 'paymentOperations')
 const isAllOperationsSelected = computed(() => {
-  return paymentOperations.value.every((operation: any) => operation.selected)
+  return operations.value.every((operation: any) => operation.selected)
 })
 
-function selectAllOperations(select: boolean) {
+watch(refundType, () => {
+  selectAllOperations(false)
   paymentOperations.value.forEach((operation: any) => {
+    operation.selected = false
+  })
+})
+
+const operations = computed(() => {
+  return paymentOperations.value.filter((operation: any) => {
+    if (
+      refundType.value == 'Возврат по вине клиента' &&
+      operation.type !== 'buyouts'
+    ) {
+    } else {
+      return operation
+    }
+  })
+})
+
+
+function selectAllOperations(select: boolean) {
+  operations.value.forEach((operation: any) => {
     operation.selected = select
   })
 }
@@ -37,7 +62,6 @@ const emit = defineEmits(['selectOperation'])
         @click="store.refundsPaymentOperationsModal = false"
         >✕</label
       >
-
       <div
         class="my-2 mx-2 overflow-y-auto"
         :style="{ 'max-height': height - 270 + 'px' }"
@@ -62,7 +86,8 @@ const emit = defineEmits(['selectOperation'])
           </thead>
           <tbody>
             <!-- row 1 -->
-            <tr v-for="operation in paymentOperations" class="hover">
+
+            <tr v-for="operation in operations" class="hover">
               <th>{{ operation._id }}</th>
               <td>{{ operation.summ }}</td>
               <td>{{ operation.basisoperation }}</td>

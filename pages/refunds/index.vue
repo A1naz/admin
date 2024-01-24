@@ -33,7 +33,7 @@ const selectedUser: any = ref({
   username: '',
 })
 const selectedScreenshot: any = ref('dialog')
-const refundType = ref('Возврат за неоплаченный товар')
+const refundType = ref('Возврат по вине клиента')
 const comment = ref('')
 const selectedOperation: any = ref('')
 const selectedOperationMongoId: any = ref('')
@@ -262,6 +262,7 @@ async function createRefundRequest() {
       selectedPaymentOperationsSumm: selectedPaymentOperationsSumm.value,
       comment: comment.value,
       refundType: refundType.value,
+      mainOperationType: selectedTabOption.value,
     },
   })
   if (data.value) {
@@ -428,9 +429,11 @@ async function selectOperation(
           <th>ник менеджера</th>
           <th>ник пользователя</th>
           <th>основная операция</th>
+          <th>тип операции</th>
           <!-- <th>дополнительные операции</th> -->
           <th>общая сумма</th>
           <th>сумма доп. операций</th>
+          <th>ручная сумма</th>
           <th>статус поиска</th>
 
           <th>
@@ -457,6 +460,7 @@ async function selectOperation(
             {{ stat.userUsername }}
           </th>
           <th class="text-xs overflow-x-auto">{{ stat.mainOperation }}</th>
+          <th class="text-xs overflow-x-auto">{{ stat.mainOperationType }}</th>
           <!-- <th>
             <div
               v-for="selectedPaymentOperation in stat.selectedPaymentOperations"
@@ -467,6 +471,13 @@ async function selectOperation(
 
           <th>{{ currency.format(stat.mainOperationSumm) }}</th>
           <th>{{ currency.format(stat.selectedPaymentOperationsSumm) }}</th>
+          <th>
+            {{
+              stat.handleOperationSumm
+                ? currency.format(stat.handleOperationSumm)
+                : ''
+            }}
+          </th>
           <th>
             {{
               stat.status == 'created'
@@ -567,12 +578,21 @@ async function selectOperation(
             </div>
           </div>
         </div>
-        <div v-if="selectedTabOption == 'buyouts'" class="divider">
+        <div
+          v-if="
+            selectedTabOption == 'buyouts' &&
+            refundType == 'Возврат по вине клиента'
+          "
+          class="divider"
+        >
           или введите сумму для возврата от руки
         </div>
 
         <input
-          v-if="selectedTabOption == 'buyouts'"
+          v-if="
+            selectedTabOption == 'buyouts' &&
+            refundType == 'Возврат по вине клиента'
+          "
           v-model="handleOperationSumm"
           type="number"
           placeholder="Сумма возврата"
@@ -585,8 +605,8 @@ async function selectOperation(
           class="select select-bordered w-full mb-2 text-[16px]"
         >
           <option disabled>Тип возврата за товар</option>
-          <option value="Возврат за неоплаченный товар">
-            Возврат за неоплаченный товар
+          <option value="Возврат по вине клиента">
+            Возврат по вине клиента
           </option>
           <option value="Другой возврат">Другой возврат</option>
         </select>
@@ -602,7 +622,7 @@ async function selectOperation(
           type="text"
           v-maska
           data-maska="+7 (###) ###-##-##"
-          placeholder="Номер телефона"
+          placeholder="Номер телефона аккаунта"
           class="input input-bordered input-l mb-2 w-full"
         />
       </div>
@@ -823,7 +843,10 @@ async function selectOperation(
       @select-operation="selectOperation"
       ref="refundsOperationsModal"
     />
-    <RefundsPaymentOperationsModal :payment-operations="paymentOperations" />
+    <RefundsPaymentOperationsModal
+      :payment-operations="paymentOperations"
+      :refundType="refundType"
+    />
   </div>
 
   <!-- Put this part before </body> tag -->

@@ -22,6 +22,7 @@ export default eventHandler(async (event) => {
   const format = operations.map((operation: any) => {
     return {
       _id: operation._id,
+      type: operation.type,
       basisoperation: operation.basisoperation,
       date: operation.dataoperation,
       summ: Number(operation.summ),
