@@ -30,7 +30,7 @@ const operations = computed(() => {
   return paymentOperations.value.filter((operation: any) => {
     if (
       refundType.value == 'Возврат по вине клиента' &&
-      operation.type !== 'buyouts'
+      operation.type == 'buyouts service'
     ) {
     } else {
       return operation
