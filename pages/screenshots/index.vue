@@ -25,6 +25,7 @@ const stats = ref<any>([])
 const pages = ref(0)
 const isPageBtnsDisabled = ref(false)
 const dateRange = ref([])
+const article = ref('')
 
 definePageMeta({
   layout: 'app',
@@ -39,11 +40,12 @@ async function getStats() {
     query: {
       page: curPage.value,
       sortDate: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
-      account: query.value,
+      account: query.value.replace(/[\(\)\-\s]/g, ''),
       sortDateType: sortDateType.value,
       type: type.value,
       dateRange: dateRange.value.length > 0 ? dateRange.value : null,
     },
+    watch: false,
   })
   if (data.value) {
     stats.value = data.value.screenshots
@@ -51,13 +53,28 @@ async function getStats() {
 }
 
 async function createRequire() {
+  if (
+    !article.value ||
+    !account.value ||
+    account.value.length < 10 ||
+    article.value.length < 2
+  ) {
+    notify({
+      type: 'error',
+      title: 'Заполните все поля',
+    })
+    return
+  }
+
   isCreateButtonDisabled.value = true
   const { data, error }: any = await useFetch('/api/screenshots/create', {
     method: 'POST',
     body: {
-      account: account.value,
+      account: account.value.replace(/[\(\)\-\s]/g, ''),
       typeOperation: createType.value,
+      article: article.value,
     },
+    watch: false,
   })
   if (data.value) {
     notify({
@@ -66,6 +83,10 @@ async function createRequire() {
     })
     isCreateButtonDisabled.value = false
     closeCreateModalButton.value?.click()
+    account.value = '+7'
+    article.value = ''
+
+    getStats()
   }
   if (error.value) {
     notify({
@@ -123,9 +144,6 @@ async function onInput(event: Event) {
 }
 
 const findSearchQuery = async () => {
-  if (query.value.replaceAll(' ', '') == '') {
-    return
-  }
   inputLoading.value = true
   await getStats()
   inputLoading.value = false
@@ -160,12 +178,14 @@ if (
   <div class="flex justify-between">
     <div class="flex">
       <div>
-        <label
-          ><input
+        <label>
+          <input
             v-model="query"
             type="text"
+            v-maska
+            data-maska="+7 (###) ###-##-##"
             placeholder="Номер телефона"
-            class="input input-bordered input-l ml-4"
+            class="input input-bordered input-l mb-2 w-full"
             @input="onInput($event)"
           />
         </label>
@@ -272,6 +292,7 @@ if (
             </div>
           </th>
           <th>Аккаунт</th>
+          <th>Артикул</th>
           <th>Статус</th>
           <th class="text-center">Скриншоты</th>
         </tr>
@@ -291,8 +312,17 @@ if (
           <th class="overflow-x-auto text-xs">
             {{ stat.account }}
           </th>
+          <th class="overflow-x-auto text-xs">
+            {{ stat.article }}
+          </th>
           <th>
-            {{ stat.status == 'created' ? 'создан' : stat.status == 'rejected' ? 'нет доступа к аккаунту' : 'получен' }} 
+            {{
+              stat.status == 'created'
+                ? 'создан'
+                : stat.status == 'rejected'
+                ? 'нет доступа к аккаунту'
+                : 'получен'
+            }}
           </th>
           <th>
             <div class="flex max-w-lg overflow-x-auto justify-center">
@@ -320,8 +350,16 @@ if (
         <input
           v-model="account"
           type="text"
+          v-maska
+          data-maska="+7 (###) ###-##-##"
           placeholder="Номер телефона"
-          class="input input-bordered input-l"
+          class="input input-bordered input-l mb-2 w-full"
+        />
+        <input
+          v-model="article"
+          type="number"
+          placeholder="Артикул"
+          class="input input-bordered input-l mb-2 w-full"
         />
       </div>
       <div class="flex justify-center">

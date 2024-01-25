@@ -8,6 +8,7 @@ const screenshotsRequireSchema = new Schema({
   responseDate: { type: Date },
   account: { type: String, required: true },
   status: { type: String, default: 'created' },
+  article: { type: Number, requred: true },
   screenshots: [{ type: String }],
 })
 
