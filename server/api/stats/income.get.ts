@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
   if (!user || !user.tabs.includes('аналитика'))
     return sendRedirect(event, '/auth', 302)
 
-    const allowedUsersParam = user.isAllUsersAllowed
+  const allowedUsersParam = user.isAllUsersAllowed
     ? {
         user: { $nin: user.restrictedUsers.map((id: any) => id) },
       }
@@ -25,7 +25,7 @@ export default eventHandler(async (event) => {
         ],
       }
 
-    const allowedUsersParamForPartner = user.isAllUsersAllowed
+  const allowedUsersParamForPartner = user.isAllUsersAllowed
     ? {
         _id: { $nin: user.restrictedUsers.map((id: any) => id) },
       }
@@ -466,7 +466,43 @@ export default eventHandler(async (event) => {
       expenses: 0,
       quantity: 0,
     },
+    {
+      value: 'deleted reviews',
+      title: 'Удаленные отзывы',
+      expenses: 0,
+      quantity: 0,
+    },
   ]
+
+  const deletedReviews = await paymenthistory.aggregate([
+    {
+      $match: {
+        ...allowedUsersParam,
+        dataoperation: filter.dataoperation,
+        typeoperations: 'Расход',
+        type: 'reviews',
+        basisoperation: { $regex: 'Удаление отзыва' },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        summ: { $sum: '$summ' },
+        count: { $sum: 1 },
+      },
+    },
+  ])
+
+  console.log(deletedReviews)
+
+  if (deletedReviews && deletedReviews.length > 0) {
+    services.forEach((service: any) => {
+      if (service.value == 'deleted reviews') {
+        service.expenses = deletedReviews[0].summ
+        service.quantity = deletedReviews[0].count
+      }
+    })
+  }
 
   const penaltyAggregate = await paymenthistory.aggregate([
     {
@@ -491,8 +527,8 @@ export default eventHandler(async (event) => {
     {
       $match: {
         ...allowedUsersParamForPartner,
-        'partner.refCount': { $gt: 0 } // Выбираем пользователей с refCount > 0
-      }
+        'partner.refCount': { $gt: 0 }, // Выбираем пользователей с refCount > 0
+      },
     },
     {
       $group: {
@@ -502,7 +538,6 @@ export default eventHandler(async (event) => {
       },
     },
   ])
-  
 
   if (partnersIncomeAggregate && partnersIncomeAggregate.length > 0) {
     if (partnersIncomeAggregate[0] && partnersIncomeAggregate[0].summ) {
@@ -608,8 +643,10 @@ export default eventHandler(async (event) => {
     paidUsers = paidUsersAggregate[0].count
   }
   const inActiveUsers = usersCount - activeUsers - 1
-  const signedUp = await User.countDocuments({ ...allowedUsersParamForPartner, registrationDate: filter.dataoperation })
-
+  const signedUp = await User.countDocuments({
+    ...allowedUsersParamForPartner,
+    registrationDate: filter.dataoperation,
+  })
 
   const pieGraphData = {
     data: [inActiveUsers, paidUsers, activeUsers],
@@ -622,7 +659,7 @@ export default eventHandler(async (event) => {
           : 'Активные последнюю неделю'
       }`,
     ],
-  signedUp,
+    signedUp,
   }
 
   services[3].quantity = Math.floor(Number(services[3].expenses) / 5)
