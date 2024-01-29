@@ -40,7 +40,7 @@ const selectedOperationMongoId: any = ref('')
 const inputLoading = ref(false)
 const curPage = ref(1)
 const stats = ref<any>([])
-const pages = ref(0)
+const pages = ref(10000)
 const isPageBtnsDisabled = ref(false)
 const dateRange = ref([])
 const loadingIndex = ref(false)
@@ -428,12 +428,14 @@ async function selectOperation(
         <tr>
           <th>ник менеджера</th>
           <th>ник пользователя</th>
+          <th>номер телефона аккаунта</th>
           <th>основная операция</th>
           <th>тип операции</th>
-          <!-- <th>дополнительные операции</th> -->
+          <th>тип возврата</th>
           <th>общая сумма</th>
           <th>сумма доп. операций</th>
           <th>ручная сумма</th>
+          <th>основание операции</th>
           <th>статус поиска</th>
 
           <th>
@@ -447,7 +449,8 @@ async function selectOperation(
           </th>
           <th>подтверждение</th>
           <th>комментарий отмены</th>
-          <th class="text-center">скриншот</th>
+          <th class="text-center">скриншот запроса</th>
+          <th class="text-center">скриншот аккаунта</th>
         </tr>
       </thead>
       <tbody>
@@ -459,8 +462,12 @@ async function selectOperation(
           <th class="text-xs overflow-x-auto">
             {{ stat.userUsername }}
           </th>
+          <th class="text-xs overflow-x-auto">
+            {{ stat.phoneNumber }}
+          </th>
           <th class="text-xs overflow-x-auto">{{ stat.mainOperation }}</th>
           <th class="text-xs overflow-x-auto">{{ stat.mainOperationType }}</th>
+          <th class="text-xs overflow-x-auto">{{ stat.refundType }}</th>
           <!-- <th>
             <div
               v-for="selectedPaymentOperation in stat.selectedPaymentOperations"
@@ -477,6 +484,9 @@ async function selectOperation(
                 ? currency.format(stat.handleOperationSumm)
                 : ''
             }}
+          </th>
+          <th style="min-width: 250px">
+            {{ stat.comment }}
           </th>
           <th>
             {{
@@ -508,6 +518,17 @@ async function selectOperation(
                   :src="stat.screenshot"
                   class="cursor-pointer rounded w-24 ml-1"
                   @click="openImageModal(stat.screenshot)"
+                />
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="flex max-w-lg overflow-x-auto justify-center">
+              <div>
+                <img
+                  :src="stat.accountScreenshot"
+                  class="cursor-pointer rounded w-24 ml-1"
+                  @click="openImageModal(stat.accountScreenshot)"
                 />
               </div>
             </div>
