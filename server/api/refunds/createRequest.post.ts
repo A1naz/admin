@@ -51,6 +51,7 @@ export default eventHandler(async (event) => {
     refundType,
     phoneNumber,
     mainOperationType,
+    requestDate: new Date(),
   })
 
   await ActionHistory.create({
