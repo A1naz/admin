@@ -23,6 +23,8 @@ ARG fkApiKey
 ARG fkSecret1
 ARG fkSecret2
 ARG fkID
+ARG YANDEX_SECRET_KEY
+ARG YANDEX_ACCESS_KEY_ID
 
 ENV MONGODB_URI=${MONGODB_URI}
 ENV NAME=${NAME}
@@ -44,6 +46,8 @@ ENV fkApiKey=${fkApiKey}
 ENV fkSecret1=${fkSecret1}
 ENV fkSecret2=${fkSecret2}
 ENV fkID=${fkID}
+ENV YANDEX_SECRET_KEY=${YANDEX_SECRET_KEY}
+ENV YANDEX_ACCESS_KEY_ID=${YANDEX_ACCESS_KEY_ID}
 
 
 RUN npm install -g pnpm
