@@ -117,8 +117,8 @@ export default defineNuxtConfig({
   s3: {
     client: {
       credentials: {
-        secretAccessKey: 'YCNnWGgkItHnLLEKtqCq4LP-cmCtcMpydXKJnbO5',
-        accessKeyId: 'YCAJEdIRUFVg4W949lwNMEivY',
+        secretAccessKey: process.env.YANDEX_SECRET_KEY || '',
+        accessKeyId: process.env.YANDEX_ACCESS_KEY_ID || '',
       },
       region: 'ru-central1',
       endpoint: 'https://storage.yandexcloud.net',

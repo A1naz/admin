@@ -21,6 +21,19 @@ export default eventHandler(async (event) => {
     })
   }
 
+  const userWithdraw = await User.findById(foundWIthdraw.user)
+  if (!userWithdraw) {
+    throw createError({
+      statusCode: 400,
+      message: 'Пользователь не найден',
+    })
+  }
+
+  if (foundWIthdraw.status == 'cancelled') {
+    userWithdraw.partner.balance -= foundWIthdraw.amount
+  }
+
+
   foundWIthdraw.status = 'created'
   ActionHistory.create({
     adminUser: user._id,
@@ -29,6 +42,7 @@ export default eventHandler(async (event) => {
     date: new Date(),
   })
   await foundWIthdraw.save()
+  await userWithdraw.save()
 
   return { status: 'ok' }
 })

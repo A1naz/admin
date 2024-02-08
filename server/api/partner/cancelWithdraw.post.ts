@@ -28,7 +28,27 @@ export default eventHandler(async (event) => {
     actionDescription: `Платеж с id ${foundWIthdraw._id} был отменен пользователем ${user.uuid} - ${user.username}`,
     date: new Date(),
   })
+
+
+  if (!foundWIthdraw) {
+    throw createError({
+      statusCode: 400,
+      message: 'Запрос выплаты не найден',
+    })
+  }
+
+  const userWithdraw = await User.findById(foundWIthdraw.user)
+  if (!userWithdraw) {
+    throw createError({
+      statusCode: 400,
+      message: 'Пользователь не найден',
+    })
+  }
+
+  userWithdraw.partner.balance += foundWIthdraw.amount
+  
   await foundWIthdraw.save()
+  await userWithdraw.save()
 
   return { status: 'ok' }
 })
