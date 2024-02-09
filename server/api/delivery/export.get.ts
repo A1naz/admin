@@ -1,41 +1,87 @@
 import ExcelJS from 'exceljs'
-
-import { User } from '@/server/lib/models/User'
-import { getServerSession } from '#auth'
 import { Delivery } from '@/server/lib/models/Delivery'
 import { Buyout } from '@/server/lib/models/Buyout'
+import { getServerSession } from '#auth'
+import { AdminUser } from '~/server/lib/models/AdminUser'
+import { User } from '@/server/lib/models/User'
+import { ActionHistory } from '@/server/lib/models/actionHistory'
 
-const keys = Object.keys as <T>(obj: T) =>
-(keyof T extends infer U ? U extends string ? U : U extends number ? `${U}` : never : never)[]
+const keys = Object.keys as <T>(
+  obj: T
+) => (keyof T extends infer U
+  ? U extends string
+    ? U
+    : U extends number
+    ? `${U}`
+    : never
+  : never)[]
 
 export default eventHandler(async (event) => {
   try {
     const session = (await getServerSession(event)) as any
+    const adminUser = await AdminUser.findOne({ uuid: session.uuid })
+    if (
+      !adminUser ||
+      (!adminUser.mainAdmin &&
+        !adminUser.tabs.includes('товары готовые к выдаче'))
+        )
+        return sendRedirect(event, '/auth', 302)
+        
+        const { uuid } = getQuery(event)
+        const user = await User.findOne({ uuid })
+        if (!user) {
+          throw createError({
+            statusCode: 400,
+            message: 'Пользователь не найден',
+          })
+        }
+        
+        await ActionHistory.create({
+          adminUser: adminUser._id,
+          userUuid: user.uuid,
+          actionId: 103,
+          actionDescription: `Админ ${adminUser.uuid} - ${adminUser.username} экспорт общей таблицы excel`,
+          date: new Date(),
+        })
+        
+        if (!adminUser.isAllUsersAllowed) {
+          const allowedUsersParam = adminUser.allowedUsers.map(
+            (item: any) => item.valueOf
+          )
+          const restrictedUsersParam = adminUser.restrictedUsers.map(
+            (item: any) => item.valueOf
+          )
+    
+          if (
+            !allowedUsersParam.includes(user._id.valueOf()) ||
+            restrictedUsersParam.includes(user._id.valueOf())
+          ) {
+            throw createError({
+              statusCode: 400,
+              message: 'Пользователь не разрешен',
+            })
+          }
+        }
 
-    if (!session)
-      return sendRedirect(event, '/auth', 302)
+        const deliveries = await Delivery.find({ user }).sort({ _id: -1 })
+        if (!deliveries.length) {
+          throw createError({
+            statusCode: 400,
+            message: 'Нет доставок для экспорта',
+          })
+        }
 
-    const user = await User.findOne({ uuid: session.uuid })
-    if (!user)
-      return sendRedirect(event, '/auth', 302)
-
-    const runtimeConfig = useRuntimeConfig()
-    const deliveries = await Delivery.find({ user }).sort({ _id: -1 })
-    if (!deliveries.length) {
-      throw createError({
-        statusCode: 400,
-        message: 'Нет доставок для экспорта',
-      })
-    }
+        const runtimeConfig = useRuntimeConfig()
     const format = await Promise.all(
       deliveries.map(async (delivery, index) => {
         const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
-        if (!buyout)
-          return undefined
+        if (!buyout) return undefined
 
-        const phone = delivery.recipientphone
+        const phone = delivery.recipientphone || ''
         const replaced = `+${phone[0]} (***) *** ${phone.slice(7)}`
-        const currentstatus = delivery.statusdelivery?.length ? delivery.statusdelivery[delivery.statusdelivery.length - 1].status : 'Неизвестно'
+        const currentstatus = delivery.statusdelivery?.length
+          ? delivery.statusdelivery[delivery.statusdelivery.length - 1].status
+          : 'Неизвестно'
 
         return {
           index,
@@ -55,24 +101,54 @@ export default eventHandler(async (event) => {
           pricebuy: delivery.pricebuy,
           updatedAt: delivery.updatedAt,
         }
-      }),
+      })
     )
 
     const workbook = new ExcelJS.Workbook()
-    const ready = format.filter(item => item)
+    const ready = format.filter((item) => item)
     const sheet = workbook.addWorksheet('Общая таблица', {
       headerFooter: { firstHeader: `Всего доставок: ${ready.length}` },
     })
 
     sheet.columns = [
       { header: 'Номер', key: 'place', font: { bold: true } },
-      { header: 'Код получения', key: 'receiptcode', width: 16, font: { bold: true } },
-      { header: 'Статус', key: 'currentstatus', width: 24, font: { bold: true } },
-      { header: 'Адрес пункта выдачи', key: 'point', width: 64, font: { bold: true } },
+      {
+        header: 'Код получения',
+        key: 'receiptcode',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Статус',
+        key: 'currentstatus',
+        width: 24,
+        font: { bold: true },
+      },
+      {
+        header: 'Адрес пункта выдачи',
+        key: 'point',
+        width: 64,
+        font: { bold: true },
+      },
       { header: 'Товар', key: 'productname', width: 48, font: { bold: true } },
-      { header: 'Получатель', key: 'recipient', width: 16, font: { bold: true } },
-      { header: 'Телефон получателя', key: 'recipientphone', width: 16, font: { bold: true } },
-      { header: 'Дата обновления', key: 'updatedAt', width: 16, font: { bold: true } },
+      {
+        header: 'Получатель',
+        key: 'recipient',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Телефон получателя',
+        key: 'recipientphone',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Дата обновления',
+        key: 'updatedAt',
+        width: 16,
+        font: { bold: true },
+      },
       { header: 'ID Выкупа', key: 'uuid', width: 32, font: { bold: true } },
     ]
     sheet.addRows(ready)
@@ -82,14 +158,16 @@ export default eventHandler(async (event) => {
     idCol.eachCell((cell, rowNumber) => {
       cell.value = {
         text: cell.value!.toString(),
-        hyperlink: `${runtimeConfig.PUBLIC_SITE_URL}/buyouts?uuid=${cell.value?.toString()}`,
+        hyperlink: `${
+          runtimeConfig.PUBLIC_SITE_URL
+        }/buyouts?uuid=${cell.value?.toString()}`,
       }
     })
     // export table
     const buffer = await workbook.xlsx.writeBuffer()
+
     return buffer
-  }
-  catch (e) {
+  } catch (e) {
     throw createError({
       statusCode: 500,
       message: 'Не удалось создать таблицу',

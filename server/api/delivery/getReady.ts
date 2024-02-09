@@ -2,32 +2,78 @@ import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { Delivery } from '@/server/lib/models/Delivery'
 import { Buyout } from '@/server/lib/models/Buyout'
+import { AdminUser } from '~/server/lib/models/AdminUser'
+import { ActionHistory } from '@/server/lib/models/actionHistory'
 
 export default eventHandler(async (event) => {
+  const { uuid } = getQuery(event)
   const session = (await getServerSession(event)) as any
-
-  if (!session)
+  const adminUser = await AdminUser.findOne({ uuid: session.uuid })
+  if (
+    !adminUser ||
+    (!adminUser.mainAdmin &&
+      !adminUser.tabs.includes('товары готовые к выдаче'))
+  )
     return sendRedirect(event, '/auth', 302)
 
-  const user = await User.findOne({ uuid: session.uuid })
-  if (!user)
-    return sendRedirect(event, '/auth', 302)
+  const user = await User.findOne({ uuid })
+
+  if (!user) {
+    throw createError({
+      statusCode: 400,
+      message: 'Пользователь не найден',
+    })
+  }
+
+
+  await ActionHistory.create({
+    adminUser: adminUser._id,
+    userUuid: user.uuid,
+    actionId: 101,
+    actionDescription: `Админ ${adminUser.uuid} - ${adminUser.username} экспорт общей таблицы excel`,
+    date: new Date(),
+  })
+
+  if (!adminUser.isAllUsersAllowed) {
+    const allowedUsersParam = adminUser.allowedUsers.map(
+      (item: any) => item.valueOf
+    )
+    const restrictedUsersParam = adminUser.restrictedUsers.map(
+      (item: any) => item.valueOf
+    )
+
+
+    if (
+      !allowedUsersParam.includes(user._id.valueOf()) ||
+      restrictedUsersParam.includes(user._id.valueOf())
+    ) {
+      throw createError({
+        statusCode: 400,
+        message: 'Пользователь не разрешен',
+      })
+    }
+  }
 
   const all = await Delivery.find({ user }).sort({ _id: -1 })
 
   const format = await Promise.all(
     all.map(async (delivery) => {
       const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
-      if (!buyout)
-        return null
+      if (!buyout) return null
       const place = all.findIndex(
-        item => item._id.toString() === delivery._id.toString(),
+        (item) => item._id.toString() === delivery._id.toString()
       )
 
-      const phone = delivery.recipientphone
+      const phone = delivery.recipientphone || ''
       const replaced = `+${phone[0]} (***) *** ${phone.slice(7)}`
-      const currentstatus = delivery.statusdelivery?.length ? delivery.statusdelivery[delivery.statusdelivery.length - 1].status : 'Неизвестно'
-      const statusupdated = delivery.statusdelivery?.length ? new Date(delivery.statusdelivery[delivery.statusdelivery.length - 1].date) : new Date()
+      const currentstatus = delivery.statusdelivery?.length
+        ? delivery.statusdelivery[delivery.statusdelivery.length - 1].status
+        : 'Неизвестно'
+      const statusupdated = delivery.statusdelivery?.length
+        ? new Date(
+            delivery.statusdelivery[delivery.statusdelivery.length - 1].date
+          )
+        : new Date()
       return {
         place: place + 1,
         uuid: buyout.uuid,
@@ -48,20 +94,20 @@ export default eventHandler(async (event) => {
         recipientphone: replaced,
         updatedAt: delivery.updatedAt,
       }
-    }),
+    })
   )
   const filtered = format.filter((item) => {
     if (item)
-      return item!.currentstatus === 'Готов к выдаче' || item!.currentstatus === 'Готов к получению'
-    else
-      return false
+      return (
+        item!.currentstatus === 'Готов к выдаче' ||
+        item!.currentstatus === 'Готов к получению'
+      )
+    else return false
   })
   const points = {} as any
   filtered.forEach((item, index) => {
-    if (points[item!.point])
-      points[item!.point].push(item)
-    else
-      points[item!.point] = [item]
+    if (points[item!.point]) points[item!.point].push(item)
+    else points[item!.point] = [item]
   })
   return points
 })
