@@ -6,35 +6,42 @@ const props = defineProps<{
 }>()
 const route = useRoute()
 
-const currentPath = ref(useRoute().path)
-
-watchEffect(() => {
-  currentPath.value = route.path
-})
 const active = computed(() => {
-  return currentPath.value.includes(props.href)
+  return route.path.includes(props.href.split('/')[1])
 })
+
 </script>
 
 <template>
-  <li>
-    <NuxtLink
-      :to="props.href" class="mx-4 rounded-lg"
-    >
-      <IconCSS
-        :color="active ? 'white' : 'black'"
-        :name="icon" size="24"
-      /><span
-        :class="{
-          'opacity-100': !active,
-        }" class=""
-      >{{ title }}</span>
+  <li v-if="props.href != '/autoanswer'">
+    <NuxtLink class="mx-4 rounded-lg" :to="props.href">
+      <div v-if="!active" class="flex">
+        <Icon :name="icon" size="24" />
+        <span
+          class="ml-2 mt-[2px]"
+          :class="{
+            'opacity-100': !active,
+          }"
+          >{{ title }}</span
+        >
+      </div>
+      <div v-else class="flex">
+        <div class="hidden dark:block">
+          <Icon :name="icon" color="#6466f1" size="24" />
+        </div>
+        <div class="dark:hidden">
+          <Icon :name="icon" class="dark:hidden" color="#296dff" size="24" />
+        </div>
+        <span class="text-primary :hover:text-base-100 ml-2 mt-[2px]">{{
+          title
+        }}</span>
+      </div>
     </NuxtLink>
   </li>
 </template>
 
 <style scoped>
 .router-link-active {
-  @apply bg-primary text-white bg-opacity-90 active:bg-primary active:text-white focus:bg-primary focus:text-white hover:bg-primary hover:text-white
+  @apply text-primary bg-opacity-90 active:bg-transparent active:text-primary focus:bg-transparent focus:text-primary hover:bg-primary hover:text-primary;
 }
 </style>

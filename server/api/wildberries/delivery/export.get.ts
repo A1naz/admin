@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs'
-import { Delivery } from '@/server/lib/models/Delivery'
-import { Buyout } from '@/server/lib/models/Buyout'
+import { Delivery } from '@/server/lib/models/wildberries/Delivery'
+import { Buyout } from '@/server/lib/models/wildberries/Buyout'
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { User } from '@/server/lib/models/User'

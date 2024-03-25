@@ -3,20 +3,20 @@
 const baseUrl = '/'
 
 const description =
-  'TOPvTOP — платформа «всё в одном» для комплексного продвижения товаров на маркетплейсах: управление рекламными кампаниями, AB-тестирование карточек, закупка товаром, заборы с ПВЗ и фулфилмент по всему миру. Решайте любые задачи с TOPvTOP!'
+  'Админка'
 export default defineNuxtConfig({
   app: {
     baseURL: baseUrl,
     head: {
       viewport: 'width=device-width,initial-scale=1',
       title: process.env.NAME,
-      link: [{ rel: 'icon', href: '/favicon.svg' }],
+      link: [{ rel: 'icon', href: '/favicon.png' }],
       titleTemplate: '%pageTitle %titleSeparator %siteName',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         {
           name: 'description',
-          content: 'TOPVTOP - сервис продвижения Wildberries',
+          content: 'Админка',
         },
         {
           name: 'apple-mobile-web-app-status-bar-style',
@@ -33,7 +33,7 @@ export default defineNuxtConfig({
   },
 
   auth: {
-    origin: process.env.PUBLIC_SITE_URL || 'https://app.topvtop.pro',
+    origin: process.env.PUBLIC_SITE_URL || 'https://admin.marketmonstr.pro',
     enableGlobalAppMiddleware: true,
     defaultProvider: 'credentials',
   },
@@ -165,6 +165,8 @@ export default defineNuxtConfig({
     env: process.env.ENV_WORK,
     indexable: true,
     MONGODB_URI: process.env.MONGODB_URI,
+    WB_DB_URI: process.env.WB_DB_URI,
+    OZON_DB_URI: process.env.OZON_DB_URI,
     SECRET: process.env.SECRET,
     smtpHost: process.env.smtpHost,
     smtpPort: process.env.smtpPort,

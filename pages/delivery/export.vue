@@ -92,7 +92,7 @@ const { stop } = useIntersectionObserver(
 )
 const skip = ref(50)
 const end = ref(false)
-const { data, error } = await useFetch('/api/delivery/getReady', {
+const { data, error } = await useFetch('/api/wildberries/delivery/getReady', {
   method: 'GET',
   headers: useRequestHeaders(['cookie']) as HeadersInit,
   params: {
@@ -149,6 +149,8 @@ onMounted(async () => {
                 <div>{{ delivery.recipient }}</div>
                 <div>Телефон</div>
                 <div>{{ delivery.recipientphone }}</div>
+                <div>Пользователь</div>
+                <div>{{ delivery.username }}</div>
                 <div class="font-bold">
                   Код получения
                 </div>

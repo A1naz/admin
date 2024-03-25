@@ -76,18 +76,21 @@ function closeOverlay() {
           <div class="divider"></div>
         </div>
         <SidebarItem
+          class="hidden"
           v-if="store.client.mainAdmin"
           title="Пользователи и права"
           icon="mdi:user"
           href="/users"
         />
         <SidebarItem
+          class="hidden"
           v-if="store.client.mainAdmin"
           title="Ручные пополнения средств"
           icon="mdi:account-credit-card"
           href="/manualTransfer"
         />
         <SidebarItem
+          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('история действий')
@@ -97,6 +100,7 @@ function closeOverlay() {
           href="/actionsHistory"
         />
         <SidebarItem
+          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('финансовые операции')
@@ -122,6 +126,7 @@ function closeOverlay() {
           <template #title> Партнерская программа </template>
         </SidebarItem>
         <SidebarItem
+          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('управление пользователями платформы')
@@ -131,15 +136,16 @@ function closeOverlay() {
           href="/usersManagement"
         />
         <SidebarItem
+          class="hidden"
           v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('аналитика')
+            store.client.mainAdmin || store.client.tabs.includes('аналитика')
           "
           icon="mdi:google-analytics"
           title="Аналитика"
           href="/stats?type=all&period=today"
         />
         <SidebarItem
+          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('запросы скриншотов')
@@ -149,6 +155,7 @@ function closeOverlay() {
           href="/screenshots"
         />
         <SidebarItem
+          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('ошибки финансовых операции')
@@ -158,6 +165,7 @@ function closeOverlay() {
           href="/paymentErrors"
         />
         <SidebarItem
+          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('переводы с аккаунта на аккаунт')
@@ -167,6 +175,7 @@ function closeOverlay() {
           href="/balanceTransfer"
         />
         <SidebarItem
+          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('управление тарифами')
@@ -176,6 +185,7 @@ function closeOverlay() {
           href="/tariff"
         />
         <SidebarItem
+          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('возвраты средств клиентам')
@@ -191,7 +201,7 @@ function closeOverlay() {
           "
           icon="game-icons:card-pickup"
           title="Товары готовые к выдаче"
-          href="/delivery"
+          href="/delivery/wildberries"
         />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">

@@ -1,9 +1,9 @@
 import ExcelJS from 'exceljs'
 
 import type { Document } from 'mongoose'
-import { Delivery } from '@/server/lib/models/Delivery'
-import { Buyout } from '@/server/lib/models/Buyout'
-import { Buyoutlog } from '@/server/lib/models/Buyoutlog'
+import { Delivery } from '@/server/lib/models/wildberries/Delivery'
+import { Buyout } from '@/server/lib/models/wildberries/Buyout'
+import { Buyoutlog } from '@/server/lib/models/wildberries/Buyoutlog'
 import { User } from '@/server/lib/models/User'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'

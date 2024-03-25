@@ -7,6 +7,9 @@ definePageMeta({
 
 import { notify } from '@kyvg/vue3-notification'
 const store = useMainStore()
+const selectedUsers = ref([])
+const isButtonsDisabled = ref(false)
+
 const selectedUser = ref<any>({
   username: '',
 })
@@ -19,14 +22,16 @@ if (
 }
 
 async function exportReadyXLS() {
-  const { data } = await useFetch('/api/delivery/exportReady', {
+  isButtonsDisabled.value = true
+  const { data } = await useFetch('/api/wildberries/delivery/exportReady', {
     responseType: 'blob',
     watch: false,
     method: 'GET',
     params: {
-      uuid: selectedUser.value.uuid,
+      uuid: selectedUsers.value.map((el: any) => el.uuid),
     },
   })
+  isButtonsDisabled.value = false
   const fileURL = window.URL.createObjectURL(new Blob([data.value as any]))
   const fileLink = document.createElement('a')
   fileLink.href = fileURL
@@ -35,16 +40,18 @@ async function exportReadyXLS() {
   fileLink.click()
 }
 async function exportXLS() {
-  const { data, error } = await useFetch('/api/delivery/export', {
+  isButtonsDisabled.value = true
+  const { data, error }: any = await useFetch('/api/wildberries/delivery/export', {
     responseType: 'blob',
-    watch: false,
     method: 'GET',
     params: {
-      uuid: selectedUser.value.uuid,
-    }
-}
-)
+      uuid: selectedUsers.value.map((el: any) => el.uuid),
+    },
+    watch: false,
+  })
+  isButtonsDisabled.value = false
   if (error.value) {
+
     notify({
       type: 'error',
       title: 'Что-то пошло не так',
@@ -52,6 +59,16 @@ async function exportXLS() {
     })
     return
   }
+
+  if (data.value && data.value.status == 'error') {
+    notify({
+      type: 'error',
+      title: 'Что-то пошло не так',
+      text: data.value.message,
+    })
+    return
+  }
+
   const fileURL = window.URL.createObjectURL(new Blob([data.value as any]))
   const fileLink = document.createElement('a')
   fileLink.href = fileURL
@@ -72,22 +89,43 @@ async function exportXLS() {
   </div>
   <div class="divider"></div>
   <div class="flex gap-3 items-center">
-    <selectUserModal @selectUser=";[(selectedUser = $event)]" />
+    <!-- <selectUserModal @selectUser=";[(selectedUser = $event)]" /> -->
+    <ModalManyUsers :selectedUsers="selectedUsers" />
     <div class="export">
       <div class="dropdown dropdown-end z-10">
-        <button tabindex="0" class="btn btn-sm btn-primary m-1" :disabled="selectedUser.username === ''">Экспорт</button>
+        <button
+          tabindex="0"
+          class="btn btn-sm btn-primary m-1"
+          :disabled="!selectedUsers.length || isButtonsDisabled"
+        >
+          Экспорт
+        </button>
         <ul
           tabindex="0"
           class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
         >
-          <li>
-            <NuxtLink target="blank" :to="`/delivery/export?uuid=${selectedUser.uuid}`">
+          <button class="btn btn-ghost" :disabled="isButtonsDisabled">
+            <NuxtLink
+              target="blank"
+              :to="`/delivery/export?uuid=${selectedUsers.map((el: any) => el.uuid)}`"
+            >
               Готовы к выдаче PDF
             </NuxtLink>
-          </li>
-          <li><a @click="exportReadyXLS">Готовы к выдаче Excel</a></li>
-
-          <li><a @click="exportXLS">Общая таблица Excel</a></li>
+          </button>
+          <button
+            class="btn btn-ghost"
+            @click="exportReadyXLS"
+            :disabled="isButtonsDisabled"
+          >
+            Готовы к выдаче Excel
+          </button>
+          <button
+            class="btn btn-ghost"
+            @click="exportXLS"
+            :disabled="isButtonsDisabled"
+          >
+            Общая таблица Excel
+          </button>
         </ul>
       </div>
     </div>

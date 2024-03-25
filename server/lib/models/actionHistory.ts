@@ -8,6 +8,7 @@ const ActionHistoryModel = new Schema({
   actionDescription: { type: String, required: true },
   date: { type: Date, default: Date.now(), required: true },
   userUuid: { type: String },
+  usersUuid: { type: [String] },
 })
 
 ActionHistoryModel.pre('save', function (next) {
