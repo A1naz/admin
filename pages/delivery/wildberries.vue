@@ -8,6 +8,7 @@ definePageMeta({
 import { notify } from '@kyvg/vue3-notification'
 const store = useMainStore()
 const selectedUsers = ref([])
+const selectedPVZs = ref([])
 const isButtonsDisabled = ref(false)
 
 const selectedUser = ref<any>({
@@ -29,6 +30,7 @@ async function exportReadyXLS() {
     method: 'GET',
     params: {
       uuid: selectedUsers.value.map((el: any) => el.uuid),
+      pvzs: selectedPVZs.value.map((el: any) => el.address),
     },
   })
   isButtonsDisabled.value = false
@@ -41,17 +43,20 @@ async function exportReadyXLS() {
 }
 async function exportXLS() {
   isButtonsDisabled.value = true
-  const { data, error }: any = await useFetch('/api/wildberries/delivery/export', {
-    responseType: 'blob',
-    method: 'GET',
-    params: {
-      uuid: selectedUsers.value.map((el: any) => el.uuid),
-    },
-    watch: false,
-  })
+  const { data, error }: any = await useFetch(
+    '/api/wildberries/delivery/export',
+    {
+      responseType: 'blob',
+      method: 'GET',
+      params: {
+        uuid: selectedUsers.value.map((el: any) => el.uuid),
+        pvzs: selectedPVZs.value.map((el: any) => el.address),
+      },
+      watch: false,
+    }
+  )
   isButtonsDisabled.value = false
   if (error.value) {
-
     notify({
       type: 'error',
       title: 'Что-то пошло не так',
@@ -91,6 +96,10 @@ async function exportXLS() {
   <div class="flex gap-3 items-center">
     <!-- <selectUserModal @selectUser=";[(selectedUser = $event)]" /> -->
     <ModalManyUsers :selectedUsers="selectedUsers" />
+    <ModalWildberriesManyPVZs
+      :selectedUsers="selectedUsers"
+      :selectedPVZs="selectedPVZs"
+    />
     <div class="export">
       <div class="dropdown dropdown-end z-10">
         <button
@@ -107,7 +116,7 @@ async function exportXLS() {
           <button class="btn btn-ghost" :disabled="isButtonsDisabled">
             <NuxtLink
               target="blank"
-              :to="`/delivery/export?uuid=${selectedUsers.map((el: any) => el.uuid)}`"
+              :to="`/delivery/export?uuid=${JSON.stringify(selectedUsers.map((el: any) => el.uuid))}&pvzs=${JSON.stringify(selectedPVZs.map((el: any) => el.address))}`"
             >
               Готовы к выдаче PDF
             </NuxtLink>

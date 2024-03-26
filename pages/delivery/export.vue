@@ -97,6 +97,7 @@ const { data, error } = await useFetch('/api/wildberries/delivery/getReady', {
   headers: useRequestHeaders(['cookie']) as HeadersInit,
   params: {
       uuid: route.query.uuid,
+      pvzs: route.query.pvzs,
   }
 })
 

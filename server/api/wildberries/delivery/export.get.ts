@@ -27,8 +27,8 @@ export default eventHandler(async (event) => {
     )
       return sendRedirect(event, '/auth', 302)
 
-    const { uuid } = getQuery(event)
-    
+    const { uuid, pvzs } = getQuery(event)
+
     const user = await User.find({ uuid: { $in: uuid } })
     if (!user || !user.length) {
       throw createError({
@@ -36,8 +36,6 @@ export default eventHandler(async (event) => {
         message: 'Пользователи не найдены',
       })
     }
-    
-   
 
     // if (!adminUser.isAllUsersAllowed) {
     //   const allowedUsersParam = adminUser.allowedUsers.map(
@@ -58,12 +56,15 @@ export default eventHandler(async (event) => {
     //   }
     // }
 
-    console.log('buyout');
-    const deliveries = await Delivery.find({ user: { $in: user } }).sort({
+    const deliveries = await Delivery.find({
+      user: { $in: user },
+      point: { $in: pvzs },
+    }).sort({
       point: 1,
     })
 
-    // if (!deliveries.length) {     
+
+    // if (!deliveries.length) {
     // return undefined
     // }
     const prefixesToRemove =
@@ -85,7 +86,7 @@ export default eventHandler(async (event) => {
     const format = await Promise.all(
       sorted.map(async (delivery, index) => {
         const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
-        
+
         if (!buyout) return null
 
         const phone = delivery.recipientphone || ''

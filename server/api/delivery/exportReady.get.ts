@@ -49,7 +49,7 @@ async function getReady(user: any) {
   // const buyouts: any = await Buyout.find({
   //   _id: filtered.map((delivery: any) => delivery.idbuyout),
   // })
-  // console.log(buyouts.length)
+
   const format = await Promise.all(
     filtered
       .map(async (delivery: any, index: any) => {

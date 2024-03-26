@@ -58,7 +58,6 @@ export default eventHandler(async (event) => {
     //   }
     // }
 
-    console.log('buyout');
     const deliveries = await Delivery.find({ user: { $in: user } }).sort({
       point: 1,
     })

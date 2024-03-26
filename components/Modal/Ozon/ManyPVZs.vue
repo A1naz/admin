@@ -1,5 +1,9 @@
 <script setup lang="ts">
 const props = defineProps({
+  selectedPVZs: {
+    type: Array,
+    default: () => [],
+  },
   selectedUsers: {
     type: Array,
     default: () => [],
@@ -8,10 +12,11 @@ const props = defineProps({
 
 const query = ref('')
 const inputLoading = ref(false)
-const users = ref<any>([])
-const visibleUsers = ref<any>([])
+const PVZs = ref<any>([])
+const visiblePVZs = ref<any>([])
 const showOnlySelected = ref(false)
 
+const selectedPVZs = toRef(props, 'selectedPVZs')
 const selectedUsers = toRef(props, 'selectedUsers')
 const isModalOpen = ref(false)
 async function onInput(event: Event) {
@@ -24,11 +29,11 @@ async function findSearchQuery() {
   }
   inputLoading.value = true
   showOnlySelected.value = false
-  await getUsers(query.value)
+  await getPVZs(query.value)
   inputLoading.value = false
 }
-async function getUsers(searchValue: string = '') {
-  const { data }: any = await useFetch('/api/user/getUsers', {
+async function getPVZs(searchValue: string = '') {
+  const { data }: any = await useFetch('/api/PVZ/getPVZs', {
     method: 'GET',
     params: {
       page: 1,
@@ -36,32 +41,30 @@ async function getUsers(searchValue: string = '') {
     },
   })
 
-  users.value = data.value.users
-  visibleUsers.value = users.value
+  PVZs.value = data.value.PVZs
+  visiblePVZs.value = PVZs.value
 
-  users.value.forEach((user: any) => {
-    selectedUsers.value.forEach((el: any) => {
-      if (el.uuid == user.uuid) {
-        user.isSelected = true
+  PVZs.value.forEach((PVZ: any) => {
+    selectedPVZs.value.forEach((el: any) => {
+      if (el.uuid == PVZ.uuid) {
+        PVZ.isSelected = true
       }
     })
   })
 }
 
-getUsers()
+function selectPVZ(uuid: String, select: boolean) {
 
-function selectUser(uuid: String, select: boolean) {
-
-  users.value.forEach((user: any) => {
-    if (user._id === uuid) {
+  PVZs.value.forEach((PVZ: any) => {
+    if (PVZ._id === uuid) {
       if (!select) {
-        user.isSelected = true
-        selectedUsers.value.push(user)
+        PVZ.isSelected = true
+        selectedPVZs.value.push(PVZ)
       } else {
-        user.isSelected = false
-        selectedUsers.value.forEach((el: any, i: any) => {
+        PVZ.isSelected = false
+        selectedPVZs.value.forEach((el: any, i: any) => {
           if (el._id == uuid) {
-            selectedUsers.value.splice(i, 1)
+            selectedPVZs.value.splice(i, 1)
           }
         })
       }
@@ -69,38 +72,42 @@ function selectUser(uuid: String, select: boolean) {
   })
 
   if (showOnlySelected) {
-    selectedUsers.value.forEach((user: any) => {
-      if (user._id === uuid) {
+    selectedPVZs.value.forEach((PVZ: any) => {
+      if (PVZ._id === uuid) {
         if (select) {
-          user.isSelected = false
-          selectedUsers.value.forEach((el: any, i: any) => {
+          PVZ.isSelected = false
+          selectedPVZs.value.forEach((el: any, i: any) => {
             if (el._id == uuid) {
-              selectedUsers.value.splice(i, 1)
+              selectedPVZs.value.splice(i, 1)
             }
           })
-          visibleUsers.value = selectedUsers.value
+          visiblePVZs.value = selectedPVZs.value
         }
       }
     })
   }
 }
 
-function showOnlySelectedUser() {
+function showOnlySelectedPVZ() {
   if (showOnlySelected.value) {
     showOnlySelected.value = false
-    visibleUsers.value = users.value
+    visiblePVZs.value = PVZs.value
   } else {
     showOnlySelected.value = true
-    visibleUsers.value = selectedUsers.value
+    visiblePVZs.value = selectedPVZs.value
   }
 }
 </script>
 <template>
-  <button class="ml-2 btn" @click="isModalOpen = true">
+  <button
+    :disabled="!selectedUsers.length"
+    class="ml-2 btn"
+    @click=";[(isModalOpen = true), getPVZs()]"
+  >
     {{
-      selectedUsers.length > 0
-        ? 'Выбрано Клиентов: ' + selectedUsers.length
-        : 'Выбрать Клиентов'
+      selectedPVZs.length > 0
+        ? 'Выбрано ПВЗ: ' + selectedPVZs.length
+        : 'Выбрать ПВЗ'
     }}
   </button>
   <!-- <div
@@ -109,7 +116,7 @@ function showOnlySelectedUser() {
     class="modal"
   > -->
   <div
-    id="selectUsers"
+    id="selectPVZs"
     class="modal cursor-pointer"
     :class="{ 'modal-open': isModalOpen }"
     @click="isModalOpen = false"
@@ -117,7 +124,7 @@ function showOnlySelectedUser() {
     <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
         <label
-          for="selectUsers"
+          for="selectPVZs"
           class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
           @click="isModalOpen = false"
         >
@@ -132,7 +139,7 @@ function showOnlySelectedUser() {
               ><input
                 v-model="query"
                 type="text"
-                placeholder="id, username, email, telegram"
+                placeholder="id, PVZname, email, telegram"
                 class="input input-bordered input-l ml-4 w-80"
                 @input="onInput($event)"
               />
@@ -145,7 +152,7 @@ function showOnlySelectedUser() {
           <!-- <label
             class="btn btn-primary mr-4 btn-sm mt-4"
             @click="
-              ;[(users = []), isModalOpen = false, (selectedUsers = [])]
+              ;[(PVZs = []), isModalOpen = false, (selectedPVZ = [])]
             "
             >Выбрать всех</label
           > -->
@@ -156,7 +163,7 @@ function showOnlySelectedUser() {
                 type="checkbox"
                 :checked="showOnlySelected"
                 class="checkbox checkbox-primary"
-                @click="showOnlySelectedUser"
+                @click="showOnlySelectedPVZ"
               />
             </label>
           </div>
@@ -171,37 +178,37 @@ function showOnlySelectedUser() {
             <thead>
               <tr>
                 <th>id</th>
-                <th>username</th>
+                <th>PVZname</th>
                 <th>email</th>
                 <th>telegram</th>
                 <th>Выбрать</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="hover" v-for="user in visibleUsers" :key="user.uuid">
-                <td style="max-width: 130px">{{ user.uuid }}</td>
+              <tr class="hover" v-for="PVZ in visiblePVZs" :key="PVZ.uuid">
+                <td style="max-width: 130px">{{ PVZ.uuid }}</td>
                 <td style="max-width: 150px">
                   <div class="mx-1 overflow-x-auto">
-                    {{ user.username }}
+                    {{ PVZ.PVZname }}
                   </div>
                 </td>
                 <td style="max-width: 150px" class="overflow-x-auto">
                   <div class="mx-1 overflow-x-auto">
-                    {{ user.email }}
+                    {{ PVZ.email }}
                   </div>
                 </td>
                 <td style="max-width: 150px" class="overflow-x-auto">
                   <div class="mx-1 overflow-x-auto">
-                    {{ user.telegram }}
+                    {{ PVZ.telegram }}
                   </div>
                 </td>
                 <td style="max-width: 20px">
                   <div>
                     <input
                       type="checkbox"
-                      :checked="user.isSelected"
+                      :checked="PVZ.isSelected"
                       class="checkbox checkbox-primary"
-                      @click="selectUser(user._id, user.isSelected)"
+                      @click="selectPVZ(PVZ._id, PVZ.isSelected)"
                     />
                   </div>
                 </td>

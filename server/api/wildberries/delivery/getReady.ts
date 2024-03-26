@@ -5,12 +5,15 @@ import { Buyout } from '@/server/lib/models/wildberries/Buyout'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { ActionHistory } from '@/server/lib/models/actionHistory'
 const prefixesToRemove =
-/(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
+  /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
 
 export default eventHandler(async (event) => {
-  const { uuid }: any = getQuery(event)
+  const { uuid, pvzs }: any = getQuery(event)
 
-  const uuidArray = uuid.split(',')
+  console.log(uuid)
+
+  const uuidArray = JSON.parse(uuid) as string[]
+  const pvzArray = JSON.parse(pvzs)
   const session = (await getServerSession(event)) as any
   const adminUser = await AdminUser.findOne({ uuid: session.uuid })
   if (
@@ -21,6 +24,8 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const user = await User.find({ uuid: { $in: uuidArray } })
+
+  console.log(user)
 
   if (!user || !user.length) {
     throw createError({
@@ -58,6 +63,7 @@ export default eventHandler(async (event) => {
 
   const all = await Delivery.find({
     user: { $in: user.map((item) => item._id) },
+    point: { $in: pvzArray },
   })
 
   const format = await Promise.all(
@@ -79,13 +85,13 @@ export default eventHandler(async (event) => {
           )
         : new Date()
 
-        let username = ''
+      let username = ''
 
-        user.forEach((el: any) => {
-          if (el._id.valueOf() === buyout.user.valueOf()) {
-            username = el.username
-          }
-        })
+      user.forEach((el: any) => {
+        if (el._id.valueOf() === buyout.user.valueOf()) {
+          username = el.username
+        }
+      })
 
       return {
         place: place + 1,
@@ -137,6 +143,6 @@ export default eventHandler(async (event) => {
     if (points[item!.point]) points[item!.point].push(item)
     else points[item!.point] = [item]
   })
-  
+
   return points
 })

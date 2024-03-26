@@ -19,9 +19,13 @@ const keys = Object.keys as <T>(
     : never
   : never)[]
 
-async function getReady(user: any) {
-  const deliveries = await Delivery.find({ user: { $in: user } })
-  const prefixesToRemove = /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi;
+async function getReady(user: any, pvzs: any) {
+  const deliveries = await Delivery.find({
+    user: { $in: user },
+    point: { $in: pvzs },
+  })
+  const prefixesToRemove =
+    /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
 
   const filtered: any = deliveries
     .filter((item) => {
@@ -35,10 +39,10 @@ async function getReady(user: any) {
     })
     .sort((a: any, b: any) =>
       a.point
-        .replace(prefixesToRemove, '').replace(/[^а-яё]/gi, '')
+        .replace(prefixesToRemove, '')
+        .replace(/[^а-яё]/gi, '')
         .localeCompare(
-          b.point
-            .replace(prefixesToRemove, '').replace(/[^а-яё]/gi, ''),
+          b.point.replace(prefixesToRemove, '').replace(/[^а-яё]/gi, ''),
           'ru',
           {
             sensitivity: 'accent',
@@ -46,10 +50,6 @@ async function getReady(user: any) {
         )
     )
 
-  // const buyouts: any = await Buyout.find({
-  //   _id: filtered.map((delivery: any) => delivery.idbuyout),
-  // })
-  // console.log(buyouts.length)
   const format = await Promise.all(
     filtered
       .map(async (delivery: any, index: any) => {
@@ -113,7 +113,6 @@ async function getReady(user: any) {
           currentstatus,
           statusupdated,
           productname: buyout.product.name,
-          productimage: buyout.product.image,
           receiptcode: delivery.receiptcode ? delivery.receiptcode : undefined,
           receiptcodeqr: delivery.receiptcodeqr
             ? delivery.receiptcodeqr
@@ -143,7 +142,7 @@ export default eventHandler(async (event) => {
     )
       return sendRedirect(event, '/auth', 302)
 
-    const { type, uuid } = getQuery(event)
+    const { type, uuid, pvzs } = getQuery(event)
 
     const user = await User.find({ uuid })
     if (!user || user.length === 0) {
@@ -181,7 +180,9 @@ export default eventHandler(async (event) => {
     // }
 
     const workbook = new ExcelJS.Workbook()
-    const ready = (await getReady(user)).filter((item) => item !== undefined)
+    const ready = (await getReady(user, pvzs)).filter(
+      (item) => item !== undefined
+    )
 
     const sheet = workbook.addWorksheet('Готовы к выдаче', {
       headerFooter: { firstHeader: `Всего доставок: ${ready.length}` },
@@ -261,6 +262,10 @@ export default eventHandler(async (event) => {
     // add qr codes to sheet
 
     for (const item of ready) {
+      
+      if (!item.receiptcodeqr) {
+        continue
+      }
       const image = workbook.addImage({
         base64: item?.receiptcodeqr,
         extension: 'png',
