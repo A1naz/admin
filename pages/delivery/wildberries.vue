@@ -105,7 +105,7 @@ async function exportXLS() {
         <button
           tabindex="0"
           class="btn btn-sm btn-primary m-1"
-          :disabled="!selectedUsers.length || isButtonsDisabled"
+          :disabled="!selectedUsers.length || isButtonsDisabled || !selectedPVZs.length"
         >
           Экспорт
         </button>
@@ -113,7 +113,12 @@ async function exportXLS() {
           tabindex="0"
           class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
         >
-          <button class="btn btn-ghost" :disabled="isButtonsDisabled">
+          <button
+            class="btn btn-ghost"
+            :disabled="
+              isButtonsDisabled
+            "
+          >
             <NuxtLink
               target="blank"
               :to="`/delivery/export?uuid=${JSON.stringify(selectedUsers.map((el: any) => el.uuid))}&pvzs=${JSON.stringify(selectedPVZs.map((el: any) => el.address))}`"
