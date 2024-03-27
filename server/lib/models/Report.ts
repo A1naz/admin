@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { wildberriesConnection } from '~/server/connections/wildberries'
 
 const ReportSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -8,4 +9,4 @@ const ReportSchema = new Schema({
   buyout: { type: Schema.Types.ObjectId, required: true, ref: 'Buyout'},
 })
 
-export const Report = model('Report', ReportSchema)
+export const Report = wildberriesConnection.model('Report', ReportSchema)

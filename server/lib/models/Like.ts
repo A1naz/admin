@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { wildberriesConnection } from '~/server/connections/wildberries'
 
 const LikeSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -14,4 +15,4 @@ const LikeSchema = new Schema({
   reviews: { type: Array },
 })
 
-export const Like = model('Like', LikeSchema)
+export const Like = wildberriesConnection.model('Like', LikeSchema)

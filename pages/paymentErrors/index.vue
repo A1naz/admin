@@ -6,12 +6,9 @@ const productsCountInfo = ref({
   sum: 0,
 })
 const { upload, getPublicUrl, remove } = useS3Object()
-const isCreateButtonDisabled = ref(false)
 const searchBtnText = ref('Поиск')
 const closeCreateModalButton: any = ref(null)
-const createType = ref('deliveries')
 const sortDateType = ref('requireDate')
-const currency = useCurrency()
 const type = ref('any')
 const service = ref('any')
 const { $dayjs } = useNuxtApp()
@@ -21,14 +18,11 @@ import { notify } from '@kyvg/vue3-notification'
 const dateSortIcon = ref('mdi-arrow-down')
 const query = ref('+7')
 const userQuery = ref('')
-const account = ref('+7')
 const client: any = ref({
   username: '',
 })
 const transaction = ref('')
 const transactionStatus = ref('notFount')
-const fileInput = ref()
-const url = ref('')
 const transactionNumber = ref('')
 const inputLoading = ref(false)
 const searchTransactionLoading = ref(false)
@@ -42,6 +36,7 @@ const screenshotInput: any = ref(null)
 const isSearchBtnDisabled = ref(false)
 const isSearchInputDisabled = ref(false)
 const selectUserClose: any = ref(null)
+const config = useRuntimeConfig()
 const now = new Date()
 const date = ref(now)
 const users = ref<any>([])
@@ -95,8 +90,8 @@ async function uploadToS3(event: Event) {
   }
   if (data.value)
     screenshot.value = {
-      url: data.value[0].url,
-      public: getPublicUrl(data.value[0].url),
+      url: config.public.IMAGES_URL + data.value[0].key,
+      public: config.public.IMAGES_URL + data.value[0].key,
     }
 
   loadingIndex.value = false
@@ -158,6 +153,7 @@ async function onInput(event: Event) {
 }
 
 const findSearchQuery = async () => {
+  //@ts-ignore
   if (query.value.replaceAll(' ', '') == '') {
     return
   }
@@ -288,7 +284,10 @@ async function createTransactionRequest() {
     {
       method: 'POST',
       body: {
-        screenshot: screenshot.value.public,
+        screenshot: screenshot.value.public.replace(
+          config.public.IMAGES_URL,
+          ''
+        ),
         transaction: transaction.value,
         transactionNumber: transactionNumber.value,
         client: client.value._id,
@@ -463,7 +462,7 @@ function selectUser(user: any) {
       </thead>
       <tbody>
         <!-- row 1 -->
-        <tr v-for="stat in stats" class="hover">
+        <tr v-for="stat in stats" class="hover" :key="stat.id">
           <th class="text-xs overflow-x-auto" style="max-width: 150px">
             {{ stat.managerUsername }}
           </th>
@@ -481,9 +480,11 @@ function selectUser(user: any) {
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>
                 <img
-                  :src="stat.screenshot"
+                  :src="config.public.IMAGES_URL + stat.screenshot"
                   class="cursor-pointer rounded w-16 ml-1"
-                  @click="openImageModal(stat.screenshot)"
+                  @click="
+                    openImageModal(config.public.IMAGES_URL + stat.screenshot)
+                  "
                 />
               </div>
             </div>
@@ -606,7 +607,7 @@ function selectUser(user: any) {
               accept="image/png, image/gif, image/jpeg"
               ref="screenshotInput"
               class="hidden"
-              @change="(e: Event) => uploadToS3(e)"
+              @change="(e) => uploadToS3(e)"
             />
           </div>
         </ClientOnly>

@@ -117,14 +117,14 @@ export default defineNuxtConfig({
   s3: {
     client: {
       credentials: {
-        secretAccessKey: process.env.YANDEX_SECRET_KEY || '',
-        accessKeyId: process.env.YANDEX_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.VK_SECRET_KEY  || '',
+        accessKeyId: process.env.VK_ACCESS_KEY  || '',
       },
-      region: 'ru-central1',
-      endpoint: 'https://storage.yandexcloud.net',
+      endpoint: 'https://hb.vkcs.cloud/admin/',
+      region: 'ru-msk',
     },
-    publicBucketUrl: 'https://shifft.storage.yandexcloud.net/',
-    bucket: 'shifft',
+    publicBucketUrl: `${process.env.PUBLIC_SITE_URL}/images/get/`,
+    bucket: 'ozonmpportal',
     image: {
       compression: {
         maxSizeMB: 10,
@@ -161,6 +161,7 @@ export default defineNuxtConfig({
       trailingSlash: true,
       titleSeparator: '|',
       BOT_LOGIN: process.env.BOT_LOGIN,
+      IMAGES_URL: process.env.IMAGES_URL,
     },
     env: process.env.ENV_WORK,
     indexable: true,
@@ -179,6 +180,8 @@ export default defineNuxtConfig({
     fkSecret2: process.env.fkSecret2,
     fkApiKey: process.env.fkApiKey,
     fkID: process.env.fkID,
+    VK_ACCESS_KEY: process.env.VK_ACCESS_KEY,
+    VK_SECRET_KEY: process.env.VK_SECRET_KEY,
   },
 
   security: {

@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { wildberriesConnection } from '~/server/connections/wildberries'
 
 const CartSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -14,4 +15,4 @@ const CartSchema = new Schema({
   endedDate: { type: Date },
 })
 
-export const Cart = model('Cart', CartSchema)
+export const Cart = wildberriesConnection.model('Cart', CartSchema)

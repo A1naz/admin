@@ -10,6 +10,7 @@ const paymenthistorySchema = new Schema({
   dataoperation: { type: Date },
   comment: { type: String },
   refRewarded: { type: Boolean, default: false },
+  mp: { type: String },
 })
 
 export const paymenthistory = model('paymenthistory', paymenthistorySchema)

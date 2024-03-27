@@ -1,4 +1,5 @@
 {
   "nuxt.isNuxtApp": false,
-  "editor.fontFamily": "Input Mono"
+  "editor.fontFamily": "Input Mono",
+  "editor.occurrencesHighlight": "singleFile"
 }

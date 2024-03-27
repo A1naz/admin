@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { wildberriesConnection } from '~/server/connections/wildberries'
 
 const DeliverySchema = new Schema({
   article: { type: Number, required: true, text: true },
@@ -33,4 +34,4 @@ const DeliverySchema = new Schema({
   data15: { type: {}, default: '' },
 })
 
-export const Delivery = model('Delivery', DeliverySchema)
+export const Delivery = wildberriesConnection.model('Delivery', DeliverySchema)

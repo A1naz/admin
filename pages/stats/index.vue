@@ -60,7 +60,7 @@ const findSearchQuery = async () => {
   if (topTitle.value === 'usersWithLastActivity') {
     await getUsersWithLastActivity()
   } else {
-    await getTop50()
+    // await getTop50()
   }
   inputLoading.value = false
 }
@@ -170,27 +170,27 @@ async function getData() {
   }, 600)
 }
 
-async function getTop50() {
-  inputLoading.value = true
-  const { data, error }: any = await useFetch('/api/stats/top50', {
-    method: 'GET',
-    params: {
-      searchValue: query.value,
-      selectedTop: selectedHeaders.value.value,
-    },
-  })
-  if (data.value) {
-    topForm.value.top50Articles = data.value.top50Articles
-    topForm.value.top50Buyouts = data.value.top50Buyouts
-    topForm.value.top50pvz = data.value.top50pvz
-    topForm.value.top50UsersByDeposit = data.value.top50UsersByDeposit
-    topForm.value.top100UsersByPartnerBalance =
-      data.value.top100UsersByPartnerBalance
-    topForm.value.top100UsersByPartnerPayments =
-      data.value.top100UsersByPartnerPayments
-  }
-  inputLoading.value = false
-}
+// async function getTop50() {
+//   inputLoading.value = true
+//   const { data, error }: any = await useFetch('/api/stats/top50', {
+//     method: 'GET',
+//     params: {
+//       searchValue: query.value,
+//       selectedTop: selectedHeaders.value.value,
+//     },
+//   })
+//   if (data.value) {
+//     topForm.value.top50Articles = data.value.top50Articles
+//     topForm.value.top50Buyouts = data.value.top50Buyouts
+//     topForm.value.top50pvz = data.value.top50pvz
+//     topForm.value.top50UsersByDeposit = data.value.top50UsersByDeposit
+//     topForm.value.top100UsersByPartnerBalance =
+//       data.value.top100UsersByPartnerBalance
+//     topForm.value.top100UsersByPartnerPayments =
+//       data.value.top100UsersByPartnerPayments
+//   }
+//   inputLoading.value = false
+// }
 async function getUsersWithLastActivity() {
   inputLoading.value = true
   const { data, error }: any = await useFetch(
@@ -212,7 +212,7 @@ async function getUsersWithLastActivity() {
 
 const withdrawsCount = ref(0)
 
-await getTop50()
+// await getTop50()
 await getData()
 
 const colorMode = useColorMode()
@@ -332,7 +332,7 @@ function changeTop(event: any) {
   if (topTitle.value === 'usersWithLastActivity') {
     getUsersWithLastActivity()
   } else {
-    getTop50()
+    // getTop50()
   }
 }
 
@@ -420,6 +420,7 @@ async function swapPage(destination: number) {
       @change="selectService($event)"
     >
       <option
+        :key="service.value"
         v-for="service in services"
         :value="service.value"
         :selected="route.query.type === service.value"
@@ -433,6 +434,7 @@ async function swapPage(destination: number) {
     <div class="w-11/12 max-h-96 flex flex-col">
       <div class="hidden lg:block mb-2 ml-6">
         <NuxtLink
+          :key="period.value"
           v-for="period in periods"
           :to="`/stats?type=${route.query.type}&period=${period.value}`"
           :external="true"
@@ -513,7 +515,7 @@ async function swapPage(destination: number) {
         </div>
       </div>
       <div class="flex flex-wrap mt-4">
-        <div v-for="service in services">
+        <div v-for="service in services" :key="service.value">
           <div
             class="card md:w-40 bg-base-100 shadow-md ml-1 mb-1"
             style="min-width: 100px"
@@ -539,161 +541,8 @@ async function swapPage(destination: number) {
           </div>
         </div>
       </div>
-      <div class="mt-6 flex justify-between">
-        <div>
-          <div class="flex my-5 gap-3">
-            <div
-              v-if="
-                topTitle === 'top50UsersByDeposit' ||
-                topTitle === 'top100UsersByPartnerBalance' ||
-                topTitle === 'top100UsersByPartnerPayments' ||
-                topTitle === 'usersWithLastActivity'
-              "
-            >
-              <div
-                class="join -mr-2 -mt-2"
-                v-if="topTitle === 'usersWithLastActivity'"
-              >
-                <button
-                  class="join-item btn"
-                  @click="swapPage(-1)"
-                  :disabled="isPageBtnsDisabled"
-                >
-                  «
-                </button>
-                <button class="join-item btn">{{ curPage }}</button>
-                <button
-                  class="join-item btn"
-                  @click="swapPage(1)"
-                  :disabled="isPageBtnsDisabled"
-                >
-                  »
-                </button>
-              </div>
-              <label
-                ><input
-                  v-model="query"
-                  type="text"
-                  placeholder="id, username, email, telegram"
-                  class="input input-bordered input-sm ml-4 -mr-5 w-60"
-                  @input="onInput($event)"
-                />
-              </label>
-              <span
-                v-if="inputLoading"
-                class="loading loading-spinner text-primary loading-large ml-4"
-              />
-            </div>
-            <select
-              class="select select-sm select-bordered w-42 ml-4"
-              v-model="topTitle"
-              @change="changeTop($event)"
-            >
-              <option v-for="header in headers" :value="header.value">
-                {{ header.title }}
-              </option>
-              <!-- <option value="top50Articles">артикулы по кол-ву</option>
-              <option value="top50pvz">пункты выдачи</option>
-              <option value="top50UsersByDeposit">
-                пользователи по пополнениям
-              </option>
-              <option value="top100UsersByPartnerBalance">
-                пользователи по балансу партнерки
-              </option>
-              <option value="top100UsersByPartnerPayments">
-                пользователи по вознаграждениям партнерки
-              </option> -->
-            </select>
-            <p class="text-lg font-bold text-center">
-              {{ selectedHeaders.title }}
-            </p>
-          </div>
-          <div
-            class="my-2 mx-2 overflow-y-auto ml-6 shadow-md"
-            :style="{ 'max-height': height - 270 + 'px' }"
-          >
-            <table class="table">
-              <!-- head -->
-              <thead>
-                <tr>
-                  <th>№</th>
-                  <th v-for="header in selectedHeaders.headers">
-                    {{ header }}
-                  </th>
-                  <th v-if="topTitle === 'usersWithLastActivity'">
-                    <div @click="sortByDate()" class="flex cursor-pointer">
-                      Дата последней активности
-                      <Icon
-                        class="swap-on fill-current ml-1 w-6 h-5"
-                        :name="dateSortIcon"
-                      />
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(element, index) in selectedTop" class="hover">
-                  <td style="min-width: 50px">{{ index + 1 }}</td>
-                  <td style="min-width: 200px; max-width: 200px">
-                    {{ element._id }}
-                  </td>
-                  <td
-                    style="min-width: 190px; max-width: 200px"
-                    v-if="
-                      topTitle == 'top50UsersByDeposit' ||
-                      topTitle == 'top100UsersByPartnerBalance' ||
-                      topTitle == 'top100UsersByPartnerPayments' ||
-                      topTitle == 'usersWithLastActivity'
-                    "
-                  >
-                    {{ element.username }}
-                  </td>
-                  <td
-                    style="min-width: 250px; max-width: 250px"
-                    v-if="
-                      topTitle == 'top50UsersByDeposit' ||
-                      topTitle == 'top100UsersByPartnerBalance' ||
-                      topTitle == 'top100UsersByPartnerPayments' ||
-                      topTitle == 'usersWithLastActivity'
-                    "
-                  >
-                    {{ element.email }}
-                  </td>
-                  <td style="min-width: 100px" v-if="topTitle !== 'usersWithLastActivity'">
-                    {{
-                      topTitle !== 'top50UsersByDeposit' &&
-                      topTitle !== 'top100UsersByPartnerBalance' &&
-                      topTitle !== 'top100UsersByPartnerPayments'
-                        ? element.quantity
-                        : currency.format(element.quantity)
-                    }}
-                  </td>
-                  <td
-                    v-if="
-                      topTitle == 'top50UsersByDeposit' ||
-                      topTitle == 'top100UsersByPartnerBalance' ||
-                      topTitle == 'top100UsersByPartnerPayments' ||
-                      topTitle == 'usersWithLastActivity'
-                    "
-                    style="min-width: 100px"
-                  >
-                    {{
-                      element.lastDataOperation
-                        ? defaultDate(element.lastDataOperation)
-                        : ''
-                    }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="h-10"></div>
-        </div>
-      </div>
     </div>
   </div>
-
-  <div></div>
 </template>
 
 <style scoped></style>

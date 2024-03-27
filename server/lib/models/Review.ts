@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { wildberriesConnection } from '~/server/connections/wildberries'
 
 const ReviewSchema = new Schema({
   article: { type: Number, required: true },
@@ -9,8 +10,12 @@ const ReviewSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   delivery: { type: Schema.Types.ObjectId, ref: 'Delivery', required: true },
   images: { type: Array, required: false },
-  status: { type: String, required: true, enum: ['created', 'waiting', 'working', 'published', 'canceled', 'nofunds'] },
+  status: {
+    type: String,
+    required: true,
+    enum: ['created', 'waiting', 'working', 'published', 'canceled', 'nofunds'],
+  },
   recipientphone: { type: String, required: true },
 })
 
-export const Review = model('Review', ReviewSchema)
+export const Review = wildberriesConnection.model('Review', ReviewSchema)

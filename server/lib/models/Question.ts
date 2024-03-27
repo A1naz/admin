@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { wildberriesConnection } from '~/server/connections/wildberries'
 
 const QuestionSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -11,4 +12,4 @@ const QuestionSchema = new Schema({
   publishDate: { type: Date, required: true },
 })
 
-export const Question = model('Question', QuestionSchema)
+export const Question = wildberriesConnection.model('Question', QuestionSchema)

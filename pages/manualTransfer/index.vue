@@ -23,6 +23,10 @@ const clientPC = ref(false)
 const selectedUser: any = ref({
   username: '',
 })
+
+const mpStore = useMPStore()
+
+const userBank = ref('alpha')
 const operationNumber = ref('')
 const fileInput = ref()
 const inputLoading = ref(false)
@@ -41,6 +45,7 @@ const date = ref(now)
 const users = ref<any>([])
 const phoneNumber = ref('+7')
 const summ = ref(100)
+const config = useRuntimeConfig()
 
 const screenshot = ref({
   url: 'null',
@@ -82,11 +87,12 @@ async function uploadToS3(event: Event) {
       duration: 3000,
     })
   }
-  if (data.value)
+  if (data.value) {
     screenshot.value = {
-      url: data.value[0].url,
-      public: getPublicUrl(data.value[0].url),
+      url: config.public.IMAGES_URL + data.value[0].key,
+      public: config.public.IMAGES_URL + data.value[0].key,
     }
+  }
 
   loadingIndex.value = false
 }
@@ -147,6 +153,7 @@ async function onInput(event: Event) {
 }
 
 const findSearchQuery = async () => {
+  //@ts-ignore
   if (query.value.replaceAll(' ', '') == '') {
     return
   }
@@ -179,11 +186,15 @@ async function createBalanceTransferRequest() {
       method: 'POST',
       body: {
         userId: selectedUser.value._id,
-        screenshot: screenshot.value.public,
+        screenshot: screenshot.value.public.replace(
+          config.public.IMAGES_URL,
+          ''
+        ),
         summ: Number(summ.value),
         operationNumber: operationNumber.value,
         operationDate: date.value,
         clientPC: clientPC.value,
+        bank: userBank.value,
       },
     }
   )
@@ -337,7 +348,7 @@ function selectUser(user: any) {
       </thead>
       <tbody>
         <!-- row 1 -->
-        <tr v-for="stat in stats" class="hover">
+        <tr v-for="stat in stats" class="hover" :key="stat._id">
           <th class="text-xs overflow-x-auto">
             {{ stat.userUuid }}
           </th>
@@ -346,7 +357,7 @@ function selectUser(user: any) {
           </th>
           <th class="text-xs overflow-x-auto">{{ stat.operationNumber }}</th>
           <th>{{ stat.summ }}</th>
-          
+
           <th>
             {{
               stat.status == 'created'
@@ -364,9 +375,11 @@ function selectUser(user: any) {
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>
                 <img
-                  :src="stat.screenshot"
+                  :src="config.public.IMAGES_URL + stat.screenshot"
                   class="cursor-pointer rounded w-24 ml-1"
-                  @click="openImageModal(stat.screenshot)"
+                  @click="
+                    openImageModal(config.public.IMAGES_URL + stat.screenshot)
+                  "
                 />
               </div>
             </div>
@@ -432,7 +445,8 @@ function selectUser(user: any) {
             class="input w-full input-bordered input-l mb-1"
           />
         </label>
-        <div class="flex justify-start ml-1 mb-2">
+
+        <div class="flex justify-between ml-1 mb-2">
           <div class="form-control">
             <label class="cursor-pointer label w-36">
               <span class="label-text font-bold">Клиент PC</span>
@@ -443,6 +457,12 @@ function selectUser(user: any) {
               />
             </label>
           </div>
+
+          <select v-model="userBank" class="select select-bordered max-w-xs">
+            <option disabled>Банк клиента</option>
+            <option vlaue="alpha">alpha</option>
+            <option value="psb">psb</option>
+          </select>
         </div>
       </div>
 
@@ -487,7 +507,7 @@ function selectUser(user: any) {
             accept="image/png, image/gif, image/jpeg"
             ref="screenshotInput"
             class="hidden"
-            @change="(e: Event) => uploadToS3(e)"
+            @change="(e) => uploadToS3(e)"
           />
         </div>
       </ClientOnly>

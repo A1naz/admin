@@ -52,6 +52,8 @@ const isCreateButtonDisabled = ref(false)
 const phoneNumber = ref('')
 const selectedTabOption = ref('')
 
+const config = useRuntimeConfig()
+
 const screenshot = ref({
   url: 'null',
   public: 'null',
@@ -128,13 +130,13 @@ async function uploadToS3(event: Event, screen: string = 'dialog') {
   if (data.value) {
     if (selectedScreenshot.value == 'account') {
       accountScreenshot.value = {
-        url: data.value[0].url,
-        public: getPublicUrl(data.value[0].url),
+        url: config.public.IMAGES_URL + data.value[0].key,
+        public: config.public.IMAGES_URL + data.value[0].key,
       }
     } else {
       screenshot.value = {
-        url: data.value[0].url,
-        public: getPublicUrl(data.value[0].url),
+        url: config.public.IMAGES_URL + data.value[0].key,
+        public: config.public.IMAGES_URL + data.value[0].key,
       }
     }
   }
@@ -198,6 +200,7 @@ async function onInput(event: Event) {
 }
 
 const findSearchQuery = async () => {
+  //@ts-ignore
   if (query.value.replaceAll(' ', '') == '') {
     return
   }
@@ -254,8 +257,8 @@ async function createRefundRequest() {
       phoneNumber: phoneNumber.value.replace(/[\(\)\-\s]/g, ''),
       handleOperationSumm: handleOperationSumm.value,
       userId: selectedUser.value._id,
-      screenshot: screenshot.value.public,
-      accountScreenshot: accountScreenshot.value.public,
+      screenshot: screenshot.value.public.replace(config.public.IMAGES_URL, ''),
+      accountScreenshot: accountScreenshot.value.public.replace(config.public.IMAGES_URL, ''),
       mainOperation: selectedOperationMongoId.value,
       paymentOperations: selectedPaymentOperations,
       mainOperationSumm: allPaymentOperationsSumm.value,
@@ -455,7 +458,7 @@ async function selectOperation(
       </thead>
       <tbody>
         <!-- row 1 -->
-        <tr v-for="stat in stats" class="hover">
+        <tr v-for="stat in stats" class="hover" :key="stat.id">
           <th class="text-xs overflow-x-auto">
             {{ stat.adminUsername }}
           </th>
@@ -515,9 +518,11 @@ async function selectOperation(
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>
                 <img
-                  :src="stat.screenshot"
+                  :src="config.public.IMAGES_URL + stat.screenshot"
                   class="cursor-pointer rounded w-24 ml-1"
-                  @click="openImageModal(stat.screenshot)"
+                  @click="
+                    openImageModal(config.public.IMAGES_URL + stat.screenshot)
+                  "
                 />
               </div>
             </div>
@@ -526,9 +531,11 @@ async function selectOperation(
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>
                 <img
-                  :src="stat.accountScreenshot"
+                  :src="config.public.IMAGES_URL + stat.accountScreenshot"
                   class="cursor-pointer rounded w-24 ml-1"
-                  @click="openImageModal(stat.accountScreenshot)"
+                  @click="
+                    openImageModal(config.public.IMAGES_URL + stat.accountScreenshot)
+                  "
                 />
               </div>
             </div>
@@ -737,7 +744,7 @@ async function selectOperation(
             accept="image/png, image/gif, image/jpeg"
             ref="screenshotInput"
             class="hidden"
-            @change="(e: Event) => uploadToS3(e)"
+            @change="(e) => uploadToS3(e)"
           />
         </div>
       </ClientOnly>

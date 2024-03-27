@@ -1,7 +1,7 @@
 import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
-import { Delivery } from '@/server/lib/models/wildberries/Delivery'
-import { Buyout } from '@/server/lib/models/wildberries/Buyout'
+import { Delivery } from '@/server/lib/models/Delivery'
+import { Buyout } from '@/server/lib/models/Buyout'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { ActionHistory } from '@/server/lib/models/actionHistory'
 const prefixesToRemove =
@@ -10,7 +10,6 @@ const prefixesToRemove =
 export default eventHandler(async (event) => {
   const { uuid, pvzs }: any = getQuery(event)
 
-  console.log(uuid)
 
   const uuidArray = JSON.parse(uuid) as string[]
   const pvzArray = JSON.parse(pvzs)
@@ -24,8 +23,6 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const user = await User.find({ uuid: { $in: uuidArray } })
-
-  console.log(user)
 
   if (!user || !user.length) {
     throw createError({

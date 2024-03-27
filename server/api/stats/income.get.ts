@@ -493,7 +493,6 @@ export default eventHandler(async (event) => {
     },
   ])
 
-  console.log(deletedReviews)
 
   if (deletedReviews && deletedReviews.length > 0) {
     services.forEach((service: any) => {

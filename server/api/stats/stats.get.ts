@@ -34,12 +34,12 @@ export default eventHandler(async (event) => {
   }
   const trueFilters = JSON.parse(filters)
   let commentRegex = {}
-  if ( trueFilters.type == 'penalty') {
+  if (trueFilters.type == 'penalty') {
     commentRegex = {
       comment: { $regex: 'Штраф', $options: 'i' },
     }
   }
- 
+
   if (!trueFilters.sumTo) delete trueFilters.sumTo
   if (!trueFilters.sumFrom) delete trueFilters.sumFrom
   if (trueFilters.type !== 'buyouts') {
@@ -79,7 +79,10 @@ export default eventHandler(async (event) => {
     trueFilters.typeoperations == 'any'
       ? {}
       : { typeoperations: trueFilters.typeoperations }
-  const trueType = trueFilters.type == 'any' || trueFilters.type == 'penalty' ? {} : { type: trueFilters.type }
+  const trueType =
+    trueFilters.type == 'any' || trueFilters.type == 'penalty'
+      ? {}
+      : { type: trueFilters.type }
   const trueDateRange = trueFilters.dateRange
     ? {
         dataoperation: {
@@ -91,6 +94,7 @@ export default eventHandler(async (event) => {
 
   let stats: any = await paymenthistory
     .find({
+      mp: 'wildberries',
       ...commentRegex,
       ...allowedUsersParam,
       ...trueFilters.basisoperation,
@@ -128,6 +132,7 @@ export default eventHandler(async (event) => {
     const paymentAggregate = await paymenthistory.aggregate([
       {
         $match: {
+          mp: 'wildberries',
           ...allowedUsersParam,
           ...trueFilters.basisoperation,
           ...userIds,
@@ -167,7 +172,11 @@ export default eventHandler(async (event) => {
     })
 
     format.forEach((stat: any) => {
-      if (stat.type == 'buyouts' || stat.type == 'buyouts service') {
+      if (
+        (stat.type == 'buyouts' || stat.type == 'buyouts service') &&
+        stat.basisoperation &&
+        stat.basisoperation.split(' ')[1]
+      ) {
         const buyout = buyouts.find(
           (buyout: any) =>
             buyout.uuid == stat.basisoperation.split(' ')[1].replace('#', '')

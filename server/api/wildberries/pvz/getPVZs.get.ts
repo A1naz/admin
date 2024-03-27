@@ -1,6 +1,6 @@
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { User } from '~/server/lib/models/User'
-import { Buyout } from '~/server/lib/models/wildberries/Buyout'
+import { Buyout } from '~/server/lib/models/Buyout'
 import { getServerSession } from '#auth'
 const usersPerPage = 25
 export default eventHandler(async (event) => {

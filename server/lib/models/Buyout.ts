@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose'
 import { v4 as uuid } from 'uuid'
 import { User } from './User'
+import { wildberriesConnection } from '~/server/connections/wildberries'
 
 const ProductSchema = new Schema({
   name: { type: String, required: true, text: true },
@@ -41,4 +42,4 @@ const BuyoutSchema = new Schema({
   data18: { type: {}, default: '' },
 })
 
-export const Buyout = model('Buyout', BuyoutSchema)
+export const Buyout = wildberriesConnection.model('Buyout', BuyoutSchema)
