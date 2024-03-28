@@ -166,7 +166,6 @@ function closeOverlay() {
           href="/balanceTransfer"
         />
         <SidebarItem
-          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('управление тарифами')

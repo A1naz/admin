@@ -50,7 +50,7 @@ export default eventHandler(async (event) => {
       .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? 1 : -1 })
   }
   const usersCount = await User.count()
-  const users = allUsers.map((user) => {
+  const users = allUsers.map((user: any) => {
     return {
       _id: user._id,
       uuid: user.uuid,
@@ -63,7 +63,7 @@ export default eventHandler(async (event) => {
       roles: user.roles,
       registrationDate: user.registrationDate,
       tabs: user.tabs ? user.tabs : [],
-      tariffs: user.tariff,
+      tariffs: user.MPTariffs,
       partnerRewardPercent: user.partner?.rewardPercent
         ? user.partner?.rewardPercent
         : 10,

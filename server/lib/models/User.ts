@@ -2,67 +2,53 @@ import { Schema, model } from 'mongoose'
 import { v4 as uuid } from 'uuid'
 import { Tariff } from './Tariff'
 
+interface IUserSchema extends IUser, Document {}
+
 const partnerSchema = new Schema({
   balance: { type: Number, default: 0 },
   refCount: { type: Number, default: 0 },
-  rewardPercent: { type: Number, default: 10 },
-  secondLevelPercent: { type: Number, default: 5 },
+  rewardPercent: { type: Number, default: 5 },
+  followCount: { type: Number, default: 0 }, 
+  secondLevelPercent: { type: Number, default: 2 },
 })
 
 const UserSchema = new Schema({
+  orgKey: { type: String },
+  orgName: { type: String },
+  orgOgrn: { type: String },
+  orgInn: { type: String, required: true, unique: true },
+  middleName: { type: String },
+  phoneNumber: { type: String },
+
   isBanned: { type: Boolean, default: false },
   username: { type: String, unique: true, required: true },
   firstName: { type: String, required: false },
   lastName: { type: String, required: false },
   email: { type: String, unique: false, required: false },
+  apiKeys: [
+    {
+      mp: { type: String, required: true },
+      keys: { type: [String], required: false },
+    },
+  ],
   wbApiKey: { type: String, required: false },
-  wbApiKeys: { type: Array, required: false },
+  wbApiKeys: { type: [String], required: false },
   password: { type: String, required: false },
   uuid: { type: String, unique: true, required: true, default: uuid() },
-  currentCabinet: { type: Schema.Types.ObjectId },
 
   uuidCompany: { type: String, unique: false },
   acesses: [{ type: String, required: false }],
 
   roles: [{ type: String, ref: 'Role' }],
-  tariff: {
-    type: Tariff.schema,
-    required: true,
-    default: {
-      buyouts: {
-        type: 'price',
-        value: 100,
-      },
-      deliveryStorage: {
-        type: 'price',
-        value: 25,
-      },
-      review: {
-        type: 'price',
-        value: 40,
-      },
-      likeReview: {
-        type: 'price',
-        value: 5,
-      },
-      likeProduct: {
-        type: 'price',
-        value: 5,
-      },
-      questionProduct: {
-        type: 'price',
-        value: 7,
-      },
-      cart: {
-        type: 'price',
-        value: 5,
-      },
-      autoAnswer: {
-        type: 'price',
-        value: 100,
-      },
+  MPTariffs: [
+    {
+      mp: { type: String },
+      prices: { type: Tariff.schema, required: true },
     },
-  },
+  ],
+  twoFaQR: { type: String, required: false },
+  twoFaSecret: { type: String, required: false },
+  isTwoFaEnabled: { type: Boolean, default: false },
 
   tabs: [{ type: String }],
   newEmail: { type: String, required: false },
@@ -73,13 +59,17 @@ const UserSchema = new Schema({
   tg2fa: { type: Boolean, required: false, default: false },
   balance: { type: Number, default: 0, required: true },
   registrationDate: { type: Date, default: Date.now },
+  post: { type: 'String' },
+  newPassword: { type: String },
   partner: {
     type: partnerSchema,
     ref: 'Partner',
     default: {
       balance: 0,
       refCount: 0,
-      rewardPercent: 10,
+      rewardPercent: 5,
+      secondLevelPercent: 2,
+      followCount: 0,
     },
   },
 })
@@ -90,4 +80,4 @@ UserSchema.pre('save', function (next) {
   next()
 })
 
-export const User = model('User', UserSchema)
+export const User = model<IUserSchema>('User', UserSchema)

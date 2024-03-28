@@ -3,7 +3,7 @@ import { notify } from '@kyvg/vue3-notification'
 definePageMeta({
   layout: 'app',
   auth: true,
-  title: 'Партнерская программа',
+  title: 'Тарифы',
 })
 
 const store = useMainStore()
@@ -14,13 +14,22 @@ if (
   navigateTo('/partner')
 }
 
+const closeCreateModalButton = ref()
+const standartTariffs = ref<any>([])
+const userTariffs = ref<any>([])
+const isSaveBtnDisabled = ref(false)
+
 const selectedUser = ref<any>({
   username: '',
 })
+
+const mpStore = useMPStore()
 const curPage = ref(1)
 const isPageBtnsDisabled = ref(false)
 const tariffsHistory = ref<any>([])
 const { height, width } = useWindowSize()
+const selectedMP = ref('wildberries')
+const mps = mpStore.MPTabs
 
 async function getTariffHistory() {
   const { data } = await useFetch('/api/tariff/getTariffChangeHistory', {
@@ -44,49 +53,6 @@ async function swapPage(destination: number) {
   isPageBtnsDisabled.value = false
 }
 
-const tariffs = ref<any>({
-  buyouts: {
-    type: 'price',
-    value: 100,
-  },
-  deliveryStorage: {
-    type: 'price',
-    value: 25,
-  },
-  review: {
-    type: 'price',
-    value: 40,
-  },
-  likeReview: {
-    type: 'price',
-    value: 5,
-  },
-  likeProduct: {
-    type: 'price',
-    value: 5,
-  },
-  questionProduct: {
-    type: 'price',
-    value: 7,
-  },
-  cart: {
-    type: 'price',
-    value: 5,
-  },
-  autoAnswer: {
-    type: 'price',
-    value: 100,
-  },
-  partnerRewardPercent: {
-    type: 'percent',
-    value: 10,
-  },
-  partnerSecondLevelPercent: {
-    type: 'percent',
-    value: 5,
-  },
-})
-
 function getServiceNameByKey(key: string) {
   switch (key) {
     case 'buyouts':
@@ -109,57 +75,69 @@ function getServiceNameByKey(key: string) {
       return 'Бонус партнерки %'
     case 'partnerSecondLevelPercent':
       return 'Бонус партнерки 2 уровня %'
+    case 'HotelsBuyouts':
+      return 'Бронирование отелей'
+    case 'reviewRemoving':
+      return 'Удаление отзывов'
+    case 'Hotelsreview':
+      return 'Отзывы отелей'
   }
 }
 
 function setTariffs() {
-  if (selectedUser.value.tariffs) {
-    const userTariffs = selectedUser.value.tariffs
-
-    Object.keys(userTariffs).forEach((tariffType) => {
-      if (tariffs.value[tariffType]) {
-        tariffs.value[tariffType].value = userTariffs[tariffType].value
-        tariffs.value[tariffType].type = userTariffs[tariffType].type
-      }
-    })
-
-    selectedUser.value.partnerRewardPercent
-      ? (tariffs.value.partnerRewardPercent.value =
-          selectedUser.value.partnerRewardPercent)
-      : (tariffs.value.partnerRewardPercent.type = 'percent')
-    selectedUser.value.partnerSecondLevelPercent
-      ? (tariffs.value.partnerSecondLevelPercent.value =
-          selectedUser.value.partnerSecondLevelPercent)
-      : (tariffs.value.partnerSecondLevelPercent.type = 'percent')
-  }
-
   if (selectedUser.value.uuid == 'all') {
     notify({
       title: 'Внимание',
       text: 'Выбраны все пользователи, будьте внимательны при изменении тарифов',
     })
   }
+
+  const trueTariffs = standartTariffs.value
+  trueTariffs.forEach((tariff: any) => {
+    selectedUser.value.tariffs.forEach((userTariff: any) => {
+      if (userTariff.mp === tariff.mp) {
+        for (let key of Object.keys(tariff.prices)) {
+          if (userTariff.prices[key]) {
+            tariff.prices[key].value = userTariff.prices[key].value
+            if (userTariff.prices[key].type) {
+              tariff.prices[key].type = userTariff.prices[key].type
+            }
+            if (userTariff.prices[key].minPrice) {
+              tariff.prices[key].minPrice = userTariff.prices[key].minPrice
+            }
+          }
+        }
+      }
+    })
+  })
+
+  userTariffs.value = trueTariffs
 }
 
 async function saveTariffs() {
-  for (const tariffKey in tariffs.value) {
-    if (
-      tariffs.value[tariffKey].value <= 0 ||
-      tariffs.value[tariffKey].value >= 99999
-    ) {
-      notify({
-        type: 'error',
-        title: 'Введите корректные значения тарифов',
-      })
-      return
+  isSaveBtnDisabled.value = true
+  let errors = 0
+  for (const mp of userTariffs.value) {
+    for (let key of Object.keys(mp.prices)) {
+      if (!mp.prices[key].value || mp.prices[key].value <= 0) {
+        errors++
+      }
     }
   }
 
+  if (errors > 0) {
+    notify({
+      title: 'Внимание',
+      text: 'Не все тарифы заполнены',
+    })
+    isSaveBtnDisabled.value = false
+    return
+  }
   const { data }: any = await useFetch('/api/tariff/save', {
     method: 'POST',
     body: {
       userUuid: selectedUser.value.uuid,
-      tariffs: tariffs.value,
+      tariffs: userTariffs.value,
     },
     watch: false,
   })
@@ -168,8 +146,10 @@ async function saveTariffs() {
       type: 'success',
       title: 'Тарифы сохранены',
     })
-    location.reload()
+    isSaveBtnDisabled.value = false
+    closeCreateModalButton?.value?.click()
   } else {
+    isSaveBtnDisabled.value = false
     notify({
       type: 'error',
       title: 'Произошла ошибка',
@@ -177,33 +157,27 @@ async function saveTariffs() {
   }
 }
 
-function changeServiceType(key: string, event: Event) {
-  if ((event.target as HTMLInputElement).checked) {
-    tariffs.value[key].type = 'percent'
-  } else {
-    tariffs.value[key].type = 'price'
-  }
+async function getStandartTariffs() {
+  const { data }: any = await useFetch('/api/tariff/standart', {
+    method: 'GET',
+    watch: false,
+  })
+  standartTariffs.value = data.value
+  userTariffs.value = standartTariffs.value
 }
+await getStandartTariffs()
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Партнерская программа</h1>
-  <div class="text-sm breadcrumbs ml-5">
-    <ul>
-      <li>
-        <NuxtLink to="/tariff">Управление тарифами</NuxtLink>
-      </li>
-    </ul>
-  </div>
+  <h1 class="text-2xl font-bold ml-5 my-2">Управление тарифами</h1>
   <div class="divider"></div>
   <div class="flex w-full justify-between">
     <div>
       <selectUserModal
         @selectUser="selectedUser = $event"
-        :selectAll="true"
         @selectAllUsers="selectedUser.username = 'all'"
       />
       <button
-        class="btn btn-primary mr-3"
+        class="btn btn-primary mr-3 ml-2"
         @click="setTariffs"
         onclick="createRequireModal.showModal()"
         :disabled="selectedUser.username == ''"
@@ -247,7 +221,7 @@ function changeServiceType(key: string, event: Event) {
       </thead>
       <tbody>
         <!-- row 1 -->
-        <tr class="hover" v-for="history in tariffsHistory">
+        <tr class="hover" v-for="history in tariffsHistory" :key="history.id">
           <td class="overflow-x-auto text-xs" style="max-width: 150px">
             <div class="mx-1 overflow-x-auto text-x">
               {{ history.adminUserUuid }}
@@ -277,42 +251,81 @@ function changeServiceType(key: string, event: Event) {
       </tbody>
     </table>
   </div>
+
   <dialog id="createRequireModal" class="modal">
     <div class="modal-box max-w-lg">
-      <h3 class="font-bold text-lg"></h3>
-      <div class="flex flex-col">
-        <div class="text-center mb-3 text-lg font-bold">
-          {{
-            selectedUser.username == 'all'
-              ? 'Все пользователи'
-              : selectedUser.username
-          }}
+      <h3 class="font-bold text-lg">
+        <div class="btm-nav absolute top-0.5 right-0">
+          <button
+            v-for="mp in mps"
+            :key="mp.value"
+            class="border-primary"
+            :class="{
+              active: selectedMP === mp.value,
+            }"
+            @click="selectedMP = mp.value"
+          >
+            {{ mp.title }}
+          </button>
         </div>
-
-        <div
-          v-for="(tariff, tariffKey) in tariffs"
-          class="flex justify-between"
-        >
-          <div class="mt-3">
-            {{ getServiceNameByKey(tariffKey.toString()) }}
+      </h3>
+      <div>
+        <div class="flex flex-col">
+          <div class="text-center mb-3 text-lg font-bold">
+            {{
+              selectedUser.username == 'all'
+                ? 'Все пользователи'
+                : selectedUser.username
+            }}
           </div>
-          <div>
-            <div class="form-control" v-if="tariffKey.toString() === 'buyouts'">
-              <label class="label cursor-pointer mt-1">
-                Проценты
+          <div v-for="mp in userTariffs" :key="mp.value">
+            <div
+              v-if="mp.mp === selectedMP"
+              v-for="(tariff, tariffKey) in mp.prices"
+              :key="tariffKey"
+              class="flex justify-between"
+            >
+              <div class="mt-3">
+                {{ getServiceNameByKey(tariffKey.toString()) }}
+              </div>
+              <div>
+                <div
+                  class="form-control"
+                  v-if="tariffKey.toString() === 'buyouts'"
+                >
+                  <label class="label cursor-pointer mt-1">
+                    Проценты
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary ml-1"
+                      :checked="tariff.type === 'percent'"
+                      @change="
+                        tariff.type =
+                          tariff.type === 'percent' ? 'price' : 'percent'
+                      "
+                    />
+                  </label>
+                </div>
+
                 <input
-                  type="checkbox"
-                  class="toggle toggle-primary ml-1"
-                  :checked="tariffs[tariffKey].type === 'percent'"
-                  @change="changeServiceType(tariffKey.toString(), $event)"
+                  type="number"
+                  v-model="tariff.value"
+                  class="input input-bordered my-1"
                 />
-              </label>
+                <div
+                  v-if="tariffKey.toString() === 'buyouts'"
+                  class="flex flex-col"
+                >
+                  Минимальное значение в ₽
+                  <input
+                    type="number"
+                    placeholder="Мин. значение в ₽"
+                    v-model="tariff.minPrice"
+                    class="input input-bordered my-1"
+                  />
+                </div>
+              </div>
             </div>
-            <input
-              type="number"
-              v-model="tariffs[tariffKey].value"
-              class="input input-bordered my-1"
-            />
           </div>
         </div>
       </div>
@@ -323,7 +336,11 @@ function changeServiceType(key: string, event: Event) {
         Выбраны все пользователи!
       </div>
       <div class="flex justify-center">
-        <button class="btn btn-primary mt-3 px-10" @click="saveTariffs">
+        <button
+          class="btn btn-primary mt-3 px-10"
+          :disabled="isSaveBtnDisabled"
+          @click="saveTariffs"
+        >
           Сохранить
         </button>
       </div>
