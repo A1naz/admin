@@ -10,6 +10,7 @@ const store = useMainStore()
 const selectedUsers = ref([])
 const selectedPVZs = ref([])
 const isButtonsDisabled = ref(false)
+const isAllPVZSelected = ref(false)
 
 const selectedUser = ref<any>({
   username: '',
@@ -30,7 +31,9 @@ async function exportReadyXLS() {
     method: 'GET',
     params: {
       uuid: selectedUsers.value.map((el: any) => el.uuid),
-      pvzs: selectedPVZs.value.map((el: any) => el.address),
+      pvzs: isAllPVZSelected.value
+        ? []
+        : selectedPVZs.value.map((el: any) => el.address),
     },
   })
   isButtonsDisabled.value = false
@@ -81,6 +84,18 @@ async function exportXLS() {
   document.body.appendChild(fileLink)
   fileLink.click()
 }
+
+function selectAllPVZ() {
+  isAllPVZSelected.value = !isAllPVZSelected.value
+}
+
+function clearSelectedPVZ() {
+  selectedPVZs.value = []
+}
+
+watch(selectedUsers.value, () => {
+  clearSelectedPVZ()
+})
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Товары готовые к выдаче</h1>
@@ -97,6 +112,8 @@ async function exportXLS() {
     <!-- <selectUserModal @selectUser=";[(selectedUser = $event)]" /> -->
     <ModalManyUsers :selectedUsers="selectedUsers" />
     <ModalWildberriesManyPVZs
+      @selectAllPVZ="selectAllPVZ"
+      :selectedAll="isAllPVZSelected"
       :selectedUsers="selectedUsers"
       :selectedPVZs="selectedPVZs"
     />
@@ -105,7 +122,7 @@ async function exportXLS() {
         <button
           tabindex="0"
           class="btn btn-sm btn-primary m-1"
-          :disabled="!selectedUsers.length || isButtonsDisabled || !selectedPVZs.length"
+          :disabled="!selectedUsers.length || isButtonsDisabled"
         >
           Экспорт
         </button>
@@ -113,12 +130,7 @@ async function exportXLS() {
           tabindex="0"
           class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
         >
-          <button
-            class="btn btn-ghost"
-            :disabled="
-              isButtonsDisabled
-            "
-          >
+          <button class="btn btn-ghost" :disabled="isButtonsDisabled">
             <NuxtLink
               target="blank"
               :to="`/delivery/export?uuid=${JSON.stringify(selectedUsers.map((el: any) => el.uuid))}&pvzs=${JSON.stringify(selectedPVZs.map((el: any) => el.address))}`"

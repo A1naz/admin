@@ -8,7 +8,12 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  selectedAll: {
+    type: Boolean,
+  },
 })
+
+const emit = defineEmits(['selectAllPVZ'])
 
 const query = ref('')
 const inputLoading = ref(false)
@@ -24,6 +29,7 @@ async function onInput(event: Event) {
 }
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 async function findSearchQuery() {
+  //@ts-ignore
   if (query.value.replaceAll(' ', '') == '') {
     return
   }
@@ -55,7 +61,6 @@ async function getPVZs(searchValue: string = '') {
 }
 
 function selectPVZ(uuid: String, select: boolean) {
-
   PVZs.value.forEach((PVZ: any) => {
     if (PVZ.uuid === uuid) {
       if (!select) {
@@ -98,6 +103,10 @@ function showOnlySelectedPVZ() {
     visiblePVZs.value = selectedPVZs.value
   }
 }
+
+function selectAllPVZ() {
+  emit('selectAllPVZ')
+}
 </script>
 <template>
   <button
@@ -106,7 +115,9 @@ function showOnlySelectedPVZ() {
     @click=";[(isModalOpen = true), !selectedPVZs.length ? getPVZs() : null]"
   >
     {{
-      selectedPVZs.length > 0
+      selectedAll
+        ? 'Выбраны все пвз'
+        : selectedPVZs.length > 0
         ? 'Выбрано ПВЗ: ' + selectedPVZs.length
         : 'Выбрать ПВЗ'
     }}
@@ -138,7 +149,7 @@ function showOnlySelectedPVZ() {
 
       <div>
         <div class="justify-between flex">
-          <div>
+          <div v-if="!selectedAll">
             <label
               ><input
                 v-model="query"
@@ -153,6 +164,7 @@ function showOnlySelectedPVZ() {
               class="loading loading-spinner text-primary loading-large ml-4"
             />
           </div>
+          <div v-else></div>
           <!-- <label
             class="btn btn-primary mr-4 btn-sm mt-4"
             @click="
@@ -160,20 +172,36 @@ function showOnlySelectedPVZ() {
             "
             >Выбрать всех</label
           > -->
-          <div class="form-control mr-6 mt-4">
-            <label class="label cursor-pointer">
-              <span class="label-text mr-4">Показать только выбранных</span>
-              <input
-                type="checkbox"
-                :checked="showOnlySelected"
-                class="checkbox checkbox-primary"
-                @click="showOnlySelectedPVZ"
-              />
-            </label>
+
+          <div class="flex">
+            <div class="form-control mr-6 mt-4">
+              <label class="label cursor-pointer">
+                <span class="label-text mr-4">Выбрать все</span>
+                <input
+                  type="checkbox"
+                  :checked="selectedAll"
+                  class="checkbox checkbox-primary"
+                  @click="selectAllPVZ"
+                />
+              </label>
+            </div>
+
+            <div class="form-control mr-6 mt-4" v-if="!selectedAll">
+              <label class="label cursor-pointer">
+                <span class="label-text mr-4">Показать только выбранных</span>
+                <input
+                  type="checkbox"
+                  :checked="showOnlySelected"
+                  class="checkbox checkbox-primary"
+                  @click="showOnlySelectedPVZ"
+                />
+              </label>
+            </div>
           </div>
         </div>
 
         <div
+          v-if="!selectedAll"
           class="my-2 mx-2 overflow-y-auto"
           :style="{ 'max-height': 500 + 'px' }"
         >
@@ -202,7 +230,7 @@ function showOnlySelectedPVZ() {
             </tbody>
           </table>
         </div>
-        <div class="modal-action"></div>
+        <div v-else class="hero text-xl mt-10">Выбраны все пвз</div>
       </div>
     </div>
   </div>

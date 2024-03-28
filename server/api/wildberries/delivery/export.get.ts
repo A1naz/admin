@@ -58,11 +58,10 @@ export default eventHandler(async (event) => {
 
     const deliveries = await Delivery.find({
       user: { $in: user },
-      point: { $in: pvzs },
+      point: pvzs && pvzs.length ? { $in: pvzs } : { $exists: true },
     }).sort({
       point: 1,
     })
-
 
     // if (!deliveries.length) {
     // return undefined

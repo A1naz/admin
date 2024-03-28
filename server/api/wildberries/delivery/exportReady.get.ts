@@ -22,7 +22,7 @@ const keys = Object.keys as <T>(
 async function getReady(user: any, pvzs: any) {
   const deliveries = await Delivery.find({
     user: { $in: user },
-    point: { $in: pvzs },
+    point: pvzs && pvzs.length ? { $in: pvzs } : { $exists: true },
   })
   const prefixesToRemove =
     /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
@@ -262,19 +262,36 @@ export default eventHandler(async (event) => {
     // add qr codes to sheet
 
     for (const item of ready) {
-      
-      if (!item.receiptcodeqr) {
+      if (!item?.receiptcodeqr || item?.receiptcodeqr?.length < 40) {
         continue
       }
-      const image = workbook.addImage({
-        base64: item?.receiptcodeqr,
-        extension: 'png',
-      })
-      sheet.addImage(image, {
-        tl: { col: 1, row: item!.place },
-        ext: { width: 100, height: 100 },
-      })
-      sheet.getRow(item!.place + 1).height = 100
+
+      if (
+        item.receiptcodeqr.includes(
+          'data:image/png;base64,data:image/png;base64,'
+        )
+      ) {
+        item.receiptcodeqr = item.receiptcodeqr.replace(
+          'data:image/png;base64,',
+          ''
+        )
+      }
+
+      try {
+        const image = workbook.addImage({
+          base64: item?.receiptcodeqr,
+          extension: 'png',
+        })
+        sheet.addImage(image, {
+          tl: { col: 1, row: item!.place },
+          ext: { width: 100, height: 100 },
+        })
+        sheet.getRow(item!.place + 1).height = 100
+      } catch (error) {
+        console.log(error)
+
+        continue
+      }
     }
     // export table
     const buffer = await workbook.xlsx.writeBuffer()
