@@ -27,7 +27,7 @@ export default eventHandler(async (event) => {
     )
       return sendRedirect(event, '/auth', 302)
 
-    const { uuid, pvzs } = getQuery(event)
+    const { uuid, pvzs }: any = getQuery(event)
 
     const user = await User.find({ uuid: { $in: uuid } })
     if (!user || !user.length) {
@@ -58,7 +58,7 @@ export default eventHandler(async (event) => {
 
     const deliveries = await Delivery.find({
       user: { $in: user },
-      point: pvzs && pvzs.length ? { $in: pvzs } : { $exists: true },
+      point: !pvzs && !pvzs.length ? { $in: pvzs } : { $exists: true },
     }).sort({
       point: 1,
     })
