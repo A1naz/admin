@@ -13,7 +13,6 @@ export default eventHandler(async (event) => {
   const user = await AdminUser.findOne({ uuid: session.uuid })
   if (!user || (!user.mainAdmin && !user.tabs.includes('запросы скриншотов')))
     return sendRedirect(event, '/auth', 302)
-  console.log(userUuid)
 
   const foundUser: any = await User.findOne({
     uuid: userUuid,
