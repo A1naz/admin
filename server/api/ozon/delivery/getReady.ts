@@ -1,7 +1,7 @@
 import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
-import { Delivery } from '@/server/lib/models/Delivery'
-import { Buyout } from '@/server/lib/models/Buyout'
+import { Delivery } from '@/server/lib/models/ozon/Delivery'
+import { Buyout } from '@/server/lib/models/ozon/Buyout'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { ActionHistory } from '@/server/lib/models/actionHistory'
 const prefixesToRemove =
@@ -9,6 +9,7 @@ const prefixesToRemove =
 
 export default eventHandler(async (event) => {
   const { uuid, pvzs }: any = getQuery(event)
+
 
   const uuidArray = JSON.parse(uuid) as string[]
   const pvzArray = JSON.parse(pvzs)
@@ -59,7 +60,7 @@ export default eventHandler(async (event) => {
 
   const all = await Delivery.find({
     user: { $in: user.map((item) => item._id) },
-    point: pvzArray && pvzArray.length ? { $in: pvzArray } : { $exists: true },
+    point: { $in: pvzArray },
   })
 
   const format = await Promise.all(

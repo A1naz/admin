@@ -25,7 +25,7 @@ if (
 
 async function exportReadyXLS() {
   isButtonsDisabled.value = true
-  const { data } = await useFetch('/api/wildberries/delivery/exportReady', {
+  const { data } = await useFetch('/api/ozon/delivery/exportReady', {
     responseType: 'blob',
     watch: false,
     method: 'GET',
@@ -47,7 +47,7 @@ async function exportReadyXLS() {
 async function exportXLS() {
   isButtonsDisabled.value = true
   const { data, error }: any = await useFetch(
-    '/api/wildberries/delivery/export',
+    '/api/ozon/delivery/export',
     {
       responseType: 'blob',
       method: 'GET',
@@ -100,13 +100,13 @@ watch(selectedUsers.value, () => {
 const mpStore = useMPStore()
 
 function changeMP(event: any) {
-  if (event.target.value !== 'wildberries') {
+  if (event.target.value !== 'ozon') {
     return navigateTo('/delivery/' + event.target.value)
   }
 }
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Товары готовые к выдаче Wildberries</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">Товары готовые к выдаче Ozon</h1>
   <div class="divider"></div>
   <div class="flex gap-3 items-center">
     <!-- <selectUserModal @selectUser=";[(selectedUser = $event)]" /> -->
@@ -133,7 +133,7 @@ function changeMP(event: any) {
           <button class="btn btn-ghost" :disabled="isButtonsDisabled">
             <NuxtLink
               target="blank"
-              :to="`/delivery/export?uuid=${JSON.stringify(selectedUsers.map((el: any) => el.uuid))}&pvzs=${JSON.stringify(selectedPVZs.map((el: any) => el.address))}`"
+              :to="`/delivery/ozonExport?uuid=${JSON.stringify(selectedUsers.map((el: any) => el.uuid))}&pvzs=${JSON.stringify(selectedPVZs.map((el: any) => el.address))}`"
             >
               Готовы к выдаче PDF
             </NuxtLink>
@@ -163,7 +163,7 @@ function changeMP(event: any) {
         v-for="tab in mpStore.MPTabs"
         :key="tab.value"
         :value="tab.value"
-        :selected="tab.value == 'wildberries'"
+        :selected="tab.value == 'ozon'"
       >
         {{ tab.title }}
       </option>
