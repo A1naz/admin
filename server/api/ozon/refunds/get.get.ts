@@ -42,7 +42,7 @@ export default eventHandler(async (event) => {
   }
 
   const requests = await RefundRequest.find({
-    mp: 'wildberries',
+    mp: 'ozon',
     ...allowedUsersParam,
     ...trueDateRange,
   })
@@ -68,8 +68,12 @@ export default eventHandler(async (event) => {
   })
 
   const format = requests.map((req: any) => {
-    const admin = admins.find((admin: any) => admin._id.valueOf() === req.adminUser.valueOf())
-    const user = users.find((user: any) => user._id.valueOf() === req.user.valueOf())
+    const admin = admins.find(
+      (admin: any) => admin._id.valueOf() === req.adminUser.valueOf()
+    )
+    const user = users.find(
+      (user: any) => user._id.valueOf() === req.user.valueOf()
+    )
     return {
       ...req,
       adminUsername: admin?.username,
@@ -77,5 +81,5 @@ export default eventHandler(async (event) => {
     }
   })
 
- return format
+  return format
 })

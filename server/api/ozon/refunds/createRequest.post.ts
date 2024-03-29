@@ -52,7 +52,7 @@ export default eventHandler(async (event) => {
     phoneNumber,
     mainOperationType,
     requestDate: new Date(),
-    mp: 'wildberries'
+    mp: 'ozon'
   })
 
   await ActionHistory.create({

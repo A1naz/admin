@@ -528,7 +528,7 @@ function changeMP(event: any) {
             <div v-if="header.key == 'article'" class="text-purple-500">
               <a
                 target="_blank"
-                :href="`https://www.wildberries.ru/catalog/${item.article}/detail.aspx`"
+                :href="`https://www.ozon.ru/product/${item.article}`"
               >
                 {{ item[header.key] }}
               </a>

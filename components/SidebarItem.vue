@@ -7,9 +7,8 @@ const props = defineProps<{
 const route = useRoute()
 
 const active = computed(() => {
-  return route.path.includes(props.href.split('/')[1])
+  return '/' + route.path.split('/')[1] === props.href
 })
-
 </script>
 
 <template>

@@ -3,8 +3,6 @@ const config = useRuntimeConfig()
 
 export default eventHandler(async (event) => {
   const { path }: any = getQuery(event)
-
-  console.log(path);
   
   const bucket = 'ozonmpportal'
   AWS.config.update({

@@ -20,7 +20,8 @@ const RefundRequestSchema = new Schema({
   refundType: { type: String },
   phoneNumber: { type: String },
   cancelationComment: { type: String, default: '' },
-  handleOperationSumm: { type: Number,  },
+  handleOperationSumm: { type: Number },
+  mp: { type: String },
 })
 
 export const RefundRequest = model('RefundRequest', RefundRequestSchema)

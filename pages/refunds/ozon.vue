@@ -93,7 +93,7 @@ const selectedPaymentOperationsSumm = computed(() => {
 
 async function getStats() {
   stats.value = []
-  const { data }: any = await useFetch('/api/refunds/get', {
+  const { data }: any = await useFetch('/api/ozon/refunds/get', {
     method: 'GET',
     query: {
       page: curPage.value,
@@ -250,7 +250,7 @@ async function createRefundRequest() {
     (el: any) => el.selected
   )
 
-  const { data, error }: any = await useFetch('/api/refunds/createRequest', {
+  const { data, error }: any = await useFetch('/api/ozon/refunds/createRequest', {
     watch: false,
     method: 'POST',
     body: {
@@ -329,7 +329,7 @@ async function selectOperation(
   selectedOperation.value = operationId
   selectedOperationMongoId.value = operationMongoId
 
-  const { data, error } = await useFetch('/api/refunds/paymentOperations', {
+  const { data, error } = await useFetch('/api/ozon/refunds/paymentOperations', {
     method: 'GET',
     query: {
       operationId,
@@ -349,14 +349,17 @@ async function selectOperation(
 const mpStore = useMPStore()
 
 function changeMP(event: any) {
-  if (event.target.value !== 'wildberries') {
-    navigateTo('/refunds/' + event.target.value)
+  if (event.target.value === 'wildberries') {
+    return navigateTo('/refunds')
+  } else if (event.target.value !== 'ozon') {
+    return navigateTo('/refunds/' + event.target.value)
   }
 }
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Возвраты средств клиентам Wildberries</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">Возвраты средств клиентам Ozon</h1>
   <div class="card p-fluid"></div>
+
   <div class="divider"></div>
   <div class="flex justify-between">
     <div class="flex">
@@ -405,7 +408,7 @@ function changeMP(event: any) {
           v-for="tab in mpStore.MPTabs"
           :key="tab.value"
           :value="tab.value"
-          :selected="tab.value == 'wildberries'"
+          :selected="tab.value == 'ozon'"
         >
           {{ tab.title }}
         </option>
@@ -881,7 +884,7 @@ function changeMP(event: any) {
   </div>
 
   <div>
-    <RefundsOperationsModal
+    <RefundsOzonOperationsModal
       :selected-operation="selectedOperation"
       :selected-user="selectedUser"
       @select-operation="selectOperation"
