@@ -10,6 +10,7 @@ const screenshotsRequireSchema = new Schema({
   status: { type: String, default: 'created' },
   article: { type: Number, requred: true },
   screenshots: [{ type: String }],
+  mp: { type: String, required: true },
 })
 
 export const ScreenshotsRequire = model(

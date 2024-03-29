@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 const { height, width } = useWindowSize()
 const value = ref('')
 const type = ref('any')
@@ -165,7 +165,7 @@ const search = (event: any) => {
 }
 
 async function getInfo() {
-  const { data }: any = await useFetch('/api/management/get', {
+  const { data }: any = await useFetch('/api/ozon/management/get', {
     method: 'GET',
     query: {
       page: curPage.value,
@@ -310,8 +310,10 @@ if (
 }
 
 function changeMP(event: any) {
-  if (event.target.value !== 'wildberries') {
-    navigateTo('/usersManagement/' + event.target.value)
+  if (event.target.value !== 'ozon') {
+    if (event.target.value === 'wildberries') {
+      navigateTo('/usersManagement')
+    } else navigateTo('/usersManagement/' + event.target.value)
   }
 }
 </script>
@@ -329,7 +331,7 @@ function changeMP(event: any) {
         v-for="tab in mpStore.MPTabs"
         :key="tab.value"
         :value="tab.value"
-        :selected="tab.value == 'wildberries'"
+        :selected="tab.value == 'ozon'"
       >
         {{ tab.title }}
       </option>
@@ -354,6 +356,7 @@ function changeMP(event: any) {
         <option value="Приход">приход</option>
         <option value="Расход">расход</option>
       </select> -->
+
       <div v-if="tabOption == 'buyouts' || tabOption == 'deliveries'">
         <label
           ><input
@@ -418,6 +421,7 @@ function changeMP(event: any) {
         </button>
       </DateRangePicker> -->
       <button class="btn btn-primary ml-3" @click="getInfo">Применить</button>
+
       <button
         class="btn btn-error bg-red-400 ml-3"
         v-if="selectedUser.username.length > 2 && !selectedUser.isBanned"

@@ -26,6 +26,8 @@ const pages = ref(0)
 const isPageBtnsDisabled = ref(false)
 const dateRange = ref([])
 const article = ref('')
+const selectedMP = ref('wildberries')
+const mpStore = useMPStore()
 
 definePageMeta({
   layout: 'app',
@@ -72,6 +74,7 @@ async function createRequire() {
     body: {
       account: account.value.replace(/[\(\)\-\s]/g, ''),
       typeOperation: createType.value,
+      mp: selectedMP.value,
       article: article.value,
     },
     watch: false,
@@ -346,6 +349,15 @@ if (
       <div class="flex flex-col">
         <select class="select select-bordered w-50 my-2" v-model="createType">
           <option value="deliveries">Доставки</option>
+        </select>
+        <select class="select select-bordered w-50 my-2" v-model="selectedMP">
+          <option
+            v-for="tab in mpStore.MPTabs"
+            :key="tab.value"
+            :value="tab.value"
+          >
+            {{ tab.title }}
+          </option>
         </select>
         <input
           v-model="account"

@@ -5,7 +5,7 @@ import { ActionHistory } from '~/server/lib/models/actionHistory'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { typeOperation, account, article } = await readBody(event)
+  const { typeOperation, account, article, mp } = await readBody(event)
 
   if (!session) return sendRedirect(event, '/auth', 302)
 
@@ -19,6 +19,7 @@ export default eventHandler(async (event) => {
     typeOperation,
     account,
     article,
+    mp,
     status: 'created',
   })
 
