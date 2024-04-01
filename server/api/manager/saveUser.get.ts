@@ -10,9 +10,8 @@ export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
   const { uuid, strBody }: any = getQuery(event)
 
- 
   const body = JSON.parse(strBody)
-  
+
   if (!session) return sendRedirect(event, '/auth', 302)
 
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
@@ -20,7 +19,7 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   if (uuid) {
-    let userToEdit = await User.findOne({ uuid: uuid })
+    let userToEdit: any = await User.findOne({ uuid: uuid })
 
     if (!userToEdit) {
       throw createError({
@@ -38,7 +37,7 @@ export default eventHandler(async (event) => {
         ? body.firstName
         : userToEdit.firstName
       userToEdit.lastName = body.lastName ? body.lastName : userToEdit.lastName
-      
+
       if (body.password && body.password.length > 8) {
         userToEdit.password = await bcrypt.hash(body.password, 7)
       }
@@ -89,7 +88,8 @@ export default eventHandler(async (event) => {
 
           adminUserToEdit.allowedUsers = body.allowedUsers
           adminUserToEdit.restrictedUsers = body.restrictedUsers
-          adminUserToEdit.isAllUsersAllowed = body.allowedUsers.length > 0 ? false : true
+          adminUserToEdit.isAllUsersAllowed =
+            body.allowedUsers.length > 0 ? false : true
           adminUserToEdit.password = userToEdit.password
           await adminUserToEdit.save()
         }
@@ -130,7 +130,7 @@ export default eventHandler(async (event) => {
     }
 
     if (!isUserExist) {
-      let newUser = await User.create({
+      let newUser: any = await User.create({
         uuid: newUuid,
         username: body.username,
         email: body.email,
@@ -140,6 +140,7 @@ export default eventHandler(async (event) => {
         emailConfirmed: true,
         firstName: body.firstName,
         lastName: body.lastName,
+        orgInn: 'manager:' + unicalUuid(),
       })
 
       await ActionHistory.create({

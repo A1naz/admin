@@ -238,7 +238,7 @@ await getStandartTariffs()
             </div>
           </td>
           <td class="overflow-x-auto text-xs">
-            <div class="mx-1 overflow-x-auto">
+            <div class="mx-1 overflow-x-auto whitespace-pre-wrap">
               {{ history.actionDescription }}
             </div>
           </td>

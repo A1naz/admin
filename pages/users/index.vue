@@ -286,12 +286,9 @@ async function saveUser() {
   if (error.value) {
     notify({
       type: 'error',
-      title: 'Пользователь с такой почтой уже существует',
+      title: 'Произошла ошибка',
     })
 
-    setTimeout(() => {
-      location.reload()
-    }, 2000)
   }
 }
 

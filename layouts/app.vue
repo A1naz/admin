@@ -148,6 +148,7 @@ function closeOverlay() {
           href="/screenshots"
         />
         <SidebarItem
+          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('ошибки финансовых операции')
@@ -157,6 +158,7 @@ function closeOverlay() {
           href="/paymentErrors"
         />
         <SidebarItem
+          class="hidden"
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('переводы с аккаунта на аккаунт')
