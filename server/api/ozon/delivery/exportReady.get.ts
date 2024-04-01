@@ -22,7 +22,7 @@ const keys = Object.keys as <T>(
 async function getReady(user: any, pvzs: any) {
   const deliveries = await Delivery.find({
     user: { $in: user },
-    point: pvzArray && pvzArray.length ? { $in: pvzArray } : { $exists: true },
+    point: pvzs && pvzs.length ? { $in: pvzs } : { $exists: true },
   })
   const prefixesToRemove =
     /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
@@ -32,10 +32,7 @@ async function getReady(user: any, pvzs: any) {
       const currentstatus = item.statusdelivery?.length
         ? item.statusdelivery[item.statusdelivery.length - 1].status
         : 'Неизвестно'
-      return (
-        currentstatus === 'Готов к выдаче' ||
-        currentstatus === 'Готов к получению'
-      )
+      return currentstatus.includes('Ожидает получения')
     })
     .sort((a: any, b: any) =>
       a.point
@@ -80,10 +77,8 @@ async function getReady(user: any, pvzs: any) {
           : new Date()
         const deliveryDate = delivery.statusdelivery?.length
           ? new Date(
-              delivery.statusdelivery?.find(
-                (item: any) =>
-                  item.status === 'Готов к выдаче' ||
-                  item.status === 'Готов к получению'
+              delivery.statusdelivery?.find((item: any) =>
+                item.status.includes('Ожидает получения')
               )?.date
             )
           : new Date()
@@ -190,11 +185,16 @@ export default eventHandler(async (event) => {
 
     sheet.columns = [
       { header: 'Номер', key: 'place', font: { bold: true } },
-      { header: 'QR код', key: 'receiptcode', width: 16, font: { bold: true } },
+      {
+        header: 'Штрих код',
+        key: 'receiptcode',
+        width: 48,
+        font: { bold: true },
+      },
       {
         header: 'Статус',
         key: 'currentstatus',
-        width: 16,
+        width: 48,
         font: { bold: true },
       },
       { header: 'Товар', key: 'productname', width: 48, font: { bold: true } },
@@ -282,10 +282,12 @@ export default eventHandler(async (event) => {
           base64: item?.receiptcodeqr,
           extension: 'png',
         })
+
         sheet.addImage(image, {
-          tl: { col: 1, row: item!.place },
-          ext: { width: 100, height: 100 },
+          tl: { col: 1.3, row: item!.place + 0.8 },
+          ext: { width: 280, height: 78 },
         })
+
         sheet.getRow(item!.place + 1).height = 100
       } catch (error) {
         console.log(error)
