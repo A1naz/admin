@@ -47,6 +47,22 @@ definePageMeta({
   title: 'Переводы с аккаунта на аккаунт',
 })
 
+async function getS3PublicUrl(key: string) {
+  const { data, error }: any = await useFetch('/api/images/publicUrl', {
+    method: 'GET',
+    params: {
+      path: key,
+    },
+  })
+
+  if (data.value) {
+    return data.value
+  } else {
+    return 'null'
+  }
+
+}
+
 async function getStats() {
   stats.value = []
   const { data }: any = await useFetch('/api/balanceTransfer/get', {
@@ -62,6 +78,8 @@ async function getStats() {
   })
   if (data.value) {
     stats.value = data.value.balanceTransferRequest
+  } else {
+    return 'null'
   }
 }
 
@@ -82,11 +100,16 @@ async function uploadToS3(event: Event) {
       duration: 3000,
     })
   }
-  if (data.value)
+  if (data.value) {
+    const publicUrl: any = await getS3PublicUrl(data.value[0].key)
+
+    console.log(publicUrl);
+    
     screenshot.value = {
-      url: config.public.IMAGES_URL + data.value[0].key,
-      public: config.public.IMAGES_URL + data.value[0].key,
+      url: publicUrl,
+      public: publicUrl,
     }
+  }
 
   loadingIndex.value = false
 }

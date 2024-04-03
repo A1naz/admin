@@ -52,6 +52,21 @@ const screenshot = ref({
   public: 'null',
 })
 
+async function getS3PublicUrl(key: string) {
+  const { data, error }: any = await useFetch('/api/images/publicUrl', {
+    method: 'GET',
+    params: {
+      path: 'admin/' + key,
+    },
+  })
+
+  if (data.value) {
+    return data.value
+  } else {
+    return 'null'
+  }
+}
+
 async function getStats() {
   stats.value = []
   const { data }: any = await useFetch('/api/manualTransfer/get', {
@@ -88,9 +103,13 @@ async function uploadToS3(event: Event) {
     })
   }
   if (data.value) {
+    const publicUrl: any = await getS3PublicUrl(data.value[0].key)
+
+    console.log(publicUrl)
+
     screenshot.value = {
-      url: config.public.IMAGES_URL + data.value[0].key,
-      public: config.public.IMAGES_URL + data.value[0].key,
+      url: publicUrl,
+      public: publicUrl,
     }
   }
 
@@ -375,10 +394,18 @@ function selectUser(user: any) {
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>
                 <img
-                  :src="config.public.IMAGES_URL + stat.screenshot"
+                  :src="
+                    stat.screenshot.includes('ozonmpportal.hb.vkcs.cloud')
+                      ? stat.screenshot
+                      : config.public.IMAGES_URL + stat.screenshot
+                  "
                   class="cursor-pointer rounded w-24 ml-1"
                   @click="
-                    openImageModal(config.public.IMAGES_URL + stat.screenshot)
+                    openImageModal(
+                      stat.screenshot.includes('ozonmpportal.hb.vkcs.cloud')
+                        ? stat.screenshot
+                        : config.public.IMAGES_URL + stat.screenshot
+                    )
                   "
                 />
               </div>
