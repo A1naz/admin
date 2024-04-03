@@ -88,11 +88,14 @@ async function uploadToS3(event: Event) {
       duration: 3000,
     })
   }
-  if (data.value)
+  if (data.value) {
+    const publicUrl: any = await getS3PublicUrl(data.value[0].key)
+
     screenshot.value = {
-      url: config.public.IMAGES_URL + data.value[0].key,
-      public: config.public.IMAGES_URL + data.value[0].key,
+      url: publicUrl,
+      public: publicUrl,
     }
+  }
 
   loadingIndex.value = false
 }

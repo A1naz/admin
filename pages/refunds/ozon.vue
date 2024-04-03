@@ -128,15 +128,17 @@ async function uploadToS3(event: Event, screen: string = 'dialog') {
     })
   }
   if (data.value) {
+    const publicUrl: any = await getS3PublicUrl(data.value[0].key)
+
     if (selectedScreenshot.value == 'account') {
       accountScreenshot.value = {
-        url: config.public.IMAGES_URL + data.value[0].key,
-        public: config.public.IMAGES_URL + data.value[0].key,
+        url: publicUrl,
+        public: publicUrl,
       }
     } else {
       screenshot.value = {
-        url: config.public.IMAGES_URL + data.value[0].key,
-        public: config.public.IMAGES_URL + data.value[0].key,
+        url: publicUrl,
+        public: publicUrl,
       }
     }
   }
@@ -250,27 +252,33 @@ async function createRefundRequest() {
     (el: any) => el.selected
   )
 
-  const { data, error }: any = await useFetch('/api/ozon/refunds/createRequest', {
-    watch: false,
-    method: 'POST',
-    body: {
-      phoneNumber: phoneNumber.value.replace(/[\(\)\-\s]/g, ''),
-      handleOperationSumm: handleOperationSumm.value,
-      userId: selectedUser.value._id,
-      screenshot: screenshot.value.public.replace(config.public.IMAGES_URL, ''),
-      accountScreenshot: accountScreenshot.value.public.replace(
-        config.public.IMAGES_URL,
-        ''
-      ),
-      mainOperation: selectedOperationMongoId.value,
-      paymentOperations: selectedPaymentOperations,
-      mainOperationSumm: allPaymentOperationsSumm.value,
-      selectedPaymentOperationsSumm: selectedPaymentOperationsSumm.value,
-      comment: comment.value,
-      refundType: refundType.value,
-      mainOperationType: selectedTabOption.value,
-    },
-  })
+  const { data, error }: any = await useFetch(
+    '/api/ozon/refunds/createRequest',
+    {
+      watch: false,
+      method: 'POST',
+      body: {
+        phoneNumber: phoneNumber.value.replace(/[\(\)\-\s]/g, ''),
+        handleOperationSumm: handleOperationSumm.value,
+        userId: selectedUser.value._id,
+        screenshot: screenshot.value.public.replace(
+          config.public.IMAGES_URL,
+          ''
+        ),
+        accountScreenshot: accountScreenshot.value.public.replace(
+          config.public.IMAGES_URL,
+          ''
+        ),
+        mainOperation: selectedOperationMongoId.value,
+        paymentOperations: selectedPaymentOperations,
+        mainOperationSumm: allPaymentOperationsSumm.value,
+        selectedPaymentOperationsSumm: selectedPaymentOperationsSumm.value,
+        comment: comment.value,
+        refundType: refundType.value,
+        mainOperationType: selectedTabOption.value,
+      },
+    }
+  )
   if (data.value) {
     if (data.value.status == 'ok') {
       notify({
@@ -329,13 +337,16 @@ async function selectOperation(
   selectedOperation.value = operationId
   selectedOperationMongoId.value = operationMongoId
 
-  const { data, error } = await useFetch('/api/ozon/refunds/paymentOperations', {
-    method: 'GET',
-    query: {
-      operationId,
-    },
-    watch: false,
-  })
+  const { data, error } = await useFetch(
+    '/api/ozon/refunds/paymentOperations',
+    {
+      method: 'GET',
+      query: {
+        operationId,
+      },
+      watch: false,
+    }
+  )
   if (data.value) {
     paymentOperations.value = data.value
   } else {

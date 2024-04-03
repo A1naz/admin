@@ -4,8 +4,6 @@ const config = useRuntimeConfig()
 export default eventHandler(async (event) => {
   const { path }: any = getQuery(event)
 
-  console.log(path);
-  
   AWS.config.update({
     accessKeyId: config.VK_ACCESS_KEY,
     secretAccessKey: config.VK_SECRET_KEY,

@@ -102,8 +102,6 @@ async function uploadToS3(event: Event) {
   }
   if (data.value) {
     const publicUrl: any = await getS3PublicUrl(data.value[0].key)
-
-    console.log(publicUrl);
     
     screenshot.value = {
       url: publicUrl,

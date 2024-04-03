@@ -128,15 +128,18 @@ async function uploadToS3(event: Event, screen: string = 'dialog') {
     })
   }
   if (data.value) {
+    const publicUrl: any = await getS3PublicUrl(data.value[0].key)
+    
     if (selectedScreenshot.value == 'account') {
+
       accountScreenshot.value = {
-        url: config.public.IMAGES_URL + data.value[0].key,
-        public: config.public.IMAGES_URL + data.value[0].key,
+        url: publicUrl,
+        public: publicUrl,
       }
     } else {
       screenshot.value = {
-        url: config.public.IMAGES_URL + data.value[0].key,
-        public: config.public.IMAGES_URL + data.value[0].key,
+        url: publicUrl,
+        public: publicUrl,
       }
     }
   }
@@ -355,7 +358,9 @@ function changeMP(event: any) {
 }
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Возвраты средств клиентам Wildberries</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">
+    Возвраты средств клиентам Wildberries
+  </h1>
   <div class="card p-fluid"></div>
   <div class="divider"></div>
   <div class="flex justify-between">

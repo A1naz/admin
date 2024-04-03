@@ -52,21 +52,6 @@ const screenshot = ref({
   public: 'null',
 })
 
-async function getS3PublicUrl(key: string) {
-  const { data, error }: any = await useFetch('/api/images/publicUrl', {
-    method: 'GET',
-    params: {
-      path: 'admin/' + key,
-    },
-  })
-
-  if (data.value) {
-    return data.value
-  } else {
-    return 'null'
-  }
-}
-
 async function getStats() {
   stats.value = []
   const { data }: any = await useFetch('/api/manualTransfer/get', {
@@ -104,8 +89,6 @@ async function uploadToS3(event: Event) {
   }
   if (data.value) {
     const publicUrl: any = await getS3PublicUrl(data.value[0].key)
-
-    console.log(publicUrl)
 
     screenshot.value = {
       url: publicUrl,
