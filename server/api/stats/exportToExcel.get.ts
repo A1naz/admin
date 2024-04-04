@@ -5,6 +5,8 @@ import { User } from '@/server/lib/models/User'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { Buyout } from '~/server/lib/models/Buyout'
+import { Buyout as OzonBuyout } from '~/server/lib/models/ozon/Buyout'
+import { ObjectId } from 'mongodb'
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -101,8 +103,7 @@ export default eventHandler(async (event) => {
         }
       : {}
 
-      let stats: any = []
-      
+    let stats: any = []
 
     stats = await paymenthistory
       .find({
@@ -113,13 +114,14 @@ export default eventHandler(async (event) => {
         ...trueTypeoperations,
         ...trueType,
         ...trueDateRange,
-      }).limit(limit)
-      // .sort({
-      //   dataoperation: sortDate,
-      // })
+      })
+      .limit(limit)
+    // .sort({
+    //   dataoperation: sortDate,
+    // })
 
     const statsUsersIds: any = stats.map((operation: any) => operation.user)
-    const users = await User.find({ _id: { $in: statsUsersIds } })
+    const users: any = await User.find({ _id: { $in: statsUsersIds } })
     const format = <any>[]
 
     for (const stat of stats) {
@@ -139,6 +141,7 @@ export default eventHandler(async (event) => {
       //  || trueFilters.type == 'any'
     ) {
       let buyoutsUuids: string[] = []
+      const buyoutIds: ObjectId[] = []
 
       const paymentAggregate = await paymenthistory.aggregate([
         {
@@ -170,27 +173,32 @@ export default eventHandler(async (event) => {
       for (const buyout of format) {
         if (
           (buyout.type == 'buyouts' || buyout.type == 'buyouts service') &&
-          buyout.basisoperation &&
-          buyout.basisoperation.includes('Выкуп #')
+          buyout.basisoperation
         ) {
-          buyoutsUuids.push(
-            buyout.basisoperation.split(' ')[1].replace('#', '')
-          )
+          if (buyout.basisoperation.includes('Выкуп #')) {
+            buyoutsUuids.push(
+              buyout.basisoperation.split(' ')[1].replace('#', '')
+            )
+          } else {
+            buyoutIds.push(new ObjectId(buyout.basisoperation))
+          }
         }
       }
 
       const buyouts = await Buyout.find({ uuid: { $in: buyoutsUuids } })
+      const ozonBuyouts = await OzonBuyout.find({ _id: { $in: buyoutIds } })
 
       format.forEach((stat: any) => {
-        if (
-          (stat.type == 'buyouts' && stat.basisoperation.includes('Выкуп #')) ||
-          (stat.type == 'buyouts service' &&
-            stat.basisoperation.includes('Выкуп #'))
-        ) {
-          const buyout = buyouts.find(
-            (buyout: any) =>
-              buyout.uuid == stat.basisoperation.split(' ')[1].replace('#', '')
-          )
+        if (stat.type == 'buyouts' || stat.type == 'buyouts service') {
+          const buyout = stat.basisoperation.includes('Выкуп #')
+            ? buyouts.find(
+                (buyout: any) =>
+                  buyout.uuid ==
+                  stat.basisoperation.split(' ')[1].replace('#', '')
+              )
+            : ozonBuyouts.find(
+                (buyout: any) => buyout._id.valueOf() == stat.basisoperation
+              )
 
           stat.article = buyout ? buyout.article : ''
           stat.productName = buyout ? buyout.product.name : ''
@@ -219,10 +227,11 @@ export default eventHandler(async (event) => {
 
     const columns = [
       { header: 'ID', key: '_id', width: 48, font: { bold: true } },
-      { header: 'userId', key: 'userUuid', width: 50, font: { bold: true } },
-      { header: 'email', key: 'email', width: 50, font: { bold: true } },
-      { header: 'username', key: 'username', width: 50, font: { bold: true } },
-      { header: 'telegram', key: 'telegram', width: 50, font: { bold: true } },
+      { header: 'userId', key: 'userUuid', width: 40, font: { bold: true } },
+      { header: 'email', key: 'email', width: 30, font: { bold: true } },
+      { header: 'username', key: 'username', width: 20, font: { bold: true } },
+      { header: 'telegram', key: 'telegram', width: 20, font: { bold: true } },
+      { header: 'Маркетплейс', key: 'mp', width: 14, font: { bold: true } },
       {
         header: 'сумма',
         key: 'summ',
@@ -245,7 +254,7 @@ export default eventHandler(async (event) => {
       {
         header: 'комментарии',
         key: 'comment',
-        width: 48,
+        width: 28,
         font: { bold: true },
       },
       {
