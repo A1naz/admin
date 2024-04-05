@@ -1,6 +1,7 @@
 ﻿<script setup lang="ts">
 const { height, width } = useWindowSize()
 const value = ref('')
+const mpStore = useMPStore()
 const isAllUsersSelected = computed(() => {
   return selectedUsers.value.length > 1 ? false : true
 })
@@ -34,6 +35,7 @@ const pages = ref(0)
 const isPageBtnsDisabled = ref(false)
 const selectedUsers = ref<any>([])
 const dateRange = ref([])
+const selectedMP = ref('all')
 
 const search = (event: any) => {
   items.value = [...Array(10).keys()].map((item) => event.query + '-' + item)
@@ -47,6 +49,7 @@ async function exportXLS() {
     query: {
       page: curPage.value,
       sortDate: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
+      mp: selectedMP.value,
       filters: {
         clients: selectedUsers.value.length > 0 ? selectedUsers.value : null,
         typeoperations: type.value,
@@ -79,6 +82,7 @@ async function getStats() {
     query: {
       page: curPage.value,
       sortDate: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
+      mp: selectedMP.value,
       filters: {
         clients: selectedUsers.value.length > 0 ? selectedUsers.value : null,
         typeoperations: type.value,
@@ -150,6 +154,7 @@ async function getUsers(searchValue: string = '') {
 
 getUsers()
 const findSearchQuery = async () => {
+  //@ts-ignore
   if (query.value.replaceAll(' ', '') == '') {
     return
   }
@@ -206,18 +211,18 @@ if (
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Финансовые операции</h1>
-  <div class="card p-fluid"></div>
-  <div class="text-sm breadcrumbs ml-5">
-    <ul>
-      <li>
-        <NuxtLink to="/salesAndStatistics">Финансовые операции</NuxtLink>
-      </li>
-      <!-- <li>
-                    <NuxtLink to="/partner/management">Управление партнерами</NuxtLink>
-                </li> -->
-    </ul>
-  </div>
+
   <div class="divider"></div>
+  <select
+    @change=";[(curPage = 1), getStats()]"
+    v-model="selectedMP"
+    class="select select-bordered w-50 ml-3 mb-3"
+  >
+    <option selected value="all">Все</option>
+    <option v-for="mp in mpStore.MPTabs" :value="mp.value" :key="mp.value">
+      {{ mp.title }}
+    </option>
+  </select>
   <div class="flex justify-between">
     <div class="flex">
       <button class="ml-2 btn" @click="openUsersSelectModal">
@@ -353,7 +358,7 @@ if (
       </thead>
       <tbody>
         <!-- row 1 -->
-        <tr v-for="stat in stats" class="hover">
+        <tr v-for="stat in stats" class="hover" :key="stat._id">
           <th
             style="max-width: 140px; min-width: 100px"
             class="overflow-x-auto text-xs"

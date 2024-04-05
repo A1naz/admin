@@ -26,8 +26,8 @@ export default eventHandler(async (event) => {
         ],
       }
 
-  const { page, filters, sortDate, elPerPage }: any = getQuery(event)
-
+  const { page, filters, sortDate, elPerPage, mp }: any = getQuery(event)
+  
   let productsCountInfo = {
     count: 0,
     sum: 0,
@@ -94,7 +94,7 @@ export default eventHandler(async (event) => {
 
   let stats: any = await paymenthistory
     .find({
-      mp: 'wildberries',
+      mp: mp == 'all' ? { $exists: true } : mp,
       ...commentRegex,
       ...allowedUsersParam,
       ...trueFilters.basisoperation,
@@ -109,7 +109,7 @@ export default eventHandler(async (event) => {
     .skip(paymentPerPage * (+page - 1))
     .limit(paymentPerPage)
 
-  const statsCount: any = await paymenthistory.count()
+  // const statsCount: any = await paymenthistory.count()
   const statsUsersIds: any = stats.map((operation: any) => operation.user)
   const users = await User.find({ _id: { $in: statsUsersIds } })
   const format = <any>[]
@@ -132,7 +132,7 @@ export default eventHandler(async (event) => {
     const paymentAggregate = await paymenthistory.aggregate([
       {
         $match: {
-          mp: 'wildberries',
+          mp: mp == 'all' ? { $exists: true } : mp,
           ...allowedUsersParam,
           ...trueFilters.basisoperation,
           ...userIds,
@@ -205,7 +205,7 @@ export default eventHandler(async (event) => {
 
   return {
     stats: format,
-    statsCount,
+    statsCount: 999999,
     productsCountInfo,
   }
 })

@@ -39,7 +39,7 @@ export default eventHandler(async (event) => {
           ],
         }
 
-    const { page, filters, sortDate }: any = getQuery(event)
+    const { page, filters, sortDate, mp }: any = getQuery(event)
 
     const workbook = new ExcelJS.Workbook()
 
@@ -107,6 +107,7 @@ export default eventHandler(async (event) => {
 
     stats = await paymenthistory
       .find({
+        mp: mp == 'all' ? { $exists: true } : mp,
         ...commentRegex,
         ...allowedUsersParam,
         ...trueFilters.basisoperation,
@@ -146,6 +147,7 @@ export default eventHandler(async (event) => {
       const paymentAggregate = await paymenthistory.aggregate([
         {
           $match: {
+            mp: mp == 'all' ? { $exists: true } : mp,
             ...allowedUsersParam,
             ...trueFilters.basisoperation,
             ...userIds,
