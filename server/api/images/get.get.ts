@@ -3,7 +3,11 @@ const config = useRuntimeConfig()
 
 export default eventHandler(async (event) => {
   const { path }: any = getQuery(event)
-  
+
+  const truePath =
+    path.includes('admin/admin') || path.includes('admin/ozonmpportal/')
+      ? path.replace('admin/', '')
+      : path
   const bucket = 'ozonmpportal'
   AWS.config.update({
     accessKeyId: config.VK_ACCESS_KEY,
@@ -12,9 +16,10 @@ export default eventHandler(async (event) => {
     endpoint: 'https://hb.vkcs.cloud',
   })
 
+
   const params: AWS.S3.GetObjectRequest = {
     Bucket: 'ozonmpportal',
-    Key: path,
+    Key: truePath.replace('ozonmpportal/', ''),
   }
 
   const getImage = (params: AWS.S3.GetObjectRequest) => {

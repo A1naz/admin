@@ -28,6 +28,7 @@ const dateRange = ref([])
 const article = ref('')
 const selectedMP = ref('wildberries')
 const mpStore = useMPStore()
+const config = useRuntimeConfig()
 
 definePageMeta({
   layout: 'app',
@@ -331,9 +332,11 @@ if (
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div v-for="img in stat.screenshots">
                 <img
-                  :src="img"
+                  :src="config.public.IMAGES_URL + img"
                   class="cursor-pointer rounded w-16 ml-1"
-                  @click="openImageModal(img)"
+                  @click="
+                    openImageModal(config.public.IMAGES_URL + img)
+                  "
                 />
               </div>
             </div>
