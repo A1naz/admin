@@ -223,7 +223,14 @@ if (
       {{ mp.title }}
     </option>
   </select>
-  <div class="flex justify-between">
+  <button
+    class="btn btn-sm btn-primary ml-2"
+    @click="exportXLS"
+    :disabled="isExportBtnDisabled"
+  >
+    Экспорт
+  </button>
+  <div class="flex flex-col justify-between">
     <div class="flex">
       <button class="ml-2 btn" @click="openUsersSelectModal">
         {{
@@ -300,14 +307,7 @@ if (
         Применить
       </button>
     </div>
-    <div>
-      <button
-        class="btn btn-sm btn-primary mr-3"
-        @click="exportXLS"
-        :disabled="isExportBtnDisabled"
-      >
-        Экспорт
-      </button>
+    <div class="flex justify-end ml-2 mt-3">
       <div class="join mr-2">
         <button
           class="join-item btn"
