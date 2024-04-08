@@ -190,7 +190,7 @@ export default eventHandler(async (event) => {
 
     sheet.columns = [
       { header: 'Номер', key: 'place', font: { bold: true } },
-      { header: 'QR код', key: 'receiptcode', width: 16, font: { bold: true } },
+      { header: 'QR код', key: 'receiptcode', width: 24, font: { bold: true } },
       {
         header: 'Статус',
         key: 'currentstatus',
@@ -283,7 +283,7 @@ export default eventHandler(async (event) => {
           extension: 'png',
         })
         sheet.addImage(image, {
-          tl: { col: 1, row: item!.place },
+          tl: { col: 1.5, row: item!.place + 0.8 },
           ext: { width: 100, height: 100 },
         })
         sheet.getRow(item!.place + 1).height = 100
