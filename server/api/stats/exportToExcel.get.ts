@@ -105,6 +105,8 @@ export default eventHandler(async (event) => {
 
     let stats: any = []
 
+    console.log(mp)
+
     stats = await paymenthistory
       .find({
         mp: mp == 'all' ? { $exists: true } : mp,
@@ -187,9 +189,10 @@ export default eventHandler(async (event) => {
         }
       }
 
-      const buyouts = await Buyout.find({ uuid: { $in: buyoutsUuids } })
-      const ozonBuyouts = await OzonBuyout.find({ _id: { $in: buyoutIds } })
+      const wbBuyouts = await Buyout.find({ uuid: { $in: buyoutsUuids } })
+      const ozonBuyouts = await OzonBuyout.find({ uuid: { $in: buyoutsUuids } })
 
+      const buyouts = wbBuyouts.concat(ozonBuyouts)
       format.forEach((stat: any) => {
         if (stat.type == 'buyouts' || stat.type == 'buyouts service') {
           const buyout = stat.basisoperation.includes('Выкуп #')
