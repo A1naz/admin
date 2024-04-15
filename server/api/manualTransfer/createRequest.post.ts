@@ -4,10 +4,30 @@ import { AdminUser } from '~/server/lib/models/AdminUser'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { User } from '~/server/lib/models/User'
 
+function formatDate(date: Date) {
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+
+  const formattedDay = String(day).padStart(2, '0')
+  const formattedMonth = String(month).padStart(2, '0')
+
+  const formattedDate = `${formattedDay}.${formattedMonth}.${year}`
+
+  return formattedDate
+}
+
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { userId, operationNumber, screenshot, summ, operationDate, clientPC, bank } =
-    await readBody(event)
+  const {
+    userId,
+    operationNumber,
+    screenshot,
+    summ,
+    operationDate,
+    clientPC,
+    bank,
+  } = await readBody(event)
 
   if (!session) return sendRedirect(event, '/auth', 302)
 
@@ -24,6 +44,7 @@ export default eventHandler(async (event) => {
 
   const mskDate = new Date()
   mskDate.setHours(mskDate.getHours() + 3)
+  const strDate = formatDate(new Date(operationDate))
 
   const newTransactionRequest = await manualBalanceTransferRequest.create({
     user: recipientUser._id,
@@ -33,9 +54,10 @@ export default eventHandler(async (event) => {
     screenshot,
     acception: '0/2',
     createdAt: mskDate,
-    operationDate: operationDate,
+    operationDate: strDate,
+    fullDate: mskDate,
     clientPC,
-    bank
+    bank,
   })
 
   await ActionHistory.create({
@@ -44,6 +66,11 @@ export default eventHandler(async (event) => {
     actionDescription: `Админ ${user.uuid} - ${user.username} создал запрос перевода ${newTransactionRequest._id}`,
     date: new Date(),
   })
+
+  return {
+    status: 'error',
+    message: 'Получатель не найден',
+  }
 
   return {
     status: 'ok',
