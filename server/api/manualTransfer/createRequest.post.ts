@@ -68,11 +68,6 @@ export default eventHandler(async (event) => {
   })
 
   return {
-    status: 'error',
-    message: 'Получатель не найден',
-  }
-
-  return {
     status: 'ok',
     message: 'Запрос успешно создан',
   }
