@@ -54,6 +54,8 @@ async function getPVZs(searchValue: string = '') {
   PVZs.value.forEach((PVZ: any) => {
     selectedPVZs.value.forEach((el: any) => {
       if (el.uuid == PVZ.uuid) {
+        console.log(el.uuid, PVZ.uuid);
+        
         PVZ.isSelected = true
       }
     })
@@ -154,7 +156,7 @@ function selectAllPVZ() {
               ><input
                 v-model="query"
                 type="text"
-                placeholder="Название адресса ПВЗ"
+                placeholder="Название адреса ПВЗ"
                 class="input input-bordered input-l ml-4 w-80"
                 @input="onInput($event)"
               />
@@ -209,7 +211,7 @@ function selectAllPVZ() {
             <!-- head -->
             <thead>
               <tr>
-                <th>Название адресса ПВЗ</th>
+                <th>Название адреса ПВЗ</th>
                 <th>Выбрать</th>
               </tr>
             </thead>

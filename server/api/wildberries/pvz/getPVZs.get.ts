@@ -33,7 +33,7 @@ export default eventHandler(async (event) => {
     if (PVZsMap.has(buyout.point)) return
     PVZsMap.set(buyout.point, {
       address: buyout.point,
-      uuid: index + 1,
+      uuid: buyout.point,
     })
   })
 
