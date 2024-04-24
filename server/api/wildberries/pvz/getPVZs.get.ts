@@ -38,7 +38,7 @@ export default eventHandler(async (event) => {
   })
 
   const PVZs = Array.from(PVZsMap.values())
- 
+
   return {
     PVZs,
     PVZsCount: PVZs.length,

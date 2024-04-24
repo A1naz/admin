@@ -20,10 +20,20 @@ const keys = Object.keys as <T>(
   : never)[]
 
 async function getReady(user: any, pvzs: any) {
+  console.log(pvzs)
+  let pvzsArray = []
+  if (typeof pvzs === 'string') {
+    pvzsArray.push(pvzs.trimRight())
+  } else if (typeof pvzs === 'object') {
+    pvzsArray = pvzs.map((p: string) => p.trimRight())
+  }
+
   const deliveries = await Delivery.find({
-    user: { $in: user },
-    point: pvzs && pvzs.length ? { $in: pvzs } : { $exists: true },
+    user: { $in: user.map((item: any) => item._id) },
+    point:
+      pvzsArray && pvzsArray.length ? { $in: pvzsArray } : { $exists: true },
   })
+
   const prefixesToRemove =
     /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
 
