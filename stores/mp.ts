@@ -6,6 +6,7 @@ export const useMPStore = defineStore('mp', {
         MPTabs: [
             { title: 'Wildberries', value: 'wildberries' },
             { title: 'Ozon', value: 'ozon' },
+            { title: 'Avito', value: 'avito' },
           ],
     }),
     persist: {

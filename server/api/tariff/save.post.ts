@@ -33,6 +33,8 @@ function getServiceNameByKey(key: string) {
       return 'Удаление отзывов'
     case 'Hotelsreview':
       return 'Отзывы отелей'
+      case 'penalty':
+        return 'Штрафы'
   }
 }
 
@@ -56,39 +58,41 @@ export default eventHandler(async (event) => {
     })
   }
 
+  console.log(tariffs[2]);
+  
   foundUser.MPTariffs = tariffs
-  let tariffsStr = ''
-  tariffs.forEach((item: any) => {
-    let pricesStr = `  ${item.mp.toUpperCase()}: \n `
-    let index = 0
+  // let tariffsStr = ''
+  // tariffs.forEach((item: any) => {
+  //   let pricesStr = `  ${item.mp.toUpperCase()}: \n `
+  //   let index = 0
 
-    for (let key in item.prices) {
-      index++
-      const symbol = index >= Object.keys(item.prices).length ? '. ' : ', '
-      const valueSymbol = item.prices[key].type == 'percent' ? '%' : '₽'
-      pricesStr =
-        pricesStr +
-        ' - ' +
-        getServiceNameByKey(key.toString()) +
-        ': ' +
-        item.prices[key].value +
-        valueSymbol +
-        symbol + '\n'
-    }
+  //   for (let key in item.prices) {
+  //     index++
+  //     const symbol = index >= Object.keys(item.prices).length ? '. ' : ', '
+  //     const valueSymbol = item.prices[key].type == 'percent' ? '%' : '₽'
+  //     pricesStr =
+  //       pricesStr +
+  //       ' - ' +
+  //       getServiceNameByKey(key.toString()) +
+  //       ': ' +
+  //       item.prices[key].value +
+  //       valueSymbol +
+  //       symbol + '\n'
+  //   }
 
-    tariffsStr += pricesStr + '\n'
-  })
+  //   tariffsStr += pricesStr + '\n'
+  // })
 
   await foundUser.save()
 
-  await ActionHistory.create({
-    adminUser: user._id,
-    adminUserUuid: user.uuid,
-    actionId: 92,
-    actionDescription: ` Тарифы пользователя ${foundUser.username} были изменены на значения:\n${tariffsStr}`,
-    date: new Date(),
-    userUuid: foundUser.uuid,
-  })
+  // await ActionHistory.create({
+  //   adminUser: user._id,
+  //   adminUserUuid: user.uuid,
+  //   actionId: 92,
+  //   actionDescription: ` Тарифы пользователя ${foundUser.username} были изменены на значения:\n${tariffsStr}`,
+  //   date: new Date(),
+  //   userUuid: foundUser.uuid,
+  // })
 
   return {
     status: 'ok',

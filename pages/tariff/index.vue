@@ -16,8 +16,10 @@ if (
 
 const closeCreateModalButton = ref()
 const standartTariffs = ref<any>([])
+const defaultPriсes = ref<any>([])
 const userTariffs = ref<any>([])
 const isSaveBtnDisabled = ref(false)
+const isStandartTariffs = ref(false)
 
 const selectedUser = ref<any>({
   username: '',
@@ -81,6 +83,8 @@ function getServiceNameByKey(key: string) {
       return 'Удаление отзывов'
     case 'Hotelsreview':
       return 'Отзывы отелей'
+    case 'penalty':
+      return 'Штрафы'
   }
 }
 
@@ -163,6 +167,7 @@ async function getStandartTariffs() {
     watch: false,
   })
   standartTariffs.value = data.value
+  defaultPriсes.value = data.value
   userTariffs.value = standartTariffs.value
 }
 await getStandartTariffs()
@@ -172,7 +177,15 @@ await getStandartTariffs()
   <div class="divider"></div>
   <div class="flex w-full justify-between">
     <div>
+      <div class="form-control max-w-[200px] ml-3">
+        <label class="label cursor-pointer">
+          <span class="label-text">Стандартные тарифы</span>
+          <input type="checkbox" v-model="isStandartTariffs" class="checkbox" />
+        </label>
+      </div>
+
       <selectUserModal
+        class="hidden"
         @selectUser="selectedUser = $event"
         @selectAllUsers="selectedUser.username = 'all'"
       />
@@ -255,7 +268,7 @@ await getStandartTariffs()
   <dialog id="createRequireModal" class="modal">
     <div class="modal-box max-w-lg">
       <h3 class="font-bold text-lg">
-        <div class="btm-nav absolute top-0.5 right-0">
+        <!-- <div class="btm-nav absolute top-0.5 right-0">
           <button
             v-for="mp in mps"
             :key="mp.value"
@@ -267,18 +280,43 @@ await getStandartTariffs()
           >
             {{ mp.title }}
           </button>
+        </div> -->
+
+        <div class="flex justify-center mb-2">
+          <select
+            v-model="selectedMP"
+            class="select w-full max-w-xs select-bordered"
+          >
+            <option
+              v-for="mp in mps"
+              :key="mp.value"
+              :value="mp.value"
+              class="text-center"
+            >
+              {{ mp.title }}
+            </option>
+          </select>
         </div>
       </h3>
       <div>
         <div class="flex flex-col">
-          <div class="text-center mb-3 text-lg font-bold">
+          <div
+            class="text-center mb-3 text-lg font-bold"
+            :class="{
+              'text-red-500': isStandartTariffs,
+            }"
+          >
             {{
-              selectedUser.username == 'all'
-                ? 'Все пользователи'
+              isStandartTariffs
+                ? 'Выбраны стандартные тарифы'
                 : selectedUser.username
             }}
           </div>
-          <div v-for="mp in userTariffs" :key="mp.value">
+          <div
+            v-if="!isStandartTariffs"
+            v-for="mp in userTariffs"
+            :key="mp.value"
+          >
             <div
               v-if="mp.mp === selectedMP"
               v-for="(tariff, tariffKey) in mp.prices"
@@ -306,12 +344,60 @@ await getStandartTariffs()
                     />
                   </label>
                 </div>
-
                 <input
                   type="number"
                   v-model="tariff.value"
                   class="input input-bordered my-1"
                 />
+                <div
+                  v-if="tariffKey.toString() === 'buyouts'"
+                  class="flex flex-col"
+                >
+                  Минимальное значение в ₽
+                  <input
+                    type="number"
+                    placeholder="Мин. значение в ₽"
+                    v-model="tariff.minPrice"
+                    class="input input-bordered my-1"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else v-for="mp in defaultPriсes" :key="Date.now()">
+            <div
+              v-if="mp.mp === selectedMP"
+              v-for="(tariff, tariffKey) in mp.prices"
+              :key="tariffKey"
+              class="flex justify-between"
+            >
+              <div class="mt-3">
+                {{ getServiceNameByKey(tariffKey.toString()) }} СТандарт
+              </div>
+              <div>
+                <div
+                  class="form-control"
+                  v-if="tariffKey.toString() === 'buyouts'"
+                >
+                  <label class="label cursor-pointer mt-1">
+                    Проценты
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary ml-1"
+                      :checked="tariff.type === 'percent'"
+                      @change="
+                        tariff.type =
+                          tariff.type === 'percent' ? 'price' : 'percent'
+                      "
+                    />
+                  </label>
+                </div>
+                <input
+                  type="number"
+                  v-model="tariff.value"
+                  class="input input-bordered my-1"
+                />
+                
                 <div
                   v-if="tariffKey.toString() === 'buyouts'"
                   class="flex flex-col"

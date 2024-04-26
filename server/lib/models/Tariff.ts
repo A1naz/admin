@@ -14,13 +14,17 @@ const TariffPropSchema = new Schema({
 
 const TariffSchema = new Schema({
   buyouts: { type: TariffPropSchema },
+  HotelsBuyouts: { type: TariffPropSchema },
   deliveryStorage: { type: TariffPropSchema },
+  HotelsReview: { type: TariffPropSchema },
   review: { type: TariffPropSchema },
   likeReview: { type: TariffPropSchema },
   likeProduct: { type: TariffPropSchema },
   questionProduct: { type: TariffPropSchema },
+  reviewRemoving: { type: TariffPropSchema },
   cart: { type: TariffPropSchema },
   autoAnswer: { type: TariffPropSchema },
+  penalty: { type: TariffPropSchema },
 })
 
 export const Tariff = model('Tariffs', TariffSchema)
