@@ -1,9 +1,9 @@
-﻿import { User } from '@/server/lib/models/User'
-import { AdminUser } from '~/server/lib/models/AdminUser'
+﻿import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
 import { Buyout } from '@/server/lib/models/Buyout'
 import { Delivery } from '~~/server/lib/models/Delivery'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
+import { DefaultPrices } from '~/server/lib/models/defaultPrices'
 
 function getServiceNameByKey(key: string) {
   switch (key) {
@@ -33,8 +33,8 @@ function getServiceNameByKey(key: string) {
       return 'Удаление отзывов'
     case 'Hotelsreview':
       return 'Отзывы отелей'
-      case 'penalty':
-        return 'Штрафы'
+    case 'penalty':
+      return 'Штрафы'
   }
 }
 
@@ -47,20 +47,10 @@ export default eventHandler(async (event) => {
   if (!user || (!user.mainAdmin && !user.tabs.includes('управление тарифами')))
     return sendRedirect(event, '/auth', 302)
 
-  const foundUser: any = await User.findOne({
-    uuid: userUuid,
-  })
+  const defaultPrices = await DefaultPrices.findOne()
+  if (!defaultPrices)  throw createError({ statusCode: 500 })
 
-  if (!foundUser) {
-    throw createError({
-      statusCode: 400,
-      message: 'Пользователь не найден',
-    })
-  }
-
-  console.log(tariffs[2]);
-  
-  foundUser.MPTariffs = tariffs
+    defaultPrices.values = tariffs
   let tariffsStr = ''
   tariffs.forEach((item: any) => {
     let pricesStr = `  ${item.mp.toUpperCase()}: \n `
@@ -77,21 +67,21 @@ export default eventHandler(async (event) => {
         ': ' +
         item.prices[key].value +
         valueSymbol +
-        symbol + '\n'
+        symbol +
+        '\n'
     }
 
     tariffsStr += pricesStr + '\n'
   })
 
-  await foundUser.save()
+  await defaultPrices.save()
 
   await ActionHistory.create({
     adminUser: user._id,
     adminUserUuid: user.uuid,
-    actionId: 92,
-    actionDescription: ` Тарифы пользователя ${foundUser.username} были изменены на значения:\n${tariffsStr}`,
+    actionId: 93,
+    actionDescription: `Стандартные тарифы были изменены на значения:\n${tariffsStr}`,
     date: new Date(),
-    userUuid: foundUser.uuid,
   })
 
   return {

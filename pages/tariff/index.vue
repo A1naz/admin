@@ -96,7 +96,8 @@ function setTariffs() {
     })
   }
 
-  const trueTariffs = standartTariffs.value
+  const trueTariffs: any = JSON.parse(JSON.stringify(standartTariffs.value))
+
   trueTariffs.forEach((tariff: any) => {
     selectedUser.value.tariffs.forEach((userTariff: any) => {
       if (userTariff.mp === tariff.mp) {
@@ -137,11 +138,16 @@ async function saveTariffs() {
     isSaveBtnDisabled.value = false
     return
   }
-  const { data }: any = await useFetch('/api/tariff/save', {
+  const url = isStandartTariffs.value
+    ? '/api/tariff/saveStandart'
+    : '/api/tariff/save'
+  const { data }: any = await useFetch(url, {
     method: 'POST',
     body: {
-      userUuid: selectedUser.value.uuid,
-      tariffs: userTariffs.value,
+      userUuid: isStandartTariffs.value ? null : selectedUser.value.uuid,
+      tariffs: isStandartTariffs.value
+        ? defaultPriсes.value
+        : userTariffs.value,
     },
     watch: false,
   })
@@ -166,11 +172,11 @@ async function getStandartTariffs() {
     method: 'GET',
     watch: false,
   })
+
   standartTariffs.value = data.value
   defaultPriсes.value = data.value
-  userTariffs.value = standartTariffs.value
 }
-await getStandartTariffs()
+getStandartTariffs()
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Управление тарифами</h1>
@@ -193,7 +199,7 @@ await getStandartTariffs()
         class="btn btn-primary mr-3 ml-2"
         @click="setTariffs"
         onclick="createRequireModal.showModal()"
-        :disabled="selectedUser.username == ''"
+        :disabled="selectedUser.username == '' && !isStandartTariffs"
       >
         Редактировать тарифы
       </button>
@@ -268,20 +274,6 @@ await getStandartTariffs()
   <dialog id="createRequireModal" class="modal">
     <div class="modal-box max-w-lg">
       <h3 class="font-bold text-lg">
-        <!-- <div class="btm-nav absolute top-0.5 right-0">
-          <button
-            v-for="mp in mps"
-            :key="mp.value"
-            class="border-primary"
-            :class="{
-              active: selectedMP === mp.value,
-            }"
-            @click="selectedMP = mp.value"
-          >
-            {{ mp.title }}
-          </button>
-        </div> -->
-
         <div class="flex justify-center mb-2">
           <select
             v-model="selectedMP"
@@ -315,12 +307,12 @@ await getStandartTariffs()
           <div
             v-if="!isStandartTariffs"
             v-for="mp in userTariffs"
-            :key="mp.value"
+            :key="'1user:' + selectedUser.uuid + mp.value"
           >
             <div
               v-if="mp.mp === selectedMP"
               v-for="(tariff, tariffKey) in mp.prices"
-              :key="tariffKey"
+              :key="'1user' + mp.mp + tariffKey"
               class="flex justify-between"
             >
               <div class="mt-3">
@@ -364,15 +356,19 @@ await getStandartTariffs()
               </div>
             </div>
           </div>
-          <div v-else v-for="mp in defaultPriсes" :key="Date.now()">
+          <div
+            v-else
+            v-for="marketPlace in defaultPriсes"
+            :key="'2standart' + marketPlace.mp"
+          >
             <div
-              v-if="mp.mp === selectedMP"
-              v-for="(tariff, tariffKey) in mp.prices"
-              :key="tariffKey"
+              v-if="marketPlace.mp === selectedMP"
+              v-for="(tariff, tariffKey) in marketPlace.prices"
+              :key="'2standart' + marketPlace.mp + tariffKey"
               class="flex justify-between"
             >
               <div class="mt-3">
-                {{ getServiceNameByKey(tariffKey.toString()) }} СТандарт
+                {{ getServiceNameByKey(tariffKey.toString()) }}
               </div>
               <div>
                 <div
@@ -393,11 +389,12 @@ await getStandartTariffs()
                   </label>
                 </div>
                 <input
+                  :key="'2standart' + marketPlace.mp + tariffKey + 'input'"
                   type="number"
                   v-model="tariff.value"
                   class="input input-bordered my-1"
                 />
-                
+
                 <div
                   v-if="tariffKey.toString() === 'buyouts'"
                   class="flex flex-col"
