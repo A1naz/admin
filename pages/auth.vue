@@ -22,7 +22,6 @@ const formData = reactive({
 async function login() {
   v$.value.$validate()
   if (v$.value.$error) return
-
   loading.value = true
   const { error, url } = await signIn('credentials', {
     redirect: false,
