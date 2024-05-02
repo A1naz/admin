@@ -77,6 +77,7 @@ const tabs = ref([
       { key: 'any', title: 'Все' },
       { key: 'active', title: 'Активные' },
       { key: 'completed', title: 'Завершенные' },
+      { key: 'ready', title: 'Готовы к выдаче' },
     ],
   },
   {

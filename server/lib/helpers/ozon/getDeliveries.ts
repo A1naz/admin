@@ -7,17 +7,34 @@ export default async function getDeliveries(
   page: any,
   serviceId: any
 ) {
-  const statusObj = status == 'any' ? {} : { status: status }
+  const statusObj =
+    status == 'any'
+      ? {}
+      : status == 'ready'
+      ? {
+          status: 'active',
+          $expr: {
+            $in: [
+              { $arrayElemAt: ['$statusdelivery.status', -1] },
+              ['Готов к получению', 'Готов к выдаче', 'Ожидает получения'],
+            ],
+          },
+        }
+      : { status: status }
 
   let serviceIdFilter: any = {}
   if (serviceId) {
     const trueServiceId = serviceId.replaceAll('#', '')
     serviceIdFilter = {
-      uuidbuyout: trueServiceId
+      uuidbuyout: trueServiceId,
     }
   }
   const user = await User.findById(userId)
-  const deliveries: any = await Delivery.find({ user, ...statusObj, ...serviceIdFilter })
+  const deliveries: any = await Delivery.find({
+    user,
+    ...statusObj,
+    ...serviceIdFilter,
+  })
     .sort({ createdAt: -1 })
     .skip((page - 1) * 50)
     .limit(50)
