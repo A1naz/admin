@@ -29,9 +29,7 @@ export default eventHandler(async (event) => {
   }
   let trueUser = {}
   if (adminUserId) {
-    console.log('adminUserId', adminUserId)
     const adminUser = await User.findById(adminUserId)
-    console.log('adminUser', adminUser)
 
     if (adminUser) {
       trueUser = { userId: adminUser._id }
@@ -42,7 +40,7 @@ export default eventHandler(async (event) => {
     ...trueDateRange,
   })
     .sort({
-      date: sortDate,
+      createdAt: sortDate,
     })
     .skip(paymentPerPage * (+page - 1))
     .limit(paymentPerPage)
