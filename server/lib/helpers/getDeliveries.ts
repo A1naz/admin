@@ -7,6 +7,7 @@ export default async function getDeliveries(
   page: any,
   serviceId: any
 ) {
+  
   const statusObj =
     status == 'any'
       ? {}
@@ -20,8 +21,16 @@ export default async function getDeliveries(
             ],
           },
         }
+      : status == 'canceled'
+      ? { 
+          $expr: {
+            $in: [
+              { $arrayElemAt: ['$statusdelivery.status', -1] },
+              [ 'Возврат', 'Отмена магазином', 'Возврат средств'],        
+            ],
+          },
+        }
       : { status: status }
-
   let serviceIdFilter: any = {}
   if (serviceId) {
     const trueServiceId = serviceId.replaceAll('#', '')

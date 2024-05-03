@@ -78,6 +78,7 @@ const tabs = ref([
       { key: 'active', title: 'Активные' },
       { key: 'completed', title: 'Завершенные' },
       { key: 'ready', title: 'Готовы к выдаче' },
+      { key: 'canceled', title: 'Возврат/Отмена' },
     ],
   },
   {
