@@ -35,6 +35,7 @@ function selectAdminUser(user: any) {
 }
 
 async function getActs() {
+  
   const { data }: any = await useFetch('/api/userLogs/get', {
     method: 'GET',
     params: {
@@ -115,7 +116,7 @@ function sortByDate() {
 const store = useMainStore()
 if (
   !store.client.mainAdmin &&
-  !store.client.tabs.includes('история действий')
+  !store.client.tabs.includes('история действий пользователей')
 ) {
   navigateTo('/partner')
 }
@@ -124,7 +125,7 @@ await getActs()
 </script>
 <template>
   <div>
-    <h1 class="text-2xl font-bold ml-5 my-2">История действий пользователя</h1>
+    <h1 class="text-2xl font-bold ml-5 my-2">История действий пользователей</h1>
     <div class="card p-fluid"></div>
 
     <div class="divider"></div>
@@ -136,7 +137,7 @@ await getActs()
         >
           {{
             selectedAdminUser.username == ''
-              ? 'Выбрать админа'
+              ? 'Выбрать пользователя'
               : selectedAdminUser.username
           }}
         </button>
@@ -200,8 +201,8 @@ await getActs()
         <!-- head -->
         <thead>
           <tr>
-            <th>_ID админа</th>
-            <th>ID пользователя</th>
+            <th>_ID пользователя</th>
+            <th>Никнейм пользователя</th>
             <th>Описание</th>
             <th>
               <div @click="sortByDate" class="flex cursor-pointer">
@@ -285,7 +286,7 @@ await getActs()
             </thead>
             <tbody>
               <tr class="hover" v-for="admin in adminUsers" :key="admin.uuid">
-                <td style="max-width: 130px">{{ admin.uuid }}</td>
+                <td style="max-width: 130px">{{ admin._id }}</td>
                 <td style="max-width: 150px">
                   <div class="mx-1 overflow-x-auto">
                     {{ admin.username }}

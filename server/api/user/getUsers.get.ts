@@ -1,6 +1,7 @@
 ﻿import { AdminUser } from '~/server/lib/models/AdminUser'
 import { User } from '~/server/lib/models/User'
 import { getServerSession } from '#auth'
+import { Types } from 'mongoose'
 const usersPerPage = 25
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -40,6 +41,16 @@ export default eventHandler(async (event) => {
       .skip(usersPerPage * (+page - 1))
       .limit(usersPerPage)
       .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? -1 : 1 })
+    if (Types.ObjectId.isValid(searchValue)) {
+      allUsers = await User.find({
+        ...allowedUsersParam,
+        ...rolesParam,
+        _id: searchValue,
+      })
+        .skip(usersPerPage * (+page - 1))
+        .limit(usersPerPage)
+        .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? -1 : 1 });
+    }
   } else {
     allUsers = await User.find({
       ...rolesParam,
