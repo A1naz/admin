@@ -78,6 +78,7 @@ const tabs = ref([
       { key: 'active', title: 'Активные' },
       { key: 'completed', title: 'Завершенные' },
       { key: 'ready', title: 'Готовы к выдаче' },
+      { key: 'canceled', title: 'Возврат/Отмена' },
     ],
   },
   {
@@ -457,7 +458,8 @@ function changeMP(event: any) {
   <div
     class="my-2 mx-2 overflow-y-auto"
     :style="{ 'max-height': height - 270 + 'px' }"
-  >
+  > 
+  
     <table class="table table-pin-rows">
       <!-- head -->
       <thead>

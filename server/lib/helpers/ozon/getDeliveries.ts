@@ -20,7 +20,16 @@ export default async function getDeliveries(
             ],
           },
         }
-      : { status: status }
+        : status == 'canceled'
+        ? { 
+            $expr: {
+              $in: [
+                { $arrayElemAt: ['$statusdelivery.status', -1] },
+                [ 'Возврат', 'Отмена магазином', 'Возврат средств', 'Отменён', 'Отменен'],        
+              ],
+            },
+          }
+        : { status: status }
 
   let serviceIdFilter: any = {}
   if (serviceId) {
