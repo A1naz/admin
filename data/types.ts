@@ -35,6 +35,18 @@ export interface IUser extends Entity {
   allowedUsersModal: Boolean
 }
 
+export interface IUserLogs extends Entity {
+  userId: ObjectId,
+  userNick: string,
+  userEmail: string,
+  uuidCompany: string,
+  description: string,
+  documentType: string,
+  documentId: string,
+  mp: string,
+  createdAt?: Date
+}
+
 export interface Partner {
   balance: number
   refCount: number
