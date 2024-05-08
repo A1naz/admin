@@ -99,6 +99,15 @@ function closeOverlay() {
         <SidebarItem
           v-if="
             store.client.mainAdmin ||
+            store.client.tabs.includes('история действий пользователей')
+          "
+          title="История действий пользователей"
+          icon="mdi:clipboard-account"
+          href="/usersHistory"
+        />
+        <SidebarItem
+          v-if="
+            store.client.mainAdmin ||
             store.client.tabs.includes('финансовые операции')
           "
           title="Финансовые операции"
