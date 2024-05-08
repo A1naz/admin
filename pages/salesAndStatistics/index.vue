@@ -61,7 +61,7 @@ async function exportXLS() {
   const fileURL = window.URL.createObjectURL(new Blob([data.value as any]))
   const fileLink = document.createElement('a')
   fileLink.href = fileURL
-  fileLink.setAttribute('download', 'Готовы к выдаче.xlsx')
+  fileLink.setAttribute('download', 'Финансовые операции.xlsx')
   document.body.appendChild(fileLink)
   fileLink.click()
   isExportBtnDisabled.value = false
@@ -257,17 +257,19 @@ if (
         <option selected value="any">все услуги</option>
         <option value="deposit">депозит</option>
         <option value="buyouts">выкупы</option>
-        <option value="reviews">отзывы</option>
+        <option value="review">отзывы</option>
         <option value="questions">вопросы</option>
-        <option value="carts">корзина</option>
-        <option value="likes">лайки</option>
+        <option value="cart">корзина</option>
+        <option value="likeReview">лайки отзывов</option>
+        <option value="questionProduct">вопросы</option>
         <option value="autoanswers">автоответчик</option>
         <option value="refund">возврат</option>
-        <option value="productlikes">лайки на товаров</option>
+        <option value="reviewRemoving">удаление отзывов</option>
+        <option value="likeProduct">лайки на товаров</option>
         <option value="other">другое</option>
         <option value="buyouts service">услуги выкупов</option>
         <option value="deliveries">доставки</option>
-        <option value="penalty">штрафы</option>
+        <option value="deliveryStorage">штрафы</option>
       </select>
       <div v-if="service == 'buyouts'">
         <label
