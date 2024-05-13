@@ -13,6 +13,7 @@ const currency = useCurrency()
 const type = ref('any')
 const service = ref('any')
 const { $dayjs } = useNuxtApp()
+const creating = ref(false)
 const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 const createClose: any = ref(null)
 import { notify } from '@kyvg/vue3-notification'
@@ -56,6 +57,7 @@ async function getStats() {
 }
 
 async function createRequire() {
+  
   if (
     !article.value ||
     !account.value ||
@@ -378,7 +380,7 @@ if (
         />
       </div>
       <div class="flex justify-center">
-        <button class="btn btn-primary mt-3 px-10" @click="createRequire">
+        <button class="btn btn-primary mt-3 px-10" @click="createRequire" :disabled="isCreateButtonDisabled">
           Создать запрос
         </button>
       </div>
