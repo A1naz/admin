@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.38.6",
-    "@bg-dev/nuxt-s3": "^0.2.6",
+    "@bg-dev/nuxt-s3": "0.2.8",
     "@nuxt/devtools": "^0.6.7",
     "@nuxt/image-edge": "1.0.0-28020728.5df24eb",
     "@nuxtjs/color-mode": "^3.3.0",
