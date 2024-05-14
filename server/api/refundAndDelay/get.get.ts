@@ -11,7 +11,8 @@ export default eventHandler(async (event) => {
   if (!session) return sendRedirect(event, '/auth', 302)
   const user = await AdminUser.findOne({ uuid: session.uuid })
   if (!user 
-    // && !user.tabs.includes('возвраты средств клиентам')
+    ||
+    (!user.mainAdmin && !user.tabs.includes('возврат и задержка'))
   )
     return sendRedirect(event, '/auth', 302)
 
@@ -73,11 +74,11 @@ export default eventHandler(async (event) => {
     ...trueUser,
     ...trueDateRange,
     ...uuid,
-    $and: [
-        { "data13": { $not: /_/ } },
-        { "data13": { $ne: "Purchased" } },
-        { "data13": { $ne: "" } }
-    ]
+    $or: [
+      { data13: { $regex: 'Отказ', $options: 'i' } },
+      { data13: { $regex: 'Возврат', $options: 'i' } },
+      { data13: { $regex: 'Отмен', $options: 'i' } },
+  ]
   })
   .sort({
       updatedAt: sortDate,
@@ -100,7 +101,7 @@ export default eventHandler(async (event) => {
           point: delivery.point,
           statusdelivery: delivery.statusdelivery,
           date: delivery.statusdelivery?.length ?  delivery.statusdelivery[0].date : '-',
-          currentstatus,
+          currentstatus: delivery.data13 ? delivery.data13 : currentstatus,
           updatedAt: delivery.updatedAt,
       }
     })

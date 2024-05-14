@@ -122,8 +122,8 @@ function sortByDate() {
 const store = useMainStore()
 if (
   !store.client.mainAdmin 
-  // &&
-  // !store.client.tabs.includes('история действий пользователей')
+  &&
+  !store.client.tabs.includes('возврат и задержка')
 ) {
   navigateTo('/partner')
 }
@@ -144,7 +144,7 @@ await getActs()
     <div class="divider"></div>
     <div class="flex justify-between">
       <div class="flex">
-        <select
+        <!-- <select
           class="select select-bordered max-w-xs mb-2"
           @change="($event) => changeMP($event)"
         >
@@ -156,7 +156,7 @@ await getActs()
           >
             {{ tab.title }}
           </option>
-        </select>
+        </select> -->
         <div class="join join-horizontal">
           <button
             class="ml-2 btn max-w-xl w-xl join-item"

@@ -108,7 +108,7 @@ function closeOverlay() {
         <SidebarItem
           v-if="
             store.client.mainAdmin ||
-            store.client.tabs.includes('история действий пользователей')
+            store.client.tabs.includes('возврат и задержка')
           "
           title="Возврат и задержка"
           icon="vaadin:rotate-left"
