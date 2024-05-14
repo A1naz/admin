@@ -108,6 +108,15 @@ function closeOverlay() {
         <SidebarItem
           v-if="
             store.client.mainAdmin ||
+            store.client.tabs.includes('возврат и задержка')
+          "
+          title="Возврат и задержка"
+          icon="vaadin:rotate-left"
+          href="/refundAndDelay"
+        />
+        <SidebarItem
+          v-if="
+            store.client.mainAdmin ||
             store.client.tabs.includes('финансовые операции')
           "
           title="Финансовые операции"
