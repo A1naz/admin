@@ -43,6 +43,7 @@ async function getActs() {
   const { data }: any = await useFetch('/api/refundAndDelay/get', {
     method: 'GET',
     params: {
+      watch: false,
       page: curPage.value,
       sortDate: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
       userId:
@@ -78,9 +79,9 @@ async function swapPage(destination: number) {
 }
 
 async function getUsers(searchValue: string = '') {
-
   const { data }: any = await useFetch('/api/user/getUsers', {
     method: 'GET',
+    watch: false,
     params: {
       page: 1,
       searchValue,
@@ -121,8 +122,7 @@ function sortByDate() {
 
 const store = useMainStore()
 if (
-  !store.client.mainAdmin 
-  &&
+  !store.client.mainAdmin &&
   !store.client.tabs.includes('возврат и задержка')
 ) {
   navigateTo('/partner')
@@ -206,24 +206,23 @@ await getActs()
           <option value="month">Месяц</option>
         </select>
         <div class="join mr-2">
-        <button
-          class="join-item btn"
-          @click="swapPage(-1)"
-          :disabled="isPageBtnsDisabled"
-        >
-          «
-        </button>
-        <button class="join-item btn">{{ curPage }}</button>
-        <button
-          class="join-item btn"
-          @click="swapPage(1)"
-          :disabled="isPageBtnsDisabled"
-        >
-          »
-        </button>
+          <button
+            class="join-item btn"
+            @click="swapPage(-1)"
+            :disabled="isPageBtnsDisabled"
+          >
+            «
+          </button>
+          <button class="join-item btn">{{ curPage }}</button>
+          <button
+            class="join-item btn"
+            @click="swapPage(1)"
+            :disabled="isPageBtnsDisabled"
+          >
+            »
+          </button>
+        </div>
       </div>
-      </div>
-      
     </div>
     <div
       class="my-2 mx-2 overflow-y-auto"
@@ -238,9 +237,7 @@ await getActs()
             <th>Артикул</th>
             <th>Статус</th>
             <th>Адресс</th>
-            <th>
-              Дата выкупа
-            </th>
+            <th>Дата выкупа</th>
             <th>Дата обновления</th>
           </tr>
         </thead>
@@ -285,15 +282,18 @@ await getActs()
           <tr>
             <td colspan="7">
               <div class="hero">
-                <div class="hero-content text-center flex justify-center items-center h-80">
+                <div
+                  class="hero-content text-center flex justify-center items-center h-80"
+                >
                   <div class="max-w-md">
                     <h1 class="text-3xl font-bold">
-                      <span class="flex justify-center loading loading-dots loading-xl text-primary mx-auto p-6"></span>
+                      <span
+                        class="flex justify-center loading loading-dots loading-xl text-primary mx-auto p-6"
+                      ></span>
                     </h1>
                   </div>
                 </div>
               </div>
-              
             </td>
           </tr>
         </tbody>
@@ -302,10 +302,13 @@ await getActs()
           <tr>
             <td colspan="7">
               <div class="hero">
-                <div class="hero-content text-center flex justify-center items-center h-80">
+                <div
+                  class="hero-content text-center flex justify-center items-center h-80"
+                >
                   <div class="max-w-md">
                     <h1 class="text-3xl font-bold">
-                      Здесь ничего нет <Icon name="fluent-emoji:thinking-face" />
+                      Здесь ничего нет
+                      <Icon name="fluent-emoji:thinking-face" />
                     </h1>
                   </div>
                 </div>
