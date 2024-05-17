@@ -45,6 +45,16 @@ async function exportReadyXLS() {
   fileLink.click()
 }
 async function exportXLS() {
+
+  if(selectedPVZs.value.length == 0 && !isAllPVZSelected.value){
+    notify({
+      type: 'error',
+      title: 'Ошибка',
+      text: 'Не выбрано ни одного ПВЗ',
+    })
+    return
+  }
+  
   isButtonsDisabled.value = true
   const { data, error }: any = await useFetch(
     '/api/wildberries/delivery/export',
@@ -53,7 +63,9 @@ async function exportXLS() {
       method: 'GET',
       params: {
         uuid: selectedUsers.value.map((el: any) => el.uuid),
-        pvzs: selectedPVZs.value.map((el: any) => el.address),
+        pvzs: isAllPVZSelected.value
+        ? []
+        : selectedPVZs.value.map((el: any) => el.address),
       },
       watch: false,
     }
@@ -133,7 +145,7 @@ function changeMP(event: any) {
           <button class="btn btn-ghost" :disabled="isButtonsDisabled">
             <NuxtLink
               target="blank"
-              :to="`/delivery/export?uuid=${JSON.stringify(selectedUsers.map((el: any) => el.uuid))}&pvzs=${JSON.stringify(selectedPVZs.map((el: any) => el.address))}`"
+              :to="`/delivery/export?uuid=${JSON.stringify(selectedUsers.map((el: any) => el.uuid))}&pvzs=${JSON.stringify(isAllPVZSelected ? [] : selectedPVZs.map((el: any) => el.address))}`"
             >
               Готовы к выдаче PDF
             </NuxtLink>

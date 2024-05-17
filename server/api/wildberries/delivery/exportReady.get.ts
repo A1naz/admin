@@ -60,15 +60,20 @@ async function getReady(user: any, pvzs: any) {
         )
     )
 
+  const buyoutsId = filtered.map((item:any) => item.idbuyout);
+  const buyouts = await Buyout.find({ _id: { $in: buyoutsId } })
+  const logs = await Buyoutlog.find({ _id: { $in: buyoutsId } })
+
   const format = await Promise.all(
     filtered
       .map(async (delivery: any, index: any) => {
-        const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
+        const buyout = buyouts.find((item:any) => item._id.valueOf() === delivery.idbuyout.valueOf())
 
         if (!buyout) return undefined
-        const logs = await Buyoutlog.find({ buyout: buyout._id })
-        const foundLog = logs.find((item) =>
-          item.text.includes('Выкуп выполнен')
+        const foundLog = logs.find(
+          (item) =>
+            item.buyout.valueOf() === buyout._id.valueOf() &&
+            item.text.includes('Выкуп выполнен')
         )
         const finishDate = new Date(foundLog ? foundLog.date : buyout.createdAt)
         const place = index + 1
