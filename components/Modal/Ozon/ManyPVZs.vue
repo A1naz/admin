@@ -8,7 +8,12 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  selectedAll: {
+    type: Boolean,
+  },
 })
+
+const emit = defineEmits(['selectAllPVZ'])
 
 const query = ref('')
 const inputLoading = ref(false)
@@ -24,6 +29,7 @@ async function onInput(event: Event) {
 }
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
 async function findSearchQuery() {
+  //@ts-ignore
   if (query.value.replaceAll(' ', '') == '') {
     return
   }
@@ -33,11 +39,12 @@ async function findSearchQuery() {
   inputLoading.value = false
 }
 async function getPVZs(searchValue: string = '') {
-  const { data }: any = await useFetch('/api/PVZ/getPVZs', {
+  const { data }: any = await useFetch('/api/ozon/pvz/getPVZs', {
     method: 'GET',
     params: {
       page: 1,
       searchValue,
+      users: selectedUsers.value.map((el: any) => el._id),
     },
   })
 
@@ -47,6 +54,8 @@ async function getPVZs(searchValue: string = '') {
   PVZs.value.forEach((PVZ: any) => {
     selectedPVZs.value.forEach((el: any) => {
       if (el.uuid == PVZ.uuid) {
+        console.log(el.uuid, PVZ.uuid);
+        
         PVZ.isSelected = true
       }
     })
@@ -54,16 +63,15 @@ async function getPVZs(searchValue: string = '') {
 }
 
 function selectPVZ(uuid: String, select: boolean) {
-
   PVZs.value.forEach((PVZ: any) => {
-    if (PVZ._id === uuid) {
+    if (PVZ.uuid === uuid) {
       if (!select) {
         PVZ.isSelected = true
         selectedPVZs.value.push(PVZ)
       } else {
         PVZ.isSelected = false
         selectedPVZs.value.forEach((el: any, i: any) => {
-          if (el._id == uuid) {
+          if (el.uuid == uuid) {
             selectedPVZs.value.splice(i, 1)
           }
         })
@@ -73,11 +81,11 @@ function selectPVZ(uuid: String, select: boolean) {
 
   if (showOnlySelected) {
     selectedPVZs.value.forEach((PVZ: any) => {
-      if (PVZ._id === uuid) {
+      if (PVZ.uuid === uuid) {
         if (select) {
           PVZ.isSelected = false
           selectedPVZs.value.forEach((el: any, i: any) => {
-            if (el._id == uuid) {
+            if (el.uuid == uuid) {
               selectedPVZs.value.splice(i, 1)
             }
           })
@@ -97,15 +105,21 @@ function showOnlySelectedPVZ() {
     visiblePVZs.value = selectedPVZs.value
   }
 }
+
+function selectAllPVZ() {
+  emit('selectAllPVZ')
+}
 </script>
 <template>
   <button
     :disabled="!selectedUsers.length"
     class="ml-2 btn"
-    @click=";[(isModalOpen = true), getPVZs()]"
+    @click=";[(isModalOpen = true), !selectedPVZs.length ? getPVZs() : null]"
   >
     {{
-      selectedPVZs.length > 0
+      selectedAll
+        ? 'Выбраны все пвз'
+        : selectedPVZs.length > 0
         ? 'Выбрано ПВЗ: ' + selectedPVZs.length
         : 'Выбрать ПВЗ'
     }}
@@ -121,7 +135,10 @@ function showOnlySelectedPVZ() {
     :class="{ 'modal-open': isModalOpen }"
     @click="isModalOpen = false"
   >
-    <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
+    <div
+      class="modal-box w-9/12 max-w-full max-h-3/4 min-h-[300px] cursor-auto"
+      @click.stop
+    >
       <form method="dialog">
         <label
           for="selectPVZs"
@@ -134,12 +151,12 @@ function showOnlySelectedPVZ() {
 
       <div>
         <div class="justify-between flex">
-          <div>
+          <div v-if="!selectedAll">
             <label
               ><input
                 v-model="query"
                 type="text"
-                placeholder="id, PVZname, email, telegram"
+                placeholder="Название адреса ПВЗ"
                 class="input input-bordered input-l ml-4 w-80"
                 @input="onInput($event)"
               />
@@ -149,6 +166,7 @@ function showOnlySelectedPVZ() {
               class="loading loading-spinner text-primary loading-large ml-4"
             />
           </div>
+          <div v-else></div>
           <!-- <label
             class="btn btn-primary mr-4 btn-sm mt-4"
             @click="
@@ -156,20 +174,36 @@ function showOnlySelectedPVZ() {
             "
             >Выбрать всех</label
           > -->
-          <div class="form-control mr-6 mt-4">
-            <label class="label cursor-pointer">
-              <span class="label-text mr-4">Показать только выбранных</span>
-              <input
-                type="checkbox"
-                :checked="showOnlySelected"
-                class="checkbox checkbox-primary"
-                @click="showOnlySelectedPVZ"
-              />
-            </label>
+
+          <div class="flex">
+            <div class="form-control mr-6 mt-4">
+              <label class="label cursor-pointer">
+                <span class="label-text mr-4">Выбрать все</span>
+                <input
+                  type="checkbox"
+                  :checked="selectedAll"
+                  class="checkbox checkbox-primary"
+                  @click="selectAllPVZ"
+                />
+              </label>
+            </div>
+
+            <div class="form-control mr-6 mt-4" v-if="!selectedAll">
+              <label class="label cursor-pointer">
+                <span class="label-text mr-4">Показать только выбранных</span>
+                <input
+                  type="checkbox"
+                  :checked="showOnlySelected"
+                  class="checkbox checkbox-primary"
+                  @click="showOnlySelectedPVZ"
+                />
+              </label>
+            </div>
           </div>
         </div>
 
         <div
+          v-if="!selectedAll"
           class="my-2 mx-2 overflow-y-auto"
           :style="{ 'max-height': 500 + 'px' }"
         >
@@ -177,38 +211,20 @@ function showOnlySelectedPVZ() {
             <!-- head -->
             <thead>
               <tr>
-                <th>id</th>
-                <th>PVZname</th>
-                <th>email</th>
-                <th>telegram</th>
+                <th>Название адреса ПВЗ</th>
                 <th>Выбрать</th>
               </tr>
             </thead>
             <tbody>
               <tr class="hover" v-for="PVZ in visiblePVZs" :key="PVZ.uuid">
-                <td style="max-width: 130px">{{ PVZ.uuid }}</td>
-                <td style="max-width: 150px">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ PVZ.PVZname }}
-                  </div>
-                </td>
-                <td style="max-width: 150px" class="overflow-x-auto">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ PVZ.email }}
-                  </div>
-                </td>
-                <td style="max-width: 150px" class="overflow-x-auto">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ PVZ.telegram }}
-                  </div>
-                </td>
+                <td style="max-width: 500px">{{ PVZ.address }}</td>
                 <td style="max-width: 20px">
                   <div>
                     <input
                       type="checkbox"
                       :checked="PVZ.isSelected"
                       class="checkbox checkbox-primary"
-                      @click="selectPVZ(PVZ._id, PVZ.isSelected)"
+                      @click="selectPVZ(PVZ.uuid, PVZ.isSelected)"
                     />
                   </div>
                 </td>
@@ -216,7 +232,7 @@ function showOnlySelectedPVZ() {
             </tbody>
           </table>
         </div>
-        <div class="modal-action"></div>
+        <div v-else class="hero text-xl mt-10">Выбраны все пвз</div>
       </div>
     </div>
   </div>

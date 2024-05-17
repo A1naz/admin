@@ -59,12 +59,15 @@ export default eventHandler(async (event) => {
 
   const all = await Delivery.find({
     user: { $in: user.map((item) => item._id) },
-    point: pvzArray && pvzArray.length ? { $in: pvzArray } : { $exists: true },
+    point: (pvzArray && pvzArray.length > 0)? { $in: pvzArray } : { $exists: true },
   })
+
+  const buyoutsId = all.map(item => item.idbuyout);
+  const buyouts = await Buyout.find({ _id: { $in: buyoutsId } })
 
   const format = await Promise.all(
     all.map(async (delivery) => {
-      const buyout = await Buyout.findOne({ _id: delivery.idbuyout })
+      const buyout = buyouts.find((item:any) => item._id.valueOf() === delivery.idbuyout.valueOf())
       if (!buyout) return null
       const place = all.findIndex(
         (item) => item._id.toString() === delivery._id.toString()
