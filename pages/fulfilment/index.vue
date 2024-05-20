@@ -6,6 +6,7 @@ definePageMeta({
 })
 
 import { notify } from '@kyvg/vue3-notification'
+import usersPVZsGet from '~/server/api/wildberries/ff/usersPVZs.get'
 
 const { height, width } = useWindowSize()
 
@@ -17,11 +18,14 @@ const inputLoading = ref(false)
 const curPage = ref(1)
 const pages = ref(0)
 const query = ref('')
+const pvzQuery = ref('')
 const isPageBtnsDisabled = ref(false)
-const adminUsers = ref<any>([])
+const users = ref<any>([])
 const pvzs = ref<any>([])
+const userPvzs = ref<any>([])
 const pvzsCount = ref(0)
 const selectUserClose: any = ref(null)
+const selectPVZClose: any = ref(null)
 const selectedMP = ref('wildberries')
 const selectedUser: any = ref({
   username: '',
@@ -48,9 +52,7 @@ async function getPvzs() {
     }
   )
   if (data.value) {
-    pvzsCount.value = data.value.count
-    pvzs.value = data.value.acts
-    pages.value = Math.ceil(pvzsCount.value / elPerPage)
+    userPvzs.value = data.value.PVZs
   }
 }
 
@@ -65,7 +67,7 @@ async function swapPage(destination: number) {
   }
   curPage.value += destination
   isPageBtnsDisabled.value = true
-  adminUsers.value = []
+  users.value = []
   await getPvzs()
   isPageBtnsDisabled.value = false
 }
@@ -79,7 +81,18 @@ async function getUsers(searchValue: string = '') {
     },
   })
 
-  adminUsers.value = data.value.users
+  users.value = data.value.users
+}
+async function getPoints(searchValue: string = '') {
+  const { data }: any = await useFetch(`/api/${selectedMP.value}/ff/points`, {
+    method: 'GET',
+    params: {
+      page: 1,
+      searchValue,
+    },
+  })
+
+  pvzs.value = data.value.PVZs
 }
 
 const findSearchQuery = async () => {
@@ -91,10 +104,24 @@ const findSearchQuery = async () => {
   inputLoading.value = false
 }
 
+const findSearchQueryPVZ = async () => {
+  if (pvzQuery.value.replaceAll(' ', '') == '') {
+    return
+  }
+  inputLoading.value = true
+  await getPoints(pvzQuery.value)
+  inputLoading.value = false
+}
+
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
+const findSearchQueryPVZDebounced = useDebounceFn(findSearchQueryPVZ, 1000)
 
 async function onInput(event: Event) {
   findSearchQueryDebounced()
+}
+
+async function onInputPVZ(event: Event) {
+  findSearchQueryPVZDebounced()
 }
 
 function sortByDate() {
@@ -106,18 +133,47 @@ function sortByDate() {
   getPvzs()
 }
 
-const store = useMainStore()
-if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент')) {
-  navigateTo('/partner')
-}
-
 function openUsersSelectModal() {
   selectUserClose.value?.click()
+}
+function openPVZSelectModal() {
+  selectPVZClose.value?.click()
 }
 
 function changeMP(event: any) {
   selectedMP.value = event.target.value
   getPvzs()
+}
+
+async function selectPVZ(pvz: any) {
+  const { data, error }: any = await useFetch(
+    `/api/${selectedMP.value}/ff/addPVZ`,
+    {
+      method: 'POST',
+      body: {
+        userId: selectedUser.value._id,
+        pvz,
+      },
+    }
+  )
+  if (data.value.status == 'ok') {
+    notify({
+      type: 'success',
+      title: 'Добавлено в список пвз пользователя',
+    })
+    getPvzs()
+  } else if (data.value.status == 'error') {
+    notify({
+      type: 'error',
+      title: 'Не удалось добавить в список пвз пользователя',
+      text: data.value.message,
+    })
+  }
+}
+
+const store = useMainStore()
+if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент')) {
+  navigateTo('/partner')
 }
 </script>
 <template>
@@ -126,17 +182,6 @@ function changeMP(event: any) {
     <div class="divider"></div>
     <div class="flex justify-between">
       <div class="flex">
-        <button
-          class="ml-2 btn max-w-xl w-xl join-item"
-          @click="openUsersSelectModal"
-        >
-          {{
-            selectedUser.username == ''
-              ? 'Выбрать пользователя'
-              : selectedUser.username
-          }}
-        </button>
-
         <select
           class="select select-bordered max-w-xs mb-2"
           @change="($event) => changeMP($event)"
@@ -150,7 +195,16 @@ function changeMP(event: any) {
             {{ tab.title }}
           </option>
         </select>
-
+        <button
+          class="ml-2 btn max-w-xl w-xl join-item"
+          @click="openUsersSelectModal"
+        >
+          {{
+            selectedUser.username == ''
+              ? 'Выбрать пользователя'
+              : selectedUser.username
+          }}
+        </button>
         <button
           class="btn btn-circle"
           v-if="selectedUser.username.length > 0"
@@ -165,7 +219,15 @@ function changeMP(event: any) {
         >
           ✕
         </button>
+
         <!-- <button class="btn btn-primary ml-3" @click="getActs">Применить</button> -->
+        <button
+          class="ml-4 btn max-w-xl w-xl join-item"
+          @click="openPVZSelectModal"
+          :disabled="selectedUser.username == ''"
+        >
+          Добавить ПВЗ
+        </button>
       </div>
       <div class="join mr-2">
         <button
@@ -193,16 +255,16 @@ function changeMP(event: any) {
         <!-- head -->
         <thead>
           <tr>
-            <th>ID пользователя</th>
             <th>Адрес</th>
             <th>Действие</th>
           </tr>
         </thead>
         <tbody>
           <!-- row 1 -->
-          <tr v-for="pvz in pvzs" class="hover">
-            <th style="max-width: 80px; min-width: 70px"></th>
-            <th style="max-width: 300px; min-width: 140px" class="text-xs"></th>
+          <tr v-for="pvz in userPvzs" class="hover">
+            <th style="max-width: 300px; min-width: 140px">
+              {{ pvz.address }}
+            </th>
             <th style="max-width: 100px; min-width: 90px"></th>
           </tr>
         </tbody>
@@ -256,24 +318,93 @@ function changeMP(event: any) {
               </tr>
             </thead>
             <tbody>
-              <tr class="hover" v-for="admin in adminUsers" :key="admin.uuid">
-                <td style="max-width: 130px">{{ admin.uuid }}</td>
+              <tr class="hover" v-for="user in users" :key="user.uuid">
+                <td style="max-width: 130px">{{ user.uuid }}</td>
                 <td style="max-width: 150px">
                   <div class="mx-1 overflow-x-auto">
-                    {{ admin.username }}
+                    {{ user.username }}
                   </div>
                 </td>
                 <td style="max-width: 150px" class="overflow-x-auto">
                   <div class="mx-1 overflow-x-auto">
-                    {{ admin.email }}
+                    {{ user.email }}
                   </div>
                 </td>
                 <td style="max-width: 20px">
                   <button
                     class="btn btn-primary btn-sm"
-                    @click="selectUser(admin)"
+                    @click="selectUser(user)"
                   >
                     Выбрать
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="modal-action"></div>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="selectPVZ" class="modal-toggle" />
+  <div class="modal cursor-pointer" @click="openPVZSelectModal">
+    <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
+      <form method="dialog">
+        <label
+          for="selectPVZ"
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          ref="selectPVZClose"
+        >
+          ✕
+        </label>
+      </form>
+
+      <div>
+        <div class="justify-between flex">
+          <div>
+            <label
+              ><input
+                v-model="pvzQuery"
+                type="text"
+                placeholder="Введите Адрес"
+                class="input input-bordered input-l ml-4 w-80"
+                @input="onInputPVZ($event)"
+              />
+            </label>
+            <span
+              v-if="inputLoading"
+              class="loading loading-spinner text-primary loading-large ml-4"
+            />
+          </div>
+        </div>
+
+        <div
+          class="my-2 mx-2 overflow-y-auto"
+          :style="{ 'max-height': 500 + 'px' }"
+        >
+          <table class="table my-3">
+            <!-- head -->
+            <thead>
+              <tr>
+                <th>Адрес</th>
+                <th>Выбрать</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="hover" v-for="pvz in pvzs" :key="pvz.uuid">
+                <td style="max-width: 130px">{{ pvz.id }}</td>
+                <td style="max-width: 150px">
+                  <div class="mx-1 overflow-x-auto">
+                    {{ pvz.address }}
+                  </div>
+                </td>
+                <td style="max-width: 20px">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    @click="selectPVZ(pvz)"
+                  >
+                    Добавить
                   </button>
                 </td>
               </tr>

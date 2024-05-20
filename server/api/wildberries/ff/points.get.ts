@@ -2,6 +2,7 @@ import { User } from '~/server/lib/models/User'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
 import { FFPVZ } from '~/server/lib/models/wildberries/FFPVZS'
+import getPoints from '~/server/utils/wildberries/getPoints'
 
 const usersPerPage = 25
 
@@ -10,15 +11,6 @@ export default eventHandler(async (event) => {
 
   if (!session) return sendRedirect(event, '/auth', 302)
 
-  const { userId }: any = getQuery(event)
-
-  if (!userId) {
-    return {
-      status: 'error',
-      PVZs: [],
-    }
-  }
-
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (
     !userAdmin ||
@@ -26,17 +18,26 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
-  const pvzs = await FFPVZ.findOne({ user: userId })
+  const { searchValue }: any = getQuery(event)
 
-  if (!pvzs) {
-    return {
-      status: 'error',
-      PVZs: [],
+  const points = (await getPoints()).points
+
+  const searchQuery = searchValue.toLowerCase()
+  const result = []
+  for (let i = 0; i < points.length; i++) {
+    if (points[i].a.toLowerCase().includes(searchQuery)) {
+      result.push({
+        id: points[i].id,
+        address: points[i].a,
+      })
+      if (result.length === 50) {
+        break
+      }
     }
   }
 
   return {
     status: 'ok',
-    PVZs: pvzs.pvzs,
+    PVZs: result,
   }
 })
