@@ -6,7 +6,11 @@ definePageMeta({
 })
 
 import { notify } from '@kyvg/vue3-notification'
+
 const { height, width } = useWindowSize()
+
+const mpStore = useMPStore()
+
 const dateSortIcon = ref('mdi-arrow-down')
 const elPerPage = 50
 const inputLoading = ref(false)
@@ -18,7 +22,7 @@ const adminUsers = ref<any>([])
 const pvzs = ref<any>([])
 const pvzsCount = ref(0)
 const selectUserClose: any = ref(null)
-const dateRange = ref([])
+const selectedMP = ref('wildberries')
 const selectedUser: any = ref({
   username: '',
 })
@@ -30,14 +34,19 @@ function selectUser(user: any) {
 }
 
 async function getPvzs() {
-  const { data }: any = await useFetch('/api/acts/get', {
-    method: 'GET',
-    params: {
-      page: curPage.value,
-      userId:
-        selectedUser.value.username.length > 0 ? selectedUser.value._id : null,
-    },
-  })
+  const { data }: any = await useFetch(
+    '/api/' + selectedMP.value + '/ff/usersPVZs',
+    {
+      method: 'GET',
+      params: {
+        page: curPage.value,
+        userId:
+          selectedUser.value.username.length > 0
+            ? selectedUser.value._id
+            : null,
+      },
+    }
+  )
   if (data.value) {
     pvzsCount.value = data.value.count
     pvzs.value = data.value.acts
@@ -62,7 +71,7 @@ async function swapPage(destination: number) {
 }
 
 async function getUsers(searchValue: string = '') {
-  const { data }: any = await useFetch('/api/admin/getAdminUsers', {
+  const { data }: any = await useFetch('/api/user/getUsers', {
     method: 'GET',
     params: {
       page: 1,
@@ -105,6 +114,11 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
 function openUsersSelectModal() {
   selectUserClose.value?.click()
 }
+
+function changeMP(event: any) {
+  selectedMP.value = event.target.value
+  getPvzs()
+}
 </script>
 <template>
   <div>
@@ -122,6 +136,20 @@ function openUsersSelectModal() {
               : selectedUser.username
           }}
         </button>
+
+        <select
+          class="select select-bordered max-w-xs mb-2"
+          @change="($event) => changeMP($event)"
+        >
+          <option
+            v-for="tab in mpStore.MPTabs"
+            :key="tab.value"
+            :value="tab.value"
+            :selected="tab.value == 'wildberries'"
+          >
+            {{ tab.title }}
+          </option>
+        </select>
 
         <button
           class="btn btn-circle"

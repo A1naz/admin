@@ -212,14 +212,14 @@ function closeOverlay() {
           title="Товары готовые к выдаче"
           href="/delivery/wildberries"
         />
-        <!-- <SidebarItem
+        <SidebarItem
           v-if="
             store.client.mainAdmin || store.client.tabs.includes('фулфилмент')
           "
           icon="mdi:courier-fast"
           title="Фулфилмент"
           href="/fulfilment"
-        /> -->
+        />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between w-full items-center p-0 m-0">
