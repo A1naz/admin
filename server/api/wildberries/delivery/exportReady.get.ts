@@ -103,7 +103,7 @@ async function getReady(user: any, pvzs: any) {
             )
           : new Date()
         const expireDate = new Date(
-          deliveryDate.getTime() + 1000 * 60 * 60 * 24 * 7
+          deliveryDate.getTime() + 1000 * 60 * 60 * 24 * 14
         )
         let username = ''
 
