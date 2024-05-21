@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose'
 import { v4 as uuid } from 'uuid'
 import { Tariff } from './Tariff'
+import { IUser } from '@/data/types'
 
 interface IUserSchema extends IUser, Document {}
 
@@ -8,7 +9,7 @@ const partnerSchema = new Schema({
   balance: { type: Number, default: 0 },
   refCount: { type: Number, default: 0 },
   rewardPercent: { type: Number, default: 5 },
-  followCount: { type: Number, default: 0 }, 
+  followCount: { type: Number, default: 0 },
   secondLevelPercent: { type: Number, default: 2 },
 })
 
@@ -46,6 +47,7 @@ const UserSchema = new Schema({
       prices: { type: Tariff.schema, required: true },
     },
   ],
+  ffEnabled: { type: Boolean, default: false },
   twoFaQR: { type: String, required: false },
   twoFaSecret: { type: String, required: false },
   isTwoFaEnabled: { type: Boolean, default: false },

@@ -33,17 +33,18 @@ export interface IUser extends Entity {
   currentCabinet: ObjectId
   cabinets: any[]
   allowedUsersModal: Boolean
+  ffEnabled: Boolean
 }
 
 export interface IUserLogs extends Entity {
-  userId: ObjectId,
-  userNick: string,
-  userEmail: string,
-  uuidCompany: string,
-  description: string,
-  documentType: string,
-  documentId: string,
-  mp: string,
+  userId: ObjectId
+  userNick: string
+  userEmail: string
+  uuidCompany: string
+  description: string
+  documentType: string
+  documentId: string
+  mp: string
   createdAt?: Date
 }
 

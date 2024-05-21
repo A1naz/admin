@@ -20,11 +20,17 @@ export default eventHandler(async (event) => {
   const { userId, pvz } = await readBody(event)
 
   const user = await User.findById(userId)
+
   if (!user) {
     throw createError({
       message: 'Пользователь не найден',
       statusCode: 404,
     })
+  }
+
+  if (!user.ffEnabled) {
+    user.ffEnabled = true
+    await user.save()
   }
 
   const userpvzs = await FFPVZ.findOne({ user })
