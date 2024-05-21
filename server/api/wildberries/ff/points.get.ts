@@ -29,6 +29,8 @@ export default eventHandler(async (event) => {
       result.push({
         id: points[i].id,
         address: points[i].a,
+        lt: points[i].lt,
+        lg: points[i].lg,
       })
       if (result.length === 50) {
         break

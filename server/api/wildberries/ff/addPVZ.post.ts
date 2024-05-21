@@ -18,7 +18,6 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const { userId, pvz } = await readBody(event)
-  console.log(pvz, userId)
 
   const user = await User.findById(userId)
   if (!user) {
