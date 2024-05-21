@@ -30,25 +30,15 @@ export default eventHandler(async (event) => {
 
   const userpvzs = await FFPVZ.findOne({ user })
   if (!userpvzs) {
-    await FFPVZ.create({ user, pvzs: [pvz] })
+    throw createError({
+      message: 'ПВЗ не найден',
+      statusCode: 404,
+    })
   }
 
   if (userpvzs) {
-    let isIncludes = false
-    userpvzs.pvzs.forEach((item) => {
-      if (item.id === pvz.id && item.address === pvz.address) {
-        isIncludes = true
-      }
-    })
-    if (!isIncludes) {
-      userpvzs.pvzs.push(pvz)
-      await userpvzs.save()
-    } else {
-      return {
-        status: 'error',
-        message: 'Такой ПВЗ уже добавлен этому пользователю',
-      }
-    }
+    userpvzs.pvzs = userpvzs.pvzs.filter((p: any) => p.id !== pvz.id)
+    await userpvzs.save()
   }
 
   return {

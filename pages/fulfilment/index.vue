@@ -49,6 +49,7 @@ async function getPvzs() {
             ? selectedUser.value._id
             : null,
       },
+      watch: false,
     }
   )
   if (data.value) {
@@ -79,6 +80,7 @@ async function getUsers(searchValue: string = '') {
       page: 1,
       searchValue,
     },
+    watch: false,
   })
 
   users.value = data.value.users
@@ -90,6 +92,7 @@ async function getPoints(searchValue: string = '') {
       page: 1,
       searchValue,
     },
+    watch: false,
   })
 
   pvzs.value = data.value.PVZs
@@ -141,6 +144,8 @@ function openPVZSelectModal() {
 }
 
 function changeMP(event: any) {
+  pvzs.value = []
+  userPvzs.value = []
   selectedMP.value = event.target.value
   getPvzs()
 }
@@ -154,6 +159,7 @@ async function selectPVZ(pvz: any) {
         userId: selectedUser.value._id,
         pvz,
       },
+      watch: false,
     }
   )
   if (data.value.status == 'ok') {
@@ -171,6 +177,32 @@ async function selectPVZ(pvz: any) {
   }
 }
 
+async function deletePVZ(pvz: any) {
+  const { data, error }: any = await useFetch(
+    `/api/${selectedMP.value}/ff/deletePVZ`,
+    {
+      method: 'POST',
+      body: {
+        userId: selectedUser.value._id,
+        pvz,
+      },
+    }
+  )
+  if (data.value.status == 'ok') {
+    notify({
+      type: 'success',
+      title: 'Удалено из списка пвз пользователя',
+    })
+    getPvzs()
+  } else if (data.value.status == 'error') {
+    notify({
+      type: 'error',
+      title: 'Не удалось удалить из списка пвз пользователя',
+      text: data.value.message,
+    })
+  }
+}
+
 const store = useMainStore()
 if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент')) {
   navigateTo('/partner')
@@ -183,6 +215,7 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
     <div class="flex justify-between">
       <div class="flex">
         <select
+          disabled
           class="select select-bordered max-w-xs mb-2"
           @change="($event) => changeMP($event)"
         >
@@ -265,7 +298,11 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
             <th style="max-width: 300px; min-width: 140px">
               {{ pvz.address }}
             </th>
-            <th style="max-width: 100px; min-width: 90px"></th>
+            <th style="max-width: 100px; min-width: 90px">
+              <button class="btn btn-warning btn-sm" @click="deletePVZ(pvz)">
+                Удалить
+              </button>
+            </th>
           </tr>
         </tbody>
       </table>
