@@ -218,7 +218,7 @@ function closeOverlay() {
           "
           icon="mdi:courier-fast"
           title="Фулфилмент"
-          href="/fulfilment"
+          href="/fulfilment/wildberries"
         />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">

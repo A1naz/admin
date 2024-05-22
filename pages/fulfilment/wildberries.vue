@@ -147,7 +147,8 @@ function changeMP(event: any) {
   pvzs.value = []
   userPvzs.value = []
   selectedMP.value = event.target.value
-  getPvzs()
+  mpStore.selectedMP = event.target.value
+  navigateTo('/fulfilment/' + selectedMP.value)
 }
 
 async function selectPVZ(pvz: any) {
@@ -215,7 +216,6 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
     <div class="flex justify-between">
       <div class="flex">
         <select
-          disabled
           class="select select-bordered max-w-xs mb-2"
           @change="($event) => changeMP($event)"
         >

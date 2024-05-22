@@ -162,6 +162,7 @@ export default defineNuxtConfig({
       titleSeparator: '|',
       BOT_LOGIN: process.env.BOT_LOGIN,
       IMAGES_URL: process.env.IMAGES_URL,
+      YANDEX_MAPS_API_KEY: process.env.YANDEX_MAPS_API_KEY,
     },
     env: process.env.ENV_WORK,
     indexable: true,
