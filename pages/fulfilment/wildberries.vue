@@ -11,7 +11,10 @@ import usersPVZsGet from '~/server/api/wildberries/ff/usersPVZs.get'
 const { height, width } = useWindowSize()
 
 const mpStore = useMPStore()
+const store = useMainStore()
 
+const datePicker = ref(null)
+const date = ref(new Date())
 const dateSortIcon = ref('mdi-arrow-down')
 const elPerPage = 50
 const inputLoading = ref(false)
@@ -24,18 +27,16 @@ const users = ref<any>([])
 const pvzs = ref<any>([])
 const userPvzs = ref<any>([])
 const pvzsCount = ref(0)
-const selectUserClose: any = ref(null)
+const selectUserClose: any = store.allowedUsersModal
 const selectPVZClose: any = ref(null)
 const selectedMP = ref('wildberries')
-const selectedUser: any = ref({
-  username: '',
-})
+const selectedUsers: any = ref<any>([])
 
-function selectUser(user: any) {
-  selectedUser.value = user
-  selectUserClose.value?.click()
-  getPvzs()
-}
+watch(selectedUsers.value, () => {
+  if (selectedUsers.value.length > 0) {
+    getPvzs()
+  }
+})
 
 async function getPvzs() {
   const { data }: any = await useFetch(
@@ -44,10 +45,7 @@ async function getPvzs() {
       method: 'GET',
       params: {
         page: curPage.value,
-        userId:
-          selectedUser.value.username.length > 0
-            ? selectedUser.value._id
-            : null,
+        userId: selectedUsers.value,
       },
       watch: false,
     }
@@ -136,9 +134,6 @@ function sortByDate() {
   getPvzs()
 }
 
-function openUsersSelectModal() {
-  selectUserClose.value?.click()
-}
 function openPVZSelectModal() {
   selectPVZClose.value?.click()
 }
@@ -157,7 +152,7 @@ async function selectPVZ(pvz: any) {
     {
       method: 'POST',
       body: {
-        userId: selectedUser.value._id,
+        userId: selectedUsers.value,
         pvz,
       },
       watch: false,
@@ -184,7 +179,7 @@ async function deletePVZ(pvz: any) {
     {
       method: 'POST',
       body: {
-        userId: selectedUser.value._id,
+        userId: selectedUsers.value,
         pvz,
       },
     }
@@ -204,7 +199,8 @@ async function deletePVZ(pvz: any) {
   }
 }
 
-const store = useMainStore()
+
+
 if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент')) {
   navigateTo('/partner')
 }
@@ -230,38 +226,47 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
         </select>
         <button
           class="ml-2 btn max-w-xl w-xl join-item"
-          @click="openUsersSelectModal"
+          @click="store.allowedUsersModal = true"
         >
           {{
-            selectedUser.username == ''
+            selectedUsers.length == 0
               ? 'Выбрать пользователя'
-              : selectedUser.username
+              : selectedUsers.length + ' выбрано'
           }}
         </button>
+        <allowedUsersModal
+          ref="selectUserClose"
+          :selectedUsers="selectedUsers"
+          :isAllUsersEnabled="false"
+          @clearUsers="selectedUsers = []"
+        />
         <button
           class="btn btn-circle"
-          v-if="selectedUser.username.length > 0"
-          @click="
-            ;[
-              (selectedUser = {
-                username: '',
-              }),
-              getPvzs(),
-            ]
-          "
+          v-if="selectedUsers.length > 0"
+          @click=";[(selectedUsers = []), getPvzs()]"
         >
           ✕
         </button>
 
         <!-- <button class="btn btn-primary ml-3" @click="getActs">Применить</button> -->
+        <div class="ml-3">
+          <DatePicker
+            ref="datePicker"
+            :modelValue="date"
+            :min-date="new Date()"
+            :size="'md'"
+            @update:modelValue="date = $event"
+          />
+        </div>
         <button
           class="ml-4 btn max-w-xl w-xl join-item"
           @click="openPVZSelectModal"
-          :disabled="selectedUser.username == ''"
+          :disabled="selectedUsers.length == 0"
         >
           Добавить ПВЗ
         </button>
       </div>
+
       <div class="join mr-2">
         <button
           class="join-item btn"
@@ -308,82 +313,7 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
       </table>
     </div>
   </div>
-  <input type="checkbox" id="selectUser" class="modal-toggle" />
-  <div class="modal cursor-pointer" @click="openUsersSelectModal">
-    <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
-      <form method="dialog">
-        <label
-          for="selectUser"
-          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          ref="selectUserClose"
-        >
-          ✕
-        </label>
-      </form>
 
-      <div>
-        <div class="justify-between flex">
-          <div>
-            <label
-              ><input
-                v-model="query"
-                type="text"
-                placeholder="Введите id или username или email"
-                class="input input-bordered input-l ml-4 w-80"
-                @input="onInput($event)"
-              />
-            </label>
-            <span
-              v-if="inputLoading"
-              class="loading loading-spinner text-primary loading-large ml-4"
-            />
-          </div>
-        </div>
-
-        <div
-          class="my-2 mx-2 overflow-y-auto"
-          :style="{ 'max-height': 500 + 'px' }"
-        >
-          <table class="table my-3">
-            <!-- head -->
-            <thead>
-              <tr>
-                <th>id</th>
-                <th>username</th>
-                <th>email</th>
-                <th>Выбрать</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="hover" v-for="user in users" :key="user.uuid">
-                <td style="max-width: 130px">{{ user.uuid }}</td>
-                <td style="max-width: 150px">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ user.username }}
-                  </div>
-                </td>
-                <td style="max-width: 150px" class="overflow-x-auto">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ user.email }}
-                  </div>
-                </td>
-                <td style="max-width: 20px">
-                  <button
-                    class="btn btn-primary btn-sm"
-                    @click="selectUser(user)"
-                  >
-                    Выбрать
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="modal-action"></div>
-      </div>
-    </div>
-  </div>
   <input type="checkbox" id="selectPVZ" class="modal-toggle" />
   <div class="modal cursor-pointer" @click="openPVZSelectModal">
     <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
@@ -453,6 +383,7 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
       </div>
     </div>
   </div>
+  {{ selectUserClose }}
 </template>
 <style scoped>
 ::-webkit-scrollbar {

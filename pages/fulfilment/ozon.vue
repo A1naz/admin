@@ -13,6 +13,7 @@ const { height, width } = useWindowSize()
 const mpStore = useMPStore()
 
 const modalOpen = ref(false)
+const store = useMainStore()
 const dateSortIcon = ref('mdi-arrow-down')
 const elPerPage = 50
 const inputLoading = ref(false)
@@ -211,7 +212,6 @@ function closeModal() {
   modalOpen.value = false
 }
 
-const store = useMainStore()
 if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент')) {
   navigateTo('/partner')
 }
@@ -259,11 +259,11 @@ getPickpoints()
         </select>
         <button
           class="ml-2 btn max-w-xl w-xl join-item"
-          @click="openUsersSelectModal"
+          @click="store.allowedUsersModal = true"
         >
           {{
             selectedUser.username == ''
-              ? 'Выбрать пользователя'
+              ? 'Выбрать пользователей'
               : selectedUser.username
           }}
         </button>
@@ -285,9 +285,8 @@ getPickpoints()
         <!-- <button class="btn btn-primary ml-3" @click="getActs">Применить</button> -->
         <button
           class="ml-4 btn max-w-xl w-xl join-item"
-          @click="modalOpen = true"
+          @click="store.allowedUsersModal = true"
           :disabled="selectedUser.username.length == 0 || pvzLoading"
-  
         >
           Добавить ПВЗ
         </button>

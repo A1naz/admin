@@ -8,6 +8,10 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  isAllUsersEnabled: {
+    type: Boolean,
+    default: true,
+  },
 })
 const emit = defineEmits(['selectUser', 'selectAllUsers', 'clearUsers'])
 const selectedUser = ref<any>({
@@ -135,7 +139,7 @@ async function clearUsers() {
               class="loading loading-spinner text-primary loading-large ml-4"
             />
           </div>
-          <label
+          <label v-if="props.isAllUsersEnabled"
             class="btn btn-primary mr-4 btn-sm mt-4"
             @click=";[clearUsers(), (store.allowedUsersModal = false)]"
             >Выбрать всех</label
