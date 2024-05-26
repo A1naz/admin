@@ -282,13 +282,13 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
 
         <!-- <button class="btn btn-primary ml-3" @click="getActs">Применить</button> -->
         <div class="ml-3">
-          <DateOnlyPicker
+          <!-- <DateOnlyPicker
             ref="datePicker"
             :modelValue="date"
             :min-date="new Date(Date.now() - 1000 * 60 * 60 * 24)"
             :size="'md'"
             @update:modelValue=";[(date = $event), getPvzs()]"
-          />
+          /> -->
         </div>
         <button
           class="ml-4 btn max-w-xl w-xl join-item"
