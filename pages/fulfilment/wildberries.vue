@@ -273,22 +273,22 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
               : selectedUsers.length + ' выбрано'
           }}
         </button>
-        <allowedUsersModal
+        <!-- <allowedUsersModal
           ref="selectUserClose"
           :selectedUsers="selectedUsers"
           :isAllUsersEnabled="false"
           @clearUsers="selectedUsers = []"
-        />
+        /> -->
 
         <!-- <button class="btn btn-primary ml-3" @click="getActs">Применить</button> -->
         <div class="ml-3">
-          <!-- <DateOnlyPicker
+          <DateOnlyPicker
             ref="datePicker"
             :modelValue="date"
             :min-date="new Date(Date.now() - 1000 * 60 * 60 * 24)"
             :size="'md'"
             @update:modelValue=";[(date = $event), getPvzs()]"
-          /> -->
+          />
         </div>
         <button
           class="ml-4 btn max-w-xl w-xl join-item"
