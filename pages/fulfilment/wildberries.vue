@@ -229,10 +229,10 @@ async function getPickpoints() {
 
 getPickpoints()
 
-function handleAddress(address: string, lt: number, lg: number, id: string) {
+function handleAddress(address: string, lt: number, lg: number, id: string, w: string) {
   console.log(address, lt, lg, id)
 
-  selectPVZ({ address, lt, lg, id })
+  selectPVZ({ address, lt, lg, id, w })
 }
 
 function closeModal() {

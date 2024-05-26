@@ -19,6 +19,7 @@ const lastAddress = ref({
   lt: 0,
   lg: 0,
   id: '',
+  w: '',
 })
 
 const emit = defineEmits(['callback', 'close'])
@@ -54,11 +55,12 @@ function handleSelect(address: string) {
       lt: item.lt,
       lg: item.lg,
       id: item.id,
+      w: item.w,
     })
   }
 
   localStorage.setItem('wildberriesPointStore', JSON.stringify(arr))
-  emit('callback', address, item.lt, item.lg, item.id)
+  emit('callback', address, item.lt, item.lg, item.id, item.w)
   closeModal()
 }
 
