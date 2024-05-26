@@ -48,7 +48,7 @@ async function getPvzs() {
       method: 'GET',
       params: {
         page: curPage.value,
-        userId: selectedUsers.value,
+        userId: selectedUsers.value.map((el: any) => el._id),
         date: new Date(date.value).toISOString(),
       },
       watch: false,
@@ -157,7 +157,7 @@ async function selectPVZ(pvz: any) {
     {
       method: 'POST',
       body: {
-        userId: selectedUsers.value,
+        userId: selectedUsers.value.map((el: any) => el._id),
         pvz,
         date: date.value,
       },
@@ -186,7 +186,7 @@ async function deletePVZ(pvz: any) {
     {
       method: 'POST',
       body: {
-        userId: selectedUsers.value,
+        userId: selectedUsers.value.map((el: any) => el._id),
         pvz,
         date: date.value,
       },
@@ -263,7 +263,7 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
             {{ tab.title }}
           </option>
         </select>
-        <button
+        <!-- <button
           class="ml-2 btn max-w-xl w-xl join-item"
           @click="store.allowedUsersModal = true"
         >
@@ -272,13 +272,8 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
               ? 'Выбрать пользователей'
               : selectedUsers.length + ' выбрано'
           }}
-        </button>
-        <!-- <allowedUsersModal
-          ref="selectUserClose"
-          :selectedUsers="selectedUsers"
-          :isAllUsersEnabled="false"
-          @clearUsers="selectedUsers = []"
-        /> -->
+        </button> -->
+        <ModalManyUsers :selectedUsers="selectedUsers" />
 
         <!-- <button class="btn btn-primary ml-3" @click="getActs">Применить</button> -->
         <div class="ml-3">
@@ -411,7 +406,6 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
             </tbody>
           </table>
         </div>
-
         <div class="modal-action"></div>
       </div>
     </div>
