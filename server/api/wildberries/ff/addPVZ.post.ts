@@ -17,42 +17,58 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
-  const { userId, pvz } = await readBody(event)
+  const { userId, pvz, date } = await readBody(event)
+  
+  const trueDate = new Date(new Date(date).setHours(0, 0, 0, 0))
+  const minDate = new Date(new Date(date).setHours(trueDate.getHours() - 6))
+  const maxDate = new Date(new Date(date).setHours(trueDate.getHours() + 6))
 
-  const user = await User.findById(userId)
+  const users = await User.find({ _id: { $in: userId } })
 
-  if (!user) {
+  if (!users || !users.length) {
     throw createError({
-      message: 'Пользователь не найден',
+      message: 'Пользователи не найдены',
       statusCode: 404,
     })
   }
 
-  if (!user.ffEnabled) {
-    user.ffEnabled = true
-    await user.save()
-  }
+  const userPVZS = await FFPVZ.find({ user: { $in: users } })
+  for (const user of users) {
+    if (!user.ffEnabled) {
+      user.ffEnabled = true
+      await user.save()
+    }
 
-  const userpvzs = await FFPVZ.findOne({ user })
-  if (!userpvzs) {
-    await FFPVZ.create({ user, pvzs: [pvz] })
-  }
+    const userPVZ = userPVZS?.find(
+      (pvz: any) => pvz.user.valueOf() === user._id.valueOf()
+    )
 
-  if (userpvzs) {
-    let isIncludes = false
-    userpvzs.pvzs.forEach((item) => {
-      if (item.id === pvz.id && item.address === pvz.address) {
-        isIncludes = true
+    if (!userPVZ) {
+      await FFPVZ.create({
+        user,
+        pvzs: [{ ...pvz, date: trueDate }],
+      })
+    } else if (userPVZ) {
+      let isIncludes = false
+      userPVZ.pvzs.forEach((item) => {
+        if (
+          item.id === pvz.id &&
+          new Date(item.date) <= maxDate &&
+          new Date(item.date) >= minDate
+        ) {
+          console.log('saasdasd' + new Date(item.date))
+
+          isIncludes = true
+        }
+      })
+      if (!isIncludes) {
+        userPVZ.pvzs.push({
+          ...pvz,
+          date: trueDate,
+        })
+        await userPVZ.save()
       }
-    })
-    if (!isIncludes) {
-      userpvzs.pvzs.push(pvz)
-      await userpvzs.save()
-    } else {
-      return {
-        status: 'error',
-        message: 'Такой ПВЗ уже добавлен этому пользователю',
-      }
+
     }
   }
 

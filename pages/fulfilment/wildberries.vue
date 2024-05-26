@@ -13,10 +13,12 @@ const { height, width } = useWindowSize()
 const mpStore = useMPStore()
 const store = useMainStore()
 
-const datePicker = ref(null)
 const date = ref(new Date())
+date.value.setHours(12, 0, 0, 0)
+
+const modalOpen = ref(false)
+const pvzLoading = ref(false)
 const dateSortIcon = ref('mdi-arrow-down')
-const elPerPage = 50
 const inputLoading = ref(false)
 const curPage = ref(1)
 const pages = ref(0)
@@ -31,6 +33,7 @@ const selectUserClose: any = store.allowedUsersModal
 const selectPVZClose: any = ref(null)
 const selectedMP = ref('wildberries')
 const selectedUsers: any = ref<any>([])
+const addingPVZ = ref(false)
 
 watch(selectedUsers.value, () => {
   if (selectedUsers.value.length > 0) {
@@ -46,6 +49,7 @@ async function getPvzs() {
       params: {
         page: curPage.value,
         userId: selectedUsers.value,
+        date: new Date(date.value).toISOString(),
       },
       watch: false,
     }
@@ -147,6 +151,7 @@ function changeMP(event: any) {
 }
 
 async function selectPVZ(pvz: any) {
+  addingPVZ.value = true
   const { data, error }: any = await useFetch(
     `/api/${selectedMP.value}/ff/addPVZ`,
     {
@@ -154,6 +159,7 @@ async function selectPVZ(pvz: any) {
       body: {
         userId: selectedUsers.value,
         pvz,
+        date: date.value,
       },
       watch: false,
     }
@@ -171,6 +177,7 @@ async function selectPVZ(pvz: any) {
       text: data.value.message,
     })
   }
+  addingPVZ.value = false
 }
 
 async function deletePVZ(pvz: any) {
@@ -181,7 +188,9 @@ async function deletePVZ(pvz: any) {
       body: {
         userId: selectedUsers.value,
         pvz,
+        date: date.value,
       },
+      watch: false,
     }
   )
   if (data.value.status == 'ok') {
@@ -199,7 +208,36 @@ async function deletePVZ(pvz: any) {
   }
 }
 
+const pickpoints = shallowRef()
+async function getPickpoints() {
+  pvzLoading.value = true
+  try {
+    const data = await $fetch('/api/wildberries/ff/pickpoints', {
+      method: 'GET',
+    })
+    pickpoints.value = (data as any).points
+  } catch (e: any) {
+    notify({
+      title: 'Что-то пошло не так',
+      text: e?.message,
+      type: 'error',
+      duration: 3000,
+    })
+  }
+  pvzLoading.value = false
+}
 
+getPickpoints()
+
+function handleAddress(address: string, lt: number, lg: number, id: string) {
+  console.log(address, lt, lg, id)
+
+  selectPVZ({ address, lt, lg, id })
+}
+
+function closeModal() {
+  modalOpen.value = false
+}
 
 if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент')) {
   navigateTo('/partner')
@@ -212,6 +250,7 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
     <div class="flex justify-between">
       <div class="flex">
         <select
+          disabled
           class="select select-bordered max-w-xs mb-2"
           @change="($event) => changeMP($event)"
         >
@@ -230,7 +269,7 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
         >
           {{
             selectedUsers.length == 0
-              ? 'Выбрать пользователя'
+              ? 'Выбрать пользователей'
               : selectedUsers.length + ' выбрано'
           }}
         </button>
@@ -240,30 +279,23 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
           :isAllUsersEnabled="false"
           @clearUsers="selectedUsers = []"
         />
-        <button
-          class="btn btn-circle"
-          v-if="selectedUsers.length > 0"
-          @click=";[(selectedUsers = []), getPvzs()]"
-        >
-          ✕
-        </button>
 
         <!-- <button class="btn btn-primary ml-3" @click="getActs">Применить</button> -->
         <div class="ml-3">
-          <DatePicker
+          <DateOnlyPicker
             ref="datePicker"
             :modelValue="date"
-            :min-date="new Date()"
+            :min-date="new Date(Date.now() - 1000 * 60 * 60 * 24)"
             :size="'md'"
-            @update:modelValue="date = $event"
+            @update:modelValue=";[(date = $event), getPvzs()]"
           />
         </div>
         <button
           class="ml-4 btn max-w-xl w-xl join-item"
-          @click="openPVZSelectModal"
-          :disabled="selectedUsers.length == 0"
+          @click="modalOpen = true"
+          :disabled="selectedUsers.length == 0 || pvzLoading"
         >
-          Добавить ПВЗ
+          {{ pvzLoading ? 'Загрузка...' : 'Добавить ПВЗ' }}
         </button>
       </div>
 
@@ -370,6 +402,7 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
                   <button
                     class="btn btn-primary btn-sm"
                     @click="selectPVZ(pvz)"
+                    :disabled="addingPVZ"
                   >
                     Добавить
                   </button>
@@ -383,7 +416,14 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
       </div>
     </div>
   </div>
-  {{ selectUserClose }}
+
+  <ffWildberriesSelectPointModal
+    v-if="modalOpen"
+    :state="modalOpen"
+    :pickpoints="pickpoints"
+    @callback="handleAddress"
+    @close="closeModal"
+  />
 </template>
 <style scoped>
 ::-webkit-scrollbar {

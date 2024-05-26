@@ -10,7 +10,13 @@ export default eventHandler(async (event) => {
 
   if (!session) return sendRedirect(event, '/auth', 302)
 
-  const { userId }: any = getQuery(event)
+  const { userId, date }: any = getQuery(event)
+
+  const trueDate = new Date(new Date(date).setHours(0, 0, 0, 0))
+  const minDate = new Date(new Date(date).setHours(trueDate.getHours() - 1))
+  const maxDate = new Date(new Date(date).setHours(trueDate.getHours() + 1))
+
+  // console.log(minDate, maxDate)
 
   if (!userId) {
     return {
@@ -26,17 +32,32 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
-  const pvzs = await FFPVZ.findOne({ user: userId })
+  const users = await User.find({ _id: { $in: userId } })
 
-  if (!pvzs) {
+  const pvzs = await FFPVZ.find({ user: { $in: users } })
+
+  if (!pvzs || !pvzs.length) {
     return {
       status: 'error',
       PVZs: [],
     }
   }
+  const pvzsMap = new Map<string, any>()
+  pvzs.forEach((pvz: any) => {
+    pvz.pvzs.forEach((p: any) => {
+      // console.log(p.date, new Date(minDate), new Date(maxDate));
+
+      // if (new Date(p.date) >=  new Date(minDate) && new Date(p.date) >=  new Date(maxDate)) {
+      if (new Date(p.date) >= minDate && new Date(p.date) <= maxDate) {
+        pvzsMap.set(p.id, p)
+      }
+    })
+  })
+
+  const format = Array.from(pvzsMap.values())
 
   return {
     status: 'ok',
-    PVZs: pvzs.pvzs,
+    PVZs: format,
   }
 })

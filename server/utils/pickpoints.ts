@@ -1,13 +1,6 @@
 import fs from 'node:fs'
 import { PVZ } from '~/server/lib/models/ozon/PVZ'
 
-// async function getRandomProxy(): Promise<string> {
-//   const allProxies: any = await ProxySearchQuery.find()
-//   const proxies: string[] = allProxies[0].proxies
-//   const randomNumber = Math.floor(Math.random() * proxies.length - 1)
-
-//   return `https://${proxies[randomNumber]}`
-// }
 
 export async function removeExtraPickpoints() {
   const cached = fs.readFileSync('pvz/wildberriesPoints.json', 'utf8')

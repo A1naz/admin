@@ -10,6 +10,10 @@ const props = defineProps({
     type: String,
     default: 'small',
   },
+  minDate: {
+    type: Date || Number,
+    default: null,
+  },
 })
 const { $dayjs } = useNuxtApp()
 const emit = defineEmits(['update:modelValue'])
@@ -39,12 +43,13 @@ function handleDate(modelData: any) {
       v-model="date"
       :teleport-center="width < 1280"
       :teleport="true"
-      :min-date="null"
+      :min-date="minDate"
       :dark="colorMode.value === 'dark'"
       :timezone="'UTC'"
       cancel-text=""
       select-text="Сохранить"
       @update:model-value="handleDate"
+      :enable-time-picker="false"
     >
       <template #trigger>
         <div class="flex w-full justify-end">
@@ -66,7 +71,7 @@ function handleDate(modelData: any) {
               <span>Выбрано:</span>
               <span>
                 {{
-                  $dayjs(internalModelValue).format('DD.MM.YYYY HH:mm')
+                  $dayjs(internalModelValue).format('DD.MM.YYYY')
                 }}</span
               >
             </div>

@@ -17,28 +17,45 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
-  const { userId, pvz } = await readBody(event)
-  console.log(pvz, userId)
+  const { userId, pvz, date } = await readBody(event)
 
-  const user = await User.findById(userId)
-  if (!user) {
+  const trueDate = new Date(new Date(date).setHours(0, 0, 0, 0))
+  const minDate = new Date(new Date(date).setHours(trueDate.getHours() - 6))
+  const maxDate = new Date(new Date(date).setHours(trueDate.getHours() + 6))
+
+  const users = await User.find({ _id: { $in: userId } })
+
+  if (!users || !users.length) {
     throw createError({
-      message: 'Пользователь не найден',
+      message: 'Пользователи не найдены',
       statusCode: 404,
     })
   }
 
-  const userpvzs = await FFPVZ.findOne({ user })
-  if (!userpvzs) {
-    throw createError({
-      message: 'ПВЗ не найден',
-      statusCode: 404,
-    })
-  }
+  const userPVZS = await FFPVZ.find({ user: { $in: users } })
+  for (const user of users) {
+    if (!user.ffEnabled) {
+      user.ffEnabled = true
+      await user.save()
+    }
 
-  if (userpvzs) {
-    userpvzs.pvzs = userpvzs.pvzs.filter((p: any) => p.id !== pvz.id)
-    await userpvzs.save()
+    const userPVZ = userPVZS?.find(
+      (pvz: any) => pvz.user.valueOf() === user._id.valueOf()
+    )
+
+    if (userPVZ) {
+      const pvzForDeleteIndex = userPVZ.pvzs.findIndex(
+        (p: any) =>
+          p.id === pvz.id &&
+          new Date(p.date) <= maxDate &&
+          new Date(p.date) >= minDate
+      )
+
+      if (pvzForDeleteIndex < 0) continue
+      userPVZ.pvzs.splice(pvzForDeleteIndex, 1)
+
+      await userPVZ.save()
+    }
   }
 
   return {
