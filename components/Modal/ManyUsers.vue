@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { notify } from '@kyvg/vue3-notification'
 const props = defineProps({
   selectedUsers: {
     type: Array,
@@ -51,7 +52,7 @@ async function getUsers(searchValue: string = '') {
 getUsers()
 
 function selectUser(uuid: String, select: boolean) {
-
+  
   users.value.forEach((user: any) => {
     if (user._id === uuid) {
       if (!select) {
@@ -94,6 +95,63 @@ function showOnlySelectedUser() {
     visibleUsers.value = selectedUsers.value
   }
 }
+
+const templates = ref([])
+const templateTitle = ref('')
+
+function createTemplate() {
+  const { data }: any = useFetch('/api/userTemplate/createTemplate', {
+    method: 'POST',
+    body: {
+      users: selectedUsers.value,
+    }
+  })
+  if(data){
+    notify({
+      title: 'Шаблон создан',
+      type: 'success',
+    })
+    getTemplates()
+  }
+}
+
+function getTemplates() {
+  const { data }: any = useFetch('/api/userTemplate/getTemplates', {
+    method: 'GET',
+  })
+  if(data){
+    templates.value = data.value
+  }
+}
+
+getTemplates()
+
+function useTemplate(template: any) {
+  template.forEach((item: any) => {
+    if (!selectedUsers.value.some(user => user.uuid === item.uuid)) {
+      selectedUsers.value.push(item);
+    }
+  });
+}
+
+function deleteTemplate(template: any) {
+  console.log(template)
+  const { data }: any = useFetch('/api/userTemplate/deleteTemplate', {
+    method: 'POST',
+    body: {
+      uuid: template.uuid
+    }
+  })
+  if(data){
+    notify({
+      title: 'Шаблон удален',
+      type: 'success',
+    })
+    getTemplates()
+  }
+}
+
+
 </script>
 <template>
   <button class="ml-2 btn" @click="isModalOpen = true">
@@ -149,7 +207,9 @@ function showOnlySelectedUser() {
             "
             >Выбрать всех</label
           > -->
+          
           <div class="form-control mr-6 mt-4">
+            <ModalTemplates :templates="templates" @useTemplate="useTemplate" @deleteTemplate="deleteTemplate"/>
             <label class="label cursor-pointer">
               <span class="label-text mr-4">Показать только выбранных</span>
               <input
@@ -167,7 +227,6 @@ function showOnlySelectedUser() {
           :style="{ 'max-height': 500 + 'px' }"
         >
           <table class="table my-3">
-            <!-- head -->
             <thead>
               <tr>
                 <th>id</th>
@@ -209,6 +268,11 @@ function showOnlySelectedUser() {
             </tbody>
           </table>
         </div>
+        <div class="flex justify-end">
+        <button class="btn btn-primary btn-sm mx-1 overflow-x-auto mt-5" :disabled="selectedUsers.length === 0" @click="createTemplate()">
+          Создать шаблон
+        </button>
+      </div>
         <div class="modal-action"></div>
       </div>
     </div>
