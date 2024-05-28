@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { notify } from '@kyvg/vue3-notification'
 const props = defineProps({
   selectedUsers: {
     type: Array,
@@ -11,6 +12,7 @@ const inputLoading = ref(false)
 const users = ref<any>([])
 const visibleUsers = ref<any>([])
 const showOnlySelected = ref(false)
+const loading = ref(false)
 
 const selectedUsers = toRef(props, 'selectedUsers')
 const isModalOpen = ref(false)
@@ -51,7 +53,7 @@ async function getUsers(searchValue: string = '') {
 getUsers()
 
 function selectUser(uuid: String, select: boolean) {
-
+  
   users.value.forEach((user: any) => {
     if (user._id === uuid) {
       if (!select) {
@@ -94,6 +96,98 @@ function showOnlySelectedUser() {
     visibleUsers.value = selectedUsers.value
   }
 }
+
+const templates = ref([])
+const templateTitle = ref('')
+
+async function createTemplate(name: string) {
+  if(selectedUsers.value.length == 0){
+    return
+  }
+  loading.value = true
+  const { data }: any = await useFetch('/api/userTemplate/createTemplate', {
+    method: 'POST',
+    body: {
+      users: selectedUsers.value,
+      title: name,
+    },
+    watch: false,
+  })
+  if(data){
+    await getTemplates()
+    users.value.forEach((user: any) => {
+      selectedUsers.value.forEach((el: any) => {
+        if (el.uuid == user.uuid) {
+          user.isSelected = false
+        }
+      })
+    })
+    selectedUsers.value.splice(0, selectedUsers.value.length)
+    notify({
+      title: 'Шаблон создан',
+      type: 'success',
+      timeout: 3000,
+    })
+  }
+  loading.value = false
+}
+
+async function getTemplates() {
+  loading.value = true
+  const { data }: any = await useFetch('/api/userTemplate/getTemplates', {
+    method: 'GET',
+  })
+  if(data){
+    templates.value = data.value
+  }
+  loading.value = false
+}
+
+getTemplates()
+
+async function useTemplate(template: any) {
+  template.forEach((item: any) => {
+    if (!selectedUsers.value.some(user => user.uuid === item.uuid)) {
+      selectedUsers.value.push(item);
+    }
+  });
+  notify({
+    title: 'Шаблон применен к выбранным пользователям',
+    type: 'success',
+    timeout: 3000,
+  })
+}
+async function setTemplate(template: any) {
+  selectedUsers.value.splice(0, selectedUsers.value.length)
+  selectedUsers.value.push(...template)
+  notify({
+    title: 'Шаблон применен',
+    type: 'success',
+    timeout: 3000,
+  })
+}
+
+async function deleteTemplate(template: any) {
+  loading.value = true
+  const { data }: any = await useFetch('/api/userTemplate/deleteTemplate', {
+    method: 'POST',
+    query: {
+      uuid: template.uuid
+    },
+    watch: false,
+  })
+  if(data){
+    await getTemplates()
+    notify({
+      title: 'Шаблон удален',
+      type: 'success',
+      timeout: 3000,
+    })
+  }
+  loading.value = false
+}
+
+
 </script>
 <template>
   <button class="ml-2 btn" @click="isModalOpen = true">
@@ -124,7 +218,7 @@ function showOnlySelectedUser() {
           ✕
         </label>
       </form>
-
+      
       <div>
         <div class="justify-between flex">
           <div>
@@ -149,7 +243,9 @@ function showOnlySelectedUser() {
             "
             >Выбрать всех</label
           > -->
+          
           <div class="form-control mr-6 mt-4">
+            <ModalTemplates :templates="templates" @useTemplate="useTemplate" @setTemplate="setTemplate" @deleteTemplate="deleteTemplate"/>
             <label class="label cursor-pointer">
               <span class="label-text mr-4">Показать только выбранных</span>
               <input
@@ -167,7 +263,6 @@ function showOnlySelectedUser() {
           :style="{ 'max-height': 500 + 'px' }"
         >
           <table class="table my-3">
-            <!-- head -->
             <thead>
               <tr>
                 <th>id</th>
@@ -209,7 +304,14 @@ function showOnlySelectedUser() {
             </tbody>
           </table>
         </div>
+        
         <div class="modal-action"></div>
+      </div>
+      <div class="flex justify-end">
+        <ModalSaveTemplate :loading="loading" :disabled="selectedUsers.length === 0" @save="(name: string) => createTemplate(name)"/>
+        <!-- <button class="btn btn-primary btn-sm mx-1 overflow-x-auto mt-5" :disabled="selectedUsers.length === 0" @click="createTemplate()">
+          Создать шаблон
+        </button> -->
       </div>
     </div>
   </div>
