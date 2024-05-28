@@ -16,7 +16,7 @@ export default eventHandler(async (event) => {
 
   const { uuid }: any = getQuery(event)
 
-  UserTemplate.deleteOne({ uuid })
+  await UserTemplate.deleteOne({ uuid: uuid })
 
   return { status: 'ok' }
 })

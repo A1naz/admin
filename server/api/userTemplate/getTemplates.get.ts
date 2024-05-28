@@ -15,7 +15,5 @@ export default eventHandler(async (event) => {
   if (!userAdmin) return sendRedirect(event, '/auth', 302)
   const templates = await UserTemplate.find({ userUuid: userAdmin.uuid })
 
-  const userInfoObjects = templates.map(template => template.usersArray)
-  
-  return userInfoObjects
+  return templates
 })

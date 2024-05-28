@@ -13,14 +13,12 @@ export default eventHandler(async (event) => {
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (!userAdmin) return sendRedirect(event, '/auth', 302)
 
-  
-
   const newRequest = await UserTemplate.create({
     uuid: uuid(),
     user: userAdmin._id,
     userUuid: userAdmin.uuid,
     usersArray: users,
-
+    title: title,
   })
 
   // await ActionHistory.create({

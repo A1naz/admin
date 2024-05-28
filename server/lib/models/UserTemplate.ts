@@ -7,7 +7,7 @@ const UserTemplateSchema = new Schema({
   user: { type: Schema.Types.ObjectId, required: true },
   userUuid: { type: String, required: true },
   usersArray: { type: [Object], required: true },
-  // name: { type: String, required: true },
+  title: { type: String, required: true },
 })
 
 export const UserTemplate = model('UserTemplate', UserTemplateSchema)
