@@ -2,6 +2,7 @@ import { User } from '~/server/lib/models/User'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
 import { FFPVZ } from '~/server/lib/models/wildberries/FFPVZS'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
 
 const usersPerPage = 25
 
@@ -31,6 +32,15 @@ export default eventHandler(async (event) => {
       statusCode: 404,
     })
   }
+
+  await ActionHistory.create({
+    adminUser: userAdmin._id,
+    actionId: 112,
+    actionDescription: `Удаление пункта выдачи ${pvz.id} у пользователей за ${trueDate}`,
+    usersUuid: users.map((user: any) => user.uuid),
+    date: new Date(),
+    mp: 'wildberries',
+  })
 
   const userPVZS = await FFPVZ.find({ user: { $in: users } })
   for (const user of users) {

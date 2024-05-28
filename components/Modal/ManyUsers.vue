@@ -204,9 +204,8 @@ async function deleteTemplate(template: any) {
   > -->
   <div
     id="selectUsers"
-    class="modal cursor-pointer"
+    class="modal z-40"
     :class="{ 'modal-open': isModalOpen }"
-    @click="isModalOpen = false"
   >
     <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">

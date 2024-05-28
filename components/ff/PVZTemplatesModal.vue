@@ -9,11 +9,11 @@ const props = defineProps({
 
 const templates = toRef(props, 'templates')
 const isModalOpen = ref(false)
-const emit = defineEmits(['useTemplate', 'deleteTemplate', 'setTemplate'])
+const emit = defineEmits(['useTemplate', 'deleteTemplate'])
 </script>
 <template>
-  <button class="btn btn-primary btn-sm mx-1" @click="isModalOpen = true">
-    Шаблоны
+  <button class="btn btn-primary mx-1 ml-2" @click="isModalOpen = true">
+    Шаблоны пвз
   </button>
   <!-- <div
 
@@ -22,10 +22,11 @@ const emit = defineEmits(['useTemplate', 'deleteTemplate', 'setTemplate'])
   > -->
   <div
     id="selectUsers"
-    class="modal overflow-y-auto z-50"
+    class="modal cursor-pointer overflow-y-auto"
     :class="{ 'modal-open': isModalOpen }"
+    @click="isModalOpen = false"
   >
-    <div class="modal-box w-9/12 max-w-full cursor-auto h-full" @click.stop>
+    <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
         <label
           for="selectUsers"
@@ -39,7 +40,7 @@ const emit = defineEmits(['useTemplate', 'deleteTemplate', 'setTemplate'])
       <div
         v-if="templates && templates.length > 0"
         v-for="(info, index) in templates"
-        class="collapse collapse-arrow border border-base-100 bg-base-200 rounded-box z-0 overflow-hidden mt-5"
+        class="collapse collapse-arrow border border-base-100 bg-base-200 rounded-box z-0 overflow-hidden mt-2"
       >
         <input type="checkbox" />
         <div
@@ -53,21 +54,12 @@ const emit = defineEmits(['useTemplate', 'deleteTemplate', 'setTemplate'])
           <div class="flex z-10 gap-2">
             <label
               class="btn btn-sm text-red-400 z-10"
-              @click="emit('deleteTemplate', templates[index])"
+              @click="$emit('deleteTemplate', templates[index].uuid)"
               >Удалить</label
             >
             <label
-              @click="
-                ;[$emit('useTemplate', info.usersArray), (isModalOpen = false)]
-              "
+              @click="$emit('useTemplate', info.pvzs)"
               class="btn btn-sm btn-primary truncate mr-1 bg-opacity-20 border-none text-base-content"
-              >Добавить к текущим</label
-            >
-            <label
-              @click="
-                ;[$emit('setTemplate', info.usersArray), (isModalOpen = false)]
-              "
-              class="btn btn-sm btn-primary truncate mr-1 border-none text-base-100"
               >Добавить</label
             >
           </div>
@@ -78,32 +70,18 @@ const emit = defineEmits(['useTemplate', 'deleteTemplate', 'setTemplate'])
           <table class="table my-3">
             <thead class="p-0">
               <tr>
-                <th>id</th>
-                <th>username</th>
-                <th>email</th>
-                <th>telegram</th>
+                <th>Адрес</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 class="hover"
-                v-for="user in info.usersArray"
-                :key="user.uuid"
+                v-for="pvz in info.pvzs"
+                :key="pvz.uuid"
               >
-                <td style="max-width: 130px">{{ user.uuid }}</td>
                 <td style="max-width: 150px">
                   <div class="mx-1 overflow-x-auto">
-                    {{ user.username }}
-                  </div>
-                </td>
-                <td style="max-width: 150px" class="overflow-x-auto">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ user.email }}
-                  </div>
-                </td>
-                <td style="max-width: 150px" class="overflow-x-auto">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ user.telegram }}
+                    {{ pvz.address }}
                   </div>
                 </td>
               </tr>

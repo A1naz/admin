@@ -28,12 +28,13 @@ const isPageBtnsDisabled = ref(false)
 const users = ref<any>([])
 const pvzs = ref<any>([])
 const userPvzs = ref<any>([])
-const pvzsCount = ref(0)
-const selectUserClose: any = store.allowedUsersModal
 const selectPVZClose: any = ref(null)
 const selectedMP = ref('wildberries')
 const selectedUsers: any = ref<any>([])
 const addingPVZ = ref(false)
+const pvzsTemplates = ref<any>([])
+const templateName = ref('')
+const createTemplate = ref<any>(null)
 
 watch(selectedUsers.value, () => {
   if (selectedUsers.value.length > 0) {
@@ -214,6 +215,7 @@ async function getPickpoints() {
   try {
     const data = await $fetch('/api/wildberries/ff/pickpoints', {
       method: 'GET',
+      watch: false,
     })
     pickpoints.value = (data as any).points
   } catch (e: any) {
@@ -229,7 +231,13 @@ async function getPickpoints() {
 
 getPickpoints()
 
-function handleAddress(address: string, lt: number, lg: number, id: string, w: string) {
+function handleAddress(
+  address: string,
+  lt: number,
+  lg: number,
+  id: string,
+  w: string
+) {
   console.log(address, lt, lg, id)
 
   selectPVZ({ address, lt, lg, id, w })
@@ -237,6 +245,73 @@ function handleAddress(address: string, lt: number, lg: number, id: string, w: s
 
 function closeModal() {
   modalOpen.value = false
+}
+
+const getTemplates = async () => {
+  const { data }: any = await useFetch('/api/wildberries/pvz/templates', {
+    method: 'GET',
+    watch: false,
+  })
+  if (data) {
+    pvzsTemplates.value = data.value
+  }
+}
+
+getTemplates()
+
+async function saveTemplate() {
+  const { data }: any = await useFetch('/api/wildberries/pvz/saveTemplate', {
+    method: 'POST',
+    body: {
+      pvzs: userPvzs.value,
+      title: templateName.value,
+    },
+    watch: false,
+  })
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Шаблон сохранен',
+    })
+    getTemplates()
+    createTemplate.value.click()
+    templateName.value = ''
+  }
+}
+async function deleteTemplate(uuid: string) {
+  const { data }: any = await useFetch('/api/wildberries/pvz/deleteTemplate', {
+    method: 'POST',
+    body: {
+      uuid,
+    },
+    watch: false,
+  })
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Шаблон успешно удален',
+    })
+    getTemplates()
+  }
+}
+
+async function useTemplate(pvzs: any) {
+  const { data }: any = await useFetch('/api/wildberries/ff/templateAddPVZs', {
+    method: 'POST',
+    body: {
+      userId: selectedUsers.value.map((el: any) => el._id),
+      pvzs,
+      date: date.value,
+    },
+    watch: false,
+  })
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Шаблон успешно удален',
+    })
+    getPvzs()
+  }
 }
 
 if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент')) {
@@ -311,6 +386,37 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
           »
         </button>
       </div>
+    </div>
+    <div class="my-2 -ml-1 flex">
+      <!-- <button class="btn btn-primary ml-3" :disabled="userPvzs.length == 0">
+        Создать шаблон из текущих пвз
+      </button> -->
+      <div class="collapse bg-base-200 max-w-sm mr-2 -mt-0.5">
+        <input ref="createTemplate" type="checkbox" />
+        <div class="collapse-title font-medium">
+          Создать шаблон из текущих пвз
+        </div>
+        <div class="collapse-content">
+          <input
+            type="text"
+            placeholder="Название шаблона"
+            class="input input-bordered input-l"
+            v-model="templateName"
+          />
+          <button
+            class="btn btn-primary mt-2 ml-2"
+            :disabled="userPvzs.length == 0"
+            @click="saveTemplate"
+          >
+            {{ userPvzs.length == 0 ? 'Нет пвз' : 'Сохранить' }}
+          </button>
+        </div>
+      </div>
+      <FfPVZTemplatesModal
+        :templates="pvzsTemplates"
+        @useTemplate="(pvzs: any) => useTemplate(pvzs)"
+        @deleteTemplate="(uuid: string) => deleteTemplate(uuid)"
+      />
     </div>
     <div
       class="my-2 mx-2 overflow-y-auto"

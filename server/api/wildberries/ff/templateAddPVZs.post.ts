@@ -18,8 +18,8 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
-  const { userId, pvz, date } = await readBody(event)
-  
+  const { userId, pvzs, date } = await readBody(event)
+
   const trueDate = new Date(new Date(date).setHours(0, 0, 0, 0))
   const minDate = new Date(new Date(date).setHours(trueDate.getHours() - 6))
   const maxDate = new Date(new Date(date).setHours(trueDate.getHours() + 6))
@@ -36,10 +36,21 @@ export default eventHandler(async (event) => {
   await ActionHistory.create({
     adminUser: userAdmin._id,
     actionId: 112,
-    actionDescription: `Добавление пункта выдачи ${pvz.id} пользователям за ${trueDate}`,
+    actionDescription: `Добавление пунктов выдачи через шаблон пользователям за ${trueDate}`,
     usersUuid: users.map((user: any) => user.uuid),
     date: new Date(),
     mp: 'wildberries',
+  })
+
+  const pvzsFormat = pvzs.map((pvz: any) => {
+    return {
+      lt: pvz.lt,
+      lg: pvz.lg,
+      id: pvz.id,
+      address: pvz.address,
+      w: pvz.w,
+      date: trueDate,
+    }
   })
 
   const userPVZS = await FFPVZ.find({ user: { $in: users } })
@@ -54,31 +65,32 @@ export default eventHandler(async (event) => {
     )
 
     if (!userPVZ) {
+      console.log('creating');
+      
       await FFPVZ.create({
         user,
-        pvzs: [{ ...pvz, date: trueDate }],
+        pvzs: pvzsFormat,
       })
     } else if (userPVZ) {
-      let isIncludes = false
-      userPVZ.pvzs.forEach((item) => {
-        if (
-          item.id === pvz.id &&
-          new Date(item.date) <= maxDate &&
-          new Date(item.date) >= minDate
-        ) {
-          console.log('saasdasd' + new Date(item.date))
-
-          isIncludes = true
-        }
-      })
-      if (!isIncludes) {
-        userPVZ.pvzs.push({
-          ...pvz,
-          date: trueDate,
+      for (const pvz of pvzsFormat) {
+        let isIncludes = false
+        userPVZ.pvzs.forEach((item) => {
+          if (
+            item.id === pvz.id &&
+            new Date(item.date) <= maxDate &&
+            new Date(item.date) >= minDate
+          ) {
+            isIncludes = true
+          }
         })
-        await userPVZ.save()
+        if (!isIncludes) {
+          userPVZ.pvzs.push({
+            ...pvz,
+            date: trueDate,
+          })
+        }
       }
-
+      await userPVZ.save()
     }
   }
 
