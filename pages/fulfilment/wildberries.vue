@@ -308,7 +308,7 @@ async function useTemplate(pvzs: any) {
   if (data.value) {
     notify({
       type: 'success',
-      title: 'Шаблон успешно удален',
+      title: 'Адреса успешно добавлены',
     })
     getPvzs()
   }

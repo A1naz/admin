@@ -20,7 +20,6 @@ const keys = Object.keys as <T>(
   : never)[]
 
 async function getReady(user: any, pvzs: any) {
-  console.log(pvzs)
   let pvzsArray = []
   if (typeof pvzs === 'string') {
     pvzsArray.push(pvzs.trimRight())
@@ -34,40 +33,26 @@ async function getReady(user: any, pvzs: any) {
       pvzsArray && pvzsArray.length ? { $in: pvzsArray } : { $exists: true },
   })
 
-  const prefixesToRemove =
-    /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
-
-  const filtered: any = deliveries
-    .filter((item) => {
-      const currentstatus = item.statusdelivery?.length
-        ? item.statusdelivery[item.statusdelivery.length - 1].status
-        : 'Неизвестно'
-      return (
-        currentstatus === 'Готов к выдаче' ||
-        currentstatus === 'Готов к получению'
-      )
-    })
-    .sort((a: any, b: any) =>
-      a.point
-        .replace(prefixesToRemove, '')
-        .replace(/[^а-яё]/gi, '')
-        .localeCompare(
-          b.point.replace(prefixesToRemove, '').replace(/[^а-яё]/gi, ''),
-          'ru',
-          {
-            sensitivity: 'accent',
-          }
-        )
+  const filtered: any = deliveries.filter((item) => {
+    const currentstatus = item.statusdelivery?.length
+      ? item.statusdelivery[item.statusdelivery.length - 1].status
+      : 'Неизвестно'
+    return (
+      currentstatus === 'Готов к выдаче' ||
+      currentstatus === 'Готов к получению'
     )
+  })
 
-  const buyoutsId = filtered.map((item:any) => item.idbuyout);
+  const buyoutsId = filtered.map((item: any) => item.idbuyout)
   const buyouts = await Buyout.find({ _id: { $in: buyoutsId } })
   const logs = await Buyoutlog.find({ _id: { $in: buyoutsId } })
 
   const format = await Promise.all(
     filtered
       .map(async (delivery: any, index: any) => {
-        const buyout = buyouts.find((item:any) => item._id.valueOf() === delivery.idbuyout.valueOf())
+        const buyout = buyouts.find(
+          (item: any) => item._id.valueOf() === delivery.idbuyout.valueOf()
+        )
 
         if (!buyout) return undefined
         const foundLog = logs.find(
@@ -143,7 +128,21 @@ async function getReady(user: any, pvzs: any) {
       .filter((item: any) => item !== undefined)
   )
 
-  return format
+  const prefixesToRemove =
+    /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
+
+  return format.sort((a: any, b: any) =>
+    a.point
+      .replace(prefixesToRemove, '')
+      .replace(/[^а-яё]/gi, '')
+      .localeCompare(
+        b.point.replace(prefixesToRemove, '').replace(/[^а-яё]/gi, ''),
+        'ru',
+        {
+          sensitivity: 'accent',
+        }
+      )
+  )
 }
 
 export default eventHandler(async (event) => {
