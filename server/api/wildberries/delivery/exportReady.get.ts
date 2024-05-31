@@ -27,22 +27,18 @@ async function getReady(user: any, pvzs: any) {
     pvzsArray = pvzs.map((p: string) => p.trimRight())
   }
 
-  const deliveries = await Delivery.find({
+  const filtered: any = await Delivery.find({
     user: { $in: user.map((item: any) => item._id) },
     point:
       pvzsArray && pvzsArray.length ? { $in: pvzsArray } : { $exists: true },
+    $expr: {
+      $in: [
+        { $arrayElemAt: ['$statusdelivery.status', -1] },
+        ['Готов к получению', 'Готов к выдаче', 'Ожидает получения'],
+      ],
+    },
   })
-
-  const filtered: any = deliveries.filter((item) => {
-    const currentstatus = item.statusdelivery?.length
-      ? item.statusdelivery[item.statusdelivery.length - 1].status
-      : 'Неизвестно'
-    return (
-      currentstatus === 'Готов к выдаче' ||
-      currentstatus === 'Готов к получению'
-    )
-  })
-
+  
   const buyoutsId = filtered.map((item: any) => item.idbuyout)
   const buyouts = await Buyout.find({ _id: { $in: buyoutsId } })
   const logs = await Buyoutlog.find({ _id: { $in: buyoutsId } })
