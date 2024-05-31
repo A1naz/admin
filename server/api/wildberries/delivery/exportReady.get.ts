@@ -127,18 +127,7 @@ async function getReady(user: any, pvzs: any) {
   const prefixesToRemove =
     /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
 
-  return format.sort((a: any, b: any) =>
-    a.point
-      .replace(prefixesToRemove, '')
-      .replace(/[^а-яё]/gi, '')
-      .localeCompare(
-        b.point.replace(prefixesToRemove, '').replace(/[^а-яё]/gi, ''),
-        'ru',
-        {
-          sensitivity: 'accent',
-        }
-      )
-  )
+  return format
 }
 
 export default eventHandler(async (event) => {
