@@ -8,6 +8,8 @@ import { User } from '@/server/lib/models/User'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
 import { ActionHistory } from '@/server/lib/models/actionHistory'
+const prefixesToRemove =
+  /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
 
 const keys = Object.keys as <T>(
   obj: T
@@ -37,8 +39,10 @@ async function getReady(user: any, pvzs: any) {
         ['Готов к получению', 'Готов к выдаче', 'Ожидает получения'],
       ],
     },
+  }).sort({
+    point: 1,
   })
-  
+
   const buyoutsId = filtered.map((item: any) => item.idbuyout)
   const buyouts = await Buyout.find({ _id: { $in: buyoutsId } })
   const logs = await Buyoutlog.find({ _id: { $in: buyoutsId } })
@@ -123,9 +127,6 @@ async function getReady(user: any, pvzs: any) {
       })
       .filter((item: any) => item !== undefined)
   )
-
-  const prefixesToRemove =
-    /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
 
   return format
 }
@@ -257,7 +258,21 @@ export default eventHandler(async (event) => {
       },
     ]
 
-    sheet.addRows(ready)
+    sheet.addRows(
+      ready
+      // .sort((a: any, b: any) =>
+      //   a.point
+      //     .replace(prefixesToRemove, '')
+      //     .replace(/[^а-яё]/gi, '')
+      //     .localeCompare(
+      //       b.point.replace(prefixesToRemove, '').replace(/[^а-яё]/gi, ''),
+      //       'ru',
+      //       {
+      //         sensitivity: 'accent',
+      //       }
+      //     )
+      // )
+    )
     // add qr codes to sheet
 
     for (const item of ready) {
