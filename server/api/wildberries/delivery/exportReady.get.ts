@@ -39,8 +39,6 @@ async function getReady(user: any, pvzs: any) {
         ['Готов к получению', 'Готов к выдаче', 'Ожидает получения'],
       ],
     },
-  }).sort({
-    point: 1,
   })
 
   const buyoutsId = filtered.map((item: any) => item.idbuyout)
@@ -126,6 +124,18 @@ async function getReady(user: any, pvzs: any) {
         }
       })
       .filter((item: any) => item !== undefined)
+  )
+  format.sort((a: any, b: any) =>
+    a.point
+      .replace(prefixesToRemove, '')
+      .replace(/[^а-яё]/gi, '')
+      .localeCompare(
+        b.point.replace(prefixesToRemove, '').replace(/[^а-яё]/gi, ''),
+        'ru',
+        {
+          sensitivity: 'accent',
+        }
+      )
   )
 
   return format
@@ -258,24 +268,12 @@ export default eventHandler(async (event) => {
       },
     ]
 
-    sheet.addRows(
-      ready
-      // .sort((a: any, b: any) =>
-      //   a.point
-      //     .replace(prefixesToRemove, '')
-      //     .replace(/[^а-яё]/gi, '')
-      //     .localeCompare(
-      //       b.point.replace(prefixesToRemove, '').replace(/[^а-яё]/gi, ''),
-      //       'ru',
-      //       {
-      //         sensitivity: 'accent',
-      //       }
-      //     )
-      // )
-    )
+    sheet.addRows(ready)
     // add qr codes to sheet
 
+    let place = 0
     for (const item of ready) {
+      place += 1
       if (!item?.receiptcodeqr || item?.receiptcodeqr?.length < 40) {
         continue
       }
@@ -297,10 +295,10 @@ export default eventHandler(async (event) => {
           extension: 'png',
         })
         sheet.addImage(image, {
-          tl: { col: 1.5, row: item!.place + 0.8 },
+          tl: { col: 1.5, row: place + 0.8 },
           ext: { width: 100, height: 100 },
         })
-        sheet.getRow(item!.place + 1).height = 100
+        sheet.getRow(place + 1).height = 100
       } catch (error) {
         console.log(error)
 
