@@ -1,5 +1,16 @@
 import { Schema, model } from 'mongoose'
 import { v4 as uuid } from 'uuid'
+import speakeasy from 'speakeasy'
+
+function generateRandomString(length: number) {
+  const characters = '01234567abcdef'; 
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 
 const partnerSchema = new Schema({
   balance: { type: Number, default: 0 },
@@ -21,6 +32,8 @@ const UserSchema = new Schema({
   telegramUserId: { type: String, required: false },
   telegramUnlinkEmailSend: { type: Date, required: false },
   tg2fa: { type: Boolean, required: false, default: false },
+  twoFaSecret: { type: String, required: false, default: speakeasy.generateSecret(generateRandomString(20)).base32 },
+  isTwoFaEnabled: { type: Boolean, default: true },
   balance: { type: Number, default: 0, required: true },
   registrationDate: { type: Date, default: Date.now },
   tabs: [{ type: String }],
