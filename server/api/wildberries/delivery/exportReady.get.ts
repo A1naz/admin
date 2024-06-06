@@ -121,6 +121,7 @@ async function getReady(user: any, pvzs: any) {
           finishDate,
           finishTime,
           updatedAt: new Date(delivery.updatedAt),
+          key: buyout.ff ? 'Выкуп под ключ' : 'Выкуп',
         }
       })
       .filter((item: any) => item !== undefined)
@@ -263,6 +264,12 @@ export default eventHandler(async (event) => {
       {
         header: 'Дата обновления',
         key: 'updatedAt',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Тип выкупа',
+        key: 'key',
         width: 16,
         font: { bold: true },
       },

@@ -25,6 +25,7 @@ const BuyoutSchema = new Schema({
   uuid: { type: String, default: uuid() },
   createdAt: { type: Date, default: Date.now },
   place: { type: Number, required: true },
+  ff: { type: Boolean },
   completed: { type: Number, required: false, default: 0 },
   data5: { type: {}, default: '' },
   data6: { type: {}, default: '' },
