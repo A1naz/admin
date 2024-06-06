@@ -173,7 +173,7 @@ export default NuxtAuthHandler({
         }
 
         const verified = confirmTwoFaCode(code, user?.twoFaSecret)
-
+        
         if (!verified) {
           throw new Error('Invalid code')
         }

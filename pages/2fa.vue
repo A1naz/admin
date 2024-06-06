@@ -40,7 +40,7 @@ async function confirm2fa() {
 
   if (error) {
     notify({
-      title: 'Неверный код' + error,
+      title: 'Неверный код',
     })
   } else {
     await store.getClient()
