@@ -116,6 +116,9 @@ dependencies:
   sass:
     specifier: ^1.66.1
     version: 1.66.1
+  speakeasy:
+    specifier: ^2.0.0
+    version: 2.0.0
   types:
     specifier: ^0.1.1
     version: 0.1.1
@@ -211,6 +214,9 @@ devDependencies:
   '@types/uuid':
     specifier: ^9.0.3
     version: 9.0.3
+  '@types/speakeasy':
+    specifier: ^2.0.10
+    version: 2.0.10
   '@vite-pwa/nuxt':
     specifier: ^0.0.7
     version: 0.0.7(@nuxt/kit@3.11.2)(vite-plugin-pwa@0.14.7)
@@ -5817,6 +5823,12 @@ packages:
 
   /@types/semver@7.5.1:
     resolution: {integrity: sha512-cJRQXpObxfNKkFAZbJl2yjWtJCqELQIdShsogr1d2MilP8dKD9TE/nEKHkJgUNHdGKCQaf9HbIynuV2csLGVLg==}
+    dev: true
+
+  /@types/speakeasy@2.0.10:
+    resolution: {integrity: sha512-QVRlDW5r4yl7p7xkNIbAIC/JtyOcClDIIdKfuG7PWdDT1MmyhtXSANsildohy0K+Lmvf/9RUtLbNLMacvrVwxA==}
+    dependencies:
+      '@types/node': 20.5.9
     dev: true
 
   /@types/stack-utils@1.0.1:
@@ -16640,6 +16652,13 @@ packages:
 
   /spdx-license-ids@3.0.13:
     resolution: {integrity: sha512-XkD+zwiqXHikFZm4AX/7JSCXA98U5Db4AFd5XUg/+9UNtnH75+Z9KxtpYiJZx36mUDVOwH83pl7yvCer6ewM3w==}
+
+  /speakeasy@2.0.0:
+    resolution: {integrity: sha512-lW2A2s5LKi8rwu77ewisuUOtlCydF/hmQSOJjpTqTj1gZLkNgTaYnyvfxy2WBr4T/h+9c4g8HIITfj83OkFQFw==}
+    engines: {node: '>= 0.10.0'}
+    dependencies:
+      base32.js: 0.0.1
+    dev: false
 
   /specificity@0.4.1:
     resolution: {integrity: sha512-1klA3Gi5PD1Wv9Q0wUoOQN1IWAuPu0D1U03ThXTr0cJ20+/iq2tHSDnK7Kk/0LXJ1ztUB2/1Os0wKmfyNgUQfg==}
