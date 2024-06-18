@@ -86,11 +86,31 @@ export default eventHandler(async (event) => {
     ...trueUser,
     ...trueDateRange,
     ...uuid,
-    $or: [
-      { data13: { $regex: 'Отказ', $options: 'i' } },
-      { data13: { $regex: 'Возврат', $options: 'i' } },
-      { data13: { $regex: 'Отмен', $options: 'i' } },
-    ],
+    $expr: {
+      $or: [
+        {
+          $regexMatch: {
+            input: { $arrayElemAt: ['$statusdelivery.status', -1] },
+            regex: /Отказ/,
+            options: 'i',
+          },
+        },
+        {
+          $regexMatch: {
+            input: { $arrayElemAt: ['$statusdelivery.status', -1] },
+            regex: /Возврат/,
+            options: 'i',
+          },
+        },
+        {
+          $regexMatch: {
+            input: { $arrayElemAt: ['$statusdelivery.status', -1] },
+            regex: /Отмен/,
+            options: 'i',
+          },
+        },
+      ],
+    },
   })
     .sort({
       updatedAt: sortDate,
@@ -119,7 +139,7 @@ export default eventHandler(async (event) => {
         date: delivery.statusdelivery?.length
           ? delivery.statusdelivery[0].date
           : '-',
-        currentstatus: delivery.data13 ? delivery.data13 : currentstatus,
+        currentstatus: currentstatus,
         updatedAt: delivery.updatedAt,
       }
     })
