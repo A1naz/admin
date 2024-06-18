@@ -5,6 +5,7 @@ import { checkSignature } from '~~/server/lib/telegram/mod'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { NuxtAuthHandler } from '#auth'
 import { Referral } from '~/server/lib/models/Referral'
+import confirmTwoFaCode from '~/server/utils/confirmTwoFaCode'
 
 const runtimeConfig = useRuntimeConfig()
 export default NuxtAuthHandler({
@@ -19,6 +20,11 @@ export default NuxtAuthHandler({
     jwt: async ({ token, user }) => {
       const isSignIn = !!user
       if (isSignIn) {
+        token.twoFaNeeded = (user as any)?.isTwoFaEnabled
+          ? token.twoFaNeeded == false
+            ? false
+            : true
+          : false
         token.email = user ? (user as any)?.email : ''
         token.uuid = user ? (user as any)?.uuid : ''
         token.username = user ? (user as any)?.username : ''
@@ -142,6 +148,37 @@ export default NuxtAuthHandler({
         if (!user.emailConfirmed) throw new Error('Email is not confirmed')
         if (user.tg2fa && user.telegramUserId && !code) throw new Error('2fa')
 
+        return user
+      },
+    }),
+    // @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
+    CredentialsProvider.default({
+      id: '2fa',
+      name: '2fa',
+      credentials: {
+        code: {
+          type: 'text',
+        },
+      },
+
+      async authorize(credentials: any, event: any) {
+        const { code, uuid } = credentials
+
+        const user = await AdminUser.findOne({
+          uuid,
+        })
+
+        if (!user) {
+          return null
+        }
+
+        const verified = confirmTwoFaCode(code, user?.twoFaSecret)
+        
+        if (!verified) {
+          throw new Error('Invalid code')
+        }
+
+        user.isTwoFaEnabled = false
         return user
       },
     }),

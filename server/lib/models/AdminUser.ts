@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose'
 import { v4 as uuid } from 'uuid'
+import speakeasy from 'speakeasy'
+import crypto from 'crypto'
 
 const partnerSchema = new Schema({
   balance: { type: Number, default: 0 },
@@ -21,6 +23,8 @@ const UserSchema = new Schema({
   telegramUserId: { type: String, required: false },
   telegramUnlinkEmailSend: { type: Date, required: false },
   tg2fa: { type: Boolean, required: false, default: false },
+  twoFaSecret: { type: String, required: false, default: speakeasy.generateSecret(crypto.randomBytes(10).toString('hex')).base32 },
+  isTwoFaEnabled: { type: Boolean, default: true },
   balance: { type: Number, default: 0, required: true },
   registrationDate: { type: Date, default: Date.now },
   tabs: [{ type: String }],
