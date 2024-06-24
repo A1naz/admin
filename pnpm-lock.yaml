@@ -211,12 +211,12 @@ devDependencies:
   '@types/qrcode':
     specifier: ^1.5.2
     version: 1.5.2
-  '@types/uuid':
-    specifier: ^9.0.3
-    version: 9.0.3
   '@types/speakeasy':
     specifier: ^2.0.10
     version: 2.0.10
+  '@types/uuid':
+    specifier: ^9.0.3
+    version: 9.0.3
   '@vite-pwa/nuxt':
     specifier: ^0.0.7
     version: 0.0.7(@nuxt/kit@3.11.2)(vite-plugin-pwa@0.14.7)
@@ -7236,6 +7236,10 @@ packages:
 
   /balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
+
+  /base32.js@0.0.1:
+    resolution: {integrity: sha512-EGHIRiegFa62/SsA1J+Xs2tIzludPdzM064N9wjbiEgHnGnJ1V0WEpA4pEwCYT5nDvZk3ubf0shqaCS7k6xeUQ==}
+    dev: false
 
   /base64-arraybuffer@1.0.2:
     resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
