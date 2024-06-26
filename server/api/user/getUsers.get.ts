@@ -12,7 +12,7 @@ export default eventHandler(async (event) => {
 
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (!userAdmin) return sendRedirect(event, '/auth', 302)
-
+    
   let allowedUsersParam = userAdmin.isAllUsersAllowed
     ? {
         _id: { $nin: userAdmin.restrictedUsers.map((id: any) => id) },

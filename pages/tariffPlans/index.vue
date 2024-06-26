@@ -31,7 +31,7 @@ function selectUser(user: any) {
       <TariffPlansSelectUserModal @selectUser="selectUser" />
     </div>
   </div>
-  <TariffPlansAdjustTariffModal :isModalOpen="adjustTariffModal" />
+  <TariffPlansAdjustTariffModal v-model:is-modal-open="adjustTariffModal" :selectedUser="selectedUser"/>
 </template>
 <style scoped>
 ::-webkit-scrollbar {
