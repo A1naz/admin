@@ -16,8 +16,10 @@ const filtersForm = ref({
   dateRange: [],
   startDate: new Date(Date.now() + 1000 * 60 * 5),
   mp: 'all',
+  searchQuery: '',
 })
 
+const tariffs = ref([])
 const adjustTariffModal = ref(false)
 
 const selectedUser = ref<any>({
@@ -29,6 +31,20 @@ function selectUser(user: any) {
 
   adjustTariffModal.value = true
 }
+
+async function getTariffs() {
+  const { data }: any = await useFetch('/api/tariffPlans/tariffs', {
+    method: 'GET',
+    query: filtersForm.value,
+    watch: false,
+  })
+  tariffs.value = data.value
+}
+getTariffs()
+
+const findDebounced = useDebounceFn(getTariffs, 1000)
+watch(filtersForm.value, findDebounced)
+
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-3 my-2">Тарифные планы</h1>
@@ -54,6 +70,7 @@ function selectUser(user: any) {
 
       <label class="flex">
         <input
+          v-model="filtersForm.searchQuery"
           type="text"
           placeholder="Логин, наименование"
           class="input input-bordered w-60 -mr-[55px]"
