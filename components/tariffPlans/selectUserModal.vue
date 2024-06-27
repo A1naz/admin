@@ -51,9 +51,10 @@ getUsers()
 <template>
   <button
     @click="openUsersSelectModal"
-    class="btn btn-primary mr-3 px-5 max-w-xl"
+    class="btn btn-primary mr-3 px-5 max-w-xl flex"
   >
-    + Пакет
+    <span class="text-2xl mb-1 -ml-1"> + </span>
+    Пакет
   </button>
 
   <input type="checkbox" id="selectUser" class="modal-toggle" />
@@ -63,7 +64,7 @@ getUsers()
         <label
           for="selectUser"
           class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          ref="selectUserClose"
+          ref="selectUserClose" 
         >
           ✕
         </label>
@@ -96,7 +97,7 @@ getUsers()
             <!-- head -->
             <thead>
               <tr>
-                <th>id</th>
+                <th>Id</th>
                 <th>username</th>
                 <th>email</th>
                 <th>Выбрать</th>
