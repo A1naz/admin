@@ -6,7 +6,7 @@ definePageMeta({
 })
 
 import { notify } from '@kyvg/vue3-notification'
-const { height, width } = useWindowSize()
+const { height } = useWindowSize()
 const dateSortIcon = ref('mdi-arrow-down')
 const elPerPage = 50
 const inputLoading = ref(false)

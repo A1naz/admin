@@ -6,6 +6,7 @@ definePageMeta({
 })
 
 const store = useMainStore()
+const { height, width } = useWindowSize()
 
 if (!store.client.mainAdmin && !store.client.tabs.includes('тарифные планы')) {
   navigateTo('/partner')
@@ -17,6 +18,7 @@ const filtersForm = ref({
   startDate: new Date(Date.now() + 1000 * 60 * 5),
   mp: 'all',
   searchQuery: '',
+  page: 1,
 })
 
 const tariffs = ref([])
@@ -44,7 +46,6 @@ getTariffs()
 
 const findDebounced = useDebounceFn(getTariffs, 1000)
 watch(filtersForm.value, findDebounced)
-
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-3 my-2">Тарифные планы</h1>
@@ -81,6 +82,33 @@ watch(filtersForm.value, findDebounced)
         </button>
       </label>
     </div>
+  </div>
+  <div
+    class="mt-6 mx-2 overflow-y-auto"
+    :style="{ 'max-height': height - 270 + 'px' }"
+  >
+    <table class="table">
+      <!-- head -->
+      <thead>
+        <tr>
+          <th>Ответственный</th>
+          <th>Никнейм</th>
+          <th>Наименование</th>
+          <th>Создано</th>
+          <th>Маркетплейс</th>
+          <th>Тариф</th>
+          <th>Услуга</th>
+          <th>Срок</th>
+          <th>Статус</th>
+          <th>Утверждено</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- row 1 -->
+        <tr class="hover"></tr>
+      </tbody>
+    </table>
   </div>
 
   <TariffPlansAdjustTariffModal
