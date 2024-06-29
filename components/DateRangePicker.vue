@@ -111,12 +111,12 @@ function handleTime(
               <span>{{ getSecondDate(internalModelValue) }}</span>
             </div>
           </div>
-            <button
+            <!-- <button
               class="btn btn-error btn-sm block normal-case"
               @click="emit('reset')"
             >
               сброс
-            </button>
+            </button> -->
             <button
               class="btn btn-primary btn-sm block"
               @click="selectDate"

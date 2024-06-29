@@ -44,7 +44,7 @@ async function getTariffs() {
 }
 getTariffs()
 
-const findDebounced = useDebounceFn(getTariffs, 1000)
+const findDebounced = useDebounceFn(getTariffs, 500)
 watch(filtersForm.value, findDebounced)
 </script>
 <template>
@@ -81,6 +81,17 @@ watch(filtersForm.value, findDebounced)
           <Icon name="material-symbols:search" size="20" />
         </button>
       </label>
+      <div class="join mr-2">
+        <button
+          class="join-item btn"
+          @click="filtersForm.page -= 1"
+          :disabled="filtersForm.page <= 1"
+        >
+          «
+        </button>
+        <button class="join-item btn">{{ filtersForm.page }}</button>
+        <button class="join-item btn" @click="filtersForm.page += 1">»</button>
+      </div>
     </div>
   </div>
   <div
