@@ -10,8 +10,10 @@ const TariffPlanSchema = new Schema({
   timeLimitMonths: { type: Number, required: true },
   endDate: { type: Date, required: true },
   activationDate: { type: Date, required: true },
+  createdAt: { type: Date, default: new Date(Date.now()) },
   paymentDate: { type: Date, required: true },
-
+  status: { type: String, default: 'На рассмотрении' },
+  screenshot: { type: String },
 })
 
 export const TariffPlan = model('TariffPlan', TariffPlanSchema)

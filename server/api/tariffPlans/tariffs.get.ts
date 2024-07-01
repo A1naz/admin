@@ -2,6 +2,7 @@ import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { TariffPlan } from '~/server/lib/models/TariffPlan'
+import { create } from 'domain'
 const limit = 50
 
 export default eventHandler(async (event) => {
@@ -63,9 +64,34 @@ export default eventHandler(async (event) => {
     _id: { $in: tariffs.map((item: any) => item.user) },
   })
 
-  console.log(users.length)
+  const admins = await AdminUser.find({
+    _id: { $in: tariffs.map((item: any) => item.adminUser) },
+  })
+  console.log(admins)
 
-  return {
-    status: 'ok',
-  }
+  const format: any = tariffs.map((item: any) => {
+    const user = users.find((user: any) => user._id.equals(item.user))
+    const admin = admins.find((admin: any) => admin._id.equals(item.adminUser))
+
+    return {
+      adminName: admin ? admin.firstName + ' ' + admin.lastName : '',
+      adminUsername: admin ? admin.username : '',
+      userUuid: user ? user.uuid : '',
+      username: user ? user.username : '',
+      userOrgName: user ? user.orgName : '',
+      userEmail: user ? user.email : '',
+      createdAt: item.createdAt,
+      mp: item.mp,
+      tariff: item.tariff,
+      type: item.type,
+      timeLimitMonths: item.timeLimitMonths,
+      status: item.status,
+      endDate: item.endDate,
+      paymentDate: item.paymentDate,
+      activationDate: item.activationDate,
+    }
+  })
+  console.log(format)
+
+  return format
 })

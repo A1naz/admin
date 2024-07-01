@@ -12,6 +12,7 @@ export default eventHandler(async (event) => {
     activationDate,
     paymentDate,
     userUuid,
+    screenshot,
   }: any = await readBody(event)
 
   const session = (await getServerSession(event)) as any
@@ -39,9 +40,6 @@ export default eventHandler(async (event) => {
   const dateEnd = new Date(activationDate)
   dateEnd.setMonth(dateActivation.getMonth() + Number(timeLimit))
 
-  console.log('dateActivation', dateActivation)
-  console.log('dateEnd', dateEnd)
-
   await ActionHistory.create({
     adminUser: adminUser._id,
     adminUserUuid: adminUser.uuid,
@@ -61,6 +59,8 @@ export default eventHandler(async (event) => {
     activationDate: dateActivation,
     endDate: dateEnd,
     paymentDate,
+    screenshot,
+    createdAt: new Date(Date.now()),
   })
 
   return {

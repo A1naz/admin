@@ -21,7 +21,7 @@ const filtersForm = ref({
   page: 1,
 })
 
-const tariffs = ref([])
+const tariffs = ref<any>([])
 const adjustTariffModal = ref(false)
 
 const selectedUser = ref<any>({
@@ -42,10 +42,21 @@ async function getTariffs() {
   })
   tariffs.value = data.value
 }
-getTariffs()
+setTimeout(() => getTariffs(), 300)
 
 const findDebounced = useDebounceFn(getTariffs, 500)
 watch(filtersForm.value, findDebounced)
+
+const getTariffName = (tariff: any) => {
+  if (tariff == 'launch') return 'Запуск'
+  if (tariff == 'increase') return 'Рост'
+  if (tariff == 'support') return 'Поддержка'
+}
+
+const getTariffsType = (type: any) => {
+  if (type == 'basic') return 'Базовый'
+  if (type == 'full') return 'Под ключ'
+}
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-3 my-2">Тарифные планы</h1>
@@ -117,7 +128,40 @@ watch(filtersForm.value, findDebounced)
       </thead>
       <tbody>
         <!-- row 1 -->
-        <tr class="hover"></tr>
+        <tr class="hover" v-for="tariff in tariffs">
+          <th style="max-width: 80px; min-width: 70px">
+            {{ tariff.adminName }}
+          </th>
+          <th style="max-width: 80px; min-width: 70px">
+            {{ tariff.username }}
+          </th>
+          <th style="max-width: 300px; min-width: 140px">
+            {{ tariff.userOrgName }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ tariff.createdAt.slice(0, 10) }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ tariff.mp }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ getTariffName(tariff.tariff) }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ getTariffsType(tariff.type) }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ tariff.timeLimitMonths }} месяц(ев)
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ tariff.status }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ tariff.paymentDate.slice(0, 10) }} -
+            {{ tariff.activationDate.slice(0, 10) }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px"></th>
+        </tr>
       </tbody>
     </table>
   </div>
