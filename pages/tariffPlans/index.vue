@@ -139,7 +139,7 @@ const getTariffsType = (type: any) => {
             {{ tariff.userOrgName }}
           </th>
           <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.createdAt.slice(0, 10) }}
+            {{ tariff.createdAt.slice(0, 10).replace(/-/g, '.') }}
           </th>
           <th style="max-width: 100px; min-width: 90px">
             {{ tariff.mp }}
@@ -157,8 +157,8 @@ const getTariffsType = (type: any) => {
             {{ tariff.status }}
           </th>
           <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.paymentDate.slice(0, 10) }} -
-            {{ tariff.activationDate.slice(0, 10) }}
+            {{ tariff.paymentDate.slice(0, 10).replace(/-/g, '.') }} -
+            {{ tariff.activationDate.slice(0, 10).replace(/-/g, '.') }}
           </th>
           <th style="max-width: 100px; min-width: 90px"></th>
         </tr>
