@@ -28,6 +28,10 @@ const selectedUser = ref<any>({
   username: '',
 })
 
+const tariffInfoModal = ref(false)
+const paymentsCountModal = ref(false)
+const selectedTariff = ref<any>({})
+
 function selectUser(user: any) {
   selectedUser.value = user
 
@@ -44,7 +48,7 @@ async function getTariffs() {
 }
 setTimeout(() => getTariffs(), 300)
 
-const findDebounced = useDebounceFn(getTariffs, 500)
+const findDebounced = useDebounceFn(getTariffs, 300)
 watch(filtersForm.value, findDebounced)
 
 const getTariffName = (tariff: any) => {
@@ -132,10 +136,13 @@ const getTariffsType = (type: any) => {
           <th style="max-width: 80px; min-width: 70px">
             {{ tariff.adminName }}
           </th>
-          <th style="max-width: 80px; min-width: 70px">
+          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
             {{ tariff.username }}
           </th>
-          <th style="max-width: 300px; min-width: 140px">
+          <th
+            style="max-width: 300px; min-width: 140px"
+            class="overflow-x-auto"
+          >
             {{ tariff.userOrgName }}
           </th>
           <th style="max-width: 100px; min-width: 90px">
@@ -160,7 +167,26 @@ const getTariffsType = (type: any) => {
             {{ tariff.paymentDate.slice(0, 10).replace(/-/g, '.') }} -
             {{ tariff.activationDate.slice(0, 10).replace(/-/g, '.') }}
           </th>
-          <th style="max-width: 100px; min-width: 90px"></th>
+          <th style="max-width: 100px; min-width: 90px">
+            <button>
+              <Icon
+                name="mdi:account"
+                size="30"
+                color="#d0cfd8"
+                @click=";[(selectedTariff = tariff), (tariffInfoModal = true)]"
+              />
+            </button>
+            <button class="ml-2">
+              <Icon
+                name="ep:info-filled"
+                size="30"
+                color="#d0cfd8"
+                @click="
+                  ;[(paymentsCountModal = true), (selectedTariff = tariff)]
+                "
+              />
+            </button>
+          </th>
         </tr>
       </tbody>
     </table>
@@ -169,6 +195,15 @@ const getTariffsType = (type: any) => {
   <TariffPlansAdjustTariffModal
     v-model:is-modal-open="adjustTariffModal"
     :selectedUser="selectedUser"
+  />
+
+  <TariffPlansInfoModal
+    v-model:is-modal-open="tariffInfoModal"
+    :selectedTariff="selectedTariff"
+  />
+  <TariffPlansPaymentsCountModal
+    v-model:is-modal-open="paymentsCountModal"
+    :selectedTariff="selectedTariff"
   />
 </template>
 <style scoped>

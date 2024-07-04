@@ -11,10 +11,11 @@ export default eventHandler(async (event) => {
   if (!session) return sendRedirect(event, '/auth', 302)
 
   const user = await AdminUser.findOne({ uuid: session.uuid })
-  if (!user) return sendRedirect(event, '/auth', 302)
+
+  if (!user || (!user.mainAdmin && !user.tabs.includes('тарифные планы')))
+    return sendRedirect(event, '/auth', 302)
 
   const { dateRange, mp, searchQuery, page }: any = getQuery(event)
-
   const dateRangeParam: Object = dateRange
     ? {
         activationDate: {
@@ -67,7 +68,6 @@ export default eventHandler(async (event) => {
   const admins = await AdminUser.find({
     _id: { $in: tariffs.map((item: any) => item.adminUser) },
   })
-  console.log(admins)
 
   const format: any = tariffs.map((item: any) => {
     const user = users.find((user: any) => user._id.equals(item.user))
@@ -75,11 +75,13 @@ export default eventHandler(async (event) => {
 
     return {
       adminName: admin ? admin.firstName + ' ' + admin.lastName : '',
+      userFullName: user ? user.firstName + ' ' + user.lastName : '',
       adminUsername: admin ? admin.username : '',
       userUuid: user ? user.uuid : '',
       username: user ? user.username : '',
       userOrgName: user ? user.orgName : '',
       userEmail: user ? user.email : '',
+      userPhone: user ? user.phoneNumber : '',
       createdAt: item.createdAt,
       mp: item.mp,
       tariff: item.tariff,
@@ -89,9 +91,9 @@ export default eventHandler(async (event) => {
       endDate: item.endDate,
       paymentDate: item.paymentDate,
       activationDate: item.activationDate,
+      uuid: item.uuid,
     }
   })
-  console.log(format)
 
   return format
 })

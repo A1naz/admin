@@ -4,6 +4,7 @@ import { AdminUser } from './AdminUser'
 const TariffPlanSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   adminUser: { type: Schema.Types.ObjectId, ref: AdminUser, required: true },
+  uuid: { type: String, required: true },
   mp: { type: String, required: true },
   tariff: { type: String, required: true },
   type: { type: String, required: true },

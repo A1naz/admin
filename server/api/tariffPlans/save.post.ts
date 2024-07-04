@@ -3,6 +3,8 @@ import { getServerSession } from '#auth'
 import { AdminUser } from '@/server/lib/models/AdminUser'
 import { User } from '@/server/lib/models/User'
 import { ActionHistory } from '@/server/lib/models/actionHistory'
+import { v4 as uuid } from 'uuid'
+
 export default eventHandler(async (event) => {
   const {
     mp,
@@ -50,6 +52,7 @@ export default eventHandler(async (event) => {
   })
 
   await TariffPlan.create({
+    uuid: uuid(),
     adminUser: adminUser._id,
     user: user._id,
     mp,

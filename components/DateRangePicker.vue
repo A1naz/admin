@@ -87,8 +87,6 @@ function handleTime(
       :teleport-center="width < 1024"
       :time-picker-inline="true"
       :teleport="true"
-      :max-date="startDate"
-      :prevent-min-max-navigation="true"
       :dark="colorMode.value === 'dark'"
       locale="ru"
       range
