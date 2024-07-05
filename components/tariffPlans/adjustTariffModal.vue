@@ -14,7 +14,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:isModalOpen'])
+const emit = defineEmits(['update:isModalOpen', 'getTariffs'])
 
 const screenshot = ref({
   url: 'null',
@@ -87,7 +87,7 @@ async function save() {
       public: 'null',
     }
     screen.value = false
-    
+    emit('getTariffs')
     close()
   } else {
     notify({

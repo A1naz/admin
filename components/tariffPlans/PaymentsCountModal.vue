@@ -15,7 +15,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:isModalOpen'])
-const paymentsCount = ref({
+const paymentsCount: any = ref({
   buyouts: 0,
   review: 0,
   likeReview: 0,

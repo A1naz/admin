@@ -30,6 +30,7 @@ const selectedUser = ref<any>({
 
 const tariffInfoModal = ref(false)
 const paymentsCountModal = ref(false)
+const editPaymentsModal = ref(false)
 const selectedTariff = ref<any>({})
 
 function selectUser(user: any) {
@@ -167,7 +168,7 @@ const getTariffsType = (type: any) => {
             {{ tariff.paymentDate.slice(0, 10).replace(/-/g, '.') }} -
             {{ tariff.activationDate.slice(0, 10).replace(/-/g, '.') }}
           </th>
-          <th style="max-width: 100px; min-width: 90px">
+          <th style="max-width: 100px; min-width: 90px" class="flex justify-center">
             <button>
               <Icon
                 name="mdi:account"
@@ -186,6 +187,16 @@ const getTariffsType = (type: any) => {
                 "
               />
             </button>
+            <button class="ml-2">
+              <Icon
+                name="ep:edit"
+                size="30"
+                color="#d0cfd8"
+                @click="
+                  ;[(editPaymentsModal = true), (selectedTariff = tariff)]
+                "
+              />
+            </button>
           </th>
         </tr>
       </tbody>
@@ -194,6 +205,7 @@ const getTariffsType = (type: any) => {
 
   <TariffPlansAdjustTariffModal
     v-model:is-modal-open="adjustTariffModal"
+    @getTariffs="getTariffs"
     :selectedUser="selectedUser"
   />
 
@@ -203,6 +215,10 @@ const getTariffsType = (type: any) => {
   />
   <TariffPlansPaymentsCountModal
     v-model:is-modal-open="paymentsCountModal"
+    :selectedTariff="selectedTariff"
+  />
+  <TariffPlansEditModal
+    v-model:is-modal-open="editPaymentsModal"
     :selectedTariff="selectedTariff"
   />
 </template>
