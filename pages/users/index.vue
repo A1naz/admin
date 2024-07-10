@@ -180,7 +180,6 @@ async function getAllowedUsers() {
 }
 
 async function selectUser(user: any) {
-  console.log(user)
   selectedUser.value = user
   userEditForm.value.twoFaQR = user.twoFaQR
   userEditForm.value.email = user.email
