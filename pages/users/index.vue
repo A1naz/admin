@@ -619,14 +619,17 @@ if (!store.client.mainAdmin) {
           </div>
         </div>
       </div>
-      <div class="flex flex-col justify-center items-center mt-5">
-        <span class="font-semibold text-lg">Код для подключения двухфакторной аутентификации</span>
+      <div v-if="userEditForm.twoFaQR && userEditForm.twoFaQR !== ''" class="flex flex-col gap-2 justify-center items-center mt-5">
+        <span class="font-semibold text-lg">QR-код для подключения двухфакторной аутентификации</span>
         <NuxtImg
           class="bg-white"
           height="250"
           width="250"
           :src="`${userEditForm.twoFaQR}`"
         />
+      </div>
+      <div v-else class="flex flex-col justify-center items-center mt-5">
+        <span class="font-semibold text-lg">Двухфакторная аутентификация не подключена</span>
       </div>
       <div>
         <div class="modal-action">
