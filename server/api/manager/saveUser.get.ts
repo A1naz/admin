@@ -4,6 +4,27 @@ import { getServerSession } from '#auth'
 import { v4 as unicalUuid } from 'uuid'
 import bcrypt from 'bcrypt'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
+import speakeasy from 'speakeasy'
+import qrcode from 'qrcode'
+
+const getCodeAndQr = async (username: string) => {
+  const twoFaSecret: any = speakeasy.generateSecret({
+    length: 10,
+    name: 'Админка ММ: ' + username,
+  })
+
+  const twoFaQR = await new Promise((resolve, reject) => {
+    qrcode.toDataURL(twoFaSecret.otpauth_url, (err: any, data: any) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(data)
+      }
+    })
+  })
+
+  return { twoFaSecret: twoFaSecret.base32, twoFaQR }
+}
 
 const usersPerPage = 25
 export default eventHandler(async (event) => {
@@ -51,6 +72,8 @@ export default eventHandler(async (event) => {
           })
         }
 
+        const { twoFaSecret, twoFaQR } = await getCodeAndQr(userToEdit.username)
+
         if (!adminUserToEdit && !adminUserToEditByEmail) {
           await AdminUser.create({
             uuid: userToEdit.uuid,
@@ -65,6 +88,8 @@ export default eventHandler(async (event) => {
             allowedUsers: body.allowedUsers,
             restrictedUsers: body.restrictedUsers,
             isAllUsersAllowed: body.allowedUsers.length > 0 ? false : true,
+            twoFaSecret,
+            twoFaQR,
           })
 
           await ActionHistory.create({
@@ -152,6 +177,8 @@ export default eventHandler(async (event) => {
       })
 
       if (body.roles.length > 1) {
+        const { twoFaSecret, twoFaQR } = await getCodeAndQr(newUser.username)
+
         await AdminUser.create({
           uuid: newUser.uuid,
           username: newUser.username,
@@ -165,6 +192,8 @@ export default eventHandler(async (event) => {
           allowedUsers: body.allowedUsers,
           isAllUsersAllowed: body.allowedUsers.length > 0 ? false : true,
           restrictedUsers: body.restrictedUsers,
+          twoFaSecret,
+          twoFaQR,
         })
 
         await ActionHistory.create({

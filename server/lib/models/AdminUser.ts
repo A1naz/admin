@@ -25,6 +25,7 @@ const UserSchema = new Schema({
   tg2fa: { type: Boolean, required: false, default: false },
   twoFaSecret: { type: String, required: false, default: speakeasy.generateSecret(crypto.randomBytes(10).toString('hex')).base32 },
   isTwoFaEnabled: { type: Boolean, default: true },
+  twoFaQR: { type: String, required: false },
   balance: { type: Number, default: 0, required: true },
   registrationDate: { type: Date, default: Date.now },
   tabs: [{ type: String }],

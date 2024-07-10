@@ -14,7 +14,7 @@ export default NuxtAuthHandler({
     signIn: '/auth',
   },
   session: {
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 24 * 60 * 60, // 30 days
   },
   callbacks: {
     jwt: async ({ token, user }) => {
@@ -29,7 +29,15 @@ export default NuxtAuthHandler({
         token.uuid = user ? (user as any)?.uuid : ''
         token.username = user ? (user as any)?.username : ''
         token.balance = user ? (user as any)?.balance : 0
+        token.authDate = token.authDate
+          ? token.authDate
+          : new Date(new Date().setDate(new Date().getDate() + 1))
       }
+      const currentDate = new Date()
+      if (token.authDate && token.authDate < currentDate) {
+        return Promise.reject(new Error('Session expired'))
+      }
+
       return Promise.resolve(token)
     },
     session: async ({ session, token, user }) => {
@@ -124,10 +132,10 @@ export default NuxtAuthHandler({
       async authorize(credentials: any) {
         const { email, password, code } = credentials
         if (!email || !password) return null
-        
+
         if (runtimeConfig.env === 'developer') {
           const user = await AdminUser.findOne({ email })
-          
+
           if (!user) return null
           return user
         }
@@ -173,7 +181,7 @@ export default NuxtAuthHandler({
         }
 
         const verified = confirmTwoFaCode(code, user?.twoFaSecret)
-        
+
         if (!verified) {
           throw new Error('Invalid code')
         }
