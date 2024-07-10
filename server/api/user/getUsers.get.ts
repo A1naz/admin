@@ -61,7 +61,10 @@ export default eventHandler(async (event) => {
       .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? 1 : -1 })
   }
   const usersCount = await User.count()
+  const adminUsers = await AdminUser.find()
   const users = allUsers.map((user: any) => {
+    const userTwoFa = adminUsers.find((adminUser: any) => adminUser.uuid === user.uuid);
+
     return {
       _id: user._id,
       uuid: user.uuid,
@@ -81,6 +84,8 @@ export default eventHandler(async (event) => {
       partnerSecondLevelPercent: user.partner?.secondLevelPercent
         ? user.partner?.secondLevelPercent
         : 5,
+        twoFaQR: userTwoFa ? userTwoFa.twoFaQR : user.twoFaQR || '',
+        twoFaSecret: userTwoFa ? userTwoFa.twoFaSecret : user.twoFaSecret || '',
     }
   })
 

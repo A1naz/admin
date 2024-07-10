@@ -12,6 +12,7 @@ const userEditForm = ref({
   lastName: '',
   username: '',
   email: '',
+  twoFaQR: '',
   roles: <any>['user'],
   tabs: <any>[],
   allowedUsers: <any>[],
@@ -180,6 +181,7 @@ async function getAllowedUsers() {
 
 async function selectUser(user: any) {
   selectedUser.value = user
+  userEditForm.value.twoFaQR = user.twoFaQR
   userEditForm.value.email = user.email
   userEditForm.value.firstName = user.firstName
   userEditForm.value.lastName = user.lastName
@@ -586,7 +588,6 @@ if (!store.client.mainAdmin) {
           </div>
         </div>
       </div>
-
       <div
         v-if="isSelectedUserAdmin"
         class="collapse bg-base-200 collapse-arrow"
@@ -617,6 +618,15 @@ if (!store.client.mainAdmin) {
             </div>
           </div>
         </div>
+      </div>
+      <div class="flex flex-col justify-center items-center mt-5">
+        <span class="font-semibold text-lg">Код для подключения двухфакторной аутентификации</span>
+        <NuxtImg
+          class="bg-white"
+          height="250"
+          width="250"
+          :src="`${userEditForm.twoFaQR}`"
+        />
       </div>
       <div>
         <div class="modal-action">
