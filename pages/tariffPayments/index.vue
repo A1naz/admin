@@ -120,11 +120,10 @@ const getTariffsType = (type: any) => {
         <tr>
           <th>ID</th>
           <th>Наименование</th>
-          <th>Маркетплейс</th>
+          <th>Логин</th>
           <th>Пакет</th>
           <th>Стоимость</th>
           <th>Создано</th>
-          <th>Утверждено</th>
           <th></th>
         </tr>
       </thead>

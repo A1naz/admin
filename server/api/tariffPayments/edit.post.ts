@@ -1,4 +1,4 @@
-import { TariffPlan } from '@/server/lib/models/TariffPlan'
+import { TariffPayment } from '@/server/lib/models/TariffPayment'
 import { getServerSession } from '#auth'
 import { AdminUser } from '@/server/lib/models/AdminUser'
 import { User } from '@/server/lib/models/User'
@@ -18,7 +18,7 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
-  const foundTariff = await TariffPlan.findOne({ uuid })
+  const foundTariff = await TariffPayment.findOne({ uuid })
   if (!foundTariff) {
     throw createError({
       statusCode: 400,
