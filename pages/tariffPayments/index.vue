@@ -4,7 +4,7 @@ definePageMeta({
   auth: true,
   title: 'Оплата тарифов',
 })
-
+const currency = useCurrency()
 const store = useMainStore()
 const { height, width } = useWindowSize()
 
@@ -29,9 +29,9 @@ const selectedUser = ref<any>({
 })
 
 const tariffInfoModal = ref(false)
-const paymentsCountModal = ref(false)
 const editPaymentsModal = ref(false)
 const selectedTariff = ref<any>({})
+const editStatus = ref('accepted')
 
 function selectUser(user: any) {
   selectedUser.value = user
@@ -40,11 +40,13 @@ function selectUser(user: any) {
 }
 
 async function getTariffs() {
-  const { data }: any = await useFetch('/api/tariffPlans/tariffs', {
+  const { data }: any = await useFetch('/api/tariffPayments/payments', {
     method: 'GET',
     query: filtersForm.value,
     watch: false,
   })
+  console.log(data.value)
+
   tariffs.value = data.value
 }
 setTimeout(() => getTariffs(), 300)
@@ -66,25 +68,7 @@ const getTariffsType = (type: any) => {
 <template>
   <h1 class="text-2xl font-bold ml-3 my-2">Оплата тарифов</h1>
   <div class="ml-3 mb-2 mt-5 flex justify-between">
-    <div class="flex justify-between">
-      <TariffPlansSelectUserModal @selectUser="selectUser" />
-    </div>
     <div class="mr-10 flex gap-3">
-      <DateRangePicker
-        v-model="filtersForm.dateRange"
-        :start-date="filtersForm.startDate"
-        @reset="filtersForm.dateRange = []"
-      >
-        <button class="btn btn-neutral">
-          <Icon name="material-symbols:calendar-month-outline" size="26" />
-        </button>
-      </DateRangePicker>
-      <select class="select select-bordered w-50" v-model="filtersForm.mp">
-        <option value="all">Все маркетплейсы</option>
-        <option value="wildberries">Wildberries</option>
-        <option value="ozon">Ozon</option>
-      </select>
-
       <label class="flex">
         <input
           v-model="filtersForm.searchQuery"
@@ -97,17 +81,26 @@ const getTariffsType = (type: any) => {
           <Icon name="material-symbols:search" size="20" />
         </button>
       </label>
-      <div class="join mr-2">
-        <button
-          class="join-item btn"
-          @click="filtersForm.page -= 1"
-          :disabled="filtersForm.page <= 1"
-        >
-          «
+      <DateRangePicker
+        v-model="filtersForm.dateRange"
+        :start-date="filtersForm.startDate"
+        @reset="filtersForm.dateRange = []"
+      >
+        <button class="btn btn-neutral">
+          <Icon name="material-symbols:calendar-month-outline" size="26" />
         </button>
-        <button class="join-item btn">{{ filtersForm.page }}</button>
-        <button class="join-item btn" @click="filtersForm.page += 1">»</button>
-      </div>
+      </DateRangePicker>
+    </div>
+    <div class="join mr-2">
+      <button
+        class="join-item btn"
+        @click="filtersForm.page -= 1"
+        :disabled="filtersForm.page <= 1"
+      >
+        «
+      </button>
+      <button class="join-item btn">{{ filtersForm.page }}</button>
+      <button class="join-item btn" @click="filtersForm.page += 1">»</button>
     </div>
   </div>
   <div
@@ -121,6 +114,7 @@ const getTariffsType = (type: any) => {
           <th>ID</th>
           <th>Наименование</th>
           <th>Логин</th>
+          <th>Маркетплейс</th>
           <th>Пакет</th>
           <th>Стоимость</th>
           <th>Создано</th>
@@ -131,40 +125,35 @@ const getTariffsType = (type: any) => {
         <!-- row 1 -->
         <tr class="hover" v-for="tariff in tariffs">
           <th style="max-width: 80px; min-width: 70px">
-            {{ tariff.adminName }}
-          </th>
-          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
-            {{ tariff.username }}
+            {{ tariff.id }}
           </th>
           <th
             style="max-width: 300px; min-width: 140px"
             class="overflow-x-auto"
           >
-            {{ tariff.userOrgName }}
+            {{ tariff.orgName }}
           </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.createdAt.slice(0, 10).replace(/-/g, '.') }}
+          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
+            {{ tariff.username }}
           </th>
           <th style="max-width: 100px; min-width: 90px">
             {{ tariff.mp }}
           </th>
+
           <th style="max-width: 100px; min-width: 90px">
-            {{ getTariffName(tariff.tariff) }}
+            {{ tariff.paket }}
           </th>
           <th style="max-width: 100px; min-width: 90px">
-            {{ getTariffsType(tariff.type) }}
+            {{ currency.format(tariff.price) }}
           </th>
           <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.timeLimitMonths }} месяц(ев)
+            {{ tariff.createdAt.slice(0, 10).replace(/-/g, '.') }}
           </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.status }}
-          </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.paymentDate.slice(0, 10).replace(/-/g, '.') }} -
-            {{ tariff.activationDate.slice(0, 10).replace(/-/g, '.') }}
-          </th>
-          <th style="max-width: 100px; min-width: 90px" class="flex justify-center">
+
+          <th
+            style="max-width: 100px; min-width: 90px"
+            class="flex justify-center"
+          >
             <button>
               <Icon
                 name="mdi:account"
@@ -175,21 +164,29 @@ const getTariffsType = (type: any) => {
             </button>
             <button class="ml-2">
               <Icon
-                name="ep:info-filled"
+                name="el:ok"
                 size="30"
                 color="#d0cfd8"
                 @click="
-                  ;[(paymentsCountModal = true), (selectedTariff = tariff)]
+                  ;[
+                    (editPaymentsModal = true),
+                    (selectedTariff = tariff),
+                    (editStatus = 'accepted'),
+                  ]
                 "
               />
             </button>
             <button class="ml-2">
               <Icon
-                name="ep:edit"
+                name="ic:round-cancel"
                 size="30"
                 color="#d0cfd8"
                 @click="
-                  ;[(editPaymentsModal = true), (selectedTariff = tariff)]
+                  ;[
+                    (editPaymentsModal = true),
+                    (selectedTariff = tariff),
+                    (editStatus = 'rejected'),
+                  ]
                 "
               />
             </button>
@@ -205,17 +202,15 @@ const getTariffsType = (type: any) => {
     :selectedUser="selectedUser"
   />
 
-  <TariffPlansInfoModal
+  <TariffPaymentsInfoModal
     v-model:is-modal-open="tariffInfoModal"
     :selectedTariff="selectedTariff"
   />
-  <TariffPlansPaymentsCountModal
-    v-model:is-modal-open="paymentsCountModal"
-    :selectedTariff="selectedTariff"
-  />
-  <TariffPlansEditModal
+  <tariffPaymentsEditModal
     v-model:is-modal-open="editPaymentsModal"
     :selectedTariff="selectedTariff"
+    :status="editStatus"
+    :getTariffs="getTariffs"
   />
 </template>
 <style scoped>

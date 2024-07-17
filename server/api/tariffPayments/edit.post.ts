@@ -1,9 +1,7 @@
 import { TariffPayment } from '@/server/lib/models/TariffPayment'
 import { getServerSession } from '#auth'
 import { AdminUser } from '@/server/lib/models/AdminUser'
-import { User } from '@/server/lib/models/User'
 import { ActionHistory } from '@/server/lib/models/actionHistory'
-import { v4 as uuid } from 'uuid'
 
 export default eventHandler(async (event) => {
   const { uuid, status }: any = await readBody(event)
@@ -25,6 +23,16 @@ export default eventHandler(async (event) => {
       message: 'Тариф не найден',
     })
   }
+
+  await ActionHistory.create({
+    adminUser: adminUser._id,
+    actionId: 133,
+    actionDescription: `Админ ${adminUser.uuid} - ${adminUser.username} отредактировал тариф ${foundTariff._id} на статус ${status}`,
+    date: new Date(),
+  })
+
+  console.log(status);
+  
   foundTariff.status = status
   await foundTariff.save()
 

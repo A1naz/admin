@@ -6,17 +6,19 @@ import { ActionHistory } from '@/server/lib/models/actionHistory'
 import { v4 as uuid } from 'uuid'
 
 export default eventHandler(async (event) => {
-  const { mp, tariff, type, userUuid, screenshot }: any = await readBody(event)
-
-  const session = (await getServerSession(event)) as any
-  if (!session) return sendRedirect(event, '/auth', 302)
-
-  const adminUser = await AdminUser.findOne({ uuid: session.uuid })
-  if (
-    !adminUser ||
-    (!adminUser.mainAdmin && !adminUser.tabs.includes('тарифные планы'))
+  const { mp, tariff, type, userUuid, price, months }: any = await readBody(
+    event
   )
-    return sendRedirect(event, '/auth', 302)
+
+  // const session = (await getServerSession(event)) as any
+  // if (!session) return sendRedirect(event, '/auth', 302)
+
+  // const adminUser = await AdminUser.findOne({ uuid: session.uuid })
+  // if (
+  //   !adminUser ||
+  //   (!adminUser.mainAdmin && !adminUser.tabs.includes('тарифные планы'))
+  // )
+  //   return sendRedirect(event, '/auth', 302)
 
   const user = await User.findOne({ uuid: userUuid })
   if (!user) {
@@ -29,32 +31,17 @@ export default eventHandler(async (event) => {
   const currentDate = new Date()
   currentDate.setHours(12, 0, 0, 0)
 
-  const dateActivation = new Date(activationDate)
-  const dateEnd = new Date(activationDate)
-  dateEnd.setMonth(dateActivation.getMonth() + Number(timeLimit))
-
-  await ActionHistory.create({
-    adminUser: adminUser._id,
-    adminUserUuid: adminUser.uuid,
-    userUuid: user.uuid,
-    actionId: 122,
-    actionDescription: `Админ ${adminUser.uuid} - ${adminUser.username} создал тарифный план`,
-    date: new Date(),
-  })
-
-  await TariffPlan.create({
-    uuid: uuid(),
-    adminUser: adminUser._id,
+  await TariffPayment.create({
     user: user._id,
+    uuid: uuid(),
     mp,
+    price,
     tariff,
     type,
-    timeLimitMonths: timeLimit,
-    activationDate: dateActivation,
-    endDate: dateEnd,
-    paymentDate,
-    screenshot,
-    createdAt: new Date(Date.now()),
+    months,
+    login: user.username,
+    createdAt: currentDate,
+    status: 'created',
   })
 
   return {
