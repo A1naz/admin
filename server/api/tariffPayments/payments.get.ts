@@ -16,8 +16,6 @@ export default eventHandler(async (event) => {
 
   const { dateRange, mp, searchQuery, page }: any = getQuery(event)
 
-  console.log(dateRange, mp, searchQuery, page)
-
   let foundUsers: any = []
   if (searchQuery) {
     foundUsers = await User.find({

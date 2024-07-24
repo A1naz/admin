@@ -236,6 +236,14 @@ function closeOverlay() {
           title="Оплата тарифов"
           href="/tariffPayments"
         />
+        <SidebarItem
+          v-if="
+            store.client.mainAdmin || store.client.tabs.includes('продажи')
+          "
+          icon="majesticons:megaphone-line"
+          title="Продажи"
+          href="/sales"
+        />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between w-full items-center p-0 m-0">
