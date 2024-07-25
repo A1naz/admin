@@ -111,14 +111,13 @@ const getTariffsType = (type: any) => {
       <!-- head -->
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Наименование</th>
+          <th>Дата</th>
           <th>Логин</th>
-          <th>Маркетплейс</th>
-          <th>Пакет</th>
-          <th>Стоимость</th>
-          <th>Создано</th>
-          <th></th>
+          <th>Наименование</th>
+          <th>ФИО</th>
+          <th>Номер телефона</th>
+          <th>Почта</th>
+          <th>Статус</th>
         </tr>
       </thead>
       <tbody>
@@ -150,7 +149,7 @@ const getTariffsType = (type: any) => {
             {{ tariff.createdAt.slice(0, 10).replace(/-/g, '.') }}
           </th>
 
-          <th
+          <!-- <th
             style="max-width: 100px; min-width: 90px"
             class="flex justify-center"
           >
@@ -190,7 +189,7 @@ const getTariffsType = (type: any) => {
                 "
               />
             </button>
-          </th>
+          </th> -->
         </tr>
       </tbody>
     </table>
