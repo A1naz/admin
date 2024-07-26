@@ -15,9 +15,9 @@ const {
   error,
   refresh,
 } = useLazyAsyncData('client', () => $fetch('/api/user/client'))
-useIntervalFn(() => {
-  refresh()
-}, 1000 * 60)
+// useIntervalFn(() => {
+//   refresh()
+// }, 1000 * 60)
 if (status.value === 'authenticated') await store.getClient()
 
 const app = ref()

@@ -40,7 +40,7 @@ function selectUser(user: any) {
 }
 
 async function getTariffs() {
-  const { data }: any = await useFetch('/api/tariffPayments/payments', {
+  const { data }: any = await useFetch('/api/sales/payments', {
     method: 'GET',
     query: filtersForm.value,
     watch: false,
