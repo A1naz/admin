@@ -1,5 +1,4 @@
 import { Schema, model } from 'mongoose'
-import { AdminUser } from './AdminUser'
 
 const TariffPaymentSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },

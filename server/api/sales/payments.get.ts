@@ -5,14 +5,14 @@ import { TariffPayment } from '~/server/lib/models/TariffPayment'
 const limit = 50
 
 export default eventHandler(async (event) => {
-  const session = (await getServerSession(event)) as any
+  // const session = (await getServerSession(event)) as any
 
-  if (!session) return sendRedirect(event, '/auth', 302)
+  // if (!session) return sendRedirect(event, '/auth', 302)
 
-  const user = await AdminUser.findOne({ uuid: session.uuid })
+  // const user = await AdminUser.findOne({ uuid: session.uuid })
 
-  if (!user || (!user.mainAdmin && !user.tabs.includes('тарифные планы')))
-    return sendRedirect(event, '/auth', 302)
+  // if (!user || (!user.mainAdmin && !user.tabs.includes('тарифные планы')))
+  //   return sendRedirect(event, '/auth', 302)
 
   const { dateRange, mp, searchQuery, page }: any = getQuery(event)
 
@@ -67,6 +67,6 @@ export default eventHandler(async (event) => {
       status: el.status,
     }
   })
-  
+
   return format
 })
