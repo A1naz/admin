@@ -10,15 +10,15 @@ export default eventHandler(async (event) => {
     event
   )
 
-  // const session = (await getServerSession(event)) as any
-  // if (!session) return sendRedirect(event, '/auth', 302)
+  const session = (await getServerSession(event)) as any
+  if (!session) return sendRedirect(event, '/auth', 302)
 
-  // const adminUser = await AdminUser.findOne({ uuid: session.uuid })
-  // if (
-  //   !adminUser ||
-  //   (!adminUser.mainAdmin && !adminUser.tabs.includes('тарифные планы'))
-  // )
-  //   return sendRedirect(event, '/auth', 302)
+  const adminUser = await AdminUser.findOne({ uuid: session.uuid })
+  if (
+    !adminUser ||
+    (!adminUser.mainAdmin && !adminUser.tabs.includes('тарифные планы'))
+  )
+    return sendRedirect(event, '/auth', 302)
 
   const user = await User.findOne({ uuid: userUuid })
   if (!user) {
