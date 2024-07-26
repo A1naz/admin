@@ -38,8 +38,6 @@ export default eventHandler(async (event) => {
         : { $exists: true },
     typeoperations: 'product',
   })
-
-  console.log(users);
   
   if (!payments || !payments.length) {
     return []
