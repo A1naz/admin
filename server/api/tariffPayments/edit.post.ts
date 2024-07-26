@@ -1,4 +1,4 @@
-import { TariffPayment } from '@/server/lib/models/TariffPayment'
+import { TariffPayment } from '~/server/lib/models/TariffPayment'
 import { getServerSession } from '#auth'
 import { AdminUser } from '@/server/lib/models/AdminUser'
 import { ActionHistory } from '@/server/lib/models/actionHistory'
