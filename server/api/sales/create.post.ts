@@ -1,4 +1,3 @@
-import { TariffPayment } from '@/server/lib/models/TariffPayment'
 import { getServerSession } from '#auth'
 import { AdminUser } from '@/server/lib/models/AdminUser'
 import { User } from '@/server/lib/models/User'
@@ -28,21 +27,7 @@ export default eventHandler(async (event) => {
     })
   }
 
-  const currentDate = new Date()
-  currentDate.setHours(12, 0, 0, 0)
-
-  await TariffPayment.create({
-    user: user._id,
-    uuid: uuid(),
-    mp,
-    price,
-    tariff,
-    type,
-    months,
-    login: user.username,
-    createdAt: currentDate,
-    status: 'created',
-  })
+ 
 
   return {
     status: 'ok',
