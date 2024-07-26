@@ -1,7 +1,7 @@
 import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
-import { TariffPayment } from '~/server/lib/models/TariffPayment'
+import { TariffPayment } from '@/server/lib/models/TariffPayment'
 const limit = 50
 
 export default eventHandler(async (event) => {
