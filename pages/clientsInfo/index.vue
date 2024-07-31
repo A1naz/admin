@@ -6,17 +6,16 @@ definePageMeta({
 })
 
 const store = useMainStore()
-const { height, width } = useWindowSize()
+const { height } = useWindowSize()
 
 if (!store.client.mainAdmin && !store.client.tabs.includes('тарифные планы')) {
   navigateTo('/partner')
 }
-//---------------------------------------------------
 
 const filtersForm = ref({
   dateRange: [],
   startDate: new Date(Date.now() + 1000 * 60 * 5),
-  mp: 'all',
+  status: 'registered',
   searchQuery: '',
   page: 1,
 })
@@ -28,49 +27,26 @@ const selectedUser = ref<any>({
   username: '',
 })
 
-const tariffInfoModal = ref(false)
-const paymentsCountModal = ref(false)
-const editPaymentsModal = ref(false)
-const selectedTariff = ref<any>({})
 
-function selectUser(user: any) {
-  selectedUser.value = user
-
-  adjustTariffModal.value = true
-}
-
-async function getTariffs() {
-  const { data }: any = await useFetch('/api/tariffPlans/tariffs', {
+async function getClients() {
+  const { data }: any = await useFetch('/api/clientsInfo/get', {
     method: 'GET',
     query: filtersForm.value,
     watch: false,
   })
   tariffs.value = data.value
 }
-setTimeout(() => getTariffs(), 300)
 
-const findDebounced = useDebounceFn(getTariffs, 300)
+setTimeout(() => getClients(), 300)
+
+const findDebounced = useDebounceFn(getClients, 300)
 watch(filtersForm.value, findDebounced)
-
-const getTariffName = (tariff: any) => {
-  if (tariff == 'launch') return 'Запуск'
-  if (tariff == 'increase') return 'Рост'
-  if (tariff == 'support') return 'Поддержка'
-}
-
-const getTariffsType = (type: any) => {
-  if (type == 'basic') return 'Базовый'
-  if (type == 'full') return 'Под ключ'
-}
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-3 my-2">Тарифные планы</h1>
+  <h1 class="text-2xl font-bold ml-3 my-2">Клиенты</h1>
   <div class="ml-3 mb-2 mt-5 flex justify-between">
-    <div class="flex justify-between">
-      <TariffPlansSelectUserModal @selectUser="selectUser" />
-    </div>
     <div class="mr-10 flex gap-3">
-      <DateRangePicker
+      <!-- <DateRangePicker
         v-model="filtersForm.dateRange"
         :start-date="filtersForm.startDate"
         @reset="filtersForm.dateRange = []"
@@ -78,11 +54,11 @@ const getTariffsType = (type: any) => {
         <button class="btn btn-neutral">
           <Icon name="material-symbols:calendar-month-outline" size="26" />
         </button>
-      </DateRangePicker>
-      <select class="select select-bordered w-50" v-model="filtersForm.mp">
-        <option value="all">Все маркетплейсы</option>
-        <option value="wildberries">Wildberries</option>
-        <option value="ozon">Ozon</option>
+      </DateRangePicker> -->
+      <select class="select select-bordered w-50" v-model="filtersForm.status">
+        <option value="registered">Зарегистрированные</option>
+        <option value="active">Активные</option>
+        <option value="inactive">Неактивные</option>
       </select>
 
       <label class="flex">
@@ -118,105 +94,41 @@ const getTariffsType = (type: any) => {
       <!-- head -->
       <thead>
         <tr>
-          <th>Дата</th>
+          <th>Дата регистрации</th>
           <th>Логин</th>
           <th>Наименование</th>
           <th>Номер телефона</th>
           <th>Почта</th>
           <th>Детали</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
         <!-- row 1 -->
         <tr class="hover" v-for="tariff in tariffs">
           <th style="max-width: 80px; min-width: 70px">
-            {{ tariff.adminName }}
+            {{ tariff.registrationDate.slice(0, 10) }}
           </th>
-          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
-            {{ tariff.username }}
+          <th style="max-width: 80px; min-width: 70px">
+            {{ tariff.login }}
           </th>
-          <th
-            style="max-width: 300px; min-width: 140px"
-            class="overflow-x-auto"
-          >
-            {{ tariff.userOrgName }}
+          <th style="max-width: 80px; min-width: 70px">
+            {{ tariff.orgName }}
           </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.createdAt.slice(0, 10).replace(/-/g, '.') }}
+          <th style="max-width: 80px; min-width: 70px">
+            {{ tariff.phoneNumber }}
           </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.mp }}
+          <th style="max-width: 80px; min-width: 70px">
+            {{ tariff.email }}
           </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ getTariffName(tariff.tariff) }}
+          <th style="max-width: 80px; min-width: 70px">
+          
           </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ getTariffsType(tariff.type) }}
-          </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.timeLimitMonths }} месяц(ев)
-          </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.status }}
-          </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.paymentDate.slice(0, 10).replace(/-/g, '.') }} -
-            {{ tariff.activationDate.slice(0, 10).replace(/-/g, '.') }}
-          </th>
-          <th style="max-width: 100px; min-width: 90px" class="flex justify-center">
-            <button>
-              <Icon
-                name="mdi:account"
-                size="30"
-                color="#d0cfd8"
-                @click=";[(selectedTariff = tariff), (tariffInfoModal = true)]"
-              />
-            </button>
-            <button class="ml-2">
-              <Icon
-                name="ep:info-filled"
-                size="30"
-                color="#d0cfd8"
-                @click="
-                  ;[(paymentsCountModal = true), (selectedTariff = tariff)]
-                "
-              />
-            </button>
-            <button class="ml-2">
-              <Icon
-                name="ep:edit"
-                size="30"
-                color="#d0cfd8"
-                @click="
-                  ;[(editPaymentsModal = true), (selectedTariff = tariff)]
-                "
-              />
-            </button>
-          </th>
+          
         </tr>
       </tbody>
     </table>
   </div>
 
-  <TariffPlansAdjustTariffModal
-    v-model:is-modal-open="adjustTariffModal"
-    @getTariffs="getTariffs"
-    :selectedUser="selectedUser"
-  />
-
-  <TariffPlansInfoModal
-    v-model:is-modal-open="tariffInfoModal"
-    :selectedTariff="selectedTariff"
-  />
-  <TariffPlansPaymentsCountModal
-    v-model:is-modal-open="paymentsCountModal"
-    :selectedTariff="selectedTariff"
-  />
-  <TariffPlansEditModal
-    v-model:is-modal-open="editPaymentsModal"
-    :selectedTariff="selectedTariff"
-  />
 </template>
 <style scoped>
 ::-webkit-scrollbar {
