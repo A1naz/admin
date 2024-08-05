@@ -29,6 +29,7 @@ const selectedUser = ref<any>({
 
 
 async function getClients() {
+  tariffs.value = []
   const { data }: any = await useFetch('/api/clientsInfo/get', {
     method: 'GET',
     query: filtersForm.value,
@@ -46,7 +47,7 @@ watch(filtersForm.value, findDebounced)
   <h1 class="text-2xl font-bold ml-3 my-2">Клиенты</h1>
   <div class="ml-3 mb-2 mt-5 flex justify-between">
     <div class="mr-10 flex gap-3">
-      <!-- <DateRangePicker
+      <DateRangePicker
         v-model="filtersForm.dateRange"
         :start-date="filtersForm.startDate"
         @reset="filtersForm.dateRange = []"
@@ -54,7 +55,7 @@ watch(filtersForm.value, findDebounced)
         <button class="btn btn-neutral">
           <Icon name="material-symbols:calendar-month-outline" size="26" />
         </button>
-      </DateRangePicker> -->
+      </DateRangePicker>
       <select class="select select-bordered w-50" v-model="filtersForm.status">
         <option value="registered">Зарегистрированные</option>
         <option value="active">Активные</option>

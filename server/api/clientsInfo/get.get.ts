@@ -15,18 +15,7 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const { dateRange, searchQuery, page, status }: any = getQuery(event)
-
-  const dateRangeParam: Object = dateRange
-    ? {
-        activationDate: {
-          $lte: new Date(JSON.parse(dateRange[0])),
-        },
-        endDate: {
-          $gte: new Date(JSON.parse(dateRange[1])),
-        },
-      }
-    : {}
-
+    
   const searchQueryParam: Object = searchQuery
     ? {
         $or: [
@@ -38,14 +27,11 @@ export default eventHandler(async (event) => {
 
   let users = []
   if (status === 'active') {
-    console.log('active');
-    users = await getUsers.activeUsers(page, searchQueryParam)
+    users = await getUsers.activeUsers(page, searchQueryParam, dateRange)
   } else if (status === 'inactive') {
-    console.log('inactive');
-    users = await getUsers.inactiveUsers(page, searchQueryParam)
-  } else { 
-    console.log('registered');
-    users = await getUsers.registeredUsers(page, searchQueryParam)
+    users = await getUsers.inactiveUsers(page, searchQueryParam, dateRange)
+  } else {
+    users = await getUsers.registeredUsers(page, searchQueryParam, dateRange)
   }
 
   return users

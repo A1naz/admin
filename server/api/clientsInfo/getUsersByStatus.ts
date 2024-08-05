@@ -15,7 +15,20 @@ const filterUsers = (users: any[]) => {
 }
 
 export default {
-  async registeredUsers(page: number = 1, searchQueryParam: Object = {}) {
+  async registeredUsers(
+    page: number = 1,
+    searchQueryParam: Object = {},
+    dateRange: any
+  ) {
+    const dateRangeParam: Object = dateRange
+      ? {
+          registrationDate: {
+            $gte: new Date(JSON.parse(dateRange[0])),
+            $lte: new Date(JSON.parse(dateRange[1])),
+          },
+        }
+      : {}
+
     const userIds = await paymenthistory.aggregate([
       {
         $match: {},
@@ -29,6 +42,7 @@ export default {
 
     const users = await User.find({
       _id: { $nin: userIds.map((user: any) => user._id) },
+      ...dateRangeParam,
       ...searchQueryParam,
     })
       .limit(50)
@@ -42,9 +56,15 @@ export default {
 
     return format
   },
-  async activeUsers(page: number = 1, searchQueryParam: Object = {}) {
-    const curDate = new Date()
-    const twoWeeksAgo = new Date(curDate.getTime() - 14 * 24 * 60 * 60 * 1000)
+  async activeUsers(
+    page: number = 1,
+    searchQueryParam: Object = {},
+    dateRange: any
+  ) {
+    const curDate = dateRange ? new Date(JSON.parse(dateRange[1])) : new Date()
+    const twoWeeksAgo = dateRange
+      ? new Date(JSON.parse(dateRange[0]))
+      : new Date(curDate.getTime() - 14 * 24 * 60 * 60 * 1000)
 
     const userIds = await paymenthistory.aggregate([
       {
@@ -76,9 +96,15 @@ export default {
 
     return format
   },
-  async inactiveUsers(page: number = 1, searchQueryParam: Object = {}) {
-    const curDate = new Date()
-    const twoWeeksAgo = new Date(curDate.getTime() - 14 * 24 * 60 * 60 * 1000)
+  async inactiveUsers(
+    page: number = 1,
+    searchQueryParam: Object = {},
+    dateRange: any
+  ) {
+    const curDate = dateRange ? new Date(JSON.parse(dateRange[1])) : new Date()
+    const twoWeeksAgo = dateRange
+      ? new Date(JSON.parse(dateRange[0]))
+      : new Date(curDate.getTime() - 14 * 24 * 60 * 60 * 1000)
 
     const userIds = await paymenthistory.aggregate([
       {
