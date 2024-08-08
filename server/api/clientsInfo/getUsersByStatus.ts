@@ -1,4 +1,5 @@
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
+import { PaymentIntend } from '@/server/lib/models/PaymentIntend'
 import { User } from '~/server/lib/models/User'
 const limit = 50
 
@@ -10,6 +11,7 @@ const filterUsers = (users: any[]) => {
       orgName: user.orgName,
       phoneNumber: user.phoneNumber,
       email: user.email,
+      orgInn: user.orgInn,
     }
   })
 }
