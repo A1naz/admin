@@ -97,10 +97,12 @@ watch(filtersForm.value, findDebounced)
         <tr>
           <th>Дата регистрации</th>
           <th>Логин</th>
+          <th>Номер договора клиента</th>
           <th>Наименование</th>
+          <th>ИНН</th>
+          <th>ФИО</th>
           <th>Номер телефона</th>
           <th>Почта</th>
-          <th>Детали</th>
         </tr>
       </thead>
       <tbody>
@@ -109,11 +111,20 @@ watch(filtersForm.value, findDebounced)
           <th style="max-width: 80px; min-width: 70px">
             {{ tariff.registrationDate.slice(0, 10) }}
           </th>
-          <th style="max-width: 80px; min-width: 70px">
+          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
             {{ tariff.login }}
           </th>
-          <th style="max-width: 80px; min-width: 70px">
+          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
+            {{ tariff.uuid }}
+          </th>
+          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
             {{ tariff.orgName }}
+          </th>
+          <th style="max-width: 80px; min-width: 70px">
+            {{ tariff.orgInn }}
+          </th>
+          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
+            {{ tariff.FIO }}
           </th>
           <th style="max-width: 80px; min-width: 70px">
             {{ tariff.phoneNumber }}

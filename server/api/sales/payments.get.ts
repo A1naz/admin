@@ -1,7 +1,7 @@
 import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
-import { paymenthistory } from '~/server/lib/models/Paymenthistory'
+import { PaymentIntend } from '~/server/lib/models/PaymentIntend'
 const limit = 50
 
 export default eventHandler(async (event) => {
@@ -25,7 +25,7 @@ export default eventHandler(async (event) => {
       }).limit(30)
     : []
 
-  const payments = await paymenthistory.find({
+  const payments = await PaymentIntend.find({
     user: users.length
       ? { $in: users.map((user: any) => user._id) }
       : { $exists: true },
@@ -36,9 +36,11 @@ export default eventHandler(async (event) => {
             $lt: new Date(JSON.parse(dateRange[1])).setHours(23, 59, 0, 0),
           }
         : { $exists: true },
-    typeoperations: 'product',
+    // typeoperations: 'product',
   })
-  
+    .limit(limit)
+    .skip((page - 1) * limit)
+
   if (!payments || !payments.length) {
     return []
   }
@@ -60,8 +62,12 @@ export default eventHandler(async (event) => {
       FIO: user.firstName + ' ' + user.middleName + ' ' + user.lastName,
       email: user.email,
       phone: user.phoneNumber,
+      summ: el.summ,
       date: el.dataoperation,
       status: el.status || 'Не оплачено',
+      orgInn: user.orgInn,
+      registrationDate: user.registrationDate,
+      orgOgrn: user.orgOgrn,
     }
   })
 

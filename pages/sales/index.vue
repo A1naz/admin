@@ -45,7 +45,6 @@ async function getTariffs() {
     query: filtersForm.value,
     watch: false,
   })
-  console.log(data.value)
 
   tariffs.value = data.value
 }
@@ -103,6 +102,7 @@ const getTariffsType = (type: any) => {
       <button class="join-item btn" @click="filtersForm.page += 1">»</button>
     </div>
   </div>
+
   <div
     class="mt-6 mx-2 overflow-y-auto"
     :style="{ 'max-height': height - 270 + 'px' }"
@@ -112,19 +112,32 @@ const getTariffsType = (type: any) => {
       <thead>
         <tr>
           <th>Дата</th>
+          <th>Дата регистрации клиента</th>
+          <th>Номер договора клиента</th>
           <th>Логин</th>
-          <th>Наименование</th>
+          <th>Наименование организации</th>
+          <th>ОГРН(ОГРНИП)</th>
+          <th>ИНН</th>
           <th>ФИО</th>
           <th>Номер телефона</th>
           <th>Почта</th>
-          <th>Статус</th>
+          <th>Сумма</th>
         </tr>
       </thead>
       <tbody>
         <!-- row 1 -->
         <tr class="hover" v-for="tariff in tariffs">
-          <th style="max-width: 80px; min-width: 70px">
-            {{ tariff.id }}
+          <th style="max-width: 100px; min-width: 90px">
+            {{ tariff.date.slice(0, 10).replace(/-/g, '.') }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ tariff.registrationDate.slice(0, 10).replace(/-/g, '.') }}
+          </th>
+          <th style="max-width: 55px; min-width: 50px" class="overflow-x-auto">
+            {{ tariff.userUuid }}
+          </th>
+          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
+            {{ tariff.username }}
           </th>
           <th
             style="max-width: 300px; min-width: 140px"
@@ -132,23 +145,32 @@ const getTariffsType = (type: any) => {
           >
             {{ tariff.orgName }}
           </th>
+          <th
+            style="max-width: 300px; min-width: 140px"
+            class="overflow-x-auto"
+          >
+            {{ tariff.orgOgrn }}
+          </th>
+          <th
+            style="max-width: 300px; min-width: 140px"
+            class="overflow-x-auto"
+          >
+            {{ tariff.orgInn }}
+          </th>
           <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
-            {{ tariff.username }}
+            {{ tariff.FIO }}
           </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.mp }}
+          <th style="max-width: 100px; min-width: 90px" class="overflow-x-auto">
+            {{ tariff.phone }}
+          </th>
+
+          <th style="max-width: 100px; min-width: 90px" class="overflow-x-auto">
+            {{ tariff.email }}
           </th>
 
           <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.paket }}
+            {{ currency.format(tariff.summ) }}
           </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ currency.format(tariff.price) }}
-          </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.createdAt.slice(0, 10).replace(/-/g, '.') }}
-          </th>
-
           <!-- <th
             style="max-width: 100px; min-width: 90px"
             class="flex justify-center"

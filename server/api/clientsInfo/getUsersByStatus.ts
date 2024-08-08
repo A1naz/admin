@@ -12,6 +12,13 @@ const filterUsers = (users: any[]) => {
       phoneNumber: user.phoneNumber,
       email: user.email,
       orgInn: user.orgInn,
+      orgOgrn: user.orgOgrn,
+      FIO:
+        user.firstName ||
+        '' + ' ' + user.middleName ||
+        '' + ' ' + user.lastName ||
+        ' ',
+      uuid: user.uuid,
     }
   })
 }
