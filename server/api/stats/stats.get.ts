@@ -27,12 +27,13 @@ export default eventHandler(async (event) => {
       }
 
   const { page, filters, sortDate, elPerPage, mp }: any = getQuery(event)
-  
+
   let productsCountInfo = {
     count: 0,
     sum: 0,
   }
   const trueFilters = JSON.parse(filters)
+
   let commentRegex = {}
   if (trueFilters.type == 'penalty') {
     commentRegex = {
@@ -83,6 +84,12 @@ export default eventHandler(async (event) => {
     trueFilters.type == 'any' || trueFilters.type == 'penalty'
       ? {}
       : { type: trueFilters.type }
+  const trueFaceType =
+    trueFilters.faceType == 'any'
+      ? {}
+      : trueFilters.faceType == 'yurFace'
+      ? { numberpp: { $exists: false } }
+      : { numberpp: { $exists: true } }
   const trueDateRange = trueFilters.dateRange
     ? {
         dataoperation: {
@@ -91,10 +98,12 @@ export default eventHandler(async (event) => {
         },
       }
     : {}
+  const mpFilter = mp == 'all' ? {} : { mp: mp }
 
   let stats: any = await paymenthistory
     .find({
-      mp: mp == 'all' ? { $exists: true } : mp,
+      ...mpFilter,
+      ...trueFaceType,
       ...commentRegex,
       ...allowedUsersParam,
       ...trueFilters.basisoperation,

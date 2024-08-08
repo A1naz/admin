@@ -12,6 +12,7 @@ const productsCountInfo = ref({
 const isExportBtnDisabled = ref(false)
 const currency = useCurrency()
 const type = ref('any')
+const faceType = ref('any')
 const service = ref('any')
 const articleQuery = ref('')
 const { $dayjs } = useNuxtApp()
@@ -89,6 +90,7 @@ async function getStats() {
         type: service.value,
         dateRange: dateRange.value.length > 0 ? dateRange.value : null,
         article: articleQuery.value,
+        faceType: faceType.value,
       },
     },
   })
@@ -240,6 +242,15 @@ if (
         }}
       </button>
 
+      <select
+        class="select select-bordered w-50 ml-3"
+        @change=";[(curPage = 1), getStats()]"
+        v-model="faceType"
+      >
+        <option selected value="any">Все типы лица</option>
+        <option value="yurFace">Юридическое лицо</option>
+        <option value="fizFace">Физическое лицо</option>
+      </select>
       <select
         class="select select-bordered w-50 ml-3"
         @change=";[(curPage = 1), getStats()]"
