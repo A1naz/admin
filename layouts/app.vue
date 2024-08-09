@@ -246,7 +246,7 @@ function closeOverlay() {
         />
         <SidebarItem
           v-if="
-            store.client.mainAdmin || store.client.tabs.includes('продажи')
+            store.client.mainAdmin || store.client.tabs.includes('клиенты')
           "
           icon="solar:users-group-two-rounded-line-duotone"
           title="Клиенты"
