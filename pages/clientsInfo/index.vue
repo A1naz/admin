@@ -2,13 +2,13 @@
 definePageMeta({
   layout: 'app',
   auth: true,
-  title: 'Тарифные планы',
+  title: 'Клиенты',
 })
 
 const store = useMainStore()
 const { height } = useWindowSize()
 
-if (!store.client.mainAdmin && !store.client.tabs.includes('тарифные планы')) {
+if (!store.client.mainAdmin && !store.client.tabs.includes('клиенты')) {
   navigateTo('/partner')
 }
 
