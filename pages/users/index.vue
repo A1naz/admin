@@ -246,6 +246,7 @@ const tabs = ref<any>([
   'фулфилмент',
   'продажи',
   'клиенты',
+  'лендинг'
 ])
 
 async function saveUser() {
