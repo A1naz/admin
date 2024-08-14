@@ -3,6 +3,8 @@ import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { PaymentIntend } from '~/server/lib/models/PaymentIntend'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
+import he from 'he'
+
 const limit = 50
 
 export default eventHandler(async (event) => {
@@ -66,10 +68,20 @@ export default eventHandler(async (event) => {
       summ: el.summ,
       date: el.dataoperation,
       status: el.status || 'Не оплачено',
-      orgInn: user.orgInn,
       registrationDate: user.registrationDate,
       orgOgrn: user.orgOgrn,
-      bankInfo: user.bankInfo,
+      orgInn: user.orgInn,
+      rs: user.bankInfo ? user.bankInfo.rs : '',
+      bik: user.bankInfo ? user.bankInfo.bik : '',
+      ks: user.bankInfo ? user.bankInfo.ks : '',
+      bankName: user.bankInfo ? he.decode(user.bankInfo.name) : '',
+      namemini: user.bankInfo ? user.bankInfo.namemini : '',
+      index: user.bankInfo ? user.bankInfo.index : '',
+      city: user.bankInfo ? user.bankInfo.city : '',
+      address: user.bankInfo
+        ? user.bankInfo.city + ', ' + user.bankInfo.address
+        : '',
+      orgPhone: user.bankInfo ? user.bankInfo.phone : '',
     }
   })
 

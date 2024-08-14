@@ -22,22 +22,9 @@ const filtersForm = ref({
 })
 
 const tariffs = ref<any>([])
-const adjustTariffModal = ref(false)
 
-const selectedUser = ref<any>({
-  username: '',
-})
-
-const tariffInfoModal = ref(false)
-const editPaymentsModal = ref(false)
-const selectedTariff = ref<any>({})
-const editStatus = ref('accepted')
-
-function selectUser(user: any) {
-  selectedUser.value = user
-
-  adjustTariffModal.value = true
-}
+const infoModal = ref(false)
+const selectedUser = ref<any>({})
 
 async function getTariffs() {
   const { data }: any = await useFetch('/api/sales/payments', {
@@ -53,15 +40,9 @@ setTimeout(() => getTariffs(), 300)
 const findDebounced = useDebounceFn(getTariffs, 300)
 watch(filtersForm.value, findDebounced)
 
-const getTariffName = (tariff: any) => {
-  if (tariff == 'launch') return 'Запуск'
-  if (tariff == 'increase') return 'Рост'
-  if (tariff == 'support') return 'Поддержка'
-}
-
-const getTariffsType = (type: any) => {
-  if (type == 'basic') return 'Базовый'
-  if (type == 'full') return 'Под ключ'
+const openTariffInfo = (tariff: any) => {
+  selectedUser.value = tariff
+  infoModal.value = true
 }
 </script>
 <template>
@@ -111,31 +92,19 @@ const getTariffsType = (type: any) => {
       <!-- head -->
       <thead>
         <tr>
-          <th>Дата</th>
-          <th>Дата регистрации клиента</th>
-          <th>Номер договора клиента</th>
           <th>Логин</th>
-          <th>Наименование организации</th>
-          <th>ОГРН(ОГРНИП)</th>
-          <th>ИНН</th>
+          <th>Организация</th>
+          <th>№ договора</th>
+          <th>Регистрация</th>
           <th>ФИО</th>
-          <th>Номер телефона</th>
-          <th>Почта</th>
           <th>Сумма</th>
+          <th>Дата</th>
+          <th>Детали</th>
         </tr>
       </thead>
       <tbody>
         <!-- row 1 -->
         <tr class="hover" v-for="tariff in tariffs">
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.date.slice(0, 10).replace(/-/g, '.') }}
-          </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.registrationDate.slice(0, 10).replace(/-/g, '.') }}
-          </th>
-          <th style="max-width: 55px; min-width: 50px" class="overflow-x-auto">
-            {{ tariff.userUuid }}
-          </th>
           <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
             {{ tariff.username }}
           </th>
@@ -145,7 +114,22 @@ const getTariffsType = (type: any) => {
           >
             {{ tariff.orgName }}
           </th>
-          <th
+          <th style="max-width: 55px; min-width: 50px" class="overflow-x-auto">
+            {{ tariff.userUuid }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ tariff.registrationDate.slice(0, 10).replace(/-/g, '.') }}
+          </th>
+          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
+            {{ tariff.FIO }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ currency.format(tariff.summ) }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ tariff.date.slice(0, 10).replace(/-/g, '.') }}
+          </th>
+          <!-- <th
             style="max-width: 300px; min-width: 140px"
             class="overflow-x-auto"
           >
@@ -157,81 +141,25 @@ const getTariffsType = (type: any) => {
           >
             {{ tariff.orgInn }}
           </th>
-          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
-            {{ tariff.FIO }}
-          </th>
           <th style="max-width: 100px; min-width: 90px" class="overflow-x-auto">
             {{ tariff.phone }}
           </th>
 
           <th style="max-width: 100px; min-width: 90px" class="overflow-x-auto">
             {{ tariff.email }}
-          </th>
-
-          <th style="max-width: 100px; min-width: 90px">
-            {{ currency.format(tariff.summ) }}
-          </th>
-          <!-- <th
-            style="max-width: 100px; min-width: 90px"
-            class="flex justify-center"
-          >
-            <button>
-              <Icon
-                name="mdi:account"
-                size="30"
-                color="#d0cfd8"
-                @click=";[(selectedTariff = tariff), (tariffInfoModal = true)]"
-              />
-            </button>
-            <button class="ml-2">
-              <Icon
-                name="el:ok"
-                size="30"
-                color="#d0cfd8"
-                @click="
-                  ;[
-                    (editPaymentsModal = true),
-                    (selectedTariff = tariff),
-                    (editStatus = 'accepted'),
-                  ]
-                "
-              />
-            </button>
-            <button class="ml-2">
-              <Icon
-                name="ic:round-cancel"
-                size="30"
-                color="#d0cfd8"
-                @click="
-                  ;[
-                    (editPaymentsModal = true),
-                    (selectedTariff = tariff),
-                    (editStatus = 'rejected'),
-                  ]
-                "
-              />
-            </button>
           </th> -->
+          <th>
+            <button class="btn btn-neutral" @click="openTariffInfo(tariff)">
+              Информация
+            </button>
+          </th>
         </tr>
       </tbody>
     </table>
   </div>
-
-  <TariffPlansAdjustTariffModal
-    v-model:is-modal-open="adjustTariffModal"
-    @getTariffs="getTariffs"
+  <UserInfoModal
+    v-model:is-modal-open="infoModal"
     :selectedUser="selectedUser"
-  />
-
-  <TariffPaymentsInfoModal
-    v-model:is-modal-open="tariffInfoModal"
-    :selectedTariff="selectedTariff"
-  />
-  <tariffPaymentsEditModal
-    v-model:is-modal-open="editPaymentsModal"
-    :selectedTariff="selectedTariff"
-    :status="editStatus"
-    :getTariffs="getTariffs"
   />
 </template>
 <style scoped>

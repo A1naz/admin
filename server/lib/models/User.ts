@@ -51,6 +51,9 @@ const UserSchema = new Schema({
   twoFaQR: { type: String, required: false },
   twoFaSecret: { type: String, required: false },
   isTwoFaEnabled: { type: Boolean, default: false },
+  bankInfo: {
+    type: Object,
+  },
 
   tabs: [{ type: String }],
   newEmail: { type: String, required: false },

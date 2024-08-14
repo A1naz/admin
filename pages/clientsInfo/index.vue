@@ -23,10 +23,8 @@ const filtersForm = ref({
 const tariffs = ref<any>([])
 const adjustTariffModal = ref(false)
 
-const selectedUser = ref<any>({
-  username: '',
-})
-
+const selectedUser = ref<any>({})
+const infoModal = ref(false)
 
 async function getClients() {
   tariffs.value = []
@@ -42,6 +40,11 @@ setTimeout(() => getClients(), 300)
 
 const findDebounced = useDebounceFn(getClients, 300)
 watch(filtersForm.value, findDebounced)
+
+const openTariffInfo = (tariff: any) => {
+  selectedUser.value = tariff
+  infoModal.value = true
+}
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-3 my-2">Клиенты</h1>
@@ -95,52 +98,69 @@ watch(filtersForm.value, findDebounced)
       <!-- head -->
       <thead>
         <tr>
-          <th>Дата регистрации</th>
           <th>Логин</th>
-          <th>Номер договора клиента</th>
-          <th>Наименование</th>
-          <th>ИНН</th>
+          <th>Организация</th>
+          <th>№ договора</th>
+          <th>Регистрация</th>
           <th>ФИО</th>
-          <th>Номер телефона</th>
-          <th>Почта</th>
+          <th>Детали</th>
         </tr>
       </thead>
       <tbody>
         <!-- row 1 -->
         <tr class="hover" v-for="tariff in tariffs">
-          <th style="max-width: 80px; min-width: 70px">
-            {{ tariff.registrationDate.slice(0, 10) }}
-          </th>
           <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
             {{ tariff.login }}
           </th>
-          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
-            {{ tariff.uuid }}
-          </th>
-          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
+          <th
+            style="max-width: 300px; min-width: 140px"
+            class="overflow-x-auto"
+          >
             {{ tariff.orgName }}
           </th>
-          <th style="max-width: 80px; min-width: 70px">
-            {{ tariff.orgInn }}
+          <th style="max-width: 55px; min-width: 50px" class="overflow-x-auto">
+            {{ tariff.uuid }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px">
+            {{ tariff.registrationDate.slice(0, 10).replace(/-/g, '.') }}
           </th>
           <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
             {{ tariff.FIO }}
           </th>
-          <th style="max-width: 80px; min-width: 70px">
-            {{ tariff.phoneNumber }}
+
+          <!-- <th
+            style="max-width: 300px; min-width: 140px"
+            class="overflow-x-auto"
+          >
+            {{ tariff.orgOgrn }}
           </th>
-          <th style="max-width: 80px; min-width: 70px">
+          <th
+            style="max-width: 300px; min-width: 140px"
+            class="overflow-x-auto"
+          >
+            {{ tariff.orgInn }}
+          </th>
+          <th style="max-width: 100px; min-width: 90px" class="overflow-x-auto">
+            {{ tariff.phone }}
+          </th>
+
+          <th style="max-width: 100px; min-width: 90px" class="overflow-x-auto">
             {{ tariff.email }}
+          </th> -->
+          <th>
+            <button class="btn btn-neutral" @click="openTariffInfo(tariff)">
+              Информация
+            </button>
           </th>
-          <th style="max-width: 80px; min-width: 70px">
-          
-          </th>
-          
         </tr>
       </tbody>
     </table>
   </div>
 
+  <UserInfoModal
+    v-model:is-modal-open="infoModal"
+    :selectedUser="selectedUser"
+  />
 </template>
 <style scoped>
 ::-webkit-scrollbar {

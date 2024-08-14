@@ -1,6 +1,7 @@
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { PaymentIntend } from '@/server/lib/models/PaymentIntend'
 import { User } from '~/server/lib/models/User'
+import he from 'he'
 const limit = 50
 
 const filterUsers = (users: any[]) => {
@@ -9,16 +10,29 @@ const filterUsers = (users: any[]) => {
       registrationDate: user.registrationDate,
       login: user.username,
       orgName: user.orgName,
-      phoneNumber: user.phoneNumber,
+      phone: user.phoneNumber,
       email: user.email,
       orgInn: user.orgInn,
       orgOgrn: user.orgOgrn,
-      FIO:
-        user.firstName ||
-        '' + ' ' + user.middleName ||
-        '' + ' ' + user.lastName ||
-        ' ',
+      FIO: user.firstName
+        ? user.firstName
+        : ' ' + user.middleName
+        ? user.middleName
+        : ' ' + user.lastName
+        ? user.lastName
+        : ' ',
       uuid: user.uuid,
+      rs: user.bankInfo ? user.bankInfo.rs : '',
+      bik: user.bankInfo ? user.bankInfo.bik : '',
+      ks: user.bankInfo ? user.bankInfo.ks : '',
+      bankName: user.bankInfo ? he.decode(user.bankInfo.name) : '',
+      namemini: user.bankInfo ? user.bankInfo.namemini : '',
+      index: user.bankInfo ? user.bankInfo.index : '',
+      city: user.bankInfo ? user.bankInfo.city : '',
+      address: user.bankInfo
+        ? user.bankInfo.city + ', ' + user.bankInfo.address
+        : '',
+      orgPhone: user.bankInfo ? user.bankInfo.phone : '',
     }
   })
 }
