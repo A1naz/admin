@@ -2,6 +2,7 @@ import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { PaymentIntend } from '~/server/lib/models/PaymentIntend'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
 const limit = 50
 
 export default eventHandler(async (event) => {
@@ -68,7 +69,15 @@ export default eventHandler(async (event) => {
       orgInn: user.orgInn,
       registrationDate: user.registrationDate,
       orgOgrn: user.orgOgrn,
+      bankInfo: user.bankInfo,
     }
+  })
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    actionId: 82,
+    actionDescription: `Админ ${user.uuid} - ${user.username} получил список платежей, вкладка Продажи`,
+    date: new Date(),
   })
 
   return format

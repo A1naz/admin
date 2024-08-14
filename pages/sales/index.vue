@@ -65,7 +65,7 @@ const getTariffsType = (type: any) => {
 }
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-3 my-2">Оплата тарифов</h1>
+  <h1 class="text-2xl font-bold ml-3 my-2">Продажи</h1>
   <div class="ml-3 mb-2 mt-5 flex justify-between">
     <div class="mr-10 flex gap-3">
       <label class="flex">
