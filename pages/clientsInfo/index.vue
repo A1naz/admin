@@ -59,6 +59,9 @@ const openTariffInfo = (tariff: any) => {
           <Icon name="material-symbols:calendar-month-outline" size="26" />
         </button>
       </DateRangePicker>
+      <button class="btn -ml-3" @click="filtersForm.dateRange = []" v-if="filtersForm.dateRange.length">
+        <Icon name="material-symbols:close" size="26" />
+      </button>
       <select class="select select-bordered w-50" v-model="filtersForm.status">
         <option value="registered">Зарегистрированные</option>
         <option value="active">Активные</option>

@@ -13,10 +13,16 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('лендинг')) {
 }
 
 const landingInfo = ref<any>([])
+const dateRange = ref<any>([])
+const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 
 async function getLandingInfo() {
   const { data, error }: any = await useFetch('/api/landingInfo/get', {
     method: 'GET',
+    query: {
+      dateRange: dateRange.value,
+    },
+    watch: false,
   })
 
   if (data.value) {
@@ -25,10 +31,24 @@ async function getLandingInfo() {
 }
 
 await getLandingInfo()
+watch(dateRange, getLandingInfo)
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-3 my-2">Лендинг</h1>
-
+  <div class="flex">
+    <DateRangePicker
+      v-model="dateRange"
+      :start-date="startDate"
+      @reset="dateRange = []"
+    >
+      <button class="btn btn-neutral">
+        <Icon name="material-symbols:calendar-month-outline" size="26" />
+      </button>
+    </DateRangePicker>
+    <button class="btn" @click="dateRange = []" v-if="dateRange.length">
+      <Icon name="material-symbols:close" size="26" />
+    </button>
+  </div>
   <div
     class="mt-6 mx-2 overflow-y-auto"
     :style="{ 'max-height': height - 270 + 'px' }"

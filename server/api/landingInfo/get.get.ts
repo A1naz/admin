@@ -9,6 +9,17 @@ export default eventHandler(async (event) => {
 
   const user = await AdminUser.findOne({ uuid: session.uuid })
 
+  const { dateRange }: any = getQuery(event)
+
+  const dateRangeParam: Object = dateRange
+    ? {
+      registrationDate: {
+          $gte: new Date(JSON.parse(dateRange[0])),
+          $lte: new Date(JSON.parse(dateRange[1])),
+        },
+      }
+    : {}
+    
   if (!user || (!user.mainAdmin && !user.tabs.includes('лендинг')))
     return sendRedirect(event, '/auth', 302)
 
@@ -16,6 +27,7 @@ export default eventHandler(async (event) => {
     {
       $match: {
         landing: { $exists: true },
+        ...dateRangeParam,
       },
     },
 
