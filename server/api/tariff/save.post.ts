@@ -40,7 +40,7 @@ function getServiceNameByKey(key: string) {
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { userUuid, tariffs }: any = await readBody(event)
+  const { userUuid, tariffs, rewardPercent, secondLevelPercent }: any = await readBody(event)
   if (!session) return sendRedirect(event, '/auth', 302)
 
   const user = await AdminUser.findOne({ uuid: session.uuid })
@@ -82,6 +82,9 @@ export default eventHandler(async (event) => {
 
     tariffsStr += pricesStr + '\n'
   })
+
+  foundUser.partner.rewardPercent = rewardPercent
+  foundUser.partner.secondLevelPercent = secondLevelPercent
 
   await foundUser.save()
 

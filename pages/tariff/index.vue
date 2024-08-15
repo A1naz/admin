@@ -148,6 +148,8 @@ async function saveTariffs() {
       tariffs: isStandartTariffs.value
         ? defaultPriсes.value
         : userTariffs.value,
+        rewardPercent: selectedUser.value.partnerRewardPercent,
+        secondLevelPercent: selectedUser.value.partnerSecondLevelPercent,
     },
     watch: false,
   })
@@ -412,6 +414,25 @@ getStandartTariffs()
           </div>
         </div>
       </div>
+      <div class="text-lg text-center mt-2">Партнерка</div>
+      <div class="flex flex-col">
+        Партнерка, 1 уровень %
+        <input
+          type="number"
+          placeholder="Мин. значение в ₽"
+          v-model="selectedUser.partnerRewardPercent"
+          class="input input-bordered my-1"
+        />
+      </div>
+      <div class="flex flex-col">
+        Партнерка, 1 уровень %
+        <input
+          type="number"
+          placeholder="Мин. значение в ₽"
+          v-model="selectedUser.partnerSecondLevelPercent"
+          class="input input-bordered my-1"
+        />
+      </div>
       <div
         v-if="selectedUser.uuid === 'all'"
         class="text-center text-lg font-extrabold text-warning"
@@ -432,4 +453,5 @@ getStandartTariffs()
       <button ref="closeCreateModalButton">close</button>
     </form>
   </dialog>
+  {{ selectedUser }}
 </template>
