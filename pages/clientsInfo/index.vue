@@ -63,6 +63,7 @@ const openTariffInfo = (tariff: any) => {
         <Icon name="material-symbols:close" size="26" />
       </button>
       <select class="select select-bordered w-50" v-model="filtersForm.status">
+        <option value="all">Все</option>
         <option value="registered">Зарегистрированные</option>
         <option value="active">Активные</option>
         <option value="inactive">Неактивные</option>

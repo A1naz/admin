@@ -28,7 +28,9 @@ export default eventHandler(async (event) => {
     : {}
 
   let users = []
-  if (status === 'active') {
+  if (status === 'all') {
+    users = await getUsers.allUsers(page, searchQueryParam, dateRange)
+  } else if (status === 'active') {
     users = await getUsers.activeUsers(page, searchQueryParam, dateRange)
   } else if (status === 'inactive') {
     users = await getUsers.inactiveUsers(page, searchQueryParam, dateRange)

@@ -38,6 +38,35 @@ const filterUsers = (users: any[]) => {
 }
 
 export default {
+  async allUsers(
+    page: number = 1,
+    searchQueryParam: Object = {},
+    dateRange: any
+  ) {
+    const dateRangeParam: Object = dateRange
+      ? {
+          registrationDate: {
+            $gte: new Date(JSON.parse(dateRange[0])),
+            $lte: new Date(JSON.parse(dateRange[1])),
+          },
+        }
+      : {}
+
+    const users = await User.find({
+      ...dateRangeParam,
+      ...searchQueryParam,
+    })
+      .limit(50)
+      .skip(limit * (page - 1))
+
+    if (!users || !users.length) {
+      return []
+    }
+
+    const format: any = filterUsers(users)
+
+    return format
+  },
   async registeredUsers(
     page: number = 1,
     searchQueryParam: Object = {},
