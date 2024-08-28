@@ -7,6 +7,8 @@ definePageMeta({
 
 const store = useMainStore()
 const { height } = useWindowSize()
+const config = useRuntimeConfig()
+const publicUrl = config.public.siteUrl
 
 if (!store.client.mainAdmin && !store.client.tabs.includes('клиенты')) {
   navigateTo('/partner')
@@ -15,7 +17,7 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('клиенты')) {
 const filtersForm = ref({
   dateRange: [],
   startDate: new Date(Date.now() + 1000 * 60 * 5),
-  status: 'registered',
+  status: 'all',
   searchQuery: '',
   page: 1,
 })
@@ -59,7 +61,11 @@ const openTariffInfo = (tariff: any) => {
           <Icon name="material-symbols:calendar-month-outline" size="26" />
         </button>
       </DateRangePicker>
-      <button class="btn -ml-3" @click="filtersForm.dateRange = []" v-if="filtersForm.dateRange.length">
+      <button
+        class="btn -ml-3"
+        @click="filtersForm.dateRange = []"
+        v-if="filtersForm.dateRange.length"
+      >
         <Icon name="material-symbols:close" size="26" />
       </button>
       <select class="select select-bordered w-50" v-model="filtersForm.status">
@@ -103,10 +109,11 @@ const openTariffInfo = (tariff: any) => {
       <thead>
         <tr>
           <th>Логин</th>
+          <th>Статус</th>
           <th>Организация</th>
-          <th>№ договора</th>
-          <th>Регистрация</th>
-          <th>ФИО</th>
+          <th>Договор</th>
+          <th>Тариф</th>
+          <th>Реферал</th>
           <th>Детали</th>
         </tr>
       </thead>
@@ -116,6 +123,9 @@ const openTariffInfo = (tariff: any) => {
           <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
             {{ tariff.login }}
           </th>
+          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
+            {{ tariff.faceType }}
+          </th>
           <th
             style="max-width: 300px; min-width: 140px"
             class="overflow-x-auto"
@@ -123,13 +133,20 @@ const openTariffInfo = (tariff: any) => {
             {{ tariff.orgName }}
           </th>
           <th style="max-width: 55px; min-width: 50px" class="overflow-x-auto">
-            {{ tariff.uuid }}
+            <a
+            target="_blank"
+              v-if="tariff.isDocumentSigned"
+              :href="`${publicUrl}/api/docs/get?uuid=${tariff.uuid}`"
+              class="link link-primary"
+              >Скачать документ</a
+            >
+            <span v-else>Не подписан</span>
           </th>
           <th style="max-width: 100px; min-width: 90px">
             {{ tariff.registrationDate.slice(0, 10).replace(/-/g, '.') }}
           </th>
           <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
-            {{ tariff.FIO }}
+            {{ tariff.isUserReferral }}
           </th>
 
           <!-- <th

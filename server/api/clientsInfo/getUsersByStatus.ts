@@ -1,19 +1,61 @@
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { PaymentIntend } from '@/server/lib/models/PaymentIntend'
+import { Referral } from '~/server/lib/models/Referral'
 import { User } from '~/server/lib/models/User'
 import he from 'he'
 const limit = 50
 
-const filterUsers = (users: any[]) => {
+async function filterUsers(users: any[]) {
+  const foundReferrals = await Referral.find({
+    'referrals.user': { $in: users.map((user: any) => user._id) },
+  })
+
   return users.map((user: any) => {
+    let isDocumentSigned = false
+    let isUserReferral = false
+
+    if (foundReferrals && foundReferrals.length) {
+      foundReferrals.find((referral: any) => {
+        if (
+          referral.referrals.find(
+            (ref: any) => ref.user.valueOf() === user._id.valueOf()
+          )
+        ) {
+          isUserReferral = true
+        }
+      })
+    }
+
+    if (user.fizFace) {
+      isDocumentSigned = true
+    } else if (user.uuidCompany) {
+      isDocumentSigned = false
+    }
+    if (
+      user.firstName &&
+      user.lastName &&
+      user.middleName &&
+      user.bik &&
+      user.rs
+    ) {
+      isDocumentSigned = true
+    }
+
     return {
       registrationDate: user.registrationDate,
       login: user.username,
       orgName: user.orgName,
       phone: user.phoneNumber,
       email: user.email,
+      isUserReferral: isUserReferral ? 'Да' : 'Нет',
       orgInn: user.orgInn,
       orgOgrn: user.orgOgrn,
+      isDocumentSigned,
+      faceType: user.uuidCompany
+        ? 'работник'
+        : user.fizFace
+        ? 'Физ.лицо'
+        : 'Юр.лицо',
       FIO: user.firstName
         ? user.firstName
         : ' ' + user.middleName
@@ -63,7 +105,7 @@ export default {
       return []
     }
 
-    const format: any = filterUsers(users)
+    const format: any = await filterUsers(users)
 
     return format
   },
@@ -104,7 +146,7 @@ export default {
       return []
     }
 
-    const format: any = filterUsers(users)
+    const format: any = await filterUsers(users)
 
     return format
   },
@@ -144,7 +186,7 @@ export default {
       return []
     }
 
-    const format: any = filterUsers(users)
+    const format: any = await filterUsers(users)
 
     return format
   },
@@ -184,7 +226,7 @@ export default {
       return []
     }
 
-    const format: any = filterUsers(users)
+    const format: any = await filterUsers(users)
 
     return format
   },
