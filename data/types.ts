@@ -34,6 +34,7 @@ export interface IUser extends Entity {
   cabinets: any[]
   allowedUsersModal: Boolean
   ffEnabled: Boolean
+  isDocSigned: Boolean
 }
 
 export interface IUserLogs extends Entity {

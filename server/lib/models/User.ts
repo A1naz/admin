@@ -84,6 +84,7 @@ const UserSchema = new Schema({
     },
   },
   fizFace: { type: Boolean, default: false },
+  isDocSigned: { type: Boolean, default: false },
 })
 
 // UserSchema.pre('save', function (next) {

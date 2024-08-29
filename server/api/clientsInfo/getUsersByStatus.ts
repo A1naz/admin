@@ -41,6 +41,19 @@ async function filterUsers(users: any[]) {
       isDocumentSigned = true
     }
 
+    let tariff = 150
+
+    if (
+      user.MPTariffs &&
+      user.MPTariffs.length &&
+      user.MPTariffs[0].prices &&
+      user.MPTariffs[0].prices.buyouts &&
+      user.MPTariffs[0].prices.buyouts.value
+    ) {
+ 
+      tariff = user.MPTariffs[0].prices.buyouts.value
+    }
+
     return {
       registrationDate: user.registrationDate,
       login: user.username,
@@ -51,6 +64,8 @@ async function filterUsers(users: any[]) {
       orgInn: user.orgInn,
       orgOgrn: user.orgOgrn,
       isDocumentSigned,
+      isDocSigned: user.isDocSigned,
+      tariffPrice: tariff,
       faceType: user.uuidCompany
         ? 'работник'
         : user.fizFace

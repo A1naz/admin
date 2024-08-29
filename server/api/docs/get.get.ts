@@ -1,4 +1,5 @@
 import { User } from '@/server/lib/models/User'
+import { AdminUser } from '@/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
 import {
   Paragraph,
@@ -13,15 +14,20 @@ import he from 'he'
 import checkAndRemove from './checkAndRemove'
 
 export default eventHandler(async (event) => {
+  const session = (await getServerSession(event)) as any
+
+  const admin = await AdminUser.findOne({ uuid: session.uuid })
+  if (!admin || (!admin.tabs.includes('Клиенты') && !admin.mainAdmin))
+    return sendRedirect(event, '/auth', 302)
+
   const { uuid } = getQuery(event)
 
   const user = await User.findOne({ uuid })
-  
+
   if (!user) return sendRedirect(event, '/auth', 302)
 
   checkAndRemove('server/docs/signedOferta.docx')
 
-  
   let doc: any
 
   if (user.fizFace) {

@@ -5,10 +5,12 @@ definePageMeta({
   title: 'Клиенты',
 })
 
+import { notify } from '@kyvg/vue3-notification'
 const store = useMainStore()
 const { height } = useWindowSize()
 const config = useRuntimeConfig()
 const publicUrl = config.public.siteUrl
+const confirmModal = ref(false)
 
 if (!store.client.mainAdmin && !store.client.tabs.includes('клиенты')) {
   navigateTo('/partner')
@@ -46,6 +48,22 @@ watch(filtersForm.value, findDebounced)
 const openTariffInfo = (tariff: any) => {
   selectedUser.value = tariff
   infoModal.value = true
+}
+
+async function signTariff() {
+  const { data }: any = await useFetch('/api/docs/signDoc', {
+    method: 'POST',
+    params: {
+      uuid: selectedUser.value.uuid,
+    },
+  })
+  if (data.value) {
+    notify({
+      title: 'Внимание',
+      text: 'Документ подписан',
+    })
+    getClients()
+  }
 }
 </script>
 <template>
@@ -112,6 +130,7 @@ const openTariffInfo = (tariff: any) => {
           <th>Статус</th>
           <th>Организация</th>
           <th>Договор</th>
+          <th>Подписать</th>
           <th>Тариф</th>
           <th>Реферал</th>
           <th>Детали</th>
@@ -134,40 +153,32 @@ const openTariffInfo = (tariff: any) => {
           </th>
           <th style="max-width: 55px; min-width: 50px" class="overflow-x-auto">
             <a
-            target="_blank"
+              target="_blank"
               v-if="tariff.isDocumentSigned"
               :href="`${publicUrl}/api/docs/get?uuid=${tariff.uuid}`"
               class="link link-primary"
               >Скачать документ</a
             >
-            <span v-else>Не подписан</span>
+            <span v-else>Не заполнены данные</span>
+          </th>
+
+          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
+            <button
+              v-if="tariff.isDocumentSigned && !tariff.isDocSigned"
+              class="btn btn-neutral"
+              @click=";[(selectedUser = tariff), (confirmModal = true)]"
+            >
+              Подписать
+            </button>
+            <span v-else-if="tariff.isDocSigned">Подписан</span>
           </th>
           <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.registrationDate.slice(0, 10).replace(/-/g, '.') }}
+            {{ tariff.tariffPrice }} ₽
           </th>
           <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
             {{ tariff.isUserReferral }}
           </th>
 
-          <!-- <th
-            style="max-width: 300px; min-width: 140px"
-            class="overflow-x-auto"
-          >
-            {{ tariff.orgOgrn }}
-          </th>
-          <th
-            style="max-width: 300px; min-width: 140px"
-            class="overflow-x-auto"
-          >
-            {{ tariff.orgInn }}
-          </th>
-          <th style="max-width: 100px; min-width: 90px" class="overflow-x-auto">
-            {{ tariff.phone }}
-          </th>
-
-          <th style="max-width: 100px; min-width: 90px" class="overflow-x-auto">
-            {{ tariff.email }}
-          </th> -->
           <th>
             <button class="btn btn-neutral" @click="openTariffInfo(tariff)">
               Информация
@@ -182,7 +193,14 @@ const openTariffInfo = (tariff: any) => {
     v-model:is-modal-open="infoModal"
     :selectedUser="selectedUser"
   />
+  <StaticConfirmModal
+    :title="'Подтвердить действие'"
+    :description="'Вы уверены, что хотите подписать документ?'"
+    :confirmFunction="signTariff"
+    v-model:state="confirmModal"
+  />
 </template>
+
 <style scoped>
 ::-webkit-scrollbar {
   height: 4px;
