@@ -1,6 +1,7 @@
 import { getServerSession } from '#auth'
 import { User } from '~~/server/lib/models/User'
 import { AdminUser } from '~~/server/lib/models/AdminUser'
+import { ActionHistory } from '@/server/lib/models/actionHistory'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -13,13 +14,13 @@ export default eventHandler(async (event) => {
 
   const dateRangeParam: Object = dateRange
     ? {
-      registrationDate: {
+        registrationDate: {
           $gte: new Date(JSON.parse(dateRange[0])),
           $lte: new Date(JSON.parse(dateRange[1])),
         },
       }
     : {}
-    
+
   if (!user || (!user.mainAdmin && !user.tabs.includes('лендинг')))
     return sendRedirect(event, '/auth', 302)
 
@@ -46,6 +47,14 @@ export default eventHandler(async (event) => {
       landing: el._id,
       count: el.count,
     }
+  })
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    adminUserUuid: user.uuid,
+    actionDescription: ` ${user.uuid} - ${user.username} получил информацию о лендингах`,
+    userUuid: user.uuid,
+    actionId: 151,
   })
 
   return format

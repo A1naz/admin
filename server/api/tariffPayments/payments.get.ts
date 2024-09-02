@@ -2,6 +2,7 @@ import { User } from '@/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { TariffPayment } from '@/server/lib/models/TariffPayment'
+import { ActionHistory } from '@/server/lib/models/actionHistory'
 const limit = 50
 
 export default eventHandler(async (event) => {
@@ -66,6 +67,14 @@ export default eventHandler(async (event) => {
       createdAt: el.createdAt,
       status: el.status,
     }
+  })
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    adminUserUuid: user.uuid,
+    actionDescription: `админ ${user.uuid} - ${user.username} получил информацию об оплате тарифов`,
+    userUuid: user.uuid,
+    actionId: 151,
   })
   
   return format

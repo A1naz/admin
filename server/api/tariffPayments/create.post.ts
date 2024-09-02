@@ -31,9 +31,12 @@ export default eventHandler(async (event) => {
   const currentDate = new Date()
   currentDate.setHours(12, 0, 0, 0)
 
+
+  const unucalUid = uuid()
+
   await TariffPayment.create({
     user: user._id,
-    uuid: uuid(),
+    uuid: unucalUid,
     mp,
     price,
     tariff,
@@ -42,6 +45,14 @@ export default eventHandler(async (event) => {
     login: user.username,
     createdAt: currentDate,
     status: 'created',
+  })
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    adminUserUuid: user.uuid,
+    actionDescription: `админ ${user.uuid} - ${user.username} создал платеж uuid:${unucalUid}`,
+    userUuid: user.uuid,
+    actionId: 152,
   })
 
   return {

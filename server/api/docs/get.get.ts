@@ -1,5 +1,6 @@
 import { User } from '@/server/lib/models/User'
 import { AdminUser } from '@/server/lib/models/AdminUser'
+import { ActionHistory } from '@/server/lib/models/actionHistory'
 import { getServerSession } from '#auth'
 import {
   Paragraph,
@@ -632,6 +633,14 @@ export default eventHandler(async (event) => {
     } catch (err) {
       console.error('Ошибка при удалении файла:', err)
     }
+  })
+
+  await ActionHistory.create({
+    adminUser: user._id,
+    adminUserUuid: user.uuid,
+    actionDescription: `Пользователь ${admin.uuid} - ${admin.username} скачал договор пользователя ${user.uuid} - ${user.username}`,
+    userUuid: user.uuid,
+    actionId: 141,
   })
 
   return sendStream(event, fileStream)
