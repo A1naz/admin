@@ -453,5 +453,4 @@ getStandartTariffs()
       <button ref="closeCreateModalButton">close</button>
     </form>
   </dialog>
-  {{ selectedUser }}
 </template>
