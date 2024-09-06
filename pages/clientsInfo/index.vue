@@ -129,6 +129,8 @@ async function signTariff() {
           <th>Логин</th>
           <th>Статус</th>
           <th>Организация</th>
+          <th>Дата регистрации</th>
+          <th>Номер договора</th>
           <th>Договор</th>
           <th>Подписать</th>
           <th>Тариф</th>
@@ -150,6 +152,18 @@ async function signTariff() {
             class="overflow-x-auto"
           >
             {{ tariff.orgName }}
+          </th>
+          <th
+            style="max-width: 300px; min-width: 140px"
+            class="overflow-x-auto"
+          >
+            {{ tariff.registrationDate.slice(0, 10).replace(/-/g, '.') }}
+          </th>
+          <th
+            style="max-width: 300px; min-width: 140px"
+            class="overflow-x-auto"
+          >
+            {{ tariff.uuid }}
           </th>
           <th style="max-width: 55px; min-width: 50px" class="overflow-x-auto">
             <a
