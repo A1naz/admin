@@ -24,7 +24,7 @@ const screenshot = ref({
 const config = useRuntimeConfig()
 const loadingIndex = ref(false)
 const postForm = ref({
-  mp: '',
+  mp: 'all',
   tariff: '',
   type: '',
   timeLimit: 0,
@@ -161,9 +161,9 @@ async function uploadToS3(event: Event) {
         <div class="text-center mt-1">{{ selectedUser.username }}</div>
         <div class="px-5 mt-5">
           <select class="select select-bordered w-full" v-model="postForm.mp">
-            <option disabled selected value="">Выберите МП</option>
-            <option value="wildberries">Wildberries</option>
-            <option value="ozon">Ozon</option>
+            <option selected value="all">Все МП</option>
+            <!-- <option value="wildberries">Wildberries</option> -->
+            <!-- <option value="ozon">Ozon</option> -->
           </select>
           <select
             class="select select-bordered w-full mt-2"
