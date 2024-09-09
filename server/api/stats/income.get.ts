@@ -48,12 +48,15 @@ export default eventHandler(async (event) => {
 
   const types = [
     'buyouts service',
-    'likes',
-    'reviews',
-    'questions',
-    'productlikes',
-    'carts',
+    'likeReview',
+    'review',
+    'questionProduct',
+    'likeProduct',
+    'cart',
     'autoanswers',
+    'deliveryStorage',
+    'reviewRemoving',
+    'viewing'
   ]
 
   switch (period) {
@@ -147,7 +150,7 @@ export default eventHandler(async (event) => {
   } else {
     filter.type = type
   }
-
+  
   const history: any = await paymenthistory.find({
     ...allowedUsersParam,
     ...filter,
