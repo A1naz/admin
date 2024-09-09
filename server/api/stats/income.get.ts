@@ -396,6 +396,7 @@ export default eventHandler(async (event) => {
     },
   ])
 
+
   const services = [
     {
       value: 'all',
@@ -410,37 +411,37 @@ export default eventHandler(async (event) => {
       quantity: 0,
     },
     {
-      value: 'reviews',
+      value: 'review',
       title: 'Отзывы',
       expenses: 0,
       quantity: 0,
     },
     {
-      value: 'likes',
+      value: 'likeProduct',
       title: 'Лайки',
       expenses: 0,
       quantity: 0,
     },
     {
-      value: 'productlikes',
+      value: 'likeProduct',
       title: 'Лайки на товар',
       expenses: 0,
       quantity: 0,
     },
     {
-      value: 'questions',
+      value: 'questionProduct',
       title: 'Вопросы',
       expenses: 0,
       quantity: 0,
     },
     {
-      value: 'carts',
+      value: 'cart',
       title: 'Корзина',
       expenses: 0,
       quantity: 0,
     },
     {
-      value: 'autoanswer',
+      value: 'autoanswers',
       title: 'Автоответчик',
       expenses: 0,
       quantity: 0,
@@ -470,7 +471,7 @@ export default eventHandler(async (event) => {
       quantity: 0,
     },
     {
-      value: 'deleted reviews',
+      value: 'reviewRemoving',
       title: 'Удаленные отзывы',
       expenses: 0,
       quantity: 0,
@@ -483,8 +484,7 @@ export default eventHandler(async (event) => {
         ...allowedUsersParam,
         dataoperation: filter.dataoperation,
         typeoperations: 'Расход',
-        type: 'reviews',
-        basisoperation: { $regex: 'Удаление отзыва' },
+        type: 'reviewRemoving',
       },
     },
     {
@@ -499,7 +499,7 @@ export default eventHandler(async (event) => {
 
   if (deletedReviews && deletedReviews.length > 0) {
     services.forEach((service: any) => {
-      if (service.value == 'deleted reviews') {
+      if (service.value == 'reviewRemoving') {
         service.expenses = deletedReviews[0].summ
         service.quantity = deletedReviews[0].count
       }
