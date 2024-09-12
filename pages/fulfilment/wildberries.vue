@@ -6,6 +6,7 @@ definePageMeta({
 })
 
 import { notify } from '@kyvg/vue3-notification'
+import deleteAllPVZPost from '~/server/api/wildberries/ff/deleteAllPVZ.post'
 import usersPVZsGet from '~/server/api/wildberries/ff/usersPVZs.get'
 
 const { height, width } = useWindowSize()
@@ -16,6 +17,7 @@ const store = useMainStore()
 const date = ref(new Date())
 date.value.setHours(12, 0, 0, 0)
 
+const confirmModal = ref(false)
 const modalOpen = ref(false)
 const pvzLoading = ref(false)
 const dateSortIcon = ref('mdi-arrow-down')
@@ -317,6 +319,33 @@ async function useTemplate(pvzs: any) {
 if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент')) {
   navigateTo('/partner')
 }
+
+async function deleteAllPVZs() {
+  const { data, error }: any = await useFetch(
+    `/api/${selectedMP.value}/ff/deleteAllPVZ`,
+    {
+      method: 'POST',
+      body: {
+        userId: selectedUsers.value.map((el: any) => el._id),
+        date: date.value,
+      },
+      watch: false,
+    }
+  )
+  if (data.value.status == 'ok') {
+    notify({
+      type: 'success',
+      title: 'ПВЗ успешно удалены из списка пвз пользователя',
+    })
+    getPvzs()
+  } else if (data.value.status == 'error') {
+    notify({
+      type: 'error',
+      title: 'Не удалось удалить из списка пвз пользователя',
+      text: data.value.message,
+    })
+  }
+}
 </script>
 <template>
   <div>
@@ -338,19 +367,8 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
             {{ tab.title }}
           </option>
         </select>
-        <!-- <button
-          class="ml-2 btn max-w-xl w-xl join-item"
-          @click="store.allowedUsersModal = true"
-        >
-          {{
-            selectedUsers.length == 0
-              ? 'Выбрать пользователей'
-              : selectedUsers.length + ' выбрано'
-          }}
-        </button> -->
         <ModalManyUsers :selectedUsers="selectedUsers" />
 
-        <!-- <button class="btn btn-primary ml-3" @click="getActs">Применить</button> -->
         <div class="ml-3">
           <DateOnlyPicker
             ref="datePicker"
@@ -369,28 +387,28 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
         </button>
       </div>
 
-      <div class="join mr-2">
-        <button
-          class="join-item btn"
-          @click="swapPage(-1)"
-          :disabled="isPageBtnsDisabled"
-        >
-          «
-        </button>
-        <button class="join-item btn">{{ curPage }}</button>
-        <button
-          class="join-item btn"
-          @click="swapPage(1)"
-          :disabled="isPageBtnsDisabled"
-        >
-          »
-        </button>
+      <div class="flex flex-col">
+        <div class="join mr-2">
+          <button
+            class="join-item btn"
+            @click="swapPage(-1)"
+            :disabled="isPageBtnsDisabled"
+          >
+            «
+          </button>
+          <button class="join-item btn">{{ curPage }}</button>
+          <button
+            class="join-item btn"
+            @click="swapPage(1)"
+            :disabled="isPageBtnsDisabled"
+          >
+            »
+          </button>
+        </div>
       </div>
     </div>
+
     <div class="my-2 -ml-1 flex">
-      <!-- <button class="btn btn-primary ml-3" :disabled="userPvzs.length == 0">
-        Создать шаблон из текущих пвз
-      </button> -->
       <div class="collapse bg-base-200 max-w-sm mr-2 -mt-0.5">
         <input ref="createTemplate" type="checkbox" />
         <div class="collapse-title font-medium">
@@ -427,7 +445,15 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
         <thead>
           <tr>
             <th>Адрес</th>
-            <th>Действие</th>
+            <th>
+              <button
+                class="btn btn-warning btn-sm"
+                :disabled="!userPvzs || !userPvzs.length"
+                @click="confirmModal = true"
+              >
+                Удалить все пвз
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -523,6 +549,12 @@ if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент
     :pickpoints="pickpoints"
     @callback="handleAddress"
     @close="closeModal"
+  />
+  <StaticConfirmModal
+    title="Подтвердите действие"
+    description="Вы действительно хотите удалить все пвз"
+    v-model:state="confirmModal"
+    :confirmFunction="deleteAllPVZs"
   />
 </template>
 <style scoped>
