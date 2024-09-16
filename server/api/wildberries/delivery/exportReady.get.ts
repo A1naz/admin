@@ -21,7 +21,7 @@ const keys = Object.keys as <T>(
     : never
   : never)[]
 
-async function getReady(user: any, pvzs: any) {
+async function getReady(user: any, pvzs: any, selectedDays: any) {
   let pvzsArray = []
   if (typeof pvzs === 'string') {
     pvzsArray.push(pvzs.trimRight())
@@ -96,6 +96,19 @@ async function getReady(user: any, pvzs: any) {
           }
         })
 
+        if (!isNaN(selectedDays) && selectedDays.trim() !== '') {
+          const currentDate = new Date()
+          const targetDate = new Date(deliveryDate)
+          const afterDays = Number(selectedDays)
+          currentDate.setHours(0, 0, 0, 0)
+          targetDate.setHours(0, 0, 0, 0)
+          targetDate.setDate(targetDate.getDate() + afterDays)
+
+          if (currentDate <= targetDate) {
+            return
+          }
+        }
+
         return {
           index,
           place,
@@ -153,7 +166,7 @@ export default eventHandler(async (event) => {
     )
       return sendRedirect(event, '/auth', 302)
 
-    const { type, uuid, pvzs } = getQuery(event)
+    const { type, uuid, pvzs, selectedDays }: any = getQuery(event)
 
     const user = await User.find({ uuid })
     if (!user || user.length === 0) {
@@ -191,7 +204,7 @@ export default eventHandler(async (event) => {
     // }
 
     const workbook = new ExcelJS.Workbook()
-    const ready = (await getReady(user, pvzs)).filter(
+    const ready = (await getReady(user, pvzs, selectedDays)).filter(
       (item) => item !== undefined
     )
 

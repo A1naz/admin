@@ -11,6 +11,7 @@ const selectedUsers = ref([])
 const selectedPVZs = ref([])
 const isButtonsDisabled = ref(false)
 const isAllPVZSelected = ref(false)
+const selectedDays = ref('all')
 
 const selectedUser = ref<any>({
   username: '',
@@ -31,6 +32,7 @@ async function exportReadyXLS() {
     method: 'GET',
     params: {
       uuid: selectedUsers.value.map((el: any) => el.uuid),
+      selectedDays: selectedDays.value,
       pvzs: isAllPVZSelected.value
         ? []
         : selectedPVZs.value.map((el: any) => el.address),
@@ -45,8 +47,7 @@ async function exportReadyXLS() {
   fileLink.click()
 }
 async function exportXLS() {
-
-  if(selectedPVZs.value.length == 0 && !isAllPVZSelected.value){
+  if (selectedPVZs.value.length == 0 && !isAllPVZSelected.value) {
     notify({
       type: 'error',
       title: 'Ошибка',
@@ -54,7 +55,7 @@ async function exportXLS() {
     })
     return
   }
-  
+
   isButtonsDisabled.value = true
   const { data, error }: any = await useFetch(
     '/api/wildberries/delivery/export',
@@ -64,8 +65,8 @@ async function exportXLS() {
       params: {
         uuid: selectedUsers.value.map((el: any) => el.uuid),
         pvzs: isAllPVZSelected.value
-        ? []
-        : selectedPVZs.value.map((el: any) => el.address),
+          ? []
+          : selectedPVZs.value.map((el: any) => el.address),
       },
       watch: false,
     }
@@ -118,7 +119,9 @@ function changeMP(event: any) {
 }
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">Товары готовые к выдаче Wildberries</h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">
+    Товары готовые к выдаче Wildberries
+  </h1>
   <div class="divider"></div>
   <div class="flex gap-3 items-center">
     <!-- <selectUserModal @selectUser=";[(selectedUser = $event)]" /> -->
@@ -179,6 +182,16 @@ function changeMP(event: any) {
       >
         {{ tab.title }}
       </option>
+    </select>
+
+    <select
+      class="select select-bordered max-w-xs mb-2"
+      v-model="selectedDays"
+    >
+      <option value="all" selected>Все дни</option>
+      <option value="3">Прошло 3 дня</option>
+      <option value="7">Прошло 7 дней</option>
+      <option value="10">Прошло 10 дней</option>
     </select>
   </div>
 </template>
