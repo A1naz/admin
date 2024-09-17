@@ -11,6 +11,7 @@ const selectedUsers = ref([])
 const selectedPVZs = ref([])
 const isButtonsDisabled = ref(false)
 const isAllPVZSelected = ref(false)
+const selectedDays = ref('all')
 
 const selectedUser = ref<any>({
   username: '',
@@ -34,6 +35,7 @@ async function exportReadyXLS() {
       pvzs: isAllPVZSelected.value
         ? []
         : selectedPVZs.value.map((el: any) => el.address),
+      selectedDays: selectedDays.value,
     },
   })
   isButtonsDisabled.value = false
@@ -45,8 +47,7 @@ async function exportReadyXLS() {
   fileLink.click()
 }
 async function exportXLS() {
-
-  if(selectedPVZs.value.length == 0 && !isAllPVZSelected.value){
+  if (selectedPVZs.value.length == 0 && !isAllPVZSelected.value) {
     notify({
       type: 'error',
       title: 'Ошибка',
@@ -56,20 +57,17 @@ async function exportXLS() {
   }
 
   isButtonsDisabled.value = true
-  const { data, error }: any = await useFetch(
-    '/api/ozon/delivery/export',
-    {
-      responseType: 'blob',
-      method: 'GET',
-      params: {
-        uuid: selectedUsers.value.map((el: any) => el.uuid),
-        pvzs: isAllPVZSelected.value
+  const { data, error }: any = await useFetch('/api/ozon/delivery/export', {
+    responseType: 'blob',
+    method: 'GET',
+    params: {
+      uuid: selectedUsers.value.map((el: any) => el.uuid),
+      pvzs: isAllPVZSelected.value
         ? []
         : selectedPVZs.value.map((el: any) => el.address),
-      },
-      watch: false,
-    }
-  )
+    },
+    watch: false,
+  })
   isButtonsDisabled.value = false
   if (error.value) {
     notify({
@@ -179,6 +177,13 @@ function changeMP(event: any) {
       >
         {{ tab.title }}
       </option>
+    </select>
+
+    <select class="select select-bordered max-w-xs mb-2" v-model="selectedDays">
+      <option value="all" selected>Все дни</option>
+      <option value="3">Прошло 3 дня</option>
+      <option value="7">Прошло 7 дней</option>
+      <option value="10">Прошло 10 дней</option>
     </select>
   </div>
 </template>

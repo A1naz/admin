@@ -19,7 +19,7 @@ const keys = Object.keys as <T>(
     : never
   : never)[]
 
-async function getReady(user: any, pvzs: any) {
+async function getReady(user: any, pvzs: any, selectedDays: any) {
   const deliveries = await Delivery.find({
     user: { $in: user },
     point: pvzs && pvzs.length ? { $in: pvzs } : { $exists: true },
@@ -47,15 +47,17 @@ async function getReady(user: any, pvzs: any) {
         )
     )
 
-    const buyoutsId = filtered.map((item:any) => item.idbuyout);
-    const buyouts = await Buyout.find({ _id: { $in: buyoutsId } })
-    const logs = await Buyoutlog.find({ _id: { $in: buyoutsId } })
-  
-    const format = await Promise.all(
-      filtered
-        .map(async (delivery: any, index: any) => {
-        const buyout = buyouts.find((item:any) => item._id.valueOf() === delivery.idbuyout.valueOf())
-  
+  const buyoutsId = filtered.map((item: any) => item.idbuyout)
+  const buyouts = await Buyout.find({ _id: { $in: buyoutsId } })
+  const logs = await Buyoutlog.find({ _id: { $in: buyoutsId } })
+
+  const format = await Promise.all(
+    filtered
+      .map(async (delivery: any, index: any) => {
+        const buyout = buyouts.find(
+          (item: any) => item._id.valueOf() === delivery.idbuyout.valueOf()
+        )
+
         if (!buyout) return undefined
         const foundLog = logs.find(
           (item) =>
@@ -97,6 +99,19 @@ async function getReady(user: any, pvzs: any) {
             username = el.username
           }
         })
+
+        if (!isNaN(selectedDays) && selectedDays.trim() !== '') {
+          const currentDate = new Date()
+          const targetDate = new Date(deliveryDate)
+          const afterDays = Number(selectedDays)
+          currentDate.setHours(0, 0, 0, 0)
+          targetDate.setHours(0, 0, 0, 0)
+          targetDate.setDate(targetDate.getDate() + afterDays)
+
+          if (currentDate <= targetDate) {
+            return
+          }
+        }
 
         return {
           index,
@@ -142,7 +157,7 @@ export default eventHandler(async (event) => {
     )
       return sendRedirect(event, '/auth', 302)
 
-    const { type, uuid, pvzs } = getQuery(event)
+    const { type, uuid, pvzs, selectedDays }: any = getQuery(event)
 
     const user = await User.find({ uuid })
     if (!user || user.length === 0) {
@@ -180,7 +195,7 @@ export default eventHandler(async (event) => {
     // }
 
     const workbook = new ExcelJS.Workbook()
-    const ready = (await getReady(user, pvzs)).filter(
+    const ready = (await getReady(user, pvzs, selectedDays)).filter(
       (item) => item !== undefined
     )
 
