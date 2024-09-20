@@ -45,7 +45,7 @@ export default eventHandler(async (event) => {
   const pvzsMap = new Map<string, any>()
   pvzs.forEach((pvz: any) => {
     pvz.pvzs.forEach((p: any) => {
-      // console.log(p.date, new Date(minDate), new Date(maxDate));
+      // console.log(p.date, new Date(minDate), new Date(maxDate), 'p: ', p);
 
       // if (new Date(p.date) >=  new Date(minDate) && new Date(p.date) >=  new Date(maxDate)) {
       if (new Date(p.date) >= minDate && new Date(p.date) <= maxDate) {

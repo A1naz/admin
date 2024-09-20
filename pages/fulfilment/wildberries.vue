@@ -354,12 +354,11 @@ async function deleteAllPVZs() {
     <div class="flex justify-between">
       <div class="flex">
         <select
-          disabled
           class="select select-bordered max-w-xs mb-2"
           @change="($event) => changeMP($event)"
         >
           <option
-            v-for="tab in mpStore.MPTabs"
+            v-for="tab in mpStore.MPTabs.filter((el) => el.value != 'avito')"
             :key="tab.value"
             :value="tab.value"
             :selected="tab.value == 'wildberries'"

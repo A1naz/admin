@@ -128,13 +128,7 @@ function sortByDate(sortType: string) {
 
 async function swapPage(destination: number) {
   if (destination < 0 && curPage.value <= 1) return
-  if (curPage.value >= pages.value && destination > 0) {
-    notify({
-      type: 'error',
-      title: 'Последняя страница',
-    })
-    return
-  }
+
   curPage.value += destination
   isPageBtnsDisabled.value = true
   await getStats()

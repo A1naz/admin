@@ -126,7 +126,7 @@ async function createTemplate(name: string) {
     notify({
       title: 'Шаблон создан',
       type: 'success',
-      timeout: 3000,
+      duration: 3000,
     })
   }
   loading.value = false
@@ -154,7 +154,7 @@ async function useTemplate(template: any) {
   notify({
     title: 'Шаблон применен к выбранным пользователям',
     type: 'success',
-    timeout: 3000,
+    duration: 3000,
   })
 }
 async function setTemplate(template: any) {
@@ -163,7 +163,7 @@ async function setTemplate(template: any) {
   notify({
     title: 'Шаблон применен',
     type: 'success',
-    timeout: 3000,
+    duration: 3000,
   })
 }
 
@@ -181,7 +181,7 @@ async function deleteTemplate(template: any) {
     notify({
       title: 'Шаблон удален',
       type: 'success',
-      timeout: 3000,
+      duration: 3000,
     })
   }
   loading.value = false

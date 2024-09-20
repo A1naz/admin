@@ -6,16 +6,21 @@ definePageMeta({
 })
 
 import { notify } from '@kyvg/vue3-notification'
+import deleteAllPVZPost from '~/server/api/wildberries/ff/deleteAllPVZ.post'
 import usersPVZsGet from '~/server/api/wildberries/ff/usersPVZs.get'
 
 const { height, width } = useWindowSize()
 
 const mpStore = useMPStore()
-
-const modalOpen = ref(false)
 const store = useMainStore()
+
+const date = ref(new Date())
+date.value.setHours(12, 0, 0, 0)
+
+const confirmModal = ref(false)
+const modalOpen = ref(false)
+const pvzLoading = ref(false)
 const dateSortIcon = ref('mdi-arrow-down')
-const elPerPage = 50
 const inputLoading = ref(false)
 const curPage = ref(1)
 const pages = ref(0)
@@ -25,19 +30,19 @@ const isPageBtnsDisabled = ref(false)
 const users = ref<any>([])
 const pvzs = ref<any>([])
 const userPvzs = ref<any>([])
-const pvzsCount = ref(0)
-const selectUserClose: any = ref(null)
 const selectPVZClose: any = ref(null)
 const selectedMP = ref('ozon')
-const selectedUser: any = ref({
-  username: '',
-})
+const selectedUsers: any = ref<any>([])
+const addingPVZ = ref(false)
+const pvzsTemplates = ref<any>([])
+const templateName = ref('')
+const createTemplate = ref<any>(null)
 
-function selectUser(user: any) {
-  selectedUser.value = user
-  selectUserClose.value?.click()
-  getPvzs()
-}
+watch(selectedUsers.value, () => {
+  if (selectedUsers.value.length > 0) {
+    getPvzs()
+  }
+})
 
 async function getPvzs() {
   const { data }: any = await useFetch(
@@ -46,10 +51,8 @@ async function getPvzs() {
       method: 'GET',
       params: {
         page: curPage.value,
-        userId:
-          selectedUser.value.username.length > 0
-            ? selectedUser.value._id
-            : null,
+        userId: selectedUsers.value.map((el: any) => el._id),
+        date: new Date(date.value).toISOString(),
       },
       watch: false,
     }
@@ -138,9 +141,6 @@ function sortByDate() {
   getPvzs()
 }
 
-function openUsersSelectModal() {
-  selectUserClose.value?.click()
-}
 function openPVZSelectModal() {
   selectPVZClose.value?.click()
 }
@@ -150,23 +150,23 @@ function changeMP(event: any) {
   userPvzs.value = []
   selectedMP.value = event.target.value
   mpStore.selectedMP = event.target.value
-  mpStore.selectedMP = event.target.value
   navigateTo('/fulfilment/' + selectedMP.value)
 }
 
-function handleAddress(address: string, lt: number, lg: number, id: string) {
-  selectPVZ({ address, lt, lg, id })
-}
-
 async function selectPVZ(pvz: any) {
-  const { data, error }: any = await useFetch(`/api/ozon/ff/addPVZ`, {
-    method: 'POST',
-    body: {
-      userId: selectedUser.value._id,
-      pvz,
-    },
-    watch: false,
-  })
+  addingPVZ.value = true
+  const { data, error }: any = await useFetch(
+    `/api/${selectedMP.value}/ff/addPVZ`,
+    {
+      method: 'POST',
+      body: {
+        userId: selectedUsers.value.map((el: any) => el._id),
+        pvz,
+        date: date.value,
+      },
+      watch: false,
+    }
+  )
   if (data.value.status == 'ok') {
     notify({
       type: 'success',
@@ -180,6 +180,7 @@ async function selectPVZ(pvz: any) {
       text: data.value.message,
     })
   }
+  addingPVZ.value = false
 }
 
 async function deletePVZ(pvz: any) {
@@ -188,9 +189,11 @@ async function deletePVZ(pvz: any) {
     {
       method: 'POST',
       body: {
-        userId: selectedUser.value._id,
+        userId: selectedUsers.value.map((el: any) => el._id),
         pvz,
+        date: date.value,
       },
+      watch: false,
     }
   )
   if (data.value.status == 'ok') {
@@ -208,21 +211,13 @@ async function deletePVZ(pvz: any) {
   }
 }
 
-function closeModal() {
-  modalOpen.value = false
-}
-
-if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент')) {
-  navigateTo('/partner')
-}
-
 const pickpoints = shallowRef()
-const pvzLoading = ref(false)
 async function getPickpoints() {
   pvzLoading.value = true
   try {
     const data = await $fetch('/api/ozon/ff/pickpoints', {
       method: 'GET',
+      watch: false,
     })
     pickpoints.value = (data as any).points
   } catch (e: any) {
@@ -237,6 +232,120 @@ async function getPickpoints() {
 }
 
 getPickpoints()
+
+function handleAddress(
+  address: string,
+  lt: number,
+  lg: number,
+  id: string,
+  w: string
+) {
+  console.log(address, lt, lg, id)
+
+  selectPVZ({ address, lt, lg, id, w })
+}
+
+function closeModal() {
+  modalOpen.value = false
+}
+
+const getTemplates = async () => {
+  const { data }: any = await useFetch('/api/ozon/pvz/templates', {
+    method: 'GET',
+    watch: false,
+  })
+  if (data) {
+    pvzsTemplates.value = data.value
+  }
+}
+
+getTemplates()
+
+async function saveTemplate() {
+  const { data }: any = await useFetch('/api/ozon/pvz/saveTemplate', {
+    method: 'POST',
+    body: {
+      pvzs: userPvzs.value,
+      title: templateName.value,
+    },
+    watch: false,
+  })
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Шаблон сохранен',
+    })
+    getTemplates()
+    createTemplate.value.click()
+    templateName.value = ''
+  }
+}
+async function deleteTemplate(uuid: string) {
+  const { data }: any = await useFetch('/api/ozon/pvz/deleteTemplate', {
+    method: 'POST',
+    body: {
+      uuid,
+    },
+    watch: false,
+  })
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Шаблон успешно удален',
+    })
+    getTemplates()
+  }
+}
+
+async function useTemplate(pvzs: any) {
+  const { data }: any = await useFetch('/api/ozon/ff/templateAddPVZs', {
+    method: 'POST',
+    body: {
+      userId: selectedUsers.value.map((el: any) => el._id),
+      pvzs,
+      date: date.value,
+    },
+    watch: false,
+  })
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Адреса успешно добавлены',
+    })
+    getPvzs()
+  }
+}
+
+if (!store.client.mainAdmin && !store.client.tabs.includes('фулфилмент')) {
+  navigateTo('/partner')
+}
+
+async function deleteAllPVZs() {
+  const { data, error }: any = await useFetch(
+    `/api/${selectedMP.value}/ff/deleteAllPVZ`,
+    {
+      method: 'POST',
+      body: {
+        userId: selectedUsers.value.map((el: any) => el._id),
+        date: date.value,
+      },
+      watch: false,
+    }
+  )
+  if (data.value.status == 'ok') {
+    notify({
+      type: 'success',
+      title: 'ПВЗ успешно удалены из списка пвз пользователя',
+    })
+    getPvzs()
+  } else if (data.value.status == 'error') {
+    notify({
+      type: 'error',
+      title: 'Не удалось удалить из списка пвз пользователя',
+      text: data.value.message,
+    })
+  }
+}
 </script>
 <template>
   <div>
@@ -249,7 +358,7 @@ getPickpoints()
           @change="($event) => changeMP($event)"
         >
           <option
-            v-for="tab in mpStore.MPTabs"
+            v-for="tab in mpStore.MPTabs.filter((el) => el.value != 'avito')"
             :key="tab.value"
             :value="tab.value"
             :selected="tab.value == 'ozon'"
@@ -257,57 +366,74 @@ getPickpoints()
             {{ tab.title }}
           </option>
         </select>
-        <button
-          class="ml-2 btn max-w-xl w-xl join-item"
-          @click="store.allowedUsersModal = true"
-        >
-          {{
-            selectedUser.username == ''
-              ? 'Выбрать пользователей'
-              : selectedUser.username
-          }}
-        </button>
-        <button
-          class="btn btn-circle"
-          v-if="selectedUser.username.length > 0"
-          @click="
-            ;[
-              (selectedUser = {
-                username: '',
-              }),
-              getPvzs(),
-            ]
-          "
-        >
-          ✕
-        </button>
+        <ModalManyUsers :selectedUsers="selectedUsers" />
 
-        <!-- <button class="btn btn-primary ml-3" @click="getActs">Применить</button> -->
+        <div class="ml-3">
+          <DateOnlyPicker
+            ref="datePicker"
+            :modelValue="date"
+            :min-date="new Date(Date.now() - 1000 * 60 * 60 * 24)"
+            :size="'md'"
+            @update:modelValue=";[(date = $event), getPvzs()]"
+          />
+        </div>
         <button
           class="ml-4 btn max-w-xl w-xl join-item"
-          @click="store.allowedUsersModal = true"
-          :disabled="selectedUser.username.length == 0 || pvzLoading"
+          @click="modalOpen = true"
+          :disabled="selectedUsers.length == 0 || pvzLoading"
         >
-          Добавить ПВЗ
+          {{ pvzLoading ? 'Загрузка...' : 'Добавить ПВЗ' }}
         </button>
       </div>
-      <div class="join mr-2">
-        <button
-          class="join-item btn"
-          @click="swapPage(-1)"
-          :disabled="isPageBtnsDisabled"
-        >
-          «
-        </button>
-        <button class="join-item btn">{{ curPage }}</button>
-        <button
-          class="join-item btn"
-          @click="swapPage(1)"
-          :disabled="isPageBtnsDisabled"
-        >
-          »
-        </button>
+
+      <div class="flex flex-col">
+        <div class="join mr-2">
+          <button
+            class="join-item btn"
+            @click="swapPage(-1)"
+            :disabled="isPageBtnsDisabled"
+          >
+            «
+          </button>
+          <button class="join-item btn">{{ curPage }}</button>
+          <button
+            class="join-item btn"
+            @click="swapPage(1)"
+            :disabled="isPageBtnsDisabled"
+          >
+            »
+          </button>
+        </div>
       </div>
+    </div>
+
+    <div class="my-2 -ml-1 flex">
+      <div class="collapse bg-base-200 max-w-sm mr-2 -mt-0.5">
+        <input ref="createTemplate" type="checkbox" />
+        <div class="collapse-title font-medium">
+          Создать шаблон из текущих пвз
+        </div>
+        <div class="collapse-content">
+          <input
+            type="text"
+            placeholder="Название шаблона"
+            class="input input-bordered input-l"
+            v-model="templateName"
+          />
+          <button
+            class="btn btn-primary mt-2 ml-2"
+            :disabled="userPvzs.length == 0"
+            @click="saveTemplate"
+          >
+            {{ userPvzs.length == 0 ? 'Нет пвз' : 'Сохранить' }}
+          </button>
+        </div>
+      </div>
+      <FfPVZTemplatesModal
+        :templates="pvzsTemplates"
+        @useTemplate="(pvzs: any) => useTemplate(pvzs)"
+        @deleteTemplate="(uuid: string) => deleteTemplate(uuid)"
+      />
     </div>
     <div
       class="my-2 mx-2 overflow-y-auto"
@@ -318,7 +444,15 @@ getPickpoints()
         <thead>
           <tr>
             <th>Адрес</th>
-            <th>Действие</th>
+            <th>
+              <button
+                class="btn btn-warning btn-sm"
+                :disabled="!userPvzs || !userPvzs.length"
+                @click="confirmModal = true"
+              >
+                Удалить все пвз
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -337,14 +471,15 @@ getPickpoints()
       </table>
     </div>
   </div>
-  <input type="checkbox" id="selectUser" class="modal-toggle" />
-  <div class="modal cursor-pointer" @click="openUsersSelectModal">
+
+  <input type="checkbox" id="selectPVZ" class="modal-toggle" />
+  <div class="modal cursor-pointer" @click="openPVZSelectModal">
     <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
         <label
-          for="selectUser"
+          for="selectPVZ"
           class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          ref="selectUserClose"
+          ref="selectPVZClose"
         >
           ✕
         </label>
@@ -355,11 +490,11 @@ getPickpoints()
           <div>
             <label
               ><input
-                v-model="query"
+                v-model="pvzQuery"
                 type="text"
-                placeholder="Введите id или username или email"
+                placeholder="Введите Адрес"
                 class="input input-bordered input-l ml-4 w-80"
-                @input="onInput($event)"
+                @input="onInputPVZ($event)"
               />
             </label>
             <span
@@ -377,48 +512,48 @@ getPickpoints()
             <!-- head -->
             <thead>
               <tr>
-                <th>id</th>
-                <th>username</th>
-                <th>email</th>
+                <th>Адрес</th>
                 <th>Выбрать</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="hover" v-for="user in users" :key="user.uuid">
-                <td style="max-width: 130px">{{ user.uuid }}</td>
+              <tr class="hover" v-for="pvz in pvzs" :key="pvz.uuid">
+                <td style="max-width: 130px">{{ pvz.id }}</td>
                 <td style="max-width: 150px">
                   <div class="mx-1 overflow-x-auto">
-                    {{ user.username }}
-                  </div>
-                </td>
-                <td style="max-width: 150px" class="overflow-x-auto">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ user.email }}
+                    {{ pvz.address }}
                   </div>
                 </td>
                 <td style="max-width: 20px">
                   <button
                     class="btn btn-primary btn-sm"
-                    @click="selectUser(user)"
+                    @click="selectPVZ(pvz)"
+                    :disabled="addingPVZ"
                   >
-                    Выбрать
+                    Добавить
                   </button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-
         <div class="modal-action"></div>
       </div>
     </div>
   </div>
+
   <ffOzonSelectPointModal
     v-if="modalOpen"
     :state="modalOpen"
     :pickpoints="pickpoints"
     @callback="handleAddress"
     @close="closeModal"
+  />
+  <StaticConfirmModal
+    title="Подтвердите действие"
+    description="Вы действительно хотите удалить все пвз"
+    v-model:state="confirmModal"
+    :confirmFunction="deleteAllPVZs"
   />
 </template>
 <style scoped>

@@ -18,7 +18,7 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
-  const { userId, pvz, date } = await readBody(event)
+  const { userId, date } = await readBody(event)
 
   const trueDate = new Date(new Date(date).setHours(0, 0, 0, 0))
   const minDate = new Date(new Date(date).setHours(trueDate.getHours() - 6))
@@ -26,16 +26,17 @@ export default eventHandler(async (event) => {
 
   const users = await User.find({ _id: { $in: userId } })
 
-  if (!users) {
+  if (!users || !users.length) {
     throw createError({
-      message: 'Пользователь не найден',
+      message: 'Пользователи не найдены',
       statusCode: 404,
     })
   }
+
   await ActionHistory.create({
     adminUser: userAdmin._id,
     actionId: 112,
-    actionDescription: `Добавление пункта выдачи ${pvz.id} пользователям за ${trueDate}`,
+    actionDescription: `Удаление всех пвз у пользователей за ${trueDate}`,
     usersUuid: users.map((user: any) => user.uuid),
     date: new Date(),
     mp: 'wildberries',
@@ -52,31 +53,20 @@ export default eventHandler(async (event) => {
       (pvz: any) => pvz.user.valueOf() === user._id.valueOf()
     )
 
-    if (!userPVZ) {
-      await FFPVZ.create({
-        user,
-        pvzs: [{ ...pvz, date: trueDate }],
-      })
-    } else if (userPVZ) {
-      let isIncludes = false
-      userPVZ.pvzs.forEach((item) => {
-        if (
-          item.id === pvz.id &&
-          new Date(item.date) <= maxDate &&
-          new Date(item.date) >= minDate
-        ) {
+    // console.log(userPVZ)
 
-          isIncludes = true
+    if (userPVZ) {
+      let deleteIndexes = []
+
+      for (let i = userPVZ.pvzs.length - 1; i >= 0; i--) {
+        const item = userPVZ.pvzs[i];
+        if (new Date(item.date) <= maxDate && new Date(item.date) >= minDate) {
+          userPVZ.pvzs.splice(i, 1);
         }
-      })
-      if (!isIncludes) {
-        userPVZ.pvzs.push({
-          ...pvz,
-          date: trueDate,
-        })
-        await userPVZ.save()
       }
+      
 
+      await userPVZ.save()
     }
   }
 
