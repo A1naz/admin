@@ -6,8 +6,7 @@ import { ScreenshotsRequire } from '~/server/lib/models/ScreenshotsRequire'
 import { Buyout } from '~/server/lib/models/Buyout'
 
 const runtimeConfig = useRuntimeConfig()
-let paymentPerPage = 50
-let elPerPage = 50
+let elPerPage = 10
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
