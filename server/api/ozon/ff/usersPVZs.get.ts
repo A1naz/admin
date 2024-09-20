@@ -10,7 +10,11 @@ export default eventHandler(async (event) => {
 
   if (!session) return sendRedirect(event, '/auth', 302)
 
-  const { userId }: any = getQuery(event)
+  const { userId, date }: any = getQuery(event)
+
+  const trueDate = new Date(new Date(date).setHours(0, 0, 0, 0))
+  const minDate = new Date(new Date(date).setHours(trueDate.getHours() - 1))
+  const maxDate = new Date(new Date(date).setHours(trueDate.getHours() + 1))
 
   if (!userId) {
     return {
@@ -26,17 +30,25 @@ export default eventHandler(async (event) => {
   )
     return sendRedirect(event, '/auth', 302)
 
-  const pvzs = await FFPVZ.findOne({ user: userId })
+  const users = await User.find({ _id: { $in: userId } })
 
-  if (!pvzs) {
-    return {
-      status: 'error',
-      PVZs: [],
-    }
-  }
+  const pvzs = await FFPVZ.find({ user: { $in: users } })
+
+  const pvzsMap = new Map<string, any>()
+  pvzs.forEach((pvz: any) => {
+    pvz.pvzs.forEach((p: any) => {
+      // console.log(p.date, new Date(minDate), new Date(maxDate), 'p: ', p);
+
+      if (new Date(p.date) >= minDate && new Date(p.date) <= maxDate) {
+        pvzsMap.set(p.id, p)
+      }
+    })
+  })
+
+  const format = Array.from(pvzsMap.values())
 
   return {
     status: 'ok',
-    PVZs: pvzs.pvzs,
+    PVZs: format,
   }
 })
