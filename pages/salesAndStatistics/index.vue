@@ -498,6 +498,7 @@ if (
               <tr>
                 <th>id</th>
                 <th>username</th>
+                <th>организация</th>
                 <th>email</th>
                 <th>telegram</th>
                 <th>Выбрать</th>
@@ -509,6 +510,11 @@ if (
                 <td style="max-width: 150px">
                   <div class="mx-1 overflow-x-auto">
                     {{ user.username }}
+                  </div>
+                </td>
+                <td style="max-width: 150px" class="overflow-x-auto">
+                  <div class="mx-1 overflow-x-auto">
+                    {{ user.organization }}
                   </div>
                 </td>
                 <td style="max-width: 150px" class="overflow-x-auto">

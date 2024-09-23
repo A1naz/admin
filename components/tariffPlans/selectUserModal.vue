@@ -99,6 +99,7 @@ getUsers()
               <tr>
                 <th>Id</th>
                 <th>username</th>
+                <th>организация</th>
                 <th>email</th>
                 <th>Выбрать</th>
               </tr>
@@ -113,7 +114,7 @@ getUsers()
                 </td>
                 <td style="max-width: 150px" class="overflow-x-auto">
                   <div class="mx-1 overflow-x-auto">
-                    {{ user.email }}
+                    {{ user.organization }}
                   </div>
                 </td>
                 <td style="max-width: 20px">

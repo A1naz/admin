@@ -12,7 +12,7 @@ export default eventHandler(async (event) => {
 
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (!userAdmin) return sendRedirect(event, '/auth', 302)
-    
+
   let allowedUsersParam = userAdmin.isAllUsersAllowed
     ? {
         _id: { $nin: userAdmin.restrictedUsers.map((id: any) => id) },
@@ -49,7 +49,7 @@ export default eventHandler(async (event) => {
       })
         .skip(usersPerPage * (+page - 1))
         .limit(usersPerPage)
-        .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? -1 : 1 });
+        .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? -1 : 1 })
     }
   } else {
     allUsers = await User.find({
@@ -63,7 +63,9 @@ export default eventHandler(async (event) => {
   const usersCount = await User.count()
   const adminUsers = await AdminUser.find()
   const users = allUsers.map((user: any) => {
-    const userTwoFa = adminUsers.find((adminUser: any) => adminUser.uuid === user.uuid);
+    const userTwoFa = adminUsers.find(
+      (adminUser: any) => adminUser.uuid === user.uuid
+    )
 
     return {
       _id: user._id,
@@ -84,8 +86,9 @@ export default eventHandler(async (event) => {
       partnerSecondLevelPercent: user.partner?.secondLevelPercent
         ? user.partner?.secondLevelPercent
         : 5,
-        twoFaQR: userTwoFa ? userTwoFa.twoFaQR : user.twoFaQR || '',
-        twoFaSecret: userTwoFa ? userTwoFa.twoFaSecret : user.twoFaSecret || '',
+      twoFaQR: userTwoFa ? userTwoFa.twoFaQR : user.twoFaQR || '',
+      twoFaSecret: userTwoFa ? userTwoFa.twoFaSecret : user.twoFaSecret || '',
+      organization: user.fizFace ? user.username + '(Физ. лицо)' : user.orgName,
     }
   })
 

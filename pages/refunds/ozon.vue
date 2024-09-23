@@ -859,6 +859,7 @@ function changeMP(event: any) {
               <tr>
                 <th>id</th>
                 <th>username</th>
+                <th>организация</th>
                 <th>email</th>
                 <th>Выбрать</th>
               </tr>
@@ -873,7 +874,7 @@ function changeMP(event: any) {
                 </td>
                 <td style="max-width: 150px" class="overflow-x-auto">
                   <div class="mx-1 overflow-x-auto">
-                    {{ user.email }}
+                    {{ user.organization }}
                   </div>
                 </td>
                 <td style="max-width: 20px">

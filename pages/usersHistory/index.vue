@@ -280,6 +280,7 @@ await getActs()
               <tr>
                 <th>id</th>
                 <th>username</th>
+                <th>организация</th>
                 <th>email</th>
                 <th>Выбрать</th>
               </tr>
@@ -290,6 +291,11 @@ await getActs()
                 <td style="max-width: 150px">
                   <div class="mx-1 overflow-x-auto">
                     {{ admin.username }}
+                  </div>
+                </td>
+                <td style="max-width: 150px" class="overflow-x-auto">
+                  <div class="mx-1 overflow-x-auto">
+                    {{ admin.organization }}
                   </div>
                 </td>
                 <td style="max-width: 150px" class="overflow-x-auto">
