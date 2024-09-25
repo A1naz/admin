@@ -5,6 +5,7 @@ definePageMeta({
   title: 'Тарифные планы',
 })
 
+import { notify } from '@kyvg/vue3-notification'
 const store = useMainStore()
 const { height, width } = useWindowSize()
 
@@ -29,6 +30,7 @@ const selectedUser = ref<any>({
 })
 
 const tariffInfoModal = ref(false)
+const confirmModal = ref(false)
 const paymentsCountModal = ref(false)
 const editPaymentsModal = ref(false)
 const selectedTariff = ref<any>({})
@@ -61,6 +63,23 @@ const getTariffName = (tariff: any) => {
 const getTariffsType = (type: any) => {
   if (type == 'basic') return 'Базовый'
   if (type == 'full') return 'Под ключ'
+}
+
+async function removeTariffPlan() {
+  const { data }: any = await useFetch('/api/tariffPlans/remove', {
+    method: 'POST',
+    body: {
+      uuid: selectedTariff.value.uuid,
+    },
+  })
+  if (data.value) {
+    getTariffs()
+    notify({
+      title: 'Успех',
+      text: 'Тариф удален',
+      type: 'success',
+    })
+  }
 }
 </script>
 <template>
@@ -140,10 +159,7 @@ const getTariffsType = (type: any) => {
           <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
             {{ tariff.username }}
           </th>
-          <th
-            style="max-width: 300px; min-width: 140px"
-            class="overflow-x-auto"
-          >
+          <th style="max-width: 80px; min-width: 140px" class="overflow-x-auto">
             {{ tariff.userOrgName }}
           </th>
           <th style="max-width: 100px; min-width: 90px">
@@ -168,7 +184,10 @@ const getTariffsType = (type: any) => {
             {{ tariff.paymentDate.slice(0, 10).replace(/-/g, '.') }} -
             {{ tariff.activationDate.slice(0, 10).replace(/-/g, '.') }}
           </th>
-          <th style="max-width: 100px; min-width: 90px" class="flex justify-center">
+          <th
+            style="max-width: 100px; min-width: 90px"
+            class="flex justify-center"
+          >
             <button>
               <Icon
                 name="mdi:account"
@@ -197,6 +216,14 @@ const getTariffsType = (type: any) => {
                 "
               />
             </button>
+            <button class="ml-2">
+              <Icon
+                name="material-symbols:delete-outline"
+                size="30"
+                color="#d0cfd8"
+                @click=";[(confirmModal = true), (selectedTariff = tariff)]"
+              />
+            </button>
           </th>
         </tr>
       </tbody>
@@ -220,6 +247,12 @@ const getTariffsType = (type: any) => {
   <TariffPlansEditModal
     v-model:is-modal-open="editPaymentsModal"
     :selectedTariff="selectedTariff"
+  />
+  <StaticConfirmModal
+    :title="'Подтвердить действие'"
+    :description="'Вы уверены, что хотите удалить тарифный план?'"
+    :confirmFunction="removeTariffPlan"
+    v-model:state="confirmModal"
   />
 </template>
 <style scoped>
