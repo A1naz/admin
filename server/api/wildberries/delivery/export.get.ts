@@ -29,6 +29,8 @@ export default eventHandler(async (event) => {
 
     const { uuid, pvzs }: any = getQuery(event)
 
+    console.log(pvzs);
+    
     const user = await User.find({ uuid: { $in: uuid } })
     if (!user || !user.length) {
       throw createError({
@@ -37,32 +39,13 @@ export default eventHandler(async (event) => {
       })
     }
 
-    // if (!adminUser.isAllUsersAllowed) {
-    //   const allowedUsersParam = adminUser.allowedUsers.map(
-    //     (item: any) => item.valueOf
-    //   )
-    //   const restrictedUsersParam = adminUser.restrictedUsers.map(
-    //     (item: any) => item.valueOf
-    //   )
-
-    //   if (
-    //     !allowedUsersParam.includes(user._id.valueOf()) ||
-    //     restrictedUsersParam.includes(user._id.valueOf())
-    //   ) {
-    //     throw createError({
-    //       statusCode: 400,
-    //       message: 'Пользователь не разрешен',
-    //     })
-    //   }
-    // }
-
+    console.log(user.length);
+    
     const deliveries = await Delivery.find({
       user: { $in: user },
       point: pvzs && pvzs.length ? { $in: pvzs } : { $exists: true },
-    }).sort({
-      point: 1,
     })
-
+  
     // if (!deliveries.length) {
     // return undefined
     // }
@@ -89,6 +72,7 @@ export default eventHandler(async (event) => {
       sorted.map(async (delivery, index) => {
         const buyout = buyouts.find((item:any) => item._id.valueOf() === delivery.idbuyout.valueOf())
 
+        
         if (!buyout) return null
 
         const phone = delivery.recipientphone || ''
