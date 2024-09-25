@@ -37,7 +37,7 @@ export default eventHandler(async (event) => {
 
   const foundPayments: any = await paymenthistory.find({
     user: foundPlan.user,
-    mp: foundPlan.mp,
+    mp: foundPlan.mp === 'all' ? { $exists: true } : foundPlan.mp,
     dataoperation: {
       $gte: new Date(foundPlan.activationDate).setHours(0, 0, 0, 0),
       $lt: new Date(foundPlan.endDate).setHours(23, 59, 0, 0),
