@@ -640,7 +640,7 @@ function changeMP(event: any) {
       </div>
     </div>
   </div>
-  <input type="checkbox" id="imageModal" class="modal-toggle" />
+  <input type="checkbox" id="imageModal"   class="modal-toggle" />
   <div class="modal cursor-pointer" @click="closeImageModal">
     <div class="modal-box w-fit max-w-full cursor-pointer">
       <form method="dialog">

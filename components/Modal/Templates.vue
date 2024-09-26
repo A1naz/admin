@@ -9,7 +9,20 @@ const props = defineProps({
 
 const templates = toRef(props, 'templates')
 const isModalOpen = ref(false)
-const emit = defineEmits(['useTemplate', 'deleteTemplate', 'setTemplate'])
+const emit = defineEmits([
+  'useTemplate',
+  'deleteTemplate',
+  'setTemplate',
+  'isModalTemplateOpen',
+])
+
+watch(isModalOpen, (newValue) => {
+  emit('isModalTemplateOpen', isModalOpen.value)
+})
+
+defineExpose({
+  isModalOpen,
+})
 </script>
 <template>
   <button class="btn btn-primary btn-sm mx-1" @click="isModalOpen = true">
@@ -22,8 +35,9 @@ const emit = defineEmits(['useTemplate', 'deleteTemplate', 'setTemplate'])
   > -->
   <div
     id="selectUsers"
-    class="modal overflow-y-auto z-50"
+    class="modal overflow-y-auto z-50 cursor-pointer"
     :class="{ 'modal-open': isModalOpen }"
+    @click="isModalOpen = false"
   >
     <div class="modal-box w-9/12 max-w-full cursor-auto h-full" @click.stop>
       <form method="dialog">

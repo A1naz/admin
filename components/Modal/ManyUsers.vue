@@ -53,7 +53,6 @@ async function getUsers(searchValue: string = '') {
 getUsers()
 
 function selectUser(uuid: String, select: boolean) {
-  
   users.value.forEach((user: any) => {
     if (user._id === uuid) {
       if (!select) {
@@ -101,7 +100,7 @@ const templates = ref([])
 const templateTitle = ref('')
 
 async function createTemplate(name: string) {
-  if(selectedUsers.value.length == 0){
+  if (selectedUsers.value.length == 0) {
     return
   }
   loading.value = true
@@ -113,7 +112,7 @@ async function createTemplate(name: string) {
     },
     watch: false,
   })
-  if(data){
+  if (data) {
     await getTemplates()
     users.value.forEach((user: any) => {
       selectedUsers.value.forEach((el: any) => {
@@ -137,7 +136,7 @@ async function getTemplates() {
   const { data }: any = await useFetch('/api/userTemplate/getTemplates', {
     method: 'GET',
   })
-  if(data){
+  if (data) {
     templates.value = data.value
   }
   loading.value = false
@@ -147,10 +146,10 @@ getTemplates()
 
 async function useTemplate(template: any) {
   template.forEach((item: any) => {
-    if (!selectedUsers.value.some(user => user.uuid === item.uuid)) {
-      selectedUsers.value.push(item);
+    if (!selectedUsers.value.some((user) => user.uuid === item.uuid)) {
+      selectedUsers.value.push(item)
     }
-  });
+  })
   notify({
     title: 'Шаблон применен к выбранным пользователям',
     type: 'success',
@@ -172,11 +171,11 @@ async function deleteTemplate(template: any) {
   const { data }: any = await useFetch('/api/userTemplate/deleteTemplate', {
     method: 'POST',
     query: {
-      uuid: template.uuid
+      uuid: template.uuid,
     },
     watch: false,
   })
-  if(data){
+  if (data) {
     await getTemplates()
     notify({
       title: 'Шаблон удален',
@@ -187,7 +186,21 @@ async function deleteTemplate(template: any) {
   loading.value = false
 }
 
+const isModalTemplateOpen = ref(false)
+const modalTemplate = ref()
 
+const isModalSaveTemplateOpen = ref(false)
+const modalSaveTemplate = ref()
+
+function closeModal() {
+  if (isModalTemplateOpen.value) {
+    modalTemplate.value.isModalOpen = false
+  } else if (isModalSaveTemplateOpen.value) {
+    modalSaveTemplate.value.isModalOpen = false
+  } else {
+    isModalOpen.value = false
+  }
+}
 </script>
 <template>
   <button class="ml-2 btn" @click="isModalOpen = true">
@@ -204,10 +217,14 @@ async function deleteTemplate(template: any) {
   > -->
   <div
     id="selectUsers"
-    class="modal z-40"
+    class="modal z-40 cursor-pointer"
     :class="{ 'modal-open': isModalOpen }"
+    @click="closeModal"
   >
-    <div class="modal-box w-9/12 max-w-full min-h-[500px] cursor-auto" @click.stop>
+    <div
+      class="modal-box w-9/12 max-w-full min-h-[500px] cursor-auto"
+      @click.stop
+    >
       <form method="dialog">
         <label
           for="selectUsers"
@@ -217,7 +234,7 @@ async function deleteTemplate(template: any) {
           ✕
         </label>
       </form>
-      
+
       <div>
         <div class="justify-between flex">
           <div>
@@ -242,9 +259,16 @@ async function deleteTemplate(template: any) {
             "
             >Выбрать всех</label
           > -->
-          
+
           <div class="form-control mr-6 mt-4">
-            <ModalTemplates :templates="templates" @useTemplate="useTemplate" @setTemplate="setTemplate" @deleteTemplate="deleteTemplate"/>
+            <ModalTemplates
+              ref="modalTemplate"
+              :templates="templates"
+              @useTemplate="useTemplate"
+              @setTemplate="setTemplate"
+              @deleteTemplate="deleteTemplate"
+              @isModalTemplateOpen="isModalTemplateOpen = $event"
+            />
             <label class="label cursor-pointer">
               <span class="label-text mr-4">Показать только выбранных</span>
               <input
@@ -309,11 +333,17 @@ async function deleteTemplate(template: any) {
             </tbody>
           </table>
         </div>
-        
+
         <div class="modal-action"></div>
       </div>
       <div class="flex justify-end">
-        <ModalSaveTemplate :loading="loading" :disabled="selectedUsers.length === 0" @save="(name: string) => createTemplate(name)"/>
+        <ModalSaveTemplate
+          ref="modalSaveTemplate"
+          :loading="loading"
+          :disabled="selectedUsers.length === 0"
+          @save="(name: string) => createTemplate(name)"
+          @isModalTemplateOpen="isModalSaveTemplateOpen = $event"
+        />
         <!-- <button class="btn btn-primary btn-sm mx-1 overflow-x-auto mt-5" :disabled="selectedUsers.length === 0" @click="createTemplate()">
           Создать шаблон
         </button> -->
