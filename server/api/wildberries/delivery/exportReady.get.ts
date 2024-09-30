@@ -31,6 +31,7 @@ async function getReady(user: any, pvzs: any, selectedDays: any) {
 
   const filtered: any = await Delivery.find({
     user: { $in: user.map((item: any) => item._id) },
+    status: {$ne : 'completed'},
     point:
       pvzsArray && pvzsArray.length ? { $in: pvzsArray } : { $exists: true },
     $expr: {

@@ -21,6 +21,7 @@ const keys = Object.keys as <T>(
 
 async function getReady(user: any, pvzs: any, selectedDays: any) {
   const deliveries = await Delivery.find({
+    status: {$ne : 'completed'},
     user: { $in: user },
     point: pvzs && pvzs.length ? { $in: pvzs } : { $exists: true },
   })
