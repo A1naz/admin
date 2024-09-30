@@ -12,7 +12,7 @@ const props = defineProps({
 
 const isModalOpen = ref(false)
 const templateName = ref('')
-const emit = defineEmits(['save'])
+const emit = defineEmits(['save', 'isModalTemplateOpen'])
 const loading = toRef(props, 'loading')
 function save() {
   emit('save', templateName.value)
@@ -23,6 +23,14 @@ function save() {
     }
   })
 }
+
+watch(isModalOpen, (newValue) => {
+  emit('isModalTemplateOpen', isModalOpen.value)
+})
+
+defineExpose({
+  isModalOpen,
+})
 </script>
 <template>
   <button
@@ -39,8 +47,9 @@ function save() {
   > -->
   <div
     id="selectUsers"
-    class="modal overflow-y-auto"
+    class="modal overflow-y-auto cursor-pointer"
     :class="{ 'modal-open': isModalOpen }"
+    @click="isModalOpen = false"
   >
     <div class="modal-box w-9/12 max-w-md cursor-auto" @click.stop>
       <form method="dialog">

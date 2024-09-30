@@ -400,8 +400,8 @@ function selectUser(user: any) {
   </div>
 
   <input type="checkbox" id="createRequireModal" class="modal-toggle" />
-  <div id="createRequireModal" class="modal">
-    <div class="modal-box">
+  <div id="createRequireModal" class="modal ">
+    <div class="modal-box ">
       <button
         class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
         @click="closeCreateModalButton.click()"
@@ -532,7 +532,7 @@ function selectUser(user: any) {
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-      <label for="createRequireModal" ref="closeCreateModalButton">close</label>
+      <label for="createRequireModal" ref="closeCreateModalButton" class="cursor-pointer">close</label>
     </form>
   </div>
   <!-- ==================================================================== -->

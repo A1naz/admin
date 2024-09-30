@@ -808,7 +808,7 @@ function changeMP(event: any) {
     </div>
   </div>
 
-  <input type="checkbox" id="selectUser" class="modal-toggle" />
+  <input type="checkbox" id="selectUser" :checked="true" class="modal-toggle" />
   <div class="modal cursor-pointer" @click="openUsersSelectModal">
     <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
