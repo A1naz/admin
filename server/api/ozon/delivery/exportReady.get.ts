@@ -9,6 +9,9 @@ import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
 import { ActionHistory } from '@/server/lib/models/actionHistory'
 
+const prefixesToRemove =
+  /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
+
 const keys = Object.keys as <T>(
   obj: T
 ) => (keyof T extends infer U
@@ -21,14 +24,19 @@ const keys = Object.keys as <T>(
 
 async function getReady(user: any, pvzs: any, selectedDays: any) {
   const deliveries = await Delivery.find({
-    status: {$ne : 'completed'},
+    status: { $ne: 'completed' },
+    statusdelivery: {
+      $elemMatch: {
+        $or: [
+          { status: '^Ожидает получения.*' },
+          { status: { $regex: '^Ожидает получения.*' } },
+        ],
+      },
+    },
     user: { $in: user },
     point: pvzs && pvzs.length ? { $in: pvzs } : { $exists: true },
   })
-  const prefixesToRemove =
-    /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
-
-  const filtered: any = deliveries
+  const filtered = deliveries
     .filter((item) => {
       const currentstatus = item.statusdelivery?.length
         ? item.statusdelivery[item.statusdelivery.length - 1].status

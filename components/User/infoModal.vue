@@ -71,6 +71,15 @@ const close = () => {
         />
       </div>
       <div class="mt-1 ml-2">
+        ИНН
+        <input
+          type="text"
+          class="input input-bordered w-full mt-1"
+          disabled
+          v-model="selectedUser.INN"
+        />
+      </div>
+      <div class="mt-1 ml-2">
         ОГРН
         <input
           type="text"

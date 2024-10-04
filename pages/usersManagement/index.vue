@@ -578,7 +578,7 @@ function changeMP(event: any) {
               ><input
                 v-model="query"
                 type="text"
-                placeholder="Введите id или username или email"
+                placeholder="id, username, email, организация"
                 class="input input-bordered input-l ml-4 w-80"
                 @input="onInput($event)"
               />

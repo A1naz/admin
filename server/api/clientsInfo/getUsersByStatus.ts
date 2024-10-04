@@ -90,6 +90,7 @@ async function filterUsers(users: any[]) {
         ? user.bankInfo.city + ', ' + user.bankInfo.address
         : '',
       orgPhone: user.bankInfo ? user.bankInfo.phone : '',
+      INN: user.orgInn,
     }
   })
 }

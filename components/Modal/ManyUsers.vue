@@ -242,7 +242,7 @@ function closeModal() {
               ><input
                 v-model="query"
                 type="text"
-                placeholder="id, username, email, telegram"
+                placeholder="id, username, email, telegram, организация"
                 class="input input-bordered input-l ml-4 w-80"
                 @input="onInput($event)"
               />

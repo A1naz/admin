@@ -129,9 +129,8 @@ async function uploadToS3(event: Event, screen: string = 'dialog') {
   }
   if (data.value) {
     const publicUrl: any = await getS3PublicUrl(data.value[0].key)
-    
-    if (selectedScreenshot.value == 'account') {
 
+    if (selectedScreenshot.value == 'account') {
       accountScreenshot.value = {
         url: publicUrl,
         public: publicUrl,
@@ -637,15 +636,21 @@ function changeMP(event: any) {
           или введите сумму для возврата от руки
         </div>
 
-        <input
+        <!-- <input
           v-if="
             selectedTabOption == 'buyouts' &&
             refundType == 'Возврат по вине клиента'
           "
           v-model="handleOperationSumm"
-          type="number"
           placeholder="Сумма возврата"
           class="input input-bordered w-full mr-3"
+        /> -->
+        <PaymentInput
+          v-if="
+            selectedTabOption == 'buyouts' &&
+            refundType == 'Возврат по вине клиента'
+          "
+          v-model="handleOperationSumm"
         />
         <div class="divider my-2" v-if="selectedTabOption == 'buyouts'" />
         <select
@@ -828,7 +833,7 @@ function changeMP(event: any) {
               ><input
                 v-model="userQuery"
                 type="text"
-                placeholder="Введите id или username или email"
+                placeholder="id, username, email, организация"
                 class="input input-bordered input-l ml-4 w-80"
                 @input="onInput($event)"
               />
