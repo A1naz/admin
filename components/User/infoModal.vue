@@ -53,12 +53,6 @@ function copyUserDataToClipboard() {
       </form>
       <div class="flex flex-wrap">
         <div class="mt-1 ml-2 text-xl">Данные об организации</div>
-        <button
-          class="btn btn-primary btn-sm ml-3 my-2"
-          @click="copyUserDataToClipboard"
-        >
-          Скопировать данные
-        </button>
       </div>
       <div class="mt-1 ml-2">
         Телефон аккаунта
@@ -176,6 +170,14 @@ function copyUserDataToClipboard() {
           disabled
           v-model="selectedUser.orgPhone"
         />
+      </div>
+      <div class="w-full flex justify-center mt-2">
+        <button
+          class="btn btn-primary ml-3 my-2"
+          @click="copyUserDataToClipboard"
+        >
+          Копировать
+        </button>
       </div>
     </div>
   </div>
