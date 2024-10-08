@@ -4,6 +4,7 @@ import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { Buyout } from '~/server/lib/models/Buyout'
+import { Buyout as OzonBuyout } from '~/server/lib/models/ozon/Buyout'
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -46,11 +47,22 @@ export default eventHandler(async (event) => {
   if (trueFilters.type !== 'buyouts') {
     delete trueFilters.article
   } else if (trueFilters.type == 'buyouts' && trueFilters.article) {
-    const buyoutsWithThisArticle = await Buyout.find({
+    const wildberriesBuyoutsWithThisArticle = await Buyout.find({
       article: trueFilters.article,
     }).sort({
       createdAt: sortDate,
     })
+
+    const ozonBuyoutsWithThisArticle = await OzonBuyout.find({
+      article: trueFilters.article,
+    }).sort({
+      createdAt: sortDate,
+    })
+
+    const buyoutsWithThisArticle = [
+      ...wildberriesBuyoutsWithThisArticle,
+      ...ozonBuyoutsWithThisArticle,
+    ]
 
     const buyoutsUuids: string[] = []
 
@@ -176,9 +188,14 @@ export default eventHandler(async (event) => {
       }
     }
 
-    const buyouts = await Buyout.find({
+    const OzonBuyouts = await OzonBuyout.find({
       uuid: { $in: buyoutsUuids },
     })
+    const wildberriesBuyouts = await Buyout.find({
+      uuid: { $in: buyoutsUuids },
+    })
+
+    const buyouts = [...OzonBuyouts, ...wildberriesBuyouts]
 
     format.forEach((stat: any) => {
       if (
