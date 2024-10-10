@@ -16,9 +16,12 @@ export default eventHandler(async (event) => {
   if (!user || (!user.mainAdmin && !user.tabs.includes('клиенты')))
     return sendRedirect(event, '/auth', 302)
 
-  const { dateRange, searchQuery, page, status }: any = getQuery(event)
+  const { dateRange, searchQuery, page, status, clientsType }: any =
+    getQuery(event)
 
-  const searchQueryParam: Object = searchQuery
+  console.log(clientsType)
+
+  const searchQueryParam: any = searchQuery
     ? {
         $or: [
           { username: { $regex: searchQuery, $options: 'i' } },
@@ -29,13 +32,13 @@ export default eventHandler(async (event) => {
 
   let users = []
   if (status === 'all') {
-    users = await getUsers.allUsers(page, searchQueryParam, dateRange)
+    users = await getUsers.allUsers(page, searchQueryParam, dateRange, clientsType)
   } else if (status === 'active') {
-    users = await getUsers.activeUsers(page, searchQueryParam, dateRange)
+    users = await getUsers.activeUsers(page, searchQueryParam, dateRange, clientsType)
   } else if (status === 'inactive') {
-    users = await getUsers.inactiveUsers(page, searchQueryParam, dateRange)
+    users = await getUsers.inactiveUsers(page, searchQueryParam, dateRange, clientsType)
   } else {
-    users = await getUsers.registeredUsers(page, searchQueryParam, dateRange)
+    users = await getUsers.registeredUsers(page, searchQueryParam, dateRange, clientsType)
   }
 
   await ActionHistory.create({

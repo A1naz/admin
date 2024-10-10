@@ -22,6 +22,7 @@ const filtersForm = ref({
   status: 'all',
   searchQuery: '',
   page: 1,
+  clientsType: 'all'
 })
 
 const tariffs = ref<any>([])
@@ -118,6 +119,12 @@ async function signTariff() {
       </div>
     </div>
   </div>
+  <select class="select select-bordered ml-3" v-model="filtersForm.clientsType">
+    <option disabled>Тип пользователя</option>
+    <option selected value="all">Все пользователи</option>
+    <option value="fizFace">Физ. лицо</option>
+    <option value="yurFace">Юр. лицо</option>
+  </select>
   <div
     class="mt-6 mx-2 overflow-y-auto"
     :style="{ 'max-height': height - 270 + 'px' }"

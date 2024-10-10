@@ -50,7 +50,6 @@ async function filterUsers(users: any[]) {
       user.MPTariffs[0].prices.buyouts &&
       user.MPTariffs[0].prices.buyouts.value
     ) {
- 
       tariff = user.MPTariffs[0].prices.buyouts.value
     }
 
@@ -99,8 +98,18 @@ export default {
   async allUsers(
     page: number = 1,
     searchQueryParam: Object = {},
-    dateRange: any
+    dateRange: any,
+    clientsType: string
   ) {
+
+
+    const clientsParam =
+    clientsType === 'fizFace'
+      ? { fizFace: true }
+      : clientsType === 'yurFace'
+      ? { fizFace: { $ne: true } }
+      : {}
+
     const dateRangeParam: Object = dateRange
       ? {
           registrationDate: {
@@ -113,6 +122,7 @@ export default {
     const users = await User.find({
       ...dateRangeParam,
       ...searchQueryParam,
+      ...clientsParam,
     })
       .limit(50)
       .skip(limit * (page - 1))
@@ -128,7 +138,8 @@ export default {
   async registeredUsers(
     page: number = 1,
     searchQueryParam: Object = {},
-    dateRange: any
+    dateRange: any,
+    clientsType: string
   ) {
     const dateRangeParam: Object = dateRange
       ? {
@@ -138,6 +149,13 @@ export default {
           },
         }
       : {}
+
+    const clientsParam =
+      clientsType === 'fizFace'
+        ? { fizFace: true }
+        : clientsType === 'yurFace'
+        ? { fizFace: { $ne: true } }
+        : {}
 
     const userIds = await paymenthistory.aggregate([
       {
@@ -154,6 +172,7 @@ export default {
       _id: { $nin: userIds.map((user: any) => user._id) },
       ...dateRangeParam,
       ...searchQueryParam,
+      ...clientsParam,
     })
       .limit(50)
       .skip(limit * (page - 1))
@@ -169,13 +188,21 @@ export default {
   async activeUsers(
     page: number = 1,
     searchQueryParam: Object = {},
-    dateRange: any
+    dateRange: any,
+    clientsType: string
   ) {
     const curDate = dateRange ? new Date(JSON.parse(dateRange[1])) : new Date()
     const twoWeeksAgo = dateRange
       ? new Date(JSON.parse(dateRange[0]))
       : new Date(curDate.getTime() - 14 * 24 * 60 * 60 * 1000)
 
+      const clientsParam =
+      clientsType === 'fizFace'
+        ? { fizFace: true }
+        : clientsType === 'yurFace'
+        ? { fizFace: { $ne: true } }
+        : {}
+      
     const userIds = await paymenthistory.aggregate([
       {
         $match: {
@@ -194,6 +221,7 @@ export default {
     const users = await User.find({
       _id: { $in: userIds.map((user: any) => user._id) },
       ...searchQueryParam,
+      ...clientsParam
     })
       .limit(50)
       .skip(limit * (page - 1))
@@ -209,7 +237,8 @@ export default {
   async inactiveUsers(
     page: number = 1,
     searchQueryParam: Object = {},
-    dateRange: any
+    dateRange: any,
+    clientsType: string
   ) {
     const curDate = dateRange ? new Date(JSON.parse(dateRange[1])) : new Date()
     const twoWeeksAgo = dateRange
