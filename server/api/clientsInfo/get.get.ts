@@ -19,8 +19,6 @@ export default eventHandler(async (event) => {
   const { dateRange, searchQuery, page, status, clientsType }: any =
     getQuery(event)
 
-  console.log(clientsType)
-
   const searchQueryParam: any = searchQuery
     ? {
         $or: [
