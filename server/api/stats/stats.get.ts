@@ -44,17 +44,41 @@ export default eventHandler(async (event) => {
 
   if (!trueFilters.sumTo) delete trueFilters.sumTo
   if (!trueFilters.sumFrom) delete trueFilters.sumFrom
+
+  if (
+    trueFilters.productName &&
+    trueFilters.type == 'buyouts' &&
+    !trueFilters.article
+  ) {
+    const wildberriesBuyoutsArticles = await Buyout.find({
+      'product.name': { $regex: trueFilters.productName, $options: 'i' },
+    }).select('article')
+    const ozonBuyoutsArticles = await OzonBuyout.find({
+      'product.name': { $regex: trueFilters.productName, $options: 'i' },
+    }).select('article')
+    const allArticles = [...wildberriesBuyoutsArticles, ...ozonBuyoutsArticles]
+    trueFilters.article = {
+      $in: allArticles.map((article: any) => article.article),
+    }
+  }
+
   if (trueFilters.type !== 'buyouts') {
     delete trueFilters.article
   } else if (trueFilters.type == 'buyouts' && trueFilters.article) {
     const wildberriesBuyoutsWithThisArticle = await Buyout.find({
       article: trueFilters.article,
+      'product.name': trueFilters.productName
+        ? { $regex: trueFilters.productName, $options: 'i' }
+        : { $exists: true },
     }).sort({
       createdAt: sortDate,
     })
 
     const ozonBuyoutsWithThisArticle = await OzonBuyout.find({
       article: trueFilters.article,
+      'product.name': trueFilters.productName
+        ? { $regex: trueFilters.productName, $options: 'i' }
+        : { $exists: true },
     }).sort({
       createdAt: sortDate,
     })
@@ -130,7 +154,6 @@ export default eventHandler(async (event) => {
     .skip(paymentPerPage * (+page - 1))
     .limit(paymentPerPage)
 
-  // const statsCount: any = await paymenthistory.count()
   const statsUsersIds: any = stats.map((operation: any) => operation.user)
   const users = await User.find({ _id: { $in: statsUsersIds } })
   const format = <any>[]
@@ -189,9 +212,15 @@ export default eventHandler(async (event) => {
     }
 
     const OzonBuyouts = await OzonBuyout.find({
+      'product.name': trueFilters.productName
+        ? { $regex: trueFilters.productName, $options: 'i' }
+        : { $exists: true },
       uuid: { $in: buyoutsUuids },
     })
     const wildberriesBuyouts = await Buyout.find({
+      'product.name': trueFilters.productName
+        ? { $regex: trueFilters.productName, $options: 'i' }
+        : { $exists: true },
       uuid: { $in: buyoutsUuids },
     })
 

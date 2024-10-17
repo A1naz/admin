@@ -9,12 +9,14 @@ const productsCountInfo = ref({
   count: 0,
   sum: 0,
 })
+const loading = ref(false)
 const isExportBtnDisabled = ref(false)
 const currency = useCurrency()
 const type = ref('any')
 const faceType = ref('any')
 const service = ref('any')
 const articleQuery = ref('')
+const productName = ref('')
 const { $dayjs } = useNuxtApp()
 const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 const selectUsersClose: any = ref(null)
@@ -77,6 +79,7 @@ definePageMeta({
 const products = ref([])
 
 async function getStats() {
+  loading.value = true
   stats.value = []
   const { data }: any = await useFetch('/api/stats/stats', {
     method: 'GET',
@@ -91,6 +94,7 @@ async function getStats() {
         dateRange: dateRange.value.length > 0 ? dateRange.value : null,
         article: articleQuery.value,
         faceType: faceType.value,
+        productName: productName.value ? productName.value : null,
       },
     },
   })
@@ -100,6 +104,7 @@ async function getStats() {
     pages.value = Math.ceil(statsCount.value / elPerPage)
     productsCountInfo.value = data.value.productsCountInfo
   }
+  loading.value = false
 }
 
 function sortByDate() {
@@ -215,21 +220,13 @@ if (
   <h1 class="text-2xl font-bold ml-5 my-2">Финансовые операции</h1>
 
   <div class="divider"></div>
-  <select
-    @change=";[(curPage = 1), getStats()]"
-    v-model="selectedMP"
-    class="select select-bordered w-50 ml-3 mb-3"
-  >
+  <select @change=";[(curPage = 1), getStats()]" v-model="selectedMP" class="select select-bordered w-50 ml-3 mb-3">
     <option selected value="all">Все</option>
     <option v-for="mp in mpStore.MPTabs" :value="mp.value" :key="mp.value">
       {{ mp.title }}
     </option>
   </select>
-  <button
-    class="btn btn-sm btn-primary ml-2"
-    @click="exportXLS"
-    :disabled="isExportBtnDisabled"
-  >
+  <button class="btn btn-sm btn-primary ml-2" @click="exportXLS" :disabled="isExportBtnDisabled">
     Экспорт
   </button>
   <div class="flex flex-col justify-between">
@@ -242,29 +239,17 @@ if (
         }}
       </button>
 
-      <select
-        class="select select-bordered w-50 ml-3"
-        @change=";[(curPage = 1), getStats()]"
-        v-model="faceType"
-      >
+      <select class="select select-bordered w-50 ml-3" @change=";[(curPage = 1), getStats()]" v-model="faceType">
         <option selected value="any">Все типы лица</option>
         <option value="yurFace">Юридическое лицо</option>
         <option value="fizFace">Физическое лицо</option>
       </select>
-      <select
-        class="select select-bordered w-50 ml-3"
-        @change=";[(curPage = 1), getStats()]"
-        v-model="type"
-      >
+      <select class="select select-bordered w-50 ml-3" @change=";[(curPage = 1), getStats()]" v-model="type">
         <option selected value="any">все типы операции</option>
         <option value="Приход">приход</option>
         <option value="Расход">расход</option>
       </select>
-      <select
-        class="select select-bordered w-50 ml-3"
-        @change=";[(curPage = 1), getStats()]"
-        v-model="service"
-      >
+      <select class="select select-bordered w-50 ml-3" @change=";[(curPage = 1), getStats()]" v-model="service">
         <option selected value="any">все услуги</option>
         <option value="deposit">депозит</option>
         <option value="buyouts">выкупы</option>
@@ -283,67 +268,47 @@ if (
         <option value="deliveryStorage">штрафы</option>
       </select>
       <div v-if="service == 'buyouts'">
-        <label
-          ><input
-            v-model="articleQuery"
-            type="number"
-            placeholder="Артикул"
-            class="input input-bordered input-l ml-4 w-44"
-            @input="onInputArticle($event)"
-          />
+        <label><input v-model="articleQuery" type="number" placeholder="Артикул"
+            class="input input-bordered input-l ml-4 w-44" @input="onInputArticle($event)" />
         </label>
-        <span
-          v-if="inputLoading"
-          class="loading loading-spinner text-primary loading-large ml-4"
-        />
       </div>
-      <DateRangePicker
-        class="w-46"
-        v-model="dateRange"
-        :start-date="startDate"
-        @reset="dateRange = []"
-      >
+      <DateRangePicker class="w-46" v-model="dateRange" :start-date="startDate" @reset="dateRange = []">
         <button class="btn btn-primary ml-3 min-w-2xl">
           {{
             dateRange.length > 1
               ? `${$dayjs(dateRange[0]).format('DD.MM.YYYY')} - ${$dayjs(
-                  dateRange[1]
-                ).format('DD.MM.YYYY')}`
+                dateRange[1]
+              ).format('DD.MM.YYYY')}`
               : 'Выбрать даты'
           }}
         </button>
       </DateRangePicker>
-      <button
-        class="btn btn-primary ml-3"
-        @click=";[(curPage = 1), getStats()]"
-      >
+      <button class="btn btn-primary ml-3" @click=";[(curPage = 1), getStats()]">
         Применить
       </button>
     </div>
+    <div v-if="service == 'buyouts'" class="mt-2">
+      <label><input v-model="productName" type="text" placeholder="Наименование товара"
+          class="input input-bordered input-l ml-2 w-80" @input="onInputArticle($event)" />
+      </label>
+    </div>
     <div class="flex justify-end ml-2 mt-3">
       <div class="join mr-2">
-        <button
-          class="join-item btn"
-          @click="swapPage(-1)"
-          :disabled="isPageBtnsDisabled"
-        >
+        <button class="join-item btn" @click="swapPage(-1)" :disabled="isPageBtnsDisabled">
           «
         </button>
         <button class="join-item btn">{{ curPage }}</button>
-        <button
-          class="join-item btn"
-          @click="swapPage(1)"
-          :disabled="isPageBtnsDisabled"
-        >
+        <button class="join-item btn" @click="swapPage(1)" :disabled="isPageBtnsDisabled">
           »
         </button>
       </div>
     </div>
   </div>
-  <div
-    class="my-2 mx-2 overflow-y-auto"
-    :style="{ 'max-height': height - 270 + 'px' }"
-  >
+  
+  <div class="hero" v-if="loading">
+    <span class="loading loading-spinner loading-lg text-primary"></span>
+  </div>
+  <div v-else class="my-2 mx-2 overflow-y-auto" :style="{ 'max-height': height - 270 + 'px' }">
     <table class="table table-pin-rows">
       <!-- head -->
       <thead>
@@ -361,10 +326,7 @@ if (
           <th>
             <div @click="sortByDate" class="flex cursor-pointer">
               Дата операции
-              <Icon
-                class="swap-on fill-current ml-1 w-6 h-5"
-                :name="dateSortIcon"
-              />
+              <Icon class="swap-on fill-current ml-1 w-6 h-5" :name="dateSortIcon" />
             </div>
           </th>
         </tr>
@@ -372,54 +334,31 @@ if (
       <tbody>
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover" :key="stat._id">
-          <th
-            style="max-width: 140px; min-width: 100px"
-            class="overflow-x-auto text-xs"
-          >
+          <th style="max-width: 140px; min-width: 100px" class="overflow-x-auto text-xs">
             {{ stat._id }}
           </th>
-          <th
-            style="max-width: 150px; min-width: 40px"
-            class="overflow-x-auto text-xs"
-          >
+          <th style="max-width: 150px; min-width: 40px" class="overflow-x-auto text-xs">
             {{ stat.email }}
           </th>
-          <th
-            style="max-width: 100px; min-width: 40px"
-            class="overflow-x-auto text-xs"
-          >
+          <th style="max-width: 100px; min-width: 40px" class="overflow-x-auto text-xs">
             {{ stat.username }}
           </th>
-          <th
-            style="max-width: 100px; min-width: 40px"
-            class="overflow-x-auto text-xs"
-          >
+          <th style="max-width: 100px; min-width: 40px" class="overflow-x-auto text-xs">
             {{ stat.telegram }}
           </th>
           <th style="max-width: 50px; min-width: 40px">
             {{ stat.summ }}
           </th>
-          <th
-            style="max-width: 40px"
-            v-if="service == 'buyouts' || service == 'any'"
-            class="overflow-x-auto text-xs"
-          >
+          <th style="max-width: 40px" v-if="service == 'buyouts' || service == 'any'" class="overflow-x-auto text-xs">
             {{ stat.article }}
           </th>
-          <th
-            style="max-width: 160px"
-            v-if="service == 'buyouts' || service == 'any'"
-            class="overflow-x-auto text-xs"
-          >
+          <th style="max-width: 160px" v-if="service == 'buyouts' || service == 'any'" class="overflow-x-auto text-xs">
             {{ stat.productName }}
           </th>
           <th style="max-width: 160px" class="overflow-x-auto text-xs">
             {{ stat.basisoperation }}
           </th>
-          <th
-            style="max-width: 15px; min-width: 10px"
-            class="overflow-x-auto text-xs"
-          >
+          <th style="max-width: 15px; min-width: 10px" class="overflow-x-auto text-xs">
             {{ stat.dataoperation.slice(0, 10) }}
           </th>
         </tr>
@@ -427,10 +366,7 @@ if (
     </table>
   </div>
 
-  <div
-    class="mt-4 mr-6 mb-10 items-end flex justify-between"
-    v-if="service == 'buyouts'"
-  >
+  <div class="mt-4 mr-6 mb-10 items-end flex justify-between" v-if="service == 'buyouts'">
     <div></div>
     <div>
       <div class="flex">
@@ -453,11 +389,7 @@ if (
   <div class="modal cursor-pointer" @click="openUsersSelectModal">
     <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
-        <label
-          for="selectUsers"
-          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          ref="selectUsersClose"
-        >
+        <label for="selectUsers" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" ref="selectUsersClose">
           ✕
         </label>
       </form>
@@ -465,33 +397,17 @@ if (
       <div>
         <div class="justify-between flex">
           <div>
-            <label
-              ><input
-                v-model="query"
-                type="text"
-                placeholder="id, username, email, telegram, организация"
-                class="input input-bordered input-l ml-4 w-80"
-                @input="onInput($event)"
-              />
+            <label><input v-model="query" type="text" placeholder="id, username, email, telegram, организация"
+                class="input input-bordered input-l ml-4 w-80" @input="onInput($event)" />
             </label>
-            <span
-              v-if="inputLoading"
-              class="loading loading-spinner text-primary loading-large ml-4"
-            />
+            <span v-if="inputLoading" class="loading loading-spinner text-primary loading-large ml-4" />
           </div>
-          <label
-            class="btn btn-primary mr-4 btn-sm mt-4"
-            @click="
+          <label class="btn btn-primary mr-4 btn-sm mt-4" @click="
               ;[(users = []), openUsersSelectModal(), (selectedUsers = [])]
-            "
-            >Выбрать всех</label
-          >
+            ">Выбрать всех</label>
         </div>
 
-        <div
-          class="my-2 mx-2 overflow-y-auto"
-          :style="{ 'max-height': 500 + 'px' }"
-        >
+        <div class="my-2 mx-2 overflow-y-auto" :style="{ 'max-height': 500 + 'px' }">
           <table class="table my-3">
             <!-- head -->
             <thead>
@@ -529,12 +445,8 @@ if (
                 </td>
                 <td style="max-width: 20px">
                   <div>
-                    <input
-                      type="checkbox"
-                      :checked="user.isSelected"
-                      class="checkbox checkbox-primary"
-                      @click="selectUser(user._id, user.isSelected)"
-                    />
+                    <input type="checkbox" :checked="user.isSelected" class="checkbox checkbox-primary"
+                      @click="selectUser(user._id, user.isSelected)" />
                   </div>
                 </td>
               </tr>
