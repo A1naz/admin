@@ -21,7 +21,7 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
   const { page, filters, sortDate, mp }: any = getQuery(event)
   const trueFilters = JSON.parse(filters)
-  
+
   const allowedUsersParam = user.isAllUsersAllowed
     ? {
         user: { $nin: user.restrictedUsers.map((id: any) => id) },
@@ -34,7 +34,10 @@ export default eventHandler(async (event) => {
       }
 
   const users = await User.find({
-    _id: trueFilters.clients && trueFilters.clients.length ? { $in: trueFilters.clients } : { $exists: true },
+    _id:
+      trueFilters.clients && trueFilters.clients.length
+        ? { $in: trueFilters.clients }
+        : { $exists: true },
     ...allowedUsersParam,
     fizFace:
       trueFilters.faceType === 'fizFace'
@@ -68,7 +71,6 @@ export default eventHandler(async (event) => {
     .sort({ dataoperation: sortDate })
     .skip(50 * (page - 1))
     .limit(50)
-  console.log(trueFilters.type)
 
   const formatted = histories.map((h: any) => {
     const user = users.find((user: any) => user._id.equals(h.user))
@@ -97,14 +99,15 @@ export default eventHandler(async (event) => {
       trueFilters.article
     )
 
-    console.log(users.length);
-    
     const paymentAggregate = await paymenthistory.aggregate([
       {
         $match: {
           mp: mp === 'all' ? { $exists: true } : mp,
           ...allowedUsersParam,
-          user: trueFilters.clients && trueFilters.clients.length ? { $in: users.map((user: any) => user._id) } : { $exists: true },
+          user:
+            trueFilters.clients && trueFilters.clients.length
+              ? { $in: users.map((user: any) => user._id) }
+              : { $exists: true },
           type: { $in: ['buyouts', 'buyouts service'] },
           dataoperation: trueFilters.dateRange
             ? {
@@ -123,8 +126,8 @@ export default eventHandler(async (event) => {
       },
     ])
 
-    console.log(paymentAggregate);
-    
+    console.log(paymentAggregate)
+
     if (paymentAggregate && paymentAggregate.length > 0) {
       productsCountInfo = {
         count: paymentAggregate[0].count,
@@ -158,6 +161,54 @@ export default eventHandler(async (event) => {
 
     return {
       stats: info,
+      statsCount: 999999,
+      productsCountInfo,
+    }
+  } else if (trueFilters.type == 'any') {
+    const buyouts = []
+    const carts = []
+    const likeReviews = []
+    const likeProducts = []
+    const allItems = []
+
+    for (const stat of formatted) {
+      if (stat.type == 'buyouts' || stat.type == 'buyouts service') {
+        buyouts.push(stat)
+      } else if (stat.type == 'cart') {
+        carts.push(stat)
+      } else if (stat.type == 'likeReview') {
+        likeReviews.push(stat)
+      } else if (stat.type == 'likeProduct') {
+        likeProducts.push(stat)
+      } else {
+        allItems.push(stat)
+      }
+    }
+
+    const buyoutsPayment = await buyoutsInfo(
+      buyouts,
+      trueFilters.productName,
+      trueFilters.article
+    )
+    const cartsPayment = await cartsInfo(carts, trueFilters.article)
+    const likeReviewsPayment = await likeReviewInfo(
+      likeReviews,
+      trueFilters.article
+    )
+    const likeProductsPayment = await likeProductInfo(
+      likeProducts,
+      trueFilters.article
+    )
+    const allItemsPayment = [
+      ...allItems,
+      ...buyoutsPayment,
+      ...cartsPayment,
+      ...likeReviewsPayment,
+      ...likeProductsPayment,
+    ]
+
+    return {
+      stats: allItemsPayment,
       statsCount: 999999,
       productsCountInfo,
     }
