@@ -1,0 +1,171 @@
+import { User } from '@/server/lib/models/User'
+import { getServerSession } from '#auth'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
+import { AdminUser } from '~/server/lib/models/AdminUser'
+import { paymenthistory } from '~/server/lib/models/Paymenthistory'
+import { Buyout } from '~/server/lib/models/Buyout'
+import { Buyout as OzonBuyout } from '~/server/lib/models/ozon/Buyout'
+
+import buyoutsInfo from './buyouts'
+import cartsInfo from './cart'
+import likeReviewInfo from './likeReview'
+import likeProductInfo from './likeProduct'
+
+let paymentPerPage = 50
+const obj = {}
+export default eventHandler(async (event) => {
+  const session = (await getServerSession(event)) as any
+  if (!session) return sendRedirect(event, '/auth', 302)
+  const user = await AdminUser.findOne({ uuid: session.uuid })
+  if (!user || !user.tabs.includes('финансовые операции'))
+    return sendRedirect(event, '/auth', 302)
+  const { page, filters, sortDate, mp }: any = getQuery(event)
+  const trueFilters = JSON.parse(filters)
+  
+  const allowedUsersParam = user.isAllUsersAllowed
+    ? {
+        user: { $nin: user.restrictedUsers.map((id: any) => id) },
+      }
+    : {
+        $and: [
+          { user: { $in: user.allowedUsers.map((id: any) => id) } },
+          { user: { $nin: user.restrictedUsers.map((id: any) => id) } },
+        ],
+      }
+
+  const users = await User.find({
+    _id: trueFilters.clients && trueFilters.clients.length ? { $in: trueFilters.clients } : { $exists: true },
+    ...allowedUsersParam,
+    fizFace:
+      trueFilters.faceType === 'fizFace'
+        ? true
+        : trueFilters.faceType === 'yurFace'
+        ? false
+        : {
+            $in: [true, false],
+          },
+  })
+
+  const histories = await paymenthistory
+    .find({
+      user: { $in: users },
+      mp:
+        mp == 'all'
+          ? { $in: [null, 'wildberries', 'ozon', 'flowwow', 'avito'] }
+          : mp,
+      typeoperations:
+        trueFilters.typeoperations === 'any'
+          ? { $exists: true }
+          : trueFilters.typeoperations,
+      type: trueFilters.type === 'any' ? { $exists: true } : trueFilters.type,
+      dataoperation: trueFilters.dateRange
+        ? {
+            $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
+            $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
+          }
+        : { $exists: true },
+    })
+    .sort({ dataoperation: sortDate })
+    .skip(50 * (page - 1))
+    .limit(50)
+  console.log(trueFilters.type)
+
+  const formatted = histories.map((h: any) => {
+    const user = users.find((user: any) => user._id.equals(h.user))
+
+    delete h._doc._id
+    return {
+      ...h._doc,
+      uuid: user ? user.uuid : '',
+      email: user ? user.email : '',
+      username: user ? user.username : '',
+    }
+  })
+
+  let productsCountInfo = {
+    count: 0,
+    sum: 0,
+  }
+
+  if (
+    trueFilters.type === 'buyouts' ||
+    trueFilters.type === 'buyouts service'
+  ) {
+    const info = await buyoutsInfo(
+      formatted,
+      trueFilters.productName,
+      trueFilters.article
+    )
+
+    console.log(users.length);
+    
+    const paymentAggregate = await paymenthistory.aggregate([
+      {
+        $match: {
+          mp: mp === 'all' ? { $exists: true } : mp,
+          ...allowedUsersParam,
+          user: trueFilters.clients && trueFilters.clients.length ? { $in: users.map((user: any) => user._id) } : { $exists: true },
+          type: { $in: ['buyouts', 'buyouts service'] },
+          dataoperation: trueFilters.dateRange
+            ? {
+                $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
+                $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
+              }
+            : { $exists: true },
+        },
+      },
+      {
+        $group: {
+          _id: 'null',
+          sum: { $sum: '$summ' },
+          count: { $sum: 1 },
+        },
+      },
+    ])
+
+    console.log(paymentAggregate);
+    
+    if (paymentAggregate && paymentAggregate.length > 0) {
+      productsCountInfo = {
+        count: paymentAggregate[0].count,
+        sum: paymentAggregate[0].sum,
+      }
+    }
+
+    return {
+      stats: info,
+      statsCount: 999999,
+      productsCountInfo,
+    }
+  } else if (trueFilters.type === 'cart') {
+    const info = await cartsInfo(formatted, trueFilters.article)
+
+    return {
+      stats: info,
+      statsCount: 999999,
+      productsCountInfo,
+    }
+  } else if (trueFilters.type === 'likeReview') {
+    const info = await likeReviewInfo(formatted, trueFilters.article)
+
+    return {
+      stats: info,
+      statsCount: 999999,
+      productsCountInfo,
+    }
+  } else if (trueFilters.type === 'likeProduct') {
+    const info = await likeProductInfo(formatted, trueFilters.article)
+
+    return {
+      stats: info,
+      statsCount: 999999,
+      productsCountInfo,
+    }
+  }
+
+  return {
+    stats: formatted,
+    statsCount: 999999,
+    productsCountInfo,
+  }
+})

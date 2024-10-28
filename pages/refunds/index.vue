@@ -362,7 +362,7 @@ function changeMP(event: any) {
   <h1 class="text-2xl font-bold ml-5 my-2">
     Возвраты средств клиентам Wildberries
   </h1>
-  {{isModalOpen}}
+  {{ isModalOpen }}
   <div class="card p-fluid"></div>
   <div class="divider"></div>
   <div class="flex justify-between">
@@ -627,8 +627,8 @@ function changeMP(event: any) {
                 selectedScreenshot == 'dialog'
               " class="loading loading-spinner text-primary absolute mt-32" />
               <IconCSS style="max-height: 300px" v-show="screenshot.public === 'null'" class="mt-28" :name="loadingIndex == true
-                  ? ''
-                  : 'material-symbols:add-photo-alternate-outline'
+                ? ''
+                : 'material-symbols:add-photo-alternate-outline'
                 " size="70" />
             </div>
           </div>
@@ -648,8 +648,8 @@ function changeMP(event: any) {
                 selectedScreenshot == 'account'
               " class="loading loading-spinner text-primary absolute mt-32" />
               <IconCSS style="max-height: 300px" v-show="accountScreenshot.public == 'null'" class="mt-28" :name="loadingIndex == true
-                  ? ''
-                  : 'material-symbols:add-photo-alternate-outline'
+                ? ''
+                : 'material-symbols:add-photo-alternate-outline'
                 " size="70" />
             </div>
           </div>
@@ -693,7 +693,7 @@ function changeMP(event: any) {
   <div class="modal cursor-pointer" :class="{ 'modal-open': isModalOpen }" @click="isModalOpen = false">
     <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
-        <label  class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="isModalOpen = false">
+        <label class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" @click="isModalOpen = false">
           ✕
         </label>
       </form>

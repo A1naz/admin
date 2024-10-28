@@ -60,6 +60,7 @@ async function exportXLS() {
         dateRange: dateRange.value.length > 0 ? dateRange.value : null,
       },
     },
+    watch: false,
   })
   const fileURL = window.URL.createObjectURL(new Blob([data.value as any]))
   const fileLink = document.createElement('a')
@@ -81,7 +82,7 @@ const products = ref([])
 async function getStats() {
   loading.value = true
   stats.value = []
-  const { data }: any = await useFetch('/api/stats/stats', {
+  const { data }: any = await useFetch('/api/salesAndStatistics/stats', {
     method: 'GET',
     query: {
       page: curPage.value,
@@ -97,6 +98,7 @@ async function getStats() {
         productName: productName.value ? productName.value : null,
       },
     },
+    watch: false,
   })
   if (data.value) {
     statsCount.value = data.value.statsCount
@@ -218,7 +220,7 @@ if (
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Финансовые операции</h1>
-
+{{ articleQuery }}
   <div class="divider"></div>
   <select @change=";[(curPage = 1), getStats()]" v-model="selectedMP" class="select select-bordered w-50 ml-3 mb-3">
     <option selected value="all">Все</option>
@@ -254,7 +256,7 @@ if (
         <option value="deposit">депозит</option>
         <option value="buyouts">выкупы</option>
         <option value="review">отзывы</option>
-        <option value="questions">вопросы</option>
+        <!-- <option value="questions">вопросы</option> -->
         <option value="cart">корзина</option>
         <option value="likeReview">лайки отзывов</option>
         <option value="questionProduct">вопросы</option>
@@ -267,7 +269,7 @@ if (
         <option value="deliveries">доставки</option>
         <option value="deliveryStorage">штрафы</option>
       </select>
-      <div v-if="service == 'buyouts'">
+      <div>
         <label><input v-model="articleQuery" type="number" placeholder="Артикул"
             class="input input-bordered input-l ml-4 w-44" @input="onInputArticle($event)" />
         </label>
@@ -304,7 +306,7 @@ if (
       </div>
     </div>
   </div>
-  
+
   <div class="hero" v-if="loading">
     <span class="loading loading-spinner loading-lg text-primary"></span>
   </div>
@@ -316,10 +318,9 @@ if (
           <th>ID</th>
           <th>почта</th>
           <th>никнейм</th>
-          <th>телеграм</th>
           <th>сумма</th>
-          <th v-if="service == 'buyouts' || service == 'any'">артикул</th>
-          <th v-if="service == 'buyouts' || service == 'any'">
+          <th>артикул</th>
+          <th>
             наименование товара
           </th>
           <th>базис</th>
@@ -335,7 +336,7 @@ if (
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover" :key="stat._id">
           <th style="max-width: 140px; min-width: 100px" class="overflow-x-auto text-xs">
-            {{ stat._id }}
+            {{ stat.uuid }}
           </th>
           <th style="max-width: 150px; min-width: 40px" class="overflow-x-auto text-xs">
             {{ stat.email }}
@@ -343,16 +344,13 @@ if (
           <th style="max-width: 100px; min-width: 40px" class="overflow-x-auto text-xs">
             {{ stat.username }}
           </th>
-          <th style="max-width: 100px; min-width: 40px" class="overflow-x-auto text-xs">
-            {{ stat.telegram }}
-          </th>
           <th style="max-width: 50px; min-width: 40px">
             {{ stat.summ }}
           </th>
-          <th style="max-width: 40px" v-if="service == 'buyouts' || service == 'any'" class="overflow-x-auto text-xs">
+          <th style="max-width: 40px" class="overflow-x-auto text-xs">
             {{ stat.article }}
           </th>
-          <th style="max-width: 160px" v-if="service == 'buyouts' || service == 'any'" class="overflow-x-auto text-xs">
+          <th style="max-width: 160px" class="overflow-x-auto text-xs">
             {{ stat.productName }}
           </th>
           <th style="max-width: 160px" class="overflow-x-auto text-xs">
@@ -397,7 +395,7 @@ if (
       <div>
         <div class="justify-between flex">
           <div>
-            <label><input v-model="query" type="text" placeholder="id, username, email, telegram, организация"
+            <label><input v-model="query" type="text" placeholder="id, username, email, организация"
                 class="input input-bordered input-l ml-4 w-80" @input="onInput($event)" />
             </label>
             <span v-if="inputLoading" class="loading loading-spinner text-primary loading-large ml-4" />
@@ -416,7 +414,6 @@ if (
                 <th>username</th>
                 <th>организация</th>
                 <th>email</th>
-                <th>telegram</th>
                 <th>Выбрать</th>
               </tr>
             </thead>
@@ -438,11 +435,7 @@ if (
                     {{ user.email }}
                   </div>
                 </td>
-                <td style="max-width: 150px" class="overflow-x-auto">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ user.telegram }}
-                  </div>
-                </td>
+
                 <td style="max-width: 20px">
                   <div>
                     <input type="checkbox" :checked="user.isSelected" class="checkbox checkbox-primary"
