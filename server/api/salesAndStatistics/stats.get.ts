@@ -24,14 +24,14 @@ export default eventHandler(async (event) => {
 
   const allowedUsersParam = user.isAllUsersAllowed
     ? {
-        user: { $nin: user.restrictedUsers.map((id: any) => id) },
-      }
+      user: { $nin: user.restrictedUsers.map((id: any) => id) },
+    }
     : {
-        $and: [
-          { user: { $in: user.allowedUsers.map((id: any) => id) } },
-          { user: { $nin: user.restrictedUsers.map((id: any) => id) } },
-        ],
-      }
+      $and: [
+        { user: { $in: user.allowedUsers.map((id: any) => id) } },
+        { user: { $nin: user.restrictedUsers.map((id: any) => id) } },
+      ],
+    }
 
   const users = await User.find({
     _id:
@@ -43,11 +43,19 @@ export default eventHandler(async (event) => {
       trueFilters.faceType === 'fizFace'
         ? true
         : trueFilters.faceType === 'yurFace'
-        ? false
-        : {
+          ? false
+          : {
             $in: [true, false],
           },
   })
+
+  let buyouts: any = []
+  if (trueFilters.productName) {
+    buyouts = await Buyout.find({
+      user: { $in: users },
+      'product.name': { $regex: trueFilters.productName, $options: 'i' },
+    })
+  }
 
   const histories = await paymenthistory
     .find({
@@ -63,14 +71,26 @@ export default eventHandler(async (event) => {
       type: trueFilters.type === 'any' ? { $exists: true } : trueFilters.type,
       dataoperation: trueFilters.dateRange
         ? {
-            $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
-            $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
-          }
+          $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
+          $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
+        }
         : { $exists: true },
+      basisoperation: buyouts && buyouts.length ?
+        {
+          $in: [
+            ...buyouts.map((buyout: any) => 'Выкуп #' + buyout.uuid),
+          ]
+        } : { $exists: true },
+      article: trueFilters.article ? {
+        $in: [
+          Number(trueFilters.article),
+          trueFilters.article.toString(),
+        ]
+      } : { $exists: true }
     })
     .sort({ dataoperation: sortDate })
-    .skip(50 * (page - 1))
-    .limit(50)
+    .skip(100 * (page - 1))
+    .limit(100)
 
   const formatted = histories.map((h: any) => {
     const user = users.find((user: any) => user._id.equals(h.user))
@@ -111,9 +131,9 @@ export default eventHandler(async (event) => {
           type: { $in: ['buyouts', 'buyouts service'] },
           dataoperation: trueFilters.dateRange
             ? {
-                $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
-                $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
-              }
+              $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
+              $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
+            }
             : { $exists: true },
         },
       },
@@ -125,8 +145,6 @@ export default eventHandler(async (event) => {
         },
       },
     ])
-
-    console.log(paymentAggregate)
 
     if (paymentAggregate && paymentAggregate.length > 0) {
       productsCountInfo = {
