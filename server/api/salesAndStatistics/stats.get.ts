@@ -60,10 +60,9 @@ export default eventHandler(async (event) => {
   const histories = await paymenthistory
     .find({
       user: { $in: users },
-      mp:
-        mp == 'all'
-          ? { $in: [null, 'wildberries', 'ozon', 'flowwow', 'avito'] }
-          : mp,
+      ...(mp === 'all'
+        ? {} // Без фильтра по полю mp, значит, поле может быть любым или отсутствовать
+        : { mp }),
       typeoperations:
         trueFilters.typeoperations === 'any'
           ? { $exists: true }
@@ -81,12 +80,14 @@ export default eventHandler(async (event) => {
             ...buyouts.map((buyout: any) => 'Выкуп #' + buyout.uuid),
           ]
         } : { $exists: true },
-      article: trueFilters.article ? {
-        $in: [
-          Number(trueFilters.article),
-          trueFilters.article.toString(),
-        ]
-      } : { $exists: true }
+      ...(trueFilters.article ? {
+        article: {
+          $in: [
+            Number(trueFilters.article),
+            trueFilters.article.toString(),
+          ]
+        }
+      } : {})
     })
     .sort({ dataoperation: sortDate })
     .skip(100 * (page - 1))
@@ -108,6 +109,7 @@ export default eventHandler(async (event) => {
     count: 0,
     sum: 0,
   }
+
 
   if (
     trueFilters.type === 'buyouts' ||
