@@ -39,14 +39,13 @@ export default eventHandler(async (event) => {
         ? { $in: trueFilters.clients }
         : { $exists: true },
     ...allowedUsersParam,
-    fizFace:
+    ...(
       trueFilters.faceType === 'fizFace'
-        ? true
-        : trueFilters.faceType === 'yurFace'
-          ? false
-          : {
-            $in: [true, false],
-          },
+        ? { fizFace: true } :
+        trueFilters.faceType === 'yurFace'
+          ? { fizFace: { $ne: true } }
+          : {}
+    )
   })
 
   let buyouts: any = []
