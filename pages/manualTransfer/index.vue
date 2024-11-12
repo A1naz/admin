@@ -329,7 +329,7 @@ function selectUser(user: any) {
       <!-- head -->
       <thead>
         <tr>
-          <th>uuid пользователя</th>
+          <th>Организация</th>
           <th>ник пользователя</th>
           <th>номер операции</th>
           <th>сумма</th>
@@ -352,7 +352,7 @@ function selectUser(user: any) {
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover" :key="stat._id">
           <th class="text-xs overflow-x-auto">
-            {{ stat.userUuid }}
+            {{ stat.organization }}
           </th>
           <th class="text-xs overflow-x-auto">
             {{ stat.username }}
@@ -595,6 +595,7 @@ function selectUser(user: any) {
             <thead>
               <tr>
                 <th>id</th>
+                <th>Организация</th>
                 <th>username</th>
                 <th>email</th>
                 <th>Выбрать</th>
@@ -603,6 +604,11 @@ function selectUser(user: any) {
             <tbody>
               <tr class="hover" v-for="user in users" :key="user.uuid">
                 <td style="max-width: 130px">{{ user.uuid }}</td>
+                <td style="max-width: 150px">
+                  <div class="mx-1 overflow-x-auto">
+                    {{ user.organization ? user.organization : user.username + '(Физ. лицо)'}}
+                  </div>
+                </td>
                 <td style="max-width: 150px">
                   <div class="mx-1 overflow-x-auto">
                     {{ user.username }}

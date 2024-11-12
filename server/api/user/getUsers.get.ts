@@ -36,7 +36,6 @@ export default eventHandler(async (event) => {
         { email: { $regex: searchValue, $options: 'i' } },
         { telegram: { $regex: searchValue, $options: 'i' } },
         { username: { $regex: searchValue, $options: 'i' } },
-        { orgName: { $regex: searchValue, $options: 'i' } },
       ],
     })
       .skip(usersPerPage * (+page - 1))
