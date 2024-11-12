@@ -83,12 +83,12 @@ export default eventHandler(async (event) => {
     }
   )
 
-
   const format = requests.map((req: any) => {
     const user = users.find((u: any) => u._id.valueOf() === req.user.valueOf())
     return {
       ...req,
       username: user?.username,
+      organization: user?.fizFace ? user?.username + '(Физ. лицо)' : user?.orgName,
     }
   })
 

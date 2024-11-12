@@ -5,8 +5,27 @@ import { Delivery } from '../models/Delivery'
 export default async function getReviews(
   userId: string,
   status: string,
-  page: any
+  page: any,
+  serviceId?: string,
 ) {
+  console.log('serviceId', serviceId.length);
+  let serviceIdFilter: any = {}
+  let delivery: any = null
+  let filter: any = {}
+
+  if (serviceId) {
+    const trueServiceId = serviceId.replaceAll('#', '')
+    serviceIdFilter = { uuidbuyout: trueServiceId }
+    delivery = await Delivery.findOne({ ...serviceIdFilter }).select('_id')
+
+    if (!delivery) {
+      return { info: [], count: 0 };
+    }
+
+    filter = { delivery: delivery._id }
+    console.log('delivery', delivery);
+  }
+
   const statusObj =
     status == 'any'
       ? {}
@@ -15,10 +34,15 @@ export default async function getReviews(
       : { status: status }
 
   const user = await User.findById(userId)
-  const reviews: any = await Review.find({ user, ...statusObj })
+
+  const query = filter ? { user, ...statusObj, ...filter } : { user, ...statusObj };
+   
+  const reviews: any = await Review.find(query)
     .sort({ createdAt: -1 })
     .skip((page - 1) * 50)
     .limit(50)
+
+  console.log('reviews', reviews[0]);
 
   const count = await Review.count({ user })
 

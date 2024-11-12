@@ -356,7 +356,7 @@ function changeMP(event: any) {
         <option value="Приход">приход</option>
         <option value="Расход">расход</option>
       </select> -->
-      <div v-if="tabOption == 'buyouts' || tabOption == 'deliveries'">
+      <div v-if="tabOption == 'buyouts' || tabOption == 'deliveries' || tabOption == 'reviews'">
         <label
           ><input
             v-model="serviceId"
