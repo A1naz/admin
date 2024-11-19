@@ -35,6 +35,8 @@ export interface IUser extends Entity {
   allowedUsersModal: Boolean
   ffEnabled: Boolean
   isDocSigned: Boolean
+  orgName: string
+  fizFace: Boolean
 }
 
 export interface IUserLogs extends Entity {

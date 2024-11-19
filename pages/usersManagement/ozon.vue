@@ -359,7 +359,7 @@ function changeMP(event: any) {
         <option value="Расход">расход</option>
       </select> -->
 
-      <div v-if="tabOption == 'buyouts' || tabOption == 'deliveries'">
+      <div v-if="tabOption == 'buyouts' || tabOption == 'deliveries' || tabOption == 'reviews'">
         <label
           ><input
             v-model="serviceId"
@@ -518,7 +518,7 @@ function changeMP(event: any) {
             v-for="header in selectedTab.headers"
             :key="header.key"
             style="max-width: 140px; min-width: 40px"
-          >
+          > 
             {{
               header.key == 'article' ||
               (header.key == 'name' && tabOption == 'productLikes')

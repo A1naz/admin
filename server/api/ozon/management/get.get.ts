@@ -60,7 +60,7 @@ export default eventHandler(async (event) => {
     return { info, count }
   }
   if (item == 'reviews') {
-    const { info, count } = await getReviews(userId, status, page)
+    const { info, count } = await getReviews(userId, status, page, serviceId)
     return { info, count }
   }
 

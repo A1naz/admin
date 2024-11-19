@@ -5,8 +5,27 @@ import { Delivery } from '~/server/lib/models/ozon/Delivery'
 export default async function getReviews(
   userId: string,
   status: string,
-  page: any
+  page: any,
+  serviceId?: string
 ) {
+  let serviceIdFilter: any = {}
+  let delivery: any = null
+  let filter: any = {}
+  const user = await User.findById(userId)
+
+  if (serviceId) {
+    const trueServiceId = serviceId.replaceAll('#', '')
+    serviceIdFilter = { uuidbuyout: trueServiceId }
+    delivery = await Delivery.find({ user, ...serviceIdFilter }).select('_id')
+
+    if (!delivery) {
+      return { info: [], count: 0 };
+    }
+
+    filter = { delivery: { $in: delivery.map((item: any) => item._id) } }
+    console.log('delivery', delivery);
+  }
+
   const statusObj =
     status == 'any'
       ? {}
@@ -14,8 +33,9 @@ export default async function getReviews(
       ? { status: { $in: ['created', 'working', 'waiting', 'work'] } }
       : { status: status }
 
-  const user = await User.findById(userId)
-  const reviews: any = await Review.find({ user, ...statusObj })
+  const query = filter ? { user, ...statusObj, ...filter } : { user, ...statusObj };
+   
+  const reviews: any = await Review.find(query)
     .sort({ createdAt: -1 })
     .skip((page - 1) * 50)
     .limit(50)
