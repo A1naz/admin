@@ -8,7 +8,6 @@ export default async function getReviews(
   page: any,
   serviceId?: string,
 ) {
-  console.log('serviceId', serviceId.length);
   let serviceIdFilter: any = {}
   let delivery: any = null
   let filter: any = {}
@@ -23,7 +22,6 @@ export default async function getReviews(
     }
 
     filter = { delivery: delivery._id }
-    console.log('delivery', delivery);
   }
 
   const statusObj =

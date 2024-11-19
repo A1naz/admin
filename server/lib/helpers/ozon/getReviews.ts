@@ -23,7 +23,6 @@ export default async function getReviews(
     }
 
     filter = { delivery: { $in: delivery.map((item: any) => item._id) } }
-    console.log('delivery', delivery);
   }
 
   const statusObj =

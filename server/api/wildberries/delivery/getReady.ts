@@ -120,7 +120,8 @@ export default eventHandler(async (event) => {
       if (item)
         return (
           item!.currentstatus === 'Готов к выдаче' ||
-          item!.currentstatus === 'Готов к получению'
+          item!.currentstatus === 'Готов к получению' || 
+          item!.currentstatus.includes('Заберите до')
         )
       else return false
     })

@@ -362,7 +362,6 @@ function changeMP(event: any) {
   <h1 class="text-2xl font-bold ml-5 my-2">
     Возвраты средств клиентам Wildberries
   </h1>
-  {{ isModalOpen }}
   <div class="card p-fluid"></div>
   <div class="divider"></div>
   <div class="flex justify-between">

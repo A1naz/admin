@@ -34,11 +34,17 @@ async function getReady(user: any, pvzs: any, selectedDays: any) {
     status: {$ne : 'completed'},
     point:
       pvzsArray && pvzsArray.length ? { $in: pvzsArray } : { $exists: true },
-    $expr: {
-      $in: [
-        { $arrayElemAt: ['$statusdelivery.status', -1] },
-        ['Готов к получению', 'Готов к выдаче', 'Ожидает получения'],
-      ],
+    statusdelivery: {
+      $elemMatch: {
+        $or: [
+          { status: 'Готов к выдаче' },
+          { status: 'Готов к получению' },
+          { status: '^Заберите до.*' },
+          { status: { $regex: '^Готов к получению.*' } },
+          { status: { $regex: '^Готов к выдаче.*' } },
+          { status: { $regex: '^Заберите до.*' } },
+        ],
+      },
     },
   })
 
@@ -82,7 +88,8 @@ async function getReady(user: any, pvzs: any, selectedDays: any) {
               delivery.statusdelivery?.find(
                 (item: any) =>
                   item.status === 'Готов к выдаче' ||
-                  item.status === 'Готов к получению'
+                  item.status === 'Готов к получению' || 
+                  item.status.includes( 'Заберите до')
               )?.date
             )
           : new Date()
