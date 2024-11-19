@@ -273,7 +273,7 @@ export default eventHandler(async (event) => {
                 },
                 children: [
                   new TextRun({
-                    text: `${user.firstName} ${user.lastName} ${user.middleName}`,
+                    text: `${user.lastName} ${user.firstName} ${user.middleName}`,
                     font: 'Times New Roman',
                     size: 22,
                   }),
@@ -519,7 +519,7 @@ export default eventHandler(async (event) => {
                 },
                 children: [
                   new TextRun({
-                    text: `${user.firstName} ${user.lastName} ${user.middleName}`,
+                    text: `${user.lastName} ${user.firstName} ${user.middleName}`,
                     font: 'Times New Roman',
                     size: 22,
                   }),
