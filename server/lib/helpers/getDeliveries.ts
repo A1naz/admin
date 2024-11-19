@@ -13,13 +13,19 @@ export default async function getDeliveries(
       ? {}
       : status == 'ready'
       ? {
-          status: 'active',
-          $expr: {
-            $in: [
-              { $arrayElemAt: ['$statusdelivery.status', -1] },
-              ['Готов к получению', 'Готов к выдаче', 'Ожидает получения'],
-            ],
+          statusdelivery: {
+            $elemMatch: {
+              $or: [
+                { status: 'Готов к выдаче' },
+                { status: 'Готов к получению' },
+                { status: '^Заберите до.*' },
+                { status: { $regex: '^Готов к получению.*' } },
+                { status: { $regex: '^Готов к выдаче.*' } },
+                { status: { $regex: '^Заберите до.*' } },
+              ],
+            },
           },
+          status: { $ne: 'completed' },
         }
       : status == 'canceled'
       ? { 
@@ -31,6 +37,8 @@ export default async function getDeliveries(
           },
         }
       : { status: status }
+
+  console.log('statusObj', statusObj, 'status', status)
   let serviceIdFilter: any = {}
   if (serviceId) {
     const trueServiceId = serviceId.replaceAll('#', '')
@@ -47,6 +55,8 @@ export default async function getDeliveries(
     .sort({ createdAt: -1 })
     .skip((page - 1) * 50)
     .limit(50)
+  
+  console.log('deliveries', deliveries[0] || '')
     
   const count = await Delivery.count({ user })
 
@@ -61,6 +71,7 @@ export default async function getDeliveries(
       trueDate: formattedDate,
     }
   })
+  console.log('format', format[0] || '')
 
   return { info: format, count }
 }
