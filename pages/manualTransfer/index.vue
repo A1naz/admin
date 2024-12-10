@@ -27,7 +27,7 @@ const selectedUser: any = ref({
 const mpStore = useMPStore()
 
 const userBank = ref('alpha')
-const userIP= ref('NovikovIP')
+const userIP = ref('NovikovIP')
 const operationNumber = ref('')
 const fileInput = ref()
 const inputLoading = ref(false)
@@ -44,7 +44,7 @@ const now = new Date()
 const date = ref(now)
 const users = ref<any>([])
 const phoneNumber = ref('+7')
-const summ = ref(100)
+const summ = ref()
 const config = useRuntimeConfig()
 
 const screenshot = ref({
@@ -209,6 +209,11 @@ async function createBalanceTransferRequest() {
       })
       operationNumber.value = ''
       closeCreateModalButton.value?.click()
+      summ.value = 100
+      screenshot.value = {
+        url: 'null',
+        public: 'null',
+      }
     } else {
       notify({
         type: 'error',
@@ -242,7 +247,6 @@ function selectUser(user: any) {
   userQuery.value = ''
   users.value = []
 }
-
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Ручные пополнения средств</h1>
@@ -347,6 +351,8 @@ function selectUser(user: any) {
             </div>
           </th>
           <th>подтверждение операции</th>
+          <th>ИП клиента</th>
+          <th>Банк</th>
           <th class="text-center">скриншот</th>
         </tr>
       </thead>
@@ -375,6 +381,8 @@ function selectUser(user: any) {
           </th>
           <th>{{ defaultDate(stat.createdAt) }}</th>
           <th>{{ stat.acception }}</th>
+          <th>{{ stat.userIP }}</th>
+          <th>{{ stat.bank }}</th>
           <th>
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>
@@ -441,13 +449,14 @@ function selectUser(user: any) {
           </div>
         </div>
         <label class="w-full">
-          <input
+          <!-- <input
             v-model="summ"
             type="number"
             placeholder="Сумма перевода"
             class="input w-full input-bordered input-l mb-1"
             :disabled="isSearchInputDisabled"
-          />
+          /> -->
+          <PaymentInput v-model="summ" />
         </label>
         <label class="w-full">
           <input
@@ -466,7 +475,7 @@ function selectUser(user: any) {
           </select>
         </label>
         <label class="w-full">
-          <select class="select select-bordered w-full mb-1"  v-model="userBank">
+          <select class="select select-bordered w-full mb-1" v-model="userBank">
             <option disabled>Банк клента</option>
             <option value="alpha">Альфа</option>
             <option value="psb">PSB</option>
