@@ -27,6 +27,7 @@ export default eventHandler(async (event) => {
     operationDate,
     clientPC,
     bank,
+    userIP
   } = await readBody(event)
 
   if (!session) return sendRedirect(event, '/auth', 302)
@@ -58,6 +59,7 @@ export default eventHandler(async (event) => {
     fullDate: mskDate,
     clientPC,
     bank,
+    userIP
   })
 
   await ActionHistory.create({

@@ -7,7 +7,7 @@ definePageMeta({
 
 const { height, width } = useWindowSize()
 const { upload, getPublicUrl } = useS3Object()
-const searchBtnText = ref('Поиск')
+
 const closeCreateModalButton: any = ref(null)
 const sortDateType = ref('requireDate')
 const type = ref('any')
@@ -27,6 +27,7 @@ const selectedUser: any = ref({
 const mpStore = useMPStore()
 
 const userBank = ref('alpha')
+const userIP= ref('NovikovIP')
 const operationNumber = ref('')
 const fileInput = ref()
 const inputLoading = ref(false)
@@ -37,7 +38,6 @@ const isPageBtnsDisabled = ref(false)
 const dateRange = ref([])
 const loadingIndex = ref(false)
 const screenshotInput: any = ref(null)
-const isSearchBtnDisabled = ref(false)
 const isSearchInputDisabled = ref(false)
 const selectUserClose: any = ref(null)
 const now = new Date()
@@ -197,6 +197,7 @@ async function createBalanceTransferRequest() {
         operationDate: date.value,
         clientPC: clientPC.value,
         bank: userBank.value,
+        userIP: userIP.value,
       },
     }
   )
@@ -206,8 +207,8 @@ async function createBalanceTransferRequest() {
         type: 'success',
         title: data.value.message,
       })
-
-      location.reload()
+      operationNumber.value = ''
+      closeCreateModalButton.value?.click()
     } else {
       notify({
         type: 'error',
@@ -241,6 +242,7 @@ function selectUser(user: any) {
   userQuery.value = ''
   users.value = []
 }
+
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Ручные пополнения средств</h1>
@@ -400,8 +402,8 @@ function selectUser(user: any) {
   </div>
 
   <input type="checkbox" id="createRequireModal" class="modal-toggle" />
-  <div id="createRequireModal" class="modal ">
-    <div class="modal-box ">
+  <div id="createRequireModal" class="modal">
+    <div class="modal-box">
       <button
         class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
         @click="closeCreateModalButton.click()"
@@ -455,6 +457,23 @@ function selectUser(user: any) {
             class="input w-full input-bordered input-l mb-1"
           />
         </label>
+        <label class="w-full">
+          <select v-model="userIP" class="select select-bordered w-full mb-1">
+            <option disabled>ИП клиента</option>
+            <option vlaue="NovikovIP">NovikovIP</option>
+            <option value="BalashovIP">BalashovIP</option>
+            <option value="BalIP">BalIP</option>
+          </select>
+        </label>
+        <label class="w-full">
+          <select class="select select-bordered w-full mb-1"  v-model="userBank">
+            <option disabled>Банк клента</option>
+            <option value="alpha">Альфа</option>
+            <option value="psb">PSB</option>
+            <option value="sber">Sber</option>
+            <option value="tBank">TBank</option>
+          </select>
+        </label>
 
         <div class="flex justify-between ml-1 mb-2">
           <div class="form-control">
@@ -467,12 +486,6 @@ function selectUser(user: any) {
               />
             </label>
           </div>
-
-          <select v-model="userBank" class="select select-bordered max-w-xs">
-            <option disabled>Банк клиента</option>
-            <option vlaue="alpha">alpha</option>
-            <option value="psb">psb</option>
-          </select>
         </div>
       </div>
 
@@ -532,7 +545,12 @@ function selectUser(user: any) {
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-      <label for="createRequireModal" ref="closeCreateModalButton" class="cursor-pointer">close</label>
+      <label
+        for="createRequireModal"
+        ref="closeCreateModalButton"
+        class="cursor-pointer"
+        >close</label
+      >
     </form>
   </div>
   <!-- ==================================================================== -->
@@ -606,7 +624,11 @@ function selectUser(user: any) {
                 <td style="max-width: 130px">{{ user.uuid }}</td>
                 <td style="max-width: 150px">
                   <div class="mx-1 overflow-x-auto">
-                    {{ user.organization ? user.organization : user.username + '(Физ. лицо)'}}
+                    {{
+                      user.organization
+                        ? user.organization
+                        : user.username + '(Физ. лицо)'
+                    }}
                   </div>
                 </td>
                 <td style="max-width: 150px">

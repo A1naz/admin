@@ -15,6 +15,7 @@ const manualBalanceTransferRequestSchema = new Schema({
   createdAt: { type: Date, default: new Date() },
   clientPC: { type: Boolean, default: false },
   bank: { type: String, default: '' },
+  userIP: { type: String, default: '' },
 })
 
 export const manualBalanceTransferRequest = model(

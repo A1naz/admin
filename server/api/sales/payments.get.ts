@@ -21,11 +21,11 @@ export default eventHandler(async (event) => {
 
   let users = searchQuery
     ? await User.find({
-        $or: [
-          { username: { $regex: searchQuery, $options: 'i' } },
-          { orgName: { $regex: searchQuery, $options: 'i' } },
-        ],
-      }).limit(30)
+      $or: [
+        { username: { $regex: searchQuery, $options: 'i' } },
+        { orgName: { $regex: searchQuery, $options: 'i' } },
+      ],
+    }).limit(30)
     : []
 
   const payments = await PaymentIntend.find({
@@ -35,9 +35,9 @@ export default eventHandler(async (event) => {
     dataoperation:
       dateRange && dateRange[0] && dateRange[1]
         ? {
-            $gte: new Date(JSON.parse(dateRange[0])).setHours(0, 0, 0, 0),
-            $lt: new Date(JSON.parse(dateRange[1])).setHours(23, 59, 0, 0),
-          }
+          $gte: new Date(JSON.parse(dateRange[0])).setHours(0, 0, 0, 0),
+          $lt: new Date(JSON.parse(dateRange[1])).setHours(23, 59, 0, 0),
+        }
         : { $exists: true },
     // typeoperations: 'product',
   })
@@ -57,6 +57,10 @@ export default eventHandler(async (event) => {
     const user: any = users.find(
       (user: any) => user._id.valueOf() == el.user.valueOf()
     )
+
+    if (!user) {
+      return
+    }
 
     return {
       userUuid: user.uuid,
@@ -83,7 +87,7 @@ export default eventHandler(async (event) => {
         : '',
       orgPhone: user.bankInfo ? user.bankInfo.phone : '',
     }
-  })
+  }).filter((item: any) => item !== undefined && item !== null)
 
   await ActionHistory.create({
     adminUser: user._id,
