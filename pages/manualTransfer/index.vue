@@ -214,6 +214,7 @@ async function createBalanceTransferRequest() {
         url: 'null',
         public: 'null',
       }
+      getStats()
     } else {
       notify({
         type: 'error',
