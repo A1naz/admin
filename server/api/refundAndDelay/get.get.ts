@@ -75,52 +75,57 @@ export default eventHandler(async (event) => {
 
     if (adminUser) {
       trueUser = { user: adminUser._id }
-      username = adminUser.username
+      username = adminUser.username ? adminUser.username : 'неизвестно'
     }
   }
   let uuid = {}
   if (serviceId) {
     uuid = { uuidbuyout: serviceId.trim() }
   }
-  let acts: any = await Delivery.find({
-    ...trueUser,
-    ...trueDateRange,
-    ...uuid,
-    $expr: {
-      $or: [
-        {
-          $regexMatch: {
-            input: { $arrayElemAt: ['$statusdelivery.status', -1] },
-            regex: /Отказ/,
-            options: 'i',
-          },
-        },
-        {
-          $regexMatch: {
-            input: { $arrayElemAt: ['$statusdelivery.status', -1] },
-            regex: /Возврат/,
-            options: 'i',
-          },
-        },
-        {
-          $regexMatch: {
-            input: { $arrayElemAt: ['$statusdelivery.status', -1] },
-            regex: /Отмен/,
-            options: 'i',
-          },
-        },
-      ],
+
+  const acts = await Delivery.aggregate([
+    {
+
+      $addFields: {
+        lastStatus: { $arrayElemAt: ['$statusdelivery.status', -1] }
+      }
     },
+    {
+      $match: {
+        ...trueUser,
+        ...trueDateRange,
+        ...uuid,
+        lastStatus: { $regex: /(Отказ|Возврат|Отмен)/i }
+      }
+    }
+  ]).sort({
+    updatedAt: -1,
   })
-    .sort({
-      updatedAt: sortDate,
-    })
     .skip(paymentPerPage * (+page - 1))
     .limit(paymentPerPage)
+
+
+  // let acts: any = await Delivery.find({
+  //   ...trueUser,
+  //   ...trueDateRange,
+  //   ...uuid,
+  //   $expr: {
+  //     $in: [
+  //       { $arrayElemAt: ['$statusdelivery.status', -1] },
+  //       [/Отказ/i, /Возврат/i, /Отмен/i]
+  //     ]
+  //   }
+  // })
+  //   .sort({
+  //     updatedAt: sortDate,
+  //   })
+  //   .skip(paymentPerPage * (+page - 1))
+  //   .limit(paymentPerPage)
 
   const usernames = await User.find({
     _id: { $in: acts.map((act: any) => act.user) },
   })
+  const regex = /(Отказ|Возврат|Отмен)/i;
 
   const format = await Promise.all(
     acts.map(async (delivery: any) => {
@@ -130,6 +135,9 @@ export default eventHandler(async (event) => {
       const user = usernames.find(
         (user: any) => user._id.valueOf() === delivery.user.valueOf()
       )
+
+      const index = delivery.statusdelivery.findIndex((el: any) => regex.test(el.status));
+
       return {
         username: user ? user.username : username,
         uuid: delivery.uuidbuyout,
@@ -140,12 +148,13 @@ export default eventHandler(async (event) => {
           ? delivery.statusdelivery[0].date
           : '-',
         currentstatus: currentstatus,
+        cancelDate: index !== -1 ? delivery.statusdelivery[index].date : '-',
         updatedAt: delivery.updatedAt,
       }
     })
   )
 
-  const actsCount: any = await Delivery.count()
+  const actsCount: any = 10000
 
   return {
     acts: format,

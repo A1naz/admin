@@ -238,6 +238,7 @@ await getActs()
             <th>Статус</th>
             <th>Адресс</th>
             <th>Дата выкупа</th>
+            <th>Дата отмены</th>
             <th>Дата обновления</th>
           </tr>
         </thead>
@@ -269,6 +270,12 @@ await getActs()
               class="overflow-x-auto"
             >
               {{ $dayjs(act.date).format('DD.MM.YYYY HH:mm') }}
+            </th>
+            <th
+              style="max-width: 60px; min-width: 40px"
+              class="overflow-x-auto"
+            >
+              {{ $dayjs(act.cancelDate).format('DD.MM.YYYY HH:mm') }}
             </th>
             <th
               style="max-width: 60px; min-width: 40px"
