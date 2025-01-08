@@ -27,7 +27,7 @@ const selectedUser: any = ref({
 const mpStore = useMPStore()
 
 const userBank = ref('alpha')
-const userIP = ref('NovikovIP')
+const userIP = ref('BalashovIP')
 const operationNumber = ref('')
 const fileInput = ref()
 const inputLoading = ref(false)
@@ -470,7 +470,6 @@ function selectUser(user: any) {
         <label class="w-full">
           <select v-model="userIP" class="select select-bordered w-full mb-1">
             <option disabled>ИП клиента</option>
-            <option vlaue="NovikovIP">NovikovIP</option>
             <option value="BalashovIP">BalashovIP</option>
             <option value="BalIP">BalIP</option>
           </select>
