@@ -26,8 +26,6 @@ export default eventHandler(async (event) => {
       lg: point.coordinates.lon,
     }
   })
-
-  console.log(collection);
   
   const cache = {
     updated: new Date(),

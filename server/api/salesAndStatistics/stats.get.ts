@@ -20,6 +20,7 @@ export default eventHandler(async (event) => {
   if (!user || !user.tabs.includes('финансовые операции'))
     return sendRedirect(event, '/auth', 302)
   const { page, filters, sortDate, mp }: any = getQuery(event)
+
   const trueFilters = JSON.parse(filters)
 
   const allowedUsersParam = user.isAllUsersAllowed
@@ -92,17 +93,18 @@ export default eventHandler(async (event) => {
     .skip(100 * (page - 1))
     .limit(100)
 
-  const formatted = histories.map((h: any) => {
-    const user = users.find((user: any) => user._id.equals(h.user))
-
-    delete h._doc._id
-    return {
-      ...h._doc,
-      uuid: user ? user.uuid : '',
-      email: user ? user.email : '',
-      username: user ? user.username : '',
-    }
-  })
+    const formatted = histories.map((h: any) => {
+      const user = users.find((user: any) => user._id.equals(h.user))
+      
+      delete h._doc._id
+      return {
+        ...h._doc,
+        uuid: user ? user.uuid : '',
+        email: user ? user.email : '',
+        username: user ? user.username : '',
+      }
+    })
+    
 
   let productsCountInfo = {
     count: 0,
@@ -119,7 +121,7 @@ export default eventHandler(async (event) => {
       trueFilters.productName,
       trueFilters.article
     )
-
+  
     const paymentAggregate = await paymenthistory.aggregate([
       {
         $match: {
@@ -209,6 +211,7 @@ export default eventHandler(async (event) => {
       trueFilters.productName,
       trueFilters.article
     )
+    // console.log(buyoutsPayment)
     const cartsPayment = await cartsInfo(carts, trueFilters.article)
     const likeReviewsPayment = await likeReviewInfo(
       likeReviews,

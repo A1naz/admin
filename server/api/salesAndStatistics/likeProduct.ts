@@ -49,7 +49,5 @@ export default async function (items: any[], article: string) {
     }
   })
 
-  console.log(formatted)
-
   return formatted
 }

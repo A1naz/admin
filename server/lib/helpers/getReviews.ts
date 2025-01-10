@@ -40,8 +40,6 @@ export default async function getReviews(
     .skip((page - 1) * 50)
     .limit(50)
 
-  console.log('reviews', reviews[0]);
-
   const count = await Review.count({ user })
 
   const format = await Promise.all(

@@ -28,8 +28,6 @@ export default eventHandler(async (event) => {
       return sendRedirect(event, '/auth', 302)
 
     const { uuid, pvzs }: any = getQuery(event)
-
-    console.log(pvzs);
     
     const user = await User.find({ uuid: { $in: uuid } })
     if (!user || !user.length) {
@@ -38,8 +36,6 @@ export default eventHandler(async (event) => {
         message: 'Пользователи не найдены',
       })
     }
-
-    console.log(user.length);
     
     const deliveries = await Delivery.find({
       user: { $in: user },

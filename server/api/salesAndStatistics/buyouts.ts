@@ -5,6 +5,8 @@ export default async function (
   productName: string,
   article: string
 ) {
+
+
   const ozonItems = []
   const wbItems = []
   for (const item of items) {
@@ -16,7 +18,7 @@ export default async function (
       wbItems.push(item)
     }
   }
-  
+
   const ozonBuyouts = await OzonBuyout.find({
     uuid: {
       $in: ozonItems.map((item) => item.basisoperation.split('Выкуп #')[1]),
@@ -37,18 +39,32 @@ export default async function (
     article: article ? article : { $exists: true },
   })
 
+
   const allBuyouts = [...ozonBuyouts, ...wbByouts]
-  const formatted = allBuyouts.map((buyout: any) => {
-    const foundItem = items.find(
-      (item) => item.basisoperation.split('Выкуп #')[1] === buyout.uuid
+
+  const formatted = items.map((item: any) => {
+    const foundBuyout = allBuyouts.find(
+      (buyout) => buyout.uuid === item.basisoperation.replace('Выкуп #', '')
     )
 
     return {
-      productName: buyout.product.name,
-      article: buyout.article,
-      ...foundItem,
+      productName: foundBuyout ? foundBuyout.product.name : '',
+      article: foundBuyout ? foundBuyout.article : '',
+      ...item,
     }
   })
+
+  // const formatted = allBuyouts.map((buyout: any) => {
+  //   const foundItem = items.find(
+  //     (item) => item.basisoperation.split('Выкуп #')[1] === buyout.uuid
+  //   )
+
+  //   return {
+  //     productName: buyout.product.name,
+  //     article: buyout.article,
+  //     ...foundItem,
+  //   }
+  // })
 
   return formatted
 }

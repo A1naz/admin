@@ -30,8 +30,6 @@ export default eventHandler(async (event) => {
     actionDescription: `Админ ${adminUser.uuid} - ${adminUser.username} отредактировал тариф ${foundTariff._id} на статус ${status}`,
     date: new Date(),
   })
-
-  console.log(status);
   
   foundTariff.status = status
   await foundTariff.save()

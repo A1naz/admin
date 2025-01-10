@@ -53,8 +53,6 @@ export default eventHandler(async (event) => {
       (pvz: any) => pvz.user.valueOf() === user._id.valueOf()
     )
 
-    console.log(userPVZ)
-
     if (userPVZ) {
       let deleteIndexes = []
 

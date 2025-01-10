@@ -8,18 +8,6 @@ import { Buyout } from '~/server/lib/models/Buyout'
 import { Buyout as OzonBuyout } from '~/server/lib/models/ozon/Buyout'
 import { ObjectId } from 'mongodb'
 
-const runtimeConfig = useRuntimeConfig()
-
-const keys = Object.keys as <T>(
-  obj: T
-) => (keyof T extends infer U
-  ? U extends string
-    ? U
-    : U extends number
-    ? `${U}`
-    : never
-  : never)[]
-
 export default eventHandler(async (event) => {
   try {
     const session = (await getServerSession(event)) as any
@@ -39,7 +27,7 @@ export default eventHandler(async (event) => {
           ],
         }
 
-    const { page, filters, sortDate, mp }: any = getQuery(event)
+    const { filters, sortDate, mp }: any = getQuery(event)
 
     const workbook = new ExcelJS.Workbook()
 
@@ -50,10 +38,7 @@ export default eventHandler(async (event) => {
         comment: { $regex: 'Штраф', $options: 'i' },
       }
     }
-    let productsCountInfo = {
-      count: 0,
-      sum: 0,
-    }
+
     if (!trueFilters.sumTo) delete trueFilters.sumTo
     if (!trueFilters.sumFrom) delete trueFilters.sumFrom
     if (trueFilters.type !== 'buyouts') {
@@ -105,8 +90,6 @@ export default eventHandler(async (event) => {
 
     let stats: any = []
 
-    console.log(mp)
-
     stats = await paymenthistory
       .find({
         mp: mp == 'all' ? { $exists: true } : mp,
@@ -122,6 +105,7 @@ export default eventHandler(async (event) => {
     // .sort({
     //   dataoperation: sortDate,
     // })
+    
 
     const statsUsersIds: any = stats.map((operation: any) => operation.user)
     const users: any = await User.find({ _id: { $in: statsUsersIds } })
@@ -211,6 +195,7 @@ export default eventHandler(async (event) => {
       })
     }
 
+
     const ready = format.map((el: any) => {
       if (el.type == 'buyouts' || el.type == 'buyouts service') {
         return {
@@ -221,7 +206,7 @@ export default eventHandler(async (event) => {
         return {
           ...el,
           summ: Number(el.summ),
-          article: '',
+          article: el.article ? el.article : '',
         }
       }
     })

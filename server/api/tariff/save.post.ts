@@ -57,8 +57,6 @@ export default eventHandler(async (event) => {
       message: 'Пользователь не найден',
     })
   }
-
-  console.log(tariffs[2]);
   
   foundUser.MPTariffs = tariffs
   let tariffsStr = ''
