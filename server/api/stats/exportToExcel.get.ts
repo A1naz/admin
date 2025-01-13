@@ -18,14 +18,14 @@ export default eventHandler(async (event) => {
 
     const allowedUsersParam = user.isAllUsersAllowed
       ? {
-          client: { $nin: user.restrictedUsers.map((id: any) => id) },
-        }
+        client: { $nin: user.restrictedUsers.map((id: any) => id) },
+      }
       : {
-          $and: [
-            { client: { $in: user.allowedUsers.map((id: any) => id) } },
-            { client: { $nin: user.restrictedUsers.map((id: any) => id) } },
-          ],
-        }
+        $and: [
+          { client: { $in: user.allowedUsers.map((id: any) => id) } },
+          { client: { $nin: user.restrictedUsers.map((id: any) => id) } },
+        ],
+      }
 
     const { filters, sortDate, mp }: any = getQuery(event)
 
@@ -41,9 +41,9 @@ export default eventHandler(async (event) => {
 
     if (!trueFilters.sumTo) delete trueFilters.sumTo
     if (!trueFilters.sumFrom) delete trueFilters.sumFrom
-    if (trueFilters.type !== 'buyouts') {
+    if (trueFilters.type !== 'buyouts' && trueFilters.type !== 'any') {
       delete trueFilters.article
-    } else if (trueFilters.type == 'buyouts' && trueFilters.article) {
+    } else if ((trueFilters.type == 'buyouts' || trueFilters.type == 'any') && trueFilters.article) {
       const buyoutsWithThisArticle = await Buyout.find({
         article: trueFilters.article,
       }).sort({
@@ -81,11 +81,11 @@ export default eventHandler(async (event) => {
         : { type: trueFilters.type }
     const trueDateRange = trueFilters.dateRange
       ? {
-          dataoperation: {
-            $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
-            $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
-          },
-        }
+        dataoperation: {
+          $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
+          $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
+        },
+      }
       : {}
 
     let stats: any = []
@@ -105,7 +105,7 @@ export default eventHandler(async (event) => {
     // .sort({
     //   dataoperation: sortDate,
     // })
-    
+
 
     const statsUsersIds: any = stats.map((operation: any) => operation.user)
     const users: any = await User.find({ _id: { $in: statsUsersIds } })
@@ -125,38 +125,38 @@ export default eventHandler(async (event) => {
 
     if (
       trueFilters.type == 'buyouts'
-      //  || trueFilters.type == 'any'
+      || trueFilters.type == 'any'
     ) {
       let buyoutsUuids: string[] = []
       const buyoutIds: ObjectId[] = []
 
-      const paymentAggregate = await paymenthistory.aggregate([
-        {
-          $match: {
-            mp: mp == 'all' ? { $exists: true } : mp,
-            ...allowedUsersParam,
-            ...trueFilters.basisoperation,
-            ...userIds,
-            ...trueTypeoperations,
-            type: { $in: ['buyouts', 'buyouts service'] },
-            ...trueDateRange,
-          },
-        },
-        {
-          $group: {
-            _id: 'null',
-            sum: { $sum: '$summ' },
-            count: { $sum: 1 },
-          },
-        },
-      ])
+      // const paymentAggregate = await paymenthistory.aggregate([
+      //   {
+      //     $match: {
+      //       mp: mp == 'all' ? { $exists: true } : mp,
+      //       ...allowedUsersParam,
+      //       ...trueFilters.basisoperation,
+      //       ...userIds,
+      //       ...trueTypeoperations,
+      //       type: { $in: ['buyouts', 'buyouts service'] },
+      //       ...trueDateRange,
+      //     },
+      //   },
+      //   {
+      //     $group: {
+      //       _id: 'null',
+      //       sum: { $sum: '$summ' },
+      //       count: { $sum: 1 },
+      //     },
+      //   },
+      // ])
 
-      if (paymentAggregate && paymentAggregate.length > 0) {
-        productsCountInfo = {
-          count: paymentAggregate[0].count,
-          sum: paymentAggregate[0].sum,
-        }
-      }
+      // if (paymentAggregate && paymentAggregate.length > 0) {
+      //   productsCountInfo = {
+      //     count: paymentAggregate[0].count,
+      //     sum: paymentAggregate[0].sum,
+      //   }
+      // }
 
       for (const buyout of format) {
         if (
@@ -181,13 +181,13 @@ export default eventHandler(async (event) => {
         if (stat.type == 'buyouts' || stat.type == 'buyouts service') {
           const buyout = stat.basisoperation.includes('Выкуп #')
             ? buyouts.find(
-                (buyout: any) =>
-                  buyout.uuid ==
-                  stat.basisoperation.split(' ')[1].replace('#', '')
-              )
+              (buyout: any) =>
+                buyout.uuid ==
+                stat.basisoperation.split(' ')[1].replace('#', '')
+            )
             : ozonBuyouts.find(
-                (buyout: any) => buyout._id.valueOf() == stat.basisoperation
-              )
+              (buyout: any) => buyout._id.valueOf() == stat.basisoperation
+            )
 
           stat.article = buyout ? buyout.article : ''
           stat.productName = buyout ? buyout.product.name : ''
@@ -220,7 +220,7 @@ export default eventHandler(async (event) => {
       { header: 'userId', key: 'userUuid', width: 40, font: { bold: true } },
       { header: 'email', key: 'email', width: 30, font: { bold: true } },
       { header: 'username', key: 'username', width: 20, font: { bold: true } },
-      { header: 'telegram', key: 'telegram', width: 20, font: { bold: true } },
+      // { header: 'telegram', key: 'telegram', width: 20, font: { bold: true } },
       { header: 'Маркетплейс', key: 'mp', width: 14, font: { bold: true } },
       {
         header: 'сумма',
