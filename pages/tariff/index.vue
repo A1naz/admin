@@ -182,7 +182,6 @@ getStandartTariffs()
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Управление тарифами</h1>
-  {{ mpStore.MPTabs }}
   <div class="divider"></div>
   <div class="flex w-full justify-between">
     <div>
