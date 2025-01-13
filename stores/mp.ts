@@ -7,6 +7,9 @@ export const useMPStore = defineStore('mp', {
             { title: 'Wildberries', value: 'wildberries' },
             { title: 'Ozon', value: 'ozon' },
             { title: 'Avito', value: 'avito' },
+            { title: 'Flowwow', value: 'flowwow' },
+            { title: 'VK', value: 'vk' },
+            { title: 'Ym', value: 'ym' },
           ],
     }),
     persist: {

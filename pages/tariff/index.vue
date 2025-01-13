@@ -124,7 +124,7 @@ async function saveTariffs() {
   let errors = 0
   for (const mp of userTariffs.value) {
     for (let key of Object.keys(mp.prices)) {
-      if (!mp.prices[key].value || mp.prices[key].value <= 0) {
+      if (mp.prices[key].value < 0) {
         errors++
       }
     }
@@ -148,8 +148,8 @@ async function saveTariffs() {
       tariffs: isStandartTariffs.value
         ? defaultPriсes.value
         : userTariffs.value,
-        rewardPercent: selectedUser.value.partnerRewardPercent,
-        secondLevelPercent: selectedUser.value.partnerSecondLevelPercent,
+      rewardPercent: selectedUser.value.partnerRewardPercent,
+      secondLevelPercent: selectedUser.value.partnerSecondLevelPercent,
     },
     watch: false,
   })
@@ -182,6 +182,7 @@ getStandartTariffs()
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Управление тарифами</h1>
+  {{ mpStore.MPTabs }}
   <div class="divider"></div>
   <div class="flex w-full justify-between">
     <div>
