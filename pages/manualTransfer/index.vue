@@ -26,7 +26,7 @@ const selectedUser: any = ref({
 
 const mpStore = useMPStore()
 
-const userBank = ref('alpha')
+const userBank = ref('Alfabank')
 const userIP = ref('BalashovIP')
 const operationNumber = ref('')
 const fileInput = ref()
@@ -477,7 +477,7 @@ function selectUser(user: any) {
         <label class="w-full">
           <select class="select select-bordered w-full mb-1" v-model="userBank">
             <option disabled>Банк клента</option>
-            <option value="Alpha">Альфа</option>
+            <option value="Alfabank">Альфа</option>
             <option value="PSB">PSB</option>
             <option value="Sber">Sber</option>
             <option value="TBank">TBank</option>
