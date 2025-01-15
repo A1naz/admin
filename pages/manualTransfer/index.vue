@@ -477,10 +477,10 @@ function selectUser(user: any) {
         <label class="w-full">
           <select class="select select-bordered w-full mb-1" v-model="userBank">
             <option disabled>Банк клента</option>
-            <option value="alpha">Альфа</option>
-            <option value="psb">PSB</option>
-            <option value="sber">Sber</option>
-            <option value="tBank">TBank</option>
+            <option value="Alpha">Альфа</option>
+            <option value="PSB">PSB</option>
+            <option value="Sber">Sber</option>
+            <option value="TBank">TBank</option>
           </select>
         </label>
 
