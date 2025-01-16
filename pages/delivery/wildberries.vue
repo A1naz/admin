@@ -123,7 +123,7 @@ function changeMP(event: any) {
     Товары готовые к выдаче Wildberries
   </h1>
   <div class="divider"></div>
-  <div class="flex gap-3 items-center">
+  <div class="flex gap-1 items-center">
     <!-- <selectUserModal @selectUser=";[(selectedUser = $event)]" /> -->
     <ModalManyUsers :selectedUsers="selectedUsers" />
     <ModalWildberriesManyPVZs
@@ -184,10 +184,7 @@ function changeMP(event: any) {
       </option>
     </select>
 
-    <select
-      class="select select-bordered max-w-xs mb-2"
-      v-model="selectedDays"
-    >
+    <select class="select select-bordered max-w-xs mb-2" v-model="selectedDays">
       <option value="all" selected>Все дни</option>
       <option value="3">Прошло 3 дня</option>
       <option value="7">Прошло 7 дней</option>

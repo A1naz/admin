@@ -322,29 +322,31 @@ function changeMP(event: any) {
   <div class="card p-fluid"></div>
   <div class="text-sm breadcrumbs ml-5"></div>
   <div class="divider"></div>
-  <div>
-    <select
-      class="select select-bordered max-w-xs ml-2 mb-2"
-      @change="changeMP($event)"
-    >
-      <option
-        v-for="tab in mpStore.MPTabs"
-        :key="tab.value"
-        :value="tab.value"
-        :selected="tab.value == 'wildberries'"
-      >
-        {{ tab.title }}
-      </option>
-    </select>
-  </div>
+
   <div class="flex justify-between">
     <div class="flex">
+      <div>
+        <select
+          class="select select-bordered max-w-xs ml-2 mb-2"
+          @change="changeMP($event)"
+        >
+          <option
+            v-for="tab in mpStore.MPTabs"
+            :key="tab.value"
+            :value="tab.value"
+            :selected="tab.value == 'wildberries'"
+          >
+            {{ tab.title }}
+          </option>
+        </select>
+      </div>
       <button class="ml-2 btn max-w-xl w-xl" @click="openUsersSelectModal">
-        {{
+        <!-- {{
           selectedUser.username == ''
             ? 'Выбрать пользователя'
             : selectedUser.username
-        }}
+        }} -->
+        +
       </button>
       <!-- 
       <select
@@ -356,13 +358,19 @@ function changeMP(event: any) {
         <option value="Приход">приход</option>
         <option value="Расход">расход</option>
       </select> -->
-      <div v-if="tabOption == 'buyouts' || tabOption == 'deliveries' || tabOption == 'reviews'">
+      <div
+        v-if="
+          tabOption == 'buyouts' ||
+          tabOption == 'deliveries' ||
+          tabOption == 'reviews'
+        "
+      >
         <label
           ><input
             v-model="serviceId"
             type="text"
             placeholder="Id услуги"
-            class="input input-bordered input-l ml-4"
+            class="input input-bordered input-l ml-2"
             @input="onInputService($event)"
           />
         </label>
@@ -458,8 +466,7 @@ function changeMP(event: any) {
   <div
     class="my-2 mx-2 overflow-y-auto"
     :style="{ 'max-height': height - 270 + 'px' }"
-  > 
-  
+  >
     <table class="table table-pin-rows">
       <!-- head -->
       <thead>
@@ -640,7 +647,7 @@ function changeMP(event: any) {
       </div>
     </div>
   </div>
-  <input type="checkbox" id="imageModal"   class="modal-toggle" />
+  <input type="checkbox" id="imageModal" class="modal-toggle" />
   <div class="modal cursor-pointer" @click="closeImageModal">
     <div class="modal-box w-fit max-w-full cursor-pointer">
       <form method="dialog">

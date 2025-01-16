@@ -337,24 +337,23 @@ function selectUser(user: any) {
       <thead>
         <tr>
           <th>Организация</th>
-          <th>ник пользователя</th>
-          <th>номер операции</th>
-          <th>сумма</th>
-          <th>статус</th>
+          <th>Пользователь</th>
+          <th>№ операции</th>
+          <th>Сумма</th>
+          <th>Статус</th>
 
           <th>
             <div @click="sortByDate()" class="flex cursor-pointer">
-              Дата и время создания
+              Дата заявки
               <Icon
                 class="swap-on fill-current ml-1 w-6 h-5"
                 :name="dateSortIcon"
               />
             </div>
           </th>
-          <th>подтверждение операции</th>
-          <th>ИП клиента</th>
+          <th>Организация</th>
           <th>Банк</th>
-          <th class="text-center">скриншот</th>
+          <th class="text-center">Скриншот</th>
         </tr>
       </thead>
       <tbody>
@@ -381,7 +380,7 @@ function selectUser(user: any) {
             }}
           </th>
           <th>{{ defaultDate(stat.createdAt) }}</th>
-          <th>{{ stat.acception }}</th>
+          <!-- <th>{{ stat.acception }}</th> -->
           <th>{{ stat.userIP }}</th>
           <th>{{ stat.bank }}</th>
           <th>
@@ -435,7 +434,7 @@ function selectUser(user: any) {
               : selectedUser.username
           }}
         </button>
-        <div>
+        <!-- <div>
           <div class="relative w-full p-2 mb-2 input input-bordered rounded-lg">
             <div class="absolute left-3 bottom-3">
               {{
@@ -448,7 +447,7 @@ function selectUser(user: any) {
               <DatePicker :min-date="null" v-model="date" />
             </div>
           </div>
-        </div>
+        </div> -->
         <label class="w-full">
           <!-- <input
             v-model="summ"
@@ -483,7 +482,7 @@ function selectUser(user: any) {
             <option value="TBank">TBank</option>
           </select>
         </label>
-
+        <!-- 
         <div class="flex justify-between ml-1 mb-2">
           <div class="form-control">
             <label class="cursor-pointer label w-36">
@@ -495,7 +494,7 @@ function selectUser(user: any) {
               />
             </label>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div class="text-center font-bold mt-1 mb-3">

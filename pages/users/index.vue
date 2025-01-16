@@ -24,66 +24,70 @@ const roles = ref<any>([
     text: 'Пользователь',
     disabled: true,
   },
-  {
-    value: 'manager',
-    text: 'Менеджер',
-  },
+  // {
+  //   value: 'manager',
+  //   text: 'Менеджер',
+  // },
   {
     value: 'accountant',
     text: 'Бухгалтер',
   },
+  // {
+  //   value: 'investor current account',
+  //   text: 'Инвестор расчетный счет',
+  // },
+  // {
+  //   value: 'project manager',
+  //   text: 'Проджект менеджер',
+  // },
+  // {
+  //   value: 'ceo',
+  //   text: 'CEO',
+  // },
+  // {
+  //   value: 'financier',
+  //   text: 'Финансист',
+  // },
+  // {
+  //   value: 'marketolog',
+  //   text: 'Маркетолог',
+  // },
+  // {
+  //   value: 'assistant',
+  //   text: 'Ассистент',
+  // },
+  // {
+  //   value: 'hr',
+  //   text: 'HR',
+  // },
+  // {
+  //   value: 'organazer',
+  //   text: 'Органайзер',
+  // },
+  // {
+  //   value: 'jurist',
+  //   text: 'Юрист',
+  // },
+  // {
+  //   value: 'smm',
+  //   text: 'SMM',
+  // },
+  // {
+  //   value: 'targetolog',
+  //   text: 'Таргетолог',
+  // },
   {
-    value: 'investor current account',
-    text: 'Инвестор расчетный счет',
-  },
-  {
-    value: 'project manager',
-    text: 'Проджект менеджер',
-  },
-  {
-    value: 'ceo',
-    text: 'CEO',
-  },
-  {
-    value: 'financier',
-    text: 'Финансист',
-  },
-  {
-    value: 'marketolog',
-    text: 'Маркетолог',
-  },
-  {
-    value: 'assistant',
-    text: 'Ассистент',
-  },
-  {
-    value: 'hr',
-    text: 'HR',
-  },
-  {
-    value: 'organazer',
-    text: 'Органайзер',
-  },
-  {
-    value: 'jurist',
-    text: 'Юрист',
-  },
-  {
-    value: 'smm',
-    text: 'SMM',
-  },
-  {
-    value: 'targetolog',
-    text: 'Таргетолог',
+    value: 'salesman',
+    text: 'Продажник',
   },
   {
     value: 'tech support',
     text: 'Тех.поддержка (Менеджер)',
   },
-  {
-    value: 'investor qiwi',
-    text: 'Инвестор Qiwi',
-  },
+  // {
+  //   value: 'investor qiwi',
+  //   text: 'Инвестор Qiwi',
+  // },
 ])
 const password = ref('')
 const repeatPassword = ref('')
@@ -92,7 +96,7 @@ const isSelectedUserAdmin = computed(() => {
   return userEditForm.value.roles.length > 1
 })
 
-const selectedUserRole = ref('manager')
+const selectedUserRole = ref('user')
 import { notify } from '@kyvg/vue3-notification'
 const { height, width } = useWindowSize()
 const dateSortIcon = ref('mdi-arrow-down')
@@ -247,7 +251,7 @@ const tabs = ref<any>([
   'продажи',
   'клиенты',
   'лендинг',
-  'тарифные планы'
+  'тарифные планы',
 ])
 
 async function saveUser() {
@@ -304,6 +308,27 @@ const store = useMainStore()
 if (!store.client.mainAdmin) {
   navigateTo('/partner')
 }
+
+async function copyToClipboardQR() {
+  const base64WithoutPrefix = userEditForm.value.twoFaQR.split(',')[1]
+
+  const byteCharacters = atob(base64WithoutPrefix)
+  const byteNumbers = new Array(byteCharacters.length)
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i)
+  }
+  const byteArray = new Uint8Array(byteNumbers)
+
+  const blob = new Blob([byteArray], { type: 'image/png' })
+
+  const clipboardItem = new ClipboardItem({ 'image/png': blob })
+
+  await navigator.clipboard.write([clipboardItem])
+  notify({
+    type: 'success',
+    title: 'QR-код скопирован',
+  })
+}
 </script>
 <template>
   <div>
@@ -327,7 +352,7 @@ if (!store.client.mainAdmin) {
             ><input
               v-model="query"
               type="text"
-              placeholder="id, username, email, telegram, организация"
+              placeholder="Заполните поле"
               class="input input-bordered input-l ml-4 w-80"
               @input="onInput($event)"
             />
@@ -353,7 +378,7 @@ if (!store.client.mainAdmin) {
       </div>
       <div>
         <button
-          class="btn btn-primary mr-4"
+          class="btn btn-primary mr-4 btn"
           @click="
             ;[
               (createMode = true),
@@ -374,7 +399,7 @@ if (!store.client.mainAdmin) {
             ]
           "
         >
-          Добавить пользователя
+          <Icon name="line-md:plus" size="20" />
         </button>
         <div class="join mr-2">
           <button
@@ -407,11 +432,11 @@ if (!store.client.mainAdmin) {
             <th>ID</th>
             <th>Никнейм</th>
             <th>ФИО</th>
-            <th>Telegram</th>
-            <th>Роли</th>
+            <th>Почта</th>
+            <th>Позиция</th>
             <th>
               <div @click="sortByDate" class="flex cursor-pointer">
-                Дата регистрации
+                Регистрация
                 <Icon
                   class="swap-on fill-current ml-1 w-6 h-5"
                   :name="dateSortIcon"
@@ -434,7 +459,7 @@ if (!store.client.mainAdmin) {
               {{ user.firstName }} {{ user.lastName }}
             </th>
             <th style="max-width: 120px; min-width: 100px">
-              {{ user.telegram }}
+              {{ user.email }}
             </th>
             <th style="max-width: 100px; min-width: 90px">
               {{ user.roles.map((role: any) => role).join(', ') }}
@@ -445,7 +470,7 @@ if (!store.client.mainAdmin) {
             >
               {{ defaultDate(user.registrationDate) }}
             </th>
-            <th style="max-width: 30px; min-width: 20px">
+            <th style="max-width: 10px; min-width: 10px">
               <button
                 class="btn btn-primary btn-sm"
                 @click="
@@ -456,7 +481,7 @@ if (!store.client.mainAdmin) {
                   ]
                 "
               >
-                редактировать
+                <Icon name="material-symbols:edit" size="18" />
               </button>
             </th>
           </tr>
@@ -533,7 +558,7 @@ if (!store.client.mainAdmin) {
           {{ 'Настроить' }}
         </button>
       </div> -->
-      <div v-if="isSelectedUserAdmin">
+      <!-- <div v-if="isSelectedUserAdmin">
         <div class="mb-3 flex flex-col">
           <div class="mb-2">
             <span class="my-2 ml-2"> Разрешенные пользователи </span>
@@ -564,7 +589,7 @@ if (!store.client.mainAdmin) {
           </div>
         </div>
         <div class="divider"></div>
-      </div>
+      </div> -->
       <div class="collapse bg-base-200 collapse-arrow mb-2">
         <input type="checkbox" />
         <div class="collapse-title text-xl font-medium">Настроить роли</div>
@@ -636,6 +661,9 @@ if (!store.client.mainAdmin) {
           width="250"
           :src="`${userEditForm.twoFaQR}`"
         />
+        <button class="btn mt-2" @click="copyToClipboardQR">
+          <Icon name="material-symbols:content-copy" size="26"></Icon>
+        </button>
       </div>
       <div v-else class="flex flex-col justify-center items-center mt-5">
         <span class="font-semibold text-lg"

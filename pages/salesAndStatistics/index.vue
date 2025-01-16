@@ -221,31 +221,16 @@ if (
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Финансовые операции</h1>
   <div class="divider"></div>
-  <select
-    @change=";[(curPage = 1), getStats()]"
-    v-model="selectedMP"
-    class="select select-bordered w-50 ml-3 mb-3"
-  >
-    <option selected value="all">Все</option>
-    <option v-for="mp in mpStore.MPTabs" :value="mp.value" :key="mp.value">
-      {{ mp.title }}
-    </option>
-  </select>
-  <button
-    class="btn btn-sm btn-primary ml-2"
-    @click="exportXLS"
-    :disabled="isExportBtnDisabled"
-  >
-    Экспорт
-  </button>
+
   <div class="flex flex-col justify-between">
     <div class="flex">
-      <button class="ml-2 btn" @click="openUsersSelectModal">
-        {{
+      <button class="ml-2 btn text-xl" @click="openUsersSelectModal">
+        <!-- {{
           selectedUsers.length > 0
             ? 'Выбрано Клиентов: ' + selectedUsers.length
             : 'Выбраны все Клиенты'
-        }}
+        }} -->
+        +
       </button>
 
       <select
@@ -253,7 +238,7 @@ if (
         @change=";[(curPage = 1), getStats()]"
         v-model="faceType"
       >
-        <option selected value="any">Все типы лица</option>
+        <option selected value="any">Вид</option>
         <option value="yurFace">Юридическое лицо</option>
         <option value="fizFace">Физическое лицо</option>
       </select>
@@ -262,31 +247,31 @@ if (
         @change=";[(curPage = 1), getStats()]"
         v-model="type"
       >
-        <option selected value="any">все типы операции</option>
-        <option value="Приход">приход</option>
-        <option value="Расход">расход</option>
+        <option selected value="any">Все операции</option>
+        <option value="Приход">Пополнения</option>
+        <option value="Расход">Расходы</option>
       </select>
       <select
         class="select select-bordered w-50 ml-3"
         @change=";[(curPage = 1), getStats()]"
         v-model="service"
       >
-        <option selected value="any">все услуги</option>
-        <option value="deposit">депозит</option>
-        <option value="buyouts">выкупы</option>
-        <option value="review">отзывы</option>
-        <!-- <option value="questions">вопросы</option> -->
-        <option value="cart">корзина</option>
-        <option value="likeReview">лайки отзывов</option>
-        <option value="questionProduct">вопросы</option>
-        <option value="autoanswers">автоответчик</option>
-        <option value="refund">возврат</option>
-        <option value="reviewRemoving">удаление отзывов</option>
-        <option value="likeProduct">лайки на товаров</option>
+        <option selected value="any">Все услуги</option>
+        <option value="deposit">Депозит</option>
+        <option value="buyouts">Выкуп</option>
+        <option value="buyouts service">Услуга выкупа</option>
+        <option value="review">Отзыв</option>
+        <option value="questions">Вопрос</option>
+        <option value="cart">Корзина</option>
+        <option value="likeReview">Лайк отзыва</option>
+        <option value="questionProduct">Вопрос</option>
+        <!-- <option value="autoanswers">автоответчик</option> -->
+        <option value="refund">Возврат</option>
+        <option value="reviewRemoving">Удаление отзыва</option>
+        <option value="likeProduct">Лайк товара</option>
+        <option value="deliveries">Доставка</option>
+        <option value="deliveryStorage">Штраф</option>
         <option value="other">другое</option>
-        <option value="buyouts service">услуги выкупов</option>
-        <option value="deliveries">доставки</option>
-        <option value="deliveryStorage">штрафы</option>
       </select>
       <div>
         <label
@@ -306,20 +291,39 @@ if (
         @reset="dateRange = []"
       >
         <button class="btn btn-primary ml-3 min-w-2xl">
-          {{
+          <!-- {{
             dateRange.length > 1
               ? `${$dayjs(dateRange[0]).format('DD.MM.YYYY')} - ${$dayjs(
                   dateRange[1]
                 ).format('DD.MM.YYYY')}`
               : 'Выбрать даты'
-          }}
+          }} -->
+          <Icon name="lucide:calendar" />
         </button>
       </DateRangePicker>
       <button
         class="btn btn-primary ml-3"
         @click=";[(curPage = 1), getStats()]"
       >
-        Применить
+        <!-- Применить -->
+        <Icon name="lucide:search" />
+      </button>
+      <select
+        @change=";[(curPage = 1), getStats()]"
+        v-model="selectedMP"
+        class="select select-bordered w-50 ml-3 mb-3"
+      >
+        <option selected value="all">Все</option>
+        <option v-for="mp in mpStore.MPTabs" :value="mp.value" :key="mp.value">
+          {{ mp.title }}
+        </option>
+      </select>
+      <button
+        class="btn btn-primary ml-2"
+        @click="exportXLS"
+        :disabled="isExportBtnDisabled"
+      >
+        EXL
       </button>
     </div>
     <div v-if="service == 'buyouts'" class="mt-2">

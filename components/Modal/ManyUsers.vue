@@ -204,11 +204,12 @@ function closeModal() {
 </script>
 <template>
   <button class="ml-2 btn" @click="isModalOpen = true">
-    {{
+    <!-- {{
       selectedUsers.length > 0
         ? 'Выбрано Клиентов: ' + selectedUsers.length
         : 'Выбрать Клиентов'
-    }}
+    }} -->
+    +
   </button>
   <!-- <div
 

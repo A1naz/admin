@@ -118,7 +118,7 @@ function changeMP(event: any) {
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Товары готовые к выдаче Ozon</h1>
   <div class="divider"></div>
-  <div class="flex gap-3 items-center">
+  <div class="flex gap-1 items-center">
     <!-- <selectUserModal @selectUser=";[(selectedUser = $event)]" /> -->
     <ModalManyUsers :selectedUsers="selectedUsers" />
     <ModalOzonManyPVZs

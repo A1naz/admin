@@ -324,29 +324,31 @@ function changeMP(event: any) {
   <div class="card p-fluid"></div>
   <div class="text-sm breadcrumbs ml-5"></div>
   <div class="divider"></div>
-  <div>
-    <select
-      class="select select-bordered max-w-xs ml-2 mb-2"
-      @change="changeMP($event)"
-    >
-      <option
-        v-for="tab in mpStore.MPTabs"
-        :key="tab.value"
-        :value="tab.value"
-        :selected="tab.value == 'ozon'"
-      >
-        {{ tab.title }}
-      </option>
-    </select>
-  </div>
+
   <div class="flex justify-between">
     <div class="flex">
+      <div>
+        <select
+          class="select select-bordered max-w-xs ml-2 mb-2"
+          @change="changeMP($event)"
+        >
+          <option
+            v-for="tab in mpStore.MPTabs"
+            :key="tab.value"
+            :value="tab.value"
+            :selected="tab.value == 'ozon'"
+          >
+            {{ tab.title }}
+          </option>
+        </select>
+      </div>
       <button class="ml-2 btn max-w-xl w-xl" @click="openUsersSelectModal">
-        {{
+        <!-- {{
           selectedUser.username == ''
             ? 'Выбрать пользователя'
             : selectedUser.username
-        }}
+        }} -->
+        +
       </button>
       <!-- 
       <select
@@ -359,13 +361,19 @@ function changeMP(event: any) {
         <option value="Расход">расход</option>
       </select> -->
 
-      <div v-if="tabOption == 'buyouts' || tabOption == 'deliveries' || tabOption == 'reviews'">
+      <div
+        v-if="
+          tabOption == 'buyouts' ||
+          tabOption == 'deliveries' ||
+          tabOption == 'reviews'
+        "
+      >
         <label
           ><input
             v-model="serviceId"
             type="text"
             placeholder="Id услуги"
-            class="input input-bordered input-l ml-4"
+            class="input input-bordered input-l ml-2"
             @input="onInputService($event)"
           />
         </label>
@@ -518,7 +526,7 @@ function changeMP(event: any) {
             v-for="header in selectedTab.headers"
             :key="header.key"
             style="max-width: 140px; min-width: 40px"
-          > 
+          >
             {{
               header.key == 'article' ||
               (header.key == 'name' && tabOption == 'productLikes')
@@ -561,7 +569,7 @@ function changeMP(event: any) {
   </div>
 
   <!-- Put this part before </body> tag -->
-  <input type="checkbox" id="selectUser"  class="modal-toggle" />
+  <input type="checkbox" id="selectUser" class="modal-toggle" />
   <div class="modal cursor-pointer" @click="openUsersSelectModal">
     <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
