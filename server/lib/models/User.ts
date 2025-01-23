@@ -85,6 +85,9 @@ const UserSchema = new Schema({
   },
   fizFace: { type: Boolean, default: false },
   isDocSigned: { type: Boolean, default: false },
+
+  votedFor: { type: [String], default: [] },
+  votedForService: { type: [Object], default: [] },
 })
 
 // UserSchema.pre('save', function (next) {

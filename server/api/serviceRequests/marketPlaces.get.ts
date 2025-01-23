@@ -1,0 +1,41 @@
+import { Service } from "~/server/lib/models/Service";
+import { User } from "~/server/lib/models/User";
+
+export default defineEventHandler(async (event) => {
+        const { type, query } = getQuery(event)
+    
+        const services = await Service.find({
+                type: type === 'any' ? { $exists: true } : type,
+                name: { $regex: query, $options: 'i' },
+        })
+
+        const usersVotes: any = await User.find({
+                votedFor: { $exists: true },
+        }).select('votedFor')
+
+        const userVotesMap = new Map();
+        for (const vote of usersVotes) {
+                for (const votedFor of vote.votedFor) {
+
+                        if (userVotesMap.has(votedFor)) {
+                                userVotesMap.set(votedFor, userVotesMap.get(votedFor) + 1);
+                        } else {
+                                userVotesMap.set(votedFor, 1);
+                        }
+                }
+        }
+
+        const array = Array.from(userVotesMap.entries());
+        const format = array.map((vote) => {
+                const foundService = services.find((service) => service.slug === vote[0]);
+                return {
+                        type: foundService?.type,
+                        slug: foundService?.slug,
+                        name: foundService?.name,
+                        votes: vote[1],
+                }
+        }).filter((item) => item.slug !== undefined)
+
+        return format
+}
+)

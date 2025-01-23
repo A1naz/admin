@@ -220,45 +220,21 @@ function closeOverlay() {
           title="Фулфилмент"
           href="/fulfilment/wildberries"
         />
+
         <SidebarItem
-          v-if="
-            store.client.mainAdmin || store.client.tabs.includes('тарифные планы')
-          "
-          icon="iconoir:coin"
-          title="Тарифные планы"
-          href="/tariffPlans"
-        />
-        <SidebarItem
-          v-if="
-            store.client.mainAdmin || store.client.tabs.includes('оплата тарифов')
-          "
-          icon="solar:dollar-bold"
-          title="Оплата тарифов"
-          href="/tariffPayments"
-        />
-        <SidebarItem
-          v-if="
-            store.client.mainAdmin || store.client.tabs.includes('продажи')
-          "
-          icon="majesticons:megaphone-line"
-          title="Продажи"
-          href="/sales"
-        />
-        <SidebarItem
-          v-if="
-            store.client.mainAdmin || store.client.tabs.includes('клиенты')
-          "
+          v-if="store.client.mainAdmin || store.client.tabs.includes('клиенты')"
           icon="solar:users-group-two-rounded-line-duotone"
           title="Клиенты"
           href="/clientsInfo"
         />
         <SidebarItem
           v-if="
-            store.client.mainAdmin || store.client.tabs.includes('лендинг')
+            store.client.mainAdmin ||
+            store.client.tabs.includes('запросы направлений')
           "
-          icon="ooui:article-redirect-ltr"
-          title="Лендинги"
-          href="/landingInfo"
+          icon="solar:users-group-two-rounded-line-duotone"
+          title="Запросы направлений"
+          href="/serviceRequests"
         />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
