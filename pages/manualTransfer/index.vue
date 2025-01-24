@@ -471,6 +471,7 @@ function selectUser(user: any) {
             <option disabled>ИП клиента</option>
             <option value="BalashovIP">BalashovIP</option>
             <option value="BalIP">BalIP</option>
+            <option value="FilushovIP">FilushovIP</option>
           </select>
         </label>
         <label class="w-full">
