@@ -11,6 +11,8 @@ const partnerSchema = new Schema({
   rewardPercent: { type: Number, default: 5 },
   followCount: { type: Number, default: 0 },
   secondLevelPercent: { type: Number, default: 2 },
+  partnerServiceRewardSum: { type: Number, default: 500 },
+  partnerRewardType: { type: String, default: 'service' },
 })
 
 const UserSchema = new Schema({

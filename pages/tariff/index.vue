@@ -150,6 +150,8 @@ async function saveTariffs() {
         : userTariffs.value,
       rewardPercent: selectedUser.value.partnerRewardPercent,
       secondLevelPercent: selectedUser.value.partnerSecondLevelPercent,
+      partnerServiceRewardSum: selectedUser.value.partnerServiceRewardSum,
+      partnerRewardType: selectedUser.value.partnerRewardType,
     },
     watch: false,
   })
@@ -416,15 +418,60 @@ getStandartTariffs()
       </div>
       <div class="text-lg text-center mt-2">Партнерка</div>
       <div class="flex flex-col">
-        Партнерка, 1 уровень %
+        Партнерка %
         <input
           type="number"
-          placeholder="Мин. значение в ₽"
+          :disabled="selectedUser.partnerRewardType !== 'percent'"
+          placeholder="Мин. значение в %"
           v-model="selectedUser.partnerRewardPercent"
           class="input input-bordered my-1"
         />
       </div>
       <div class="flex flex-col">
+        Партнерка, сумма за услугу ₽
+        <input
+          type="number"
+          :disabled="selectedUser.partnerRewardType !== 'service'"
+          placeholder="Значение в ₽"
+          v-model="selectedUser.partnerServiceRewardSum"
+          class="input input-bordered my-1"
+        />
+      </div>
+      <div>
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <span class="label-text">Вознаграждение в ₽</span>
+            <input
+              type="checkbox"
+              class="toggle toggle-primary"
+              :checked="selectedUser.partnerRewardType === 'service'"
+              @change="
+                selectedUser.partnerRewardType =
+                  selectedUser.partnerRewardType == 'service'
+                    ? 'percent'
+                    : 'service'
+              "
+            />
+          </label>
+        </div>
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <span class="label-text">Вознаграждение в %</span>
+            <input
+              type="checkbox"
+              class="toggle toggle-primary"
+              :checked="selectedUser.partnerRewardType === 'percent'"
+              @change="
+                selectedUser.partnerRewardType =
+                  selectedUser.partnerRewardType == 'service'
+                    ? 'percent'
+                    : 'service'
+              "
+            />
+          </label>
+        </div>
+      </div>
+      <!-- <div class="flex flex-col">
         Партнерка, 1 уровень %
         <input
           type="number"
@@ -432,7 +479,7 @@ getStandartTariffs()
           v-model="selectedUser.partnerSecondLevelPercent"
           class="input input-bordered my-1"
         />
-      </div>
+      </div> -->
       <div
         v-if="selectedUser.uuid === 'all'"
         class="text-center text-lg font-extrabold text-warning"

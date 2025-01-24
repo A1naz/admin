@@ -4,6 +4,7 @@ import { getServerSession } from '#auth'
 import { Buyout } from '@/server/lib/models/Buyout'
 import { Delivery } from '~~/server/lib/models/Delivery'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
+import { HarmexReferrals } from "~/server/lib/models/HarmexReferrals";
 
 function getServiceNameByKey(key: string) {
   switch (key) {
@@ -33,14 +34,14 @@ function getServiceNameByKey(key: string) {
       return 'Удаление отзывов'
     case 'Hotelsreview':
       return 'Отзывы отелей'
-      case 'penalty':
-        return 'Штрафы'
+    case 'penalty':
+      return 'Штрафы'
   }
 }
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { userUuid, tariffs, rewardPercent, secondLevelPercent }: any = await readBody(event)
+  const { userUuid, tariffs, rewardPercent, secondLevelPercent, partnerServiceRewardSum, partnerRewardType }: any = await readBody(event)
   if (!session) return sendRedirect(event, '/auth', 302)
 
   const user = await AdminUser.findOne({ uuid: session.uuid })
@@ -57,7 +58,7 @@ export default eventHandler(async (event) => {
       message: 'Пользователь не найден',
     })
   }
-  
+
   foundUser.MPTariffs = tariffs
   let tariffsStr = ''
   tariffs.forEach((item: any) => {
@@ -83,8 +84,27 @@ export default eventHandler(async (event) => {
 
   foundUser.partner.rewardPercent = rewardPercent
   foundUser.partner.secondLevelPercent = secondLevelPercent
+  foundUser.partner.partnerServiceRewardSum = partnerServiceRewardSum
+  foundUser.partner.partnerRewardType = partnerRewardType
 
   await foundUser.save()
+
+  const referralFound = await HarmexReferrals.findOne({ user: foundUser })
+  
+  if (!referralFound) {
+    await HarmexReferrals.create({
+      user: foundUser,
+      referrals: [{ user: user._id, date: new Date() }],
+      partnerRewardType: partnerRewardType,
+      rewardPercent: rewardPercent,
+      partnerServiceRewardSum: partnerServiceRewardSum,
+    })
+  } else {
+    referralFound.partnerRewardType = partnerRewardType
+    referralFound.rewardPercent = rewardPercent
+    referralFound.partnerServiceRewardSum = partnerServiceRewardSum
+    await referralFound.save()
+  }
 
   await ActionHistory.create({
     adminUser: user._id,

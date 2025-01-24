@@ -91,6 +91,8 @@ export default eventHandler(async (event) => {
       twoFaQR: userTwoFa ? userTwoFa.twoFaQR : user.twoFaQR || '',
       twoFaSecret: userTwoFa ? userTwoFa.twoFaSecret : user.twoFaSecret || '',
       organization: user.fizFace ? user.username + '(Физ. лицо)' : user.orgName,
+      partnerServiceRewardSum: user.partner?.serviceRewardSum ? user.partner.serviceRewardSum : 500,
+      partnerRewardType: user.partner?.rewardType ? user.partner.rewardType : 'service',
     }
   })
 
