@@ -252,6 +252,7 @@ const tabs = ref<any>([
   'клиенты',
   'лендинг',
   'тарифные планы',
+  'вывод с баланса',
 ])
 
 async function saveUser() {

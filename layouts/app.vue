@@ -236,6 +236,15 @@ function closeOverlay() {
           title="Запросы направлений"
           href="/serviceRequests"
         />
+        <SidebarItem
+          v-if="
+            store.client.mainAdmin ||
+            store.client.tabs.includes('вывод с баланса')
+          "
+          icon="ph:hand-withdraw"
+          title="Вывод с баланса"
+          href="/balanceWithdraw"
+        />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between w-full items-center p-0 m-0">
