@@ -100,6 +100,7 @@ function getStatusText(status: string) {
             <th>Номер</th>
             <th>Почта</th>
             <th>Сумма к выводу</th>
+            <th>ИНН/Карта</th>
             <th>Дата заявки</th>
             <th>Дата исполнения</th>
             <th>Статус</th>
@@ -122,6 +123,12 @@ function getStatusText(status: string) {
               {{ info.userEmail }}
             </th>
             <th style="max-width: 80px; min-width: 70px">{{ info.amount }}</th>
+            <th
+              style="max-width: 80px; min-width: 70px"
+              class="overflow-x-auto"
+            >
+              {{ info.type == 'INN' ? 'ИНН: ' : 'Карта: ' }} {{ info.info }}
+            </th>
             <th style="max-width: 80px; min-width: 70px">
               {{ info.date ? info.date.slice(0, 10) : '' }}
             </th>
@@ -150,7 +157,6 @@ function getStatusText(status: string) {
       :selectedWithdraw="selectedWithdraw"
       @getData="getData"
     />
-    {{ selectedWithdraw._id }}
   </div>
 </template>
 <style scoped>
