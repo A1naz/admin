@@ -117,22 +117,33 @@ function getStatusText(status: string) {
               {{ info.userPhoneNumber }}
             </th>
             <th
-              style="max-width: 80px; min-width: 70px"
+              style="max-width: 180px; min-width: 70px"
               class="overflow-x-auto"
             >
               {{ info.userEmail }}
             </th>
-            <th style="max-width: 80px; min-width: 70px">{{ info.amount }}</th>
+            <th style="max-width: 40px; min-width: 40px">{{ info.amount }}</th>
             <th
-              style="max-width: 80px; min-width: 70px"
+              style="max-width: 180px; min-width: 70px"
               class="overflow-x-auto"
             >
-              {{ info.type == 'INN' ? 'ИНН: ' : 'Карта: ' }} {{ info.info }}
+              <p class="whitespace-nowrap">
+                {{ info.type == 'INN' ? 'ИНН: ' : 'Карта: ' }} {{ info.info }}
+              </p>
               <p>БИК: {{ info.cardInfo ? info.cardInfo.BIK : '' }}</p>
               <p>Р/С: {{ info.cardInfo ? info.cardInfo.RS : '' }}</p>
               <p>К/С: {{ info.cardInfo ? info.cardInfo.CS : '' }}</p>
+              <p class="whitespace-nowrap">
+                Банк: {{ info.cardInfo ? info.cardInfo.bankName : '' }}
+              </p>
+              <p class="whitespace-nowrap" v-if="info.type == 'INN'">
+                Организация: {{ info.cardInfo ? info.cardInfo.orgName : '' }}
+              </p>
+              <p v-if="info.type == 'card'" class="whitespace-nowrap">
+                ФИО: {{ info.cardInfo ? info.cardInfo.FIO : '' }}
+              </p>
             </th>
-            <th style="max-width: 80px; min-width: 70px">
+            <th style="max-width: 40px; min-width: 40px">
               {{ info.date ? info.date.slice(0, 10) : '' }}
             </th>
             <th style="max-width: 80px; min-width: 70px">
