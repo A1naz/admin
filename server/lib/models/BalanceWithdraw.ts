@@ -13,6 +13,7 @@ const Model = new Schema({
   confirmationDate: { type: Date, required: false },
   type: { type: String, required: true, enum: ['INN', 'card'] },
   info: { type: String, required: false },
+  cardInfo: { type: Object, required: false },
 })
 
 // PartnerWithdrawModel.pre('save', function (next) {

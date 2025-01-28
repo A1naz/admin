@@ -128,6 +128,9 @@ function getStatusText(status: string) {
               class="overflow-x-auto"
             >
               {{ info.type == 'INN' ? 'ИНН: ' : 'Карта: ' }} {{ info.info }}
+              <p>БИК: {{ info.cardInfo ? info.cardInfo.BIK : '' }}</p>
+              <p>Р/С: {{ info.cardInfo ? info.cardInfo.RS : '' }}</p>
+              <p>К/С: {{ info.cardInfo ? info.cardInfo.CS : '' }}</p>
             </th>
             <th style="max-width: 80px; min-width: 70px">
               {{ info.date ? info.date.slice(0, 10) : '' }}
