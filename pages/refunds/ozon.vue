@@ -222,17 +222,17 @@ function openFileInput(screenType: string = 'dialog') {
 
 async function createRefundRequest() {
   isCreateButtonDisabled.value = true
-  if (
-    screenshot.value.public === 'null' ||
-    accountScreenshot.value.public === 'null'
-  ) {
-    notify({
-      type: 'error',
-      title: 'Необходимо загрузить скриншоты',
-    })
-    isCreateButtonDisabled.value = false
-    return
-  }
+  // if (
+  //   screenshot.value.public === 'null' ||
+  //   accountScreenshot.value.public === 'null'
+  // ) {
+  //   notify({
+  //     type: 'error',
+  //     title: 'Необходимо загрузить скриншоты',
+  //   })
+  //   isCreateButtonDisabled.value = false
+  //   return
+  // }
 
   if (
     !selectedOperationMongoId.value ||
@@ -480,8 +480,8 @@ function changeMP(event: any) {
           </th>
           <th>подтверждение</th>
           <th>комментарий отмены</th>
-          <th class="text-center">скриншот запроса</th>
-          <th class="text-center">скриншот аккаунта</th>
+          <!-- <th class="text-center">скриншот запроса</th>
+          <th class="text-center">скриншот аккаунта</th> -->
         </tr>
       </thead>
       <tbody>
@@ -542,7 +542,7 @@ function changeMP(event: any) {
               {{ stat.cancelationComment }}
             </div>
           </th>
-          <th>
+          <!-- <th>
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>
                 <img
@@ -554,8 +554,8 @@ function changeMP(event: any) {
                 />
               </div>
             </div>
-          </th>
-          <th>
+          </th> -->
+          <!-- <th>
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div>
                 <img
@@ -569,7 +569,7 @@ function changeMP(event: any) {
                 />
               </div>
             </div>
-          </th>
+          </th> -->
         </tr>
       </tbody>
     </table>
@@ -684,7 +684,7 @@ function changeMP(event: any) {
           class="input input-bordered input-l mb-2 w-full"
         />
       </div>
-      <div class="flex flex-col justify-center gap-2">
+      <!-- <div class="flex flex-col justify-center gap-2">
         <div>
           <div class="text-center font-bold mt-1 mb-3">
             Скриншот запроса клиента
@@ -765,7 +765,7 @@ function changeMP(event: any) {
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <ClientOnly>
         <div>
