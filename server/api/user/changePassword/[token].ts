@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { User } from '@/server/lib/models/User'
 
 export default eventHandler(async (event) => {

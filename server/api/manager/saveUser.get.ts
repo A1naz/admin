@@ -2,7 +2,7 @@
 import { User } from '~/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { v4 as unicalUuid } from 'uuid'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 import speakeasy from 'speakeasy'
 import qrcode from 'qrcode'

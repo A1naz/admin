@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 import validator from 'validator'
 import { getServerSession } from '#auth'

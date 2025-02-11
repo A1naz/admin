@@ -1,5 +1,5 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 import { checkSignature } from '~~/server/lib/telegram/mod'
 import { AdminUser } from '~/server/lib/models/AdminUser'
@@ -133,7 +133,7 @@ export default NuxtAuthHandler({
         const { email, password, code } = credentials
         if (!email || !password) return null
 
-        if (runtimeConfig.env === 'developer') {
+        if (runtimeConfig.env === 'developer1') {
           const user = await AdminUser.findOne({ email })
 
           if (!user) return null
@@ -146,10 +146,10 @@ export default NuxtAuthHandler({
         if (!user || user.roles.length <= 1) {
           throw new Error('User not found')
         }
-        if (runtimeConfig.env === 'developer') return user
+        if (runtimeConfig.env === 'developer1') return user
         if (!user.password) throw new Error('Password not set')
 
-        const isValid = await bcrypt.compare(password, user.password)
+        const isValid = await bcrypt.compareSync(password, user.password)
 
         if (!isValid) throw new Error('Invalid password')
 
