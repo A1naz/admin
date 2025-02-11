@@ -101,7 +101,6 @@ export default defineNuxtConfig({
     '@nuxtjs/fontaine',
     '@sfxcode/nuxt-primevue',
     '@nuxtjs/robots',
-    '@morev/vue-transitions/nuxt',
     '@sidebase/nuxt-pdf',
     '@artmizu/yandex-metrika-nuxt',
   ],

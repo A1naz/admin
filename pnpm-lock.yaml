@@ -20,9 +20,6 @@ importers:
       '@kyvg/vue3-notification':
         specifier: ^2.9.1
         version: 2.9.1(vue@3.3.4)
-      '@morev/vue-transitions':
-        specifier: ^2.3.6
-        version: 2.3.6(rollup@3.28.1)(vue@3.3.4)
       '@next-auth/mongodb-adapter':
         specifier: ^1.1.3
         version: 1.1.3(mongodb@5.8.1)(next-auth@4.22.5(next@13.4.19(@babel/core@7.22.15)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.66.1))(nodemailer@6.9.4)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))
@@ -1770,15 +1767,6 @@ packages:
 
   '@mongodb-js/saslprep@1.1.0':
     resolution: {integrity: sha512-Xfijy7HvfzzqiOAhAepF4SGN5e9leLkMvg/OPOF97XemjfVCYN/oWa75wnkc6mltMSTwY+XlbhWgUOJmkFspSw==}
-
-  '@morev/utils@2.6.0':
-    resolution: {integrity: sha512-i6ohZx87tOUMVRaG1HgWKp189uERCNafaJUz5TRuAw/ybrg9+fTEHz/esQZzT3OeemY8J9fiI8/EAGCqAZWbJA==}
-
-  '@morev/vue-transitions@2.3.6':
-    resolution: {integrity: sha512-a6nOExEDVHD11wjpX5r/PJf8u9ziSwrlp16SaNJl2Gyehp6UlEkFx0aZJNZhSWnn7gOaQFzJvIqfx82p9tzqxA==}
-    hasBin: true
-    peerDependencies:
-      vue: ^2.6.14 || >=3
 
   '@netlify/functions@2.0.2':
     resolution: {integrity: sha512-goWRtaIPUK/q47qLYtfGGj7HgJIRaT0snw7zZ0yeoNTfQfCRwQwvRrMAsXkCsCtq2N2Oo81L26SpkMxEQMk9hg==}
@@ -4645,19 +4633,12 @@ packages:
     resolution: {integrity: sha512-11Ndz7Nv+mvAC1j0ktTa7fAb0vLyGGX+rMHNBYQviQDGU0Hw7lhctJANqbPhu9nV9/izT/IntTgZ7Im/9LJs9g==}
     engines: {'0': node >=0.6.0}
 
-  fast-copy@3.0.1:
-    resolution: {integrity: sha512-Knr7NOtK3HWRYGtHoJrjkaWepqT8thIVGAwt0p0aUs1zqkAzXZV4vo9fFNwyb5fcqK1GKYFYxldQdIDVKhUAfA==}
-
   fast-csv@4.3.6:
     resolution: {integrity: sha512-2RNSpuwwsJGP0frGsOmTb9oUF+VkFSM4SyLTDgwf2ciHWTarN0lQTC+F2f/t5J9QjW+c65VFIAAu85GsvMIusw==}
     engines: {node: '>=10.0.0'}
 
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
-
-  fast-equals@5.0.1:
-    resolution: {integrity: sha512-WF1Wi8PwwSY7/6Kx0vKXtw8RwuSGoM1bvDaJbu7MxDlR1vovZjIAKrnzyrThgAjm6JDTu0fVgWXDlMGspodfoQ==}
-    engines: {node: '>=6.0.0'}
 
   fast-fifo@1.3.2:
     resolution: {integrity: sha512-/d9sfos4yxzpwkDkuN7k2SqFKtYNmCTzgfEpz82x34IM9/zc8KGxQoXg1liNC/izpRM/MBdt44Nmx41ZWqk+FQ==}
@@ -8551,10 +8532,6 @@ packages:
     resolution: {integrity: sha512-tLq3bSNx+xSpwvAJnzrK0Ep5CLNWjvFTOp71URMaAEWBfRb9nnJiBoUe0tF8bI4ZFO3omgBR6NvnbzVUT3Ly4g==}
     engines: {node: '>=14.16'}
 
-  type-fest@4.3.1:
-    resolution: {integrity: sha512-pphNW/msgOUSkJbH58x8sqpq8uQj6b0ZKGxEsLKMUnGorRcDjrUaLS+39+/ub41JNTwrrMyJcUB8+YZs3mbwqw==}
-    engines: {node: '>=16'}
-
   type-is@1.6.18:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}
     engines: {node: '>= 0.6'}
@@ -11593,22 +11570,6 @@ snapshots:
     dependencies:
       sparse-bitfield: 3.0.3
     optional: true
-
-  '@morev/utils@2.6.0':
-    dependencies:
-      fast-copy: 3.0.1
-      fast-equals: 5.0.1
-      ohash: 1.1.3
-      type-fest: 4.3.1
-
-  '@morev/vue-transitions@2.3.6(rollup@3.28.1)(vue@3.3.4)':
-    dependencies:
-      '@morev/utils': 2.6.0
-      '@nuxt/kit': 3.7.1(rollup@3.28.1)
-      vue: 3.3.4
-    transitivePeerDependencies:
-      - rollup
-      - supports-color
 
   '@netlify/functions@2.0.2':
     dependencies:
@@ -15505,16 +15466,12 @@ snapshots:
 
   extsprintf@1.3.0: {}
 
-  fast-copy@3.0.1: {}
-
   fast-csv@4.3.6:
     dependencies:
       '@fast-csv/format': 4.3.5
       '@fast-csv/parse': 4.3.6
 
   fast-deep-equal@3.1.3: {}
-
-  fast-equals@5.0.1: {}
 
   fast-fifo@1.3.2: {}
 
@@ -16658,10 +16615,7 @@ snapshots:
       pretty-format: 25.5.0
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - utf-8-validate
 
   jest-leak-detector@25.5.0:
     dependencies:
@@ -20244,8 +20198,6 @@ snapshots:
   type-fest@2.19.0: {}
 
   type-fest@3.13.1: {}
-
-  type-fest@4.3.1: {}
 
   type-is@1.6.18:
     dependencies:
