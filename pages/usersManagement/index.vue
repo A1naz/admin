@@ -341,12 +341,7 @@ function changeMP(event: any) {
         </select>
       </div>
       <button class="ml-2 btn max-w-xl w-xl" @click="openUsersSelectModal">
-        <!-- {{
-          selectedUser.username == ''
-            ? 'Выбрать пользователя'
-            : selectedUser.username
-        }} -->
-        +
+        {{ selectedUser.username == '' ? '+' : selectedUser.username }}
       </button>
       <!-- 
       <select
