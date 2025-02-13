@@ -20,6 +20,7 @@ const acts = ref<any>([])
 const actsCount = ref(0)
 const selectAdminUserClose: any = ref(null)
 const dateRange = ref([])
+const selectedMP = ref('wildberries')
 const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 const selectedAdminUser: any = ref({
   username: '',
@@ -40,20 +41,23 @@ function selectAdminUser(user: any) {
 
 async function getActs() {
   dataLoading.value = true
-  const { data }: any = await useFetch('/api/refundAndDelay/get', {
-    method: 'GET',
-    params: {
-      watch: false,
-      page: curPage.value,
-      sortDate: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
-      userId:
-        selectedAdminUser.value.username.length > 0
-          ? selectedAdminUser.value._id
-          : null,
-      serviceId: serviceId.value === '' ? null : serviceId.value,
-      dateRange: statusOption === 'all' ? null : statusOption.value,
-    },
-  })
+  const { data }: any = await useFetch(
+    `/api/refundAndDelay/${selectedMP.value}/get`,
+    {
+      method: 'GET',
+      params: {
+        watch: false,
+        page: curPage.value,
+        sortDate: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
+        userId:
+          selectedAdminUser.value.username.length > 0
+            ? selectedAdminUser.value._id
+            : null,
+        serviceId: serviceId.value === '' ? null : serviceId.value,
+        dateRange: statusOption === 'all' ? null : statusOption.value,
+      },
+    }
+  )
   if (data.value) {
     actsCount.value = data.value.count
     acts.value = data.value.acts
@@ -134,6 +138,11 @@ function changeMP(event: any) {
   }
 }
 
+function openRefund(act: any) {
+  const mp = selectedMP.value == 'wildberries' ? '' : selectedMP.value + '/'
+  navigateTo(`/refunds/${mp}?username=${act.username}&actUuid=${act.uuid}`)
+}
+
 await getActs()
 </script>
 <template>
@@ -191,6 +200,14 @@ await getActs()
           class="input input-bordered input-l ml-4"
           @input="getActs"
         />
+        <select
+          class="select select-bordered w-50 ml-3"
+          @change="getActs"
+          v-model="selectedMP"
+        >
+          <option value="wildberries" selected>Wildberries</option>
+          <option value="ozon">Ozon</option>
+        </select>
         <button class="btn btn-primary ml-3" @click="getActs">Применить</button>
       </div>
       <div class="flex gap-3">
@@ -240,6 +257,7 @@ await getActs()
             <th>Дата выкупа</th>
             <th>Дата отмены</th>
             <th>Дата обновления</th>
+            <th>Перейти</th>
           </tr>
         </thead>
         <tbody v-if="!dataLoading">
@@ -282,6 +300,14 @@ await getActs()
               class="overflow-x-auto"
             >
               {{ $dayjs(act.updatedAt).format('DD.MM.YYYY HH:mm') }}
+            </th>
+            <th
+              style="max-width: 60px; min-width: 40px"
+              class="overflow-x-auto"
+            >
+              <button class="btn btn-neutral" @click="openRefund(act)">
+                Создать
+              </button>
             </th>
           </tr>
         </tbody>
@@ -403,7 +429,6 @@ await getActs()
             </tbody>
           </table>
         </div>
-
         <div class="modal-action"></div>
       </div>
     </div>

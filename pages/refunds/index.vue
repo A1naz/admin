@@ -16,6 +16,7 @@ if (
 
 const currency = useCurrency()
 
+const params = useRoute().query
 const isModalOpen = ref(false)
 const { height, width } = useWindowSize()
 const { upload, getPublicUrl } = useS3Object()
@@ -318,6 +319,7 @@ async function selectOperation(
   operationMongoId: string,
   tabOption: string
 ) {
+  console.log(operationId, operationMongoId, tabOption)
   selectedTabOption.value = tabOption
   selectedOperation.value = operationId
   selectedOperationMongoId.value = operationMongoId
@@ -346,6 +348,37 @@ function changeMP(event: any) {
     navigateTo('/refunds/' + event.target.value)
   }
 }
+
+onMounted(async () => {
+  if (params && params.username && params.actUuid) {
+    const { data, error }: any = await useFetch(
+      '/api/refunds/wildberries/getInfo',
+      {
+        method: 'GET',
+        params: {
+          actUuid: params.actUuid,
+        },
+        watch: false,
+      }
+    )
+    if (error.value) {
+      notify({
+        type: 'error',
+        title: error.value.data.message,
+      })
+    } else if (data.value) {
+      if (data.value) {
+        selectedUser.value = data.value.user
+        await selectOperation(
+          data.value.buyout.operationId,
+          data.value.buyout.operationMongoId,
+          'buyouts'
+        )
+        closeCreateModalButton.value.click()
+      }
+    }
+  }
+})
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">
@@ -822,7 +855,7 @@ function changeMP(event: any) {
       :refundType="refundType"
     />
   </div>
-
+  {{ selectedOperation }}
   <!-- Put this part before </body> tag -->
 </template>
 <style scoped>
