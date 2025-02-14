@@ -38,6 +38,7 @@ const pages = ref(0)
 const isPageBtnsDisabled = ref(false)
 const selectedUsers = ref<any>([])
 const dateRange = ref([])
+const dateRangeExport = ref([])
 const selectedMP = ref('all')
 
 const search = (event: any) => {
@@ -57,7 +58,8 @@ async function exportXLS() {
         clients: selectedUsers.value.length > 0 ? selectedUsers.value : null,
         typeoperations: type.value,
         type: service.value,
-        dateRange: dateRange.value.length > 0 ? dateRange.value : null,
+        dateRange:
+          dateRangeExport.value.length > 0 ? dateRangeExport.value : null,
       },
     },
     watch: false,
@@ -318,13 +320,51 @@ if (
           {{ mp.title }}
         </option>
       </select>
-      <button
+
+      <div class="flex gap-1">
+        <DateRangePicker
+          class="w-46 -mt-1"
+          v-model="dateRangeExport"
+          :start-date="startDate"
+          @reset="dateRangeExport = []"
+        >
+          <button
+            class="btn btn-primary text-white ml-1 border-primary mt-1 border-[1px] rounded-[6px]"
+          >
+            <Icon name="solar:calendar-linear" class="-mt-1" size="22px" />
+          </button>
+        </DateRangePicker>
+        <button
+          v-if="dateRangeExport.length"
+          @click="dateRangeExport = []"
+          class="btn btn-square flex flex-shrink btn-primary font-medium rounded-lg relative group"
+        >
+          <div class="flex items-center justify-center text-white">
+            <Icon name="material-symbols:close-rounded" size="22px" />
+          </div>
+        </button>
+        <button
+          :disabled="isExportBtnDisabled"
+          @click="exportXLS"
+          class="btn flex flex-shrink btn-primary hover:text-black active:text-white font-medium rounded-lg relative group"
+        >
+          <div class="flex items-center justify-center">
+            <Icon
+              v-if="!isExportBtnDisabled"
+              name="lucide:download"
+              size="22px"
+            />
+            <span v-else class="loading loading-spinner" />
+          </div>
+        </button>
+      </div>
+      <!-- <button
         class="btn btn-primary ml-2"
         @click="exportXLS"
         :disabled="isExportBtnDisabled"
       >
         EXL
-      </button>
+      </button> -->
     </div>
     <div v-if="service == 'buyouts'" class="mt-2">
       <label
