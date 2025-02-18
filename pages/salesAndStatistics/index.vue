@@ -262,6 +262,7 @@ if (
         <option value="deposit">Депозит</option>
         <option value="buyouts">Выкуп</option>
         <option value="buyouts service">Услуга выкупа</option>
+        <option value="allBuyouts">Выкуп + Услуга выкупа</option>
         <option value="review">Отзыв</option>
         <option value="questions">Вопрос</option>
         <option value="cart">Корзина</option>
