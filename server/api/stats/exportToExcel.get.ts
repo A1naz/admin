@@ -138,6 +138,12 @@ export default eventHandler(async (event) => {
       font: { bold: true },
     },
     {
+      header: 'услуга',
+      key: 'serviceName',
+      width: 16,
+      font: { bold: true },
+    },
+    {
       header: 'базис',
       key: 'basisoperation',
       width: 60,

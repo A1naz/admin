@@ -1,5 +1,6 @@
 import { paymenthistory } from "~/server/lib/models/Paymenthistory"
 import { User } from "~/server/lib/models/User"
+import getServiceName from "./getServiceName"
 
 export default async function (trueFilters: any, mp: string, skip: number, limit: number) {
 
@@ -43,6 +44,7 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
                         basisoperation: item.basisoperation,
                         comment: item.comment,
                         dataoperation: item.dataoperation,
+                        serviceName: getServiceName(item.type)
 
                 })
         }

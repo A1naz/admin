@@ -4,6 +4,7 @@ import { Buyout as YandexMarketBuyout } from '~/server/lib/models/yandexMarket/B
 import { Buyout as AvitoBuyout } from '~/server/lib/models/avito/Buyout'
 import { paymenthistory } from "~/server/lib/models/Paymenthistory"
 import { User } from "~/server/lib/models/User"
+import getServiceName from "./getServiceName"
 
 export default async function (trueFilters: any, mp: string, skip: number, limit: number) {
 
@@ -93,6 +94,7 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
                                 dataoperation: item.dataoperation,
                                 productName: buyout ? buyout.product.name : '',
                                 article: buyout ? buyout.article : '',
+                                serviceName: getServiceName(item.type)
                         })
 
                 } else {
@@ -110,6 +112,7 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
                                 dataoperation: item.dataoperation,
                                 productName: '',
                                 article: '',
+                                serviceName: getServiceName(item.type)
                         })
                 }
         }
