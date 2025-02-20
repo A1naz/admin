@@ -39,6 +39,7 @@ export default eventHandler(async (event) => {
                         _id: foundUser._id,
                         uuid: foundUser.uuid,
                         username: foundUser.username,
+                        phoneNumber: foundUser.phoneNumber
                 },
                 buyout: {
                         operationId: foundBuyout.uuid,

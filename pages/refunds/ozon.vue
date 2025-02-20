@@ -385,6 +385,7 @@ onMounted(async () => {
     } else if (data.value) {
       if (data.value) {
         selectedUser.value = data.value.user
+        phoneNumber.value = data.value.user.phoneNumber
         await selectOperation(
           data.value.buyout.operationId,
           data.value.buyout.operationMongoId,
