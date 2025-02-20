@@ -1,4 +1,4 @@
-﻿import { Referral } from '~/server/lib/models/Referral'
+﻿import { HarmexReferrals } from '~/server/lib/models/HarmexReferrals'
 import { User } from '~/server/lib/models/User'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { getServerSession } from '#auth'
@@ -17,7 +17,7 @@ export default eventHandler(async (event) => {
 
   const { userId, page, sortType, sort, searchValue }: any = getQuery(event)
 
-  const ref = await Referral.findOne({ user: new ObjectId(userId) })
+  const ref = await HarmexReferrals.findOne({ user: new ObjectId(userId) })
 
   if (!ref) {
     return []

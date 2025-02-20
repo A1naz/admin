@@ -1,5 +1,5 @@
 ﻿import { AdminUser } from '~/server/lib/models/AdminUser'
-import { Referral } from '~/server/lib/models/Referral'
+import { HarmexReferrals } from '~/server/lib/models/HarmexReferrals'
 import { User } from '~/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
@@ -22,7 +22,7 @@ export default eventHandler(async (event) => {
     })
   }
 
-  const foundReferral = await Referral.findOne({
+  const foundReferral = await HarmexReferrals.findOne({
     'referrals.user': foundUser._id,
   })
 
@@ -41,12 +41,12 @@ export default eventHandler(async (event) => {
     const refCount = inviter?.partner.refCount ?? 0
     inviter.partner.refCount = refCount + 1
 
-    const referralFound = await Referral.findOne({ user: inviter })
+    const referralFound = await HarmexReferrals.findOne({ user: inviter })
     if (referralFound) {
       referralFound.referrals.push({ user: foundUser._id, date: new Date() })
       await referralFound.save()
     } else {
-      await Referral.create({
+      await HarmexReferrals.create({
         user: inviter,
         referrals: [{ user: foundUser._id, date: new Date() }],
       })

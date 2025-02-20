@@ -1,7 +1,7 @@
 ﻿import { PartnerPaymentHistory } from '~/server/lib/models/PartnerPaymentHistory'
 import { User } from '@/server/lib/models/User'
 import { AdminUser } from '~/server/lib/models/AdminUser'
-import { Referral } from '~/server/lib/models/Referral'
+import { HarmexReferrals } from '~/server/lib/models/HarmexReferrals'
 import { getServerSession } from '#auth'
 
 export default eventHandler(async (event) => {
@@ -13,7 +13,7 @@ export default eventHandler(async (event) => {
 
   const { userId } = getQuery(event)
   const inviterUser: any = await User.findOne({ uuid: userId })
-  const inviter = await Referral.findOne({user: inviterUser._id})
+  const inviter = await HarmexReferrals.findOne({user: inviterUser._id})
   const ids = inviter?.referrals.map((ref: any) => ref.user)
   const users = await User.find({ _id: { $in: ids } })
 

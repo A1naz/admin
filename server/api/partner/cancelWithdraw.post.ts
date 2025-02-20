@@ -1,5 +1,5 @@
 ﻿import { AdminUser } from '~/server/lib/models/AdminUser'
-import { Referral } from '~/server/lib/models/Referral'
+import { HarmexReferrals } from '~/server/lib/models/HarmexReferrals'
 import { User } from '~/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
