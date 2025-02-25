@@ -35,7 +35,7 @@ export default eventHandler(async (event) => {
         { type: trueFilters.type }
 
 
-  console.log(trueType)
+        console.log(trueFilters)
   const allData: any[] = []
 
   const dataCount = await paymenthistory.countDocuments({
@@ -53,7 +53,6 @@ export default eventHandler(async (event) => {
   }
   ).limit(500000)
 
-  console.log(dataCount)
   if (!dataCount) throw new Error('Нет данных')
 
   for (let i = 0; i < Math.ceil(dataCount / limit); i++) {
@@ -67,6 +66,7 @@ export default eventHandler(async (event) => {
           limit * i,
           limit,
         )
+
 
       } else if (trueFilters.type == 'allBuyouts') {
 
@@ -150,9 +150,9 @@ export default eventHandler(async (event) => {
       font: { bold: true },
     },
     {
-      header: 'комментарии',
+      header: 'комментарий',
       key: 'comment',
-      width: 28,
+      width: 58,
       font: { bold: true },
     },
     {
@@ -162,6 +162,8 @@ export default eventHandler(async (event) => {
       font: { bold: true },
     },
   ]
+
+
 
   if (trueFilters.type == 'buyouts' || trueFilters.type == 'any' || trueFilters.type == 'allBuyouts') {
     columns.splice(8, 0, {

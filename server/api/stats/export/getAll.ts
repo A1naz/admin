@@ -8,7 +8,11 @@ import getServiceName from "./getServiceName"
 
 export default async function (trueFilters: any, mp: string, skip: number, limit: number) {
 
+        const type = { ...trueFilters.typeoperations == 'any' ? {} : { typeoperations: trueFilters.typeoperations }, }
+        console.log(type)
+
         const history = await paymenthistory.find({
+                ...trueFilters.typeoperations == 'any' ? {} : { typeoperations: trueFilters.typeoperations },
                 user: trueFilters.clients && trueFilters.clients.length ?
                         {
                                 $in: trueFilters.clients
@@ -18,8 +22,10 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
                                 $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
                                 $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
                         } : { $exists: true },
-                mp: mp === 'all' ? { $exists: true } : mp
+                ...mp === 'all' ? {} : { mp: mp }
         }).skip(skip).limit(limit)
+
+        console.log(history.length)
 
         const users = await User.find({
                 _id: history.map((item: any) => item.user)

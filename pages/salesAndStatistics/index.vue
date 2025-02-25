@@ -418,6 +418,7 @@ if (
           <th>артикул</th>
           <th>наименование товара</th>
           <th>базис</th>
+          <th>комментарий</th>
           <th>
             <div @click="sortByDate" class="flex cursor-pointer">
               Дата операции
@@ -461,6 +462,9 @@ if (
           </th>
           <th style="max-width: 160px" class="overflow-x-auto text-xs">
             {{ stat.basisoperation }}
+          </th>
+          <th style="max-width: 160px" class="overflow-x-auto text-xs">
+            {{ stat.comment }}
           </th>
           <th
             style="max-width: 15px; min-width: 10px"

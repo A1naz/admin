@@ -18,9 +18,6 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
                 ...(mp === 'all' ? {} : { mp: mp }),
         }).skip(skip).limit(limit)
 
-
-        console.log(history.length)
-
         const users = await User.find({
                 _id: history.map((item: any) => item.user)
         }).select(
@@ -33,6 +30,7 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
         for (const item of history) {
 
                 const foundUser = users.find(user => user._id.valueOf() === item.user.valueOf())
+          
                 format.push({
                         _id: item._id,
                         userUuid: foundUser ? foundUser.uuid : '',
@@ -48,8 +46,6 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
 
                 })
         }
-
-
 
         return format
 }
