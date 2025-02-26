@@ -1,6 +1,7 @@
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { Buyout } from '~/server/lib/models/ozon/Buyout'
+import { Delivery } from "~/server/lib/models/ozon/Delivery"
 import { User } from "~/server/lib/models/User"
 
 export default eventHandler(async (event) => {
@@ -24,6 +25,17 @@ export default eventHandler(async (event) => {
                 })
 
         }
+
+        const foundDelivery = await Delivery.findOne({ uuidbuyout: actUuid })
+
+
+        if (!foundDelivery) {
+                throw createError({
+                        statusCode: 404,
+                        message: 'Доставка не найдена',
+                })
+        }
+        
         const foundUser = await User.findById(foundBuyout.user)
 
 
@@ -34,12 +46,13 @@ export default eventHandler(async (event) => {
                 })
         }
 
+
         return {
                 user: {
                         _id: foundUser._id,
                         uuid: foundUser.uuid,
                         username: foundUser.username,
-                        phoneNumber: foundUser.phoneNumber
+                        phoneNumber: foundDelivery.recipientphone
                 },
                 buyout: {
                         operationId: foundBuyout.uuid,

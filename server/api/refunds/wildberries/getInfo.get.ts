@@ -1,6 +1,7 @@
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { Buyout } from '~/server/lib/models/Buyout'
+import { Delivery } from "~/server/lib/models/Delivery"
 import { User } from "~/server/lib/models/User"
 
 export default eventHandler(async (event) => {
@@ -16,16 +17,24 @@ export default eventHandler(async (event) => {
         const { actUuid }: any = getQuery(event)
 
         const foundBuyout = await Buyout.findOne({ uuid: actUuid })
-
+        
         if (!foundBuyout) {
                 throw createError({
                         statusCode: 404,
                         message: 'Услуга не найдена',
                 })
-
+                
         }
+
+        const foundDelivery = await Delivery.findOne({ uuidbuyout: actUuid })
         const foundUser = await User.findById(foundBuyout.user)
 
+        if (!foundDelivery) {
+                throw createError({
+                        statusCode: 404,
+                        message: 'Доставка не найдена',
+                })
+        }
 
         if (!foundUser) {
                 throw createError({
@@ -39,7 +48,7 @@ export default eventHandler(async (event) => {
                         _id: foundUser._id,
                         uuid: foundUser.uuid,
                         username: foundUser.username,
-                        phoneNumber: foundUser.phoneNumber
+                        phoneNumber: foundDelivery.recipientphone
                 },
                 buyout: {
                         operationId: foundBuyout.uuid,
