@@ -1,5 +1,65 @@
 {
   "nuxt.isNuxtApp": false,
-  "editor.fontFamily": "Input Mono",
-  "editor.occurrencesHighlight": "singleFile"
+  "editor.fastScrollSensitivity": 3,
+  "editor.mouseWheelScrollSensitivity": 4,
+  "terminal.integrated.stickyScroll.maxLineCount": 5,
+  "terminal.integrated.fastScrollSensitivity": 5,
+  "terminal.integrated.smoothScrolling": true,
+  "editor.fontFamily": "Fira Code, Consolas, 'Courier New', monospace",
+  "window.zoomLevel": 0.7,
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  // Disable the default formatter, use eslint instead
+  "editor.formatOnSave": false,
+  "editor.parameterHints.enabled": false,
+  
+  // Auto fix
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
+
+  // Silent the stylistic rules in you IDE, but still auto fix them
+  "eslint.rules.customizations": [
+    { "rule": "style/*", "severity": "off", "fixable": true },
+    { "rule": "format/*", "severity": "off", "fixable": true },
+    { "rule": "*-indent", "severity": "off", "fixable": true },
+    { "rule": "*-spacing", "severity": "off", "fixable": true },
+    { "rule": "*-spaces", "severity": "off", "fixable": true },
+    { "rule": "*-order", "severity": "off", "fixable": true },
+    { "rule": "*-dangle", "severity": "off", "fixable": true },
+    { "rule": "*-newline", "severity": "off", "fixable": true },
+    { "rule": "*quotes", "severity": "off", "fixable": true },
+    { "rule": "*semi", "severity": "off", "fixable": true }
+  ],
+
+  // Enable eslint for all supported languages
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue",
+    "html",
+    "markdown",
+    "json",
+    "jsonc",
+    "yaml",
+    "toml",
+    "xml",
+    "gql",
+    "graphql",
+    "astro",
+    "css",
+    "less",
+    "scss",
+    "pcss",
+    "postcss"
+  ],
+  "editor.codeLensFontFamily": "Fira Code, Consolas, 'Courier New', monospace",
+  "editor.lineHeight": 2.5,
+  "editor.fontSize": 13,
+  "editor.codeLensFontSize": 12,
+  "debug.console.fontSize": 12,
+  "terminal.integrated.fontSize": 12,
+  "terminal.integrated.shellIntegration.history": 100,
 }

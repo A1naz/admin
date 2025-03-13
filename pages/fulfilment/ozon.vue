@@ -434,6 +434,9 @@ async function deleteAllPVZs() {
         @useTemplate="(pvzs: any) => useTemplate(pvzs)"
         @deleteTemplate="(uuid: string) => deleteTemplate(uuid)"
       />
+      <div class="text-[17px] mt-3 ml-1">
+        Кол-во пвз {{ userPvzs.length }} шт
+      </div>
     </div>
     <div
       class="my-2 mx-2 overflow-y-auto"
