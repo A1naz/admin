@@ -227,6 +227,7 @@ function closeOverlay() {
           title="Клиенты"
           href="/clientsInfo"
         />
+      
         <SidebarItem
           v-if="
             store.client.mainAdmin ||
@@ -244,6 +245,12 @@ function closeOverlay() {
           icon="ph:hand-withdraw"
           title="Вывод с баланса"
           href="/balanceWithdraw"
+        />
+        <SidebarItem
+          v-if="store.client.mainAdmin || store.client.tabs.includes('ручные уведомления')"
+          icon="iconamoon:notification-bold"
+          title="Ручные уведмоления"
+          href="/handleNotifications"
         />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">

@@ -14,6 +14,10 @@ const props = defineProps({
     type: Date || Number,
     default: null,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 const { $dayjs } = useNuxtApp()
 const emit = defineEmits(['update:modelValue'])
@@ -54,6 +58,7 @@ function handleDate(modelData: any) {
       <template #trigger>
         <div class="flex w-full justify-end">
           <button
+            :disabled="disabled"
             :class="{
               'btn-sm': size === 'small',
               'btn-md': size === 'medium',
@@ -70,9 +75,7 @@ function handleDate(modelData: any) {
             <div class="flex justify-between">
               <span>Выбрано:</span>
               <span>
-                {{
-                  $dayjs(internalModelValue).format('DD.MM.YYYY')
-                }}</span
+                {{ $dayjs(internalModelValue).format('DD.MM.YYYY') }}</span
               >
             </div>
           </div>
