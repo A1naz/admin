@@ -31,20 +31,36 @@ async function createNotification() {
   })
   if (error.value) {
     notify({
-      group: 'notifications',
       title: 'Ошибка',
       text: error.value.message,
-      type: 'error',
     })
-  } else {
-    notify({
-      group: 'notifications',
-      title: 'Успех',
-      text: 'Уведомление успешно создано',
-      type: 'success',
-    })
-    emit('update:isModalOpen', false)
+    return
   }
+
+  notify({
+    title: 'Успех',
+    text: 'Уведомление успешно создано',
+  })
+  emit('update:isModalOpen', false)
+}
+async function createNotificationTemplate() {
+  const { data, error } = await useFetch('/api/notifications/createTemplate', {
+    method: 'POST',
+    body: notifactionForm.value,
+    watch: false,
+  })
+  if (error.value) {
+    notify({
+      title: 'Ошибка',
+      text: error.value.message,
+    })
+    return
+  }
+  notify({
+    title: 'Успех',
+    text: 'Шаблон уведомления успешно создано',
+  })
+  emit('update:isModalOpen', false)
 }
 </script>
 <template>
@@ -64,6 +80,9 @@ async function createNotification() {
         </label>
       </form>
       <div class="flex flex-col w-full gap-3">
+        <div>
+          <button class="btn">Шаблоны</button>
+        </div>
         <div>
           <p class="mb-1">Выбрать клиентов</p>
           <div class="w-full">
@@ -128,7 +147,18 @@ async function createNotification() {
         </div>
       </div>
       <div class="modal-action">
-        <button class="btn btn-neutral">Шаблон</button>
+        <button
+          @click="createNotificationTemplate"
+          class="btn btn-neutral"
+          :disabled="
+            !notifactionForm.title ||
+            !notifactionForm.description ||
+            (!notifactionForm.isAllUsersSelected &&
+              notifactionForm.selectedUsers.length === 0)
+          "
+        >
+          Шаблон
+        </button>
         <button class="btn" @click="$emit('update:isModalOpen', false)">
           Отмена
         </button>

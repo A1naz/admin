@@ -1,7 +1,7 @@
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
-import { Notification } from '~/server/lib/models/Notification'
+import { NotificationTemplate } from '~/server/lib/models/NotificationTemplate'
 import { ObjectId } from 'mongodb'
 import { v4 as uuid } from 'uuid'
 
@@ -34,7 +34,7 @@ export default eventHandler(async (event) => {
     date: new Date(),
   })
 
-  await Notification.create({
+  await NotificationTemplate.create({
     text: description,
     category: title,
     admin: user._id,

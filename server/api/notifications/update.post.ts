@@ -18,41 +18,27 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const body = await readBody(event)
-  const {
-    isAllUsersSelected,
-    selectedUsers,
-    title,
-    description,
-    activationDate,
-    isImmediate,
-  } = body
 
   await ActionHistory.create({
     adminUser: user._id,
     actionId: 182,
-    actionDescription: `Админ ${user.uuid} - ${user.username} создал ручное уведомление`,
+    actionDescription: `Админ ${user.uuid} - ${user.username} изменил ручное уведомление`,
     date: new Date(),
   })
 
-  await Notification.create({
-    text: description,
-    category: title,
-    admin: user._id,
-    uuid: uuid(),
-    forAll: isAllUsersSelected,
-    users: isAllUsersSelected
-      ? []
-      : selectedUsers.map((user: any) => new ObjectId(user._id)),
-    isReaded: false,
-    readUser: [],
-    isRemoved: false,
-    removedUser: [],
-    date: new Date(Date.now()),
-    activationDate: isImmediate ? new Date(Date.now()) : activationDate,
-    expireDate: new Date(activationDate).setDate(
-      new Date(activationDate).getDate() + 30
-    ),
-  })
+  await Notification.findOneAndUpdate(
+    {
+      uuid: body.uuid,
+    },
+    {
+      text: body.text,
+      category: body.category,
+      activationDate: body.activationDate,
+      expireDate: new Date(body.activationDate).setDate(
+        new Date(body.activationDate).getDate() + 30
+      ),
+    }
+  )
 
   return {
     status: 'ok',
