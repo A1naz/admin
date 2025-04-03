@@ -28,6 +28,7 @@ const mpStore = useMPStore()
 
 const userBank = ref('Alfabank')
 const userIP = ref('BalashovIP')
+const repaymentType = ref('withoutNDS')
 const operationNumber = ref('')
 const fileInput = ref()
 const inputLoading = ref(false)
@@ -198,6 +199,7 @@ async function createBalanceTransferRequest() {
         clientPC: clientPC.value,
         bank: userBank.value,
         userIP: userIP.value,
+        repaymentType: repaymentType.value,
       },
     }
   )
@@ -341,6 +343,7 @@ function selectUser(user: any) {
           <th>№ операции</th>
           <th>Сумма</th>
           <th>Статус</th>
+          <th>Тип</th>
 
           <th>
             <div @click="sortByDate()" class="flex cursor-pointer">
@@ -377,6 +380,15 @@ function selectUser(user: any) {
                 : stat.status == 'accepted'
                 ? 'завершено'
                 : 'отменено'
+            }}
+          </th>
+          <th>
+            {{
+              stat.type && stat.type == 'WithNDS5'
+                ? 'С НДС 5%'
+                : stat.type && stat.type == 'WithNDS7'
+                ? 'С НДС 7%'
+                : 'Без НДС'
             }}
           </th>
           <th>{{ defaultDate(stat.createdAt) }}</th>
@@ -467,36 +479,31 @@ function selectUser(user: any) {
           />
         </label>
         <label class="w-full">
+          <select
+            v-model="repaymentType"
+            class="select select-bordered w-full mb-1"
+          >
+            <option disabled>Тип пополнения</option>
+            <option value="withoutNDS">Без НДС</option>
+            <option value="WithNDS5">С НДС 5%</option>
+            <option value="WithNDS7">С НДС 7%</option>
+          </select>
+        </label>
+        <label class="w-full">
           <select v-model="userIP" class="select select-bordered w-full mb-1">
             <option disabled>ИП клиента</option>
             <option value="BalashovIP">BalashovIP</option>
             <option value="BalIP">BalIP</option>
-            <option value="FilushovIP">FilushovIP</option>
-            <option value="ZhmotovIP">ZhmotovIP</option>
           </select>
         </label>
         <label class="w-full">
           <select class="select select-bordered w-full mb-1" v-model="userBank">
             <option disabled>Банк клента</option>
-            <option value="Alfabank">Альфа</option>
             <option value="PSB">PSB</option>
             <option value="Sber">Sber</option>
             <option value="TBank">TBank</option>
           </select>
         </label>
-        <!-- 
-        <div class="flex justify-between ml-1 mb-2">
-          <div class="form-control">
-            <label class="cursor-pointer label w-36">
-              <span class="label-text font-bold">Клиент PC</span>
-              <input
-                type="checkbox"
-                class="toggle toggle-primary"
-                v-model="clientPC"
-              />
-            </label>
-          </div>
-        </div> -->
       </div>
 
       <div class="text-center font-bold mt-1 mb-3">

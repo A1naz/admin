@@ -8,6 +8,7 @@ const manualBalanceTransferRequestSchema = new Schema({
   operationNumber: { type: String, required: true },
   userUuid: { type: String, required: true },
   status: { type: String, default: 'created' },
+  type: { type: String, required: false, default: "withoutNDS" },
   acception: { type: String, default: '0/2' },
   screenshot: { type: String, required: true },
   operationDate: { type: String, required: true },

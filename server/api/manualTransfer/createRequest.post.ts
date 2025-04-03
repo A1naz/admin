@@ -27,7 +27,8 @@ export default eventHandler(async (event) => {
     operationDate,
     clientPC,
     bank,
-    userIP
+    userIP,
+    repaymentType,
   } = await readBody(event)
 
   if (!session) return sendRedirect(event, '/auth', 302)
@@ -51,7 +52,13 @@ export default eventHandler(async (event) => {
     user: recipientUser._id,
     userUuid: recipientUser.uuid,
     operationNumber,
-    summ,
+    summ:
+      repaymentType === 'WithNDS5'
+        ? summ * 0.95
+        : repaymentType == 'WithNDS7'
+        ? summ * 0.93
+        : summ,
+    type: repaymentType,
     screenshot,
     acception: '0/2',
     createdAt: mskDate,
@@ -59,7 +66,7 @@ export default eventHandler(async (event) => {
     fullDate: mskDate,
     clientPC,
     bank,
-    userIP
+    userIP,
   })
 
   await ActionHistory.create({
