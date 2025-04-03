@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { notify } from '@kyvg/vue3-notification'
+import notification from '~/plugins/notification'
 const props = defineProps({
   isModalOpen: {
     type: Boolean,
@@ -7,7 +8,8 @@ const props = defineProps({
   },
 })
 
-const usersModal: any = ref(null)
+const templatesModal = ref(false)
+const usersModal = ref(null)
 const emit = defineEmits(['update:isModalOpen'])
 
 const notifactionForm = ref({
@@ -62,6 +64,14 @@ async function createNotificationTemplate() {
   })
   emit('update:isModalOpen', false)
 }
+
+function selectTemplate(template: any) {
+  notifactionForm.value.title = template.category
+  notifactionForm.value.description = template.text
+  notifactionForm.value.selectedUsers = template.users
+  notifactionForm.value.isAllUsersSelected = template.forAll
+  console.log(template)
+}
 </script>
 <template>
   <div
@@ -81,7 +91,7 @@ async function createNotificationTemplate() {
       </form>
       <div class="flex flex-col w-full gap-3">
         <div>
-          <button class="btn">Шаблоны</button>
+          <button class="btn" @click="templatesModal = true">Шаблоны</button>
         </div>
         <div>
           <p class="mb-1">Выбрать клиентов</p>
@@ -121,9 +131,10 @@ async function createNotificationTemplate() {
           placeholder="Название"
           v-model="notifactionForm.title"
         />
-        <input
+        <textarea
           type="text"
-          class="input input-bordered w-full"
+          class="textarea textarea-bordered w-full"
+          style="min-height: 150px;"
           placeholder="Описание"
           v-model="notifactionForm.description"
         />
@@ -180,6 +191,10 @@ async function createNotificationTemplate() {
     <HandleNotificationsManyUsers
       :selectedUsers="notifactionForm.selectedUsers"
       ref="usersModal"
+    />
+    <HandleNotificationsTemplatesModal
+      v-model:state="templatesModal"
+      @selectTemplate="selectTemplate"
     />
   </div>
 </template>

@@ -19,8 +19,8 @@ if (
   navigateTo('/partner')
 }
 
-const dateRange = ref<any>([])
-const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
+const dateRange = ref('all')
+const searchQuery = ref('')
 
 const isCreateModalOpen = ref(false)
 
@@ -30,6 +30,7 @@ async function getNotifications() {
     method: 'GET',
     query: {
       dateRange: dateRange.value,
+      searchQuery: searchQuery.value,
       page: curPage.value,
     },
     watch: false,
@@ -85,33 +86,26 @@ async function deleteNotification() {
   getNotifications()
 }
 
+
 function openConfirmModal(notification: any) {
   selectedNotification.value = notification
   confirmModal.value = true
 }
+
+const findDebounced = useDebounceFn(getNotifications, 300)
+watch(searchQuery, findDebounced)
+watch(dateRange, findDebounced)
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-3 my-2">{{ $route.meta.title }}</h1>
   <div class="flex pl-3">
-    <DateRangePicker
-      v-model="dateRange"
-      :start-date="startDate"
-      @reset="dateRange = []"
-    >
-      <button class="btn btn-neutral">
-        <Icon name="material-symbols:calendar-month-outline" size="26" />
-      </button>
-    </DateRangePicker>
-    <button class="btn" @click="dateRange = []" v-if="dateRange.length">
-      <Icon name="material-symbols:close" size="26" />
-    </button>
     <button
       class="btn btn-square ml-2 max-w-xl w-xl"
       @click="isCreateModalOpen = true"
     >
       <Icon name="fa6-solid:plus" size="20" />
     </button>
-    <select class="select select-bordered w-50 ml-3">
+    <select class="select select-bordered w-50 ml-3" v-model="dateRange">
       <option value="all">Все время</option>
       <option value="today">Сегодня</option>
       <option value="yesterday">Вчера</option>
@@ -120,7 +114,8 @@ function openConfirmModal(notification: any) {
       <option value="30DaysAgo">30 дней</option>
     </select>
     <input
-      class="input input-bordered w-50 ml-3"
+      v-model="searchQuery"
+      class="input input-bordered w-50 ml-3 mr-2"
       type="text"
       placeholder="название, текст"
     />
