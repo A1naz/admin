@@ -1,7 +1,7 @@
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
-import { Notification } from '~/server/lib/models/Notification'
+import { NotificationTemplate } from '~/server/lib/models/NotificationTemplate'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -13,17 +13,17 @@ export default eventHandler(async (event) => {
   if (!user || (!user.mainAdmin && !user.tabs.includes('ручные уведомления')))
     return sendRedirect(event, '/auth', 302)
 
-  const body = await readBody(event)
+  const { uuid }: any = getQuery(event)
 
   await ActionHistory.create({
     adminUser: user._id,
-    actionId: 182,
-    actionDescription: `Админ ${user.uuid} - ${user.username} удалил ручное уведомление`,
+    actionId: 192,
+    actionDescription: `Админ ${user.uuid} - ${user.username} удалил шаблон ручного уведомления`,
     date: new Date(),
   })
 
-  await Notification.findOneAndDelete({
-    uuid: body.uuid,
+  await NotificationTemplate.findOneAndDelete({
+    uuid,
   })
 
   return {
