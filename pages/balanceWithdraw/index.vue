@@ -11,6 +11,7 @@ const { height, width } = useWindowSize()
 const data = ref<any>([])
 
 const editModal = ref(false)
+const confirmModal = ref(false)
 const selectedWithdraw = ref<any>({})
 
 const isPageBtnsDisabled = ref(false)
@@ -61,6 +62,24 @@ function getStatusText(status: string) {
     case 'canceled':
       return 'Отменен'
   }
+}
+
+async function deleteWithdraw() {
+  const { data, error } = await useFetch('/api/balanceWithdraw/delete', {
+    method: 'POST',
+    query: {
+      id: selectedWithdraw.value._id,
+    },
+    watch: false,
+  })
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Заявка удалена',
+    })
+    getData()
+  }
+  
 }
 </script>
 <template>
@@ -161,6 +180,12 @@ function getStatusText(status: string) {
               >
                 <Icon name="material-symbols:edit" />
               </button>
+              <button
+                class="btn btn-neutral ml-1"
+                @click=";[(confirmModal = true), (selectedWithdraw = info)]"
+              >
+                <Icon name="material-symbols:delete" />
+              </button>
             </th>
           </tr>
         </tbody>
@@ -170,6 +195,12 @@ function getStatusText(status: string) {
       v-model:is-modal-open="editModal"
       :selectedWithdraw="selectedWithdraw"
       @getData="getData"
+    />
+    <StaticConfirmModal
+      :title="'Подтвердить действие'"
+      :description="'Вы уверены, что хотите удалить уведомление?'"
+      :confirmFunction="deleteWithdraw"
+      v-model:state="confirmModal"
     />
   </div>
 </template>
