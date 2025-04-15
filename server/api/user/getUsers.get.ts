@@ -31,13 +31,14 @@ export default eventHandler(async (event) => {
     allUsers = await User.find({
       ...allowedUsersParam,
       ...rolesParam,
+      uuidCompany: { $exists: false },
       $or: [
         { uuid: { $regex: searchValue, $options: 'i' } },
         { email: { $regex: searchValue, $options: 'i' } },
         { telegram: { $regex: searchValue, $options: 'i' } },
         { username: { $regex: searchValue, $options: 'i' } },
-        {orgInn: { $regex: searchValue, $options: 'i' }},
-        {orgName: { $regex: searchValue, $options: 'i' }},
+        { orgInn: { $regex: searchValue, $options: 'i' } },
+        { orgName: { $regex: searchValue, $options: 'i' } },
       ],
     })
       .skip(usersPerPage * (+page - 1))
@@ -45,6 +46,7 @@ export default eventHandler(async (event) => {
       .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? -1 : 1 })
     if (Types.ObjectId.isValid(searchValue)) {
       allUsers = await User.find({
+        uuidCompany: { $exists: false },
         ...allowedUsersParam,
         ...rolesParam,
         _id: searchValue,
@@ -55,6 +57,7 @@ export default eventHandler(async (event) => {
     }
   } else {
     allUsers = await User.find({
+      uuidCompany: { $exists: false },
       ...rolesParam,
       ...allowedUsersParam,
     })
@@ -62,7 +65,7 @@ export default eventHandler(async (event) => {
       .limit(usersPerPage)
       .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? 1 : -1 })
   }
-  const usersCount = await User.count()
+  const usersCount = await User.count({ uuidCompany: { $exists: false } })
   const adminUsers = await AdminUser.find()
   const users = allUsers.map((user: any) => {
     const userTwoFa = adminUsers.find(
@@ -91,8 +94,12 @@ export default eventHandler(async (event) => {
       twoFaQR: userTwoFa ? userTwoFa.twoFaQR : user.twoFaQR || '',
       twoFaSecret: userTwoFa ? userTwoFa.twoFaSecret : user.twoFaSecret || '',
       organization: user.fizFace ? user.username + '(Физ. лицо)' : user.orgName,
-      partnerServiceRewardSum: user.partner?.partnerServiceRewardSum ? user.partner.partnerServiceRewardSum : 500,
-      partnerRewardType: user.partner?.partnerRewardType ? user.partner.partnerRewardType : 'service',
+      partnerServiceRewardSum: user.partner?.partnerServiceRewardSum
+        ? user.partner.partnerServiceRewardSum
+        : 500,
+      partnerRewardType: user.partner?.partnerRewardType
+        ? user.partner.partnerRewardType
+        : 'service',
     }
   })
 

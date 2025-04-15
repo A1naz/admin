@@ -120,6 +120,7 @@ export default {
       : {}
 
     const users = await User.find({
+      uuidCompany: { $exists: false },
       ...dateRangeParam,
       ...searchQueryParam,
       ...clientsParam,
@@ -169,6 +170,7 @@ export default {
     ])
 
     const users = await User.find({
+      uuidCompany: { $exists: false },
       _id: { $nin: userIds.map((user: any) => user._id) },
       ...dateRangeParam,
       ...searchQueryParam,
@@ -219,6 +221,7 @@ export default {
     ])
 
     const users = await User.find({
+      uuidCompany: { $exists: false },
       _id: { $in: userIds.map((user: any) => user._id) },
       ...searchQueryParam,
       ...clientsParam
@@ -261,6 +264,7 @@ export default {
     ])
 
     const users = await User.find({
+      uuidCompany: { $exists: false },
       _id: { $nin: userIds.map((user: any) => user._id) },
       ...searchQueryParam,
     })
