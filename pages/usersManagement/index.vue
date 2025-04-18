@@ -49,7 +49,7 @@ const tabs = ref([
       { key: 'quantity', title: 'количество' },
       { key: 'point', title: 'адрес' },
       { key: 'rules', title: 'правила' },
-      { key: 'sizeParam', title: 'размер' },
+      { key: 'sizeparam', title: 'размер' },
       { key: 'gender', title: 'пол' },
       { key: 'dateRange', title: 'даты выкупов' },
       { key: 'trueDate', title: 'дата' },
