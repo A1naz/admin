@@ -219,6 +219,10 @@ if (
 ) {
   navigateTo('/partner')
 }
+
+watch(selectedUsers.value, () => {
+  getStats()
+})
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Финансовые операции</h1>
@@ -226,16 +230,16 @@ if (
 
   <div class="flex flex-col justify-between">
     <div class="flex">
-      <button class="ml-2 btn text-xl" @click="openUsersSelectModal">
-        <!-- {{
+      <button class="ml-2 btn text-xs" @click="openUsersSelectModal">
+        {{
           selectedUsers.length > 0
             ? 'Выбрано Клиентов: ' + selectedUsers.length
-            : 'Выбраны все Клиенты'
-        }} -->
-        +
+            : '+'
+        }}
+        
       </button>
 
-      <select
+      <!-- <select
         class="select select-bordered w-50 ml-3"
         @change=";[(curPage = 1), getStats()]"
         v-model="faceType"
@@ -243,7 +247,7 @@ if (
         <option selected value="any">Вид</option>
         <option value="yurFace">Юридическое лицо</option>
         <option value="fizFace">Физическое лицо</option>
-      </select>
+      </select> -->
       <select
         class="select select-bordered w-50 ml-3"
         @change=";[(curPage = 1), getStats()]"
@@ -251,7 +255,12 @@ if (
       >
         <option selected value="any">Все операции</option>
         <option value="Приход">Пополнения</option>
-        <option value="Расход">Расходы</option>
+        <option value="allBuyouts">Выкуп + Услуга выкупа</option>
+        <option value="buyouts service">Услуги выкупа</option>
+        <option value="review">Отзывы</option>
+        <option value="deliveryStorage">Штрафы</option>
+        <option value="questionProduct">Вопросы</option>
+        <!-- <option value="Расход">Расходы</option>
       </select>
       <select
         class="select select-bordered w-50 ml-3"
@@ -261,20 +270,15 @@ if (
         <option selected value="any">Все услуги</option>
         <option value="deposit">Депозит</option>
         <option value="buyouts">Выкуп</option>
-        <option value="buyouts service">Услуга выкупа</option>
-        <option value="allBuyouts">Выкуп + Услуга выкупа</option>
-        <option value="review">Отзыв</option>
         <option value="questions">Вопрос</option>
         <option value="cart">Корзина</option>
-        <option value="likeReview">Лайк отзыва</option>
-        <option value="questionProduct">Вопрос</option>
+        <option value="likeReview">Лайк отзыва</option> -->
         <!-- <option value="autoanswers">автоответчик</option> -->
-        <option value="refund">Возврат</option>
+        <!-- <option value="refund">Возврат</option>
         <option value="reviewRemoving">Удаление отзыва</option>
         <option value="likeProduct">Лайк товара</option>
         <option value="deliveries">Доставка</option>
-        <option value="deliveryStorage">Штраф</option>
-        <option value="other">другое</option>
+        <option value="other">другое</option> -->
       </select>
       <div>
         <label
@@ -411,7 +415,7 @@ if (
       <!-- head -->
       <thead>
         <tr>
-          <th>ID</th>
+          <th>маркетплейс</th>
           <th>почта</th>
           <th>никнейм</th>
           <th>сумма</th>
@@ -437,7 +441,8 @@ if (
             style="max-width: 140px; min-width: 100px"
             class="overflow-x-auto text-xs"
           >
-            {{ stat.uuid }}
+            <!-- {{ stat.uuid }} -->
+             {{ stat.mp }} 
           </th>
           <th
             style="max-width: 150px; min-width: 40px"

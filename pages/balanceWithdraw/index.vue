@@ -79,7 +79,6 @@ async function deleteWithdraw() {
     })
     getData()
   }
-  
 }
 </script>
 <template>
@@ -152,14 +151,32 @@ async function deleteWithdraw() {
               <p>БИК: {{ info.cardInfo ? info.cardInfo.BIK : '' }}</p>
               <p>Р/С: {{ info.cardInfo ? info.cardInfo.RS : '' }}</p>
               <p>К/С: {{ info.cardInfo ? info.cardInfo.CS : '' }}</p>
+
               <p class="whitespace-nowrap">
                 Банк: {{ info.cardInfo ? info.cardInfo.bankName : '' }}
               </p>
+
               <p class="whitespace-nowrap" v-if="info.type == 'INN'">
                 Организация: {{ info.cardInfo ? info.cardInfo.orgName : '' }}
               </p>
               <p v-if="info.type == 'card'" class="whitespace-nowrap">
                 ФИО: {{ info.cardInfo ? info.cardInfo.FIO : '' }}
+              </p>
+              <p v-if="info.type == 'card'">
+                Серия паспорта:
+                {{ info.cardInfo ? info.cardInfo.passportSeries : '' }}
+              </p>
+              <p v-if="info.type == 'card'">
+                Номер паспорта:
+                {{ info.cardInfo ? info.cardInfo.passportNumber : '' }}
+              </p>
+              <p v-if="info.type == 'card'">
+                Адрес паспорта:
+                {{ info.cardInfo ? info.cardInfo.passportAddress : '' }}
+              </p>
+              <p v-if="info.type == 'card'">
+                Дата паспорта:
+                {{ info.cardInfo ? info.cardInfo.passportDate : '' }}
               </p>
             </th>
             <th style="max-width: 40px; min-width: 40px">

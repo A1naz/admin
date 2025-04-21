@@ -5,11 +5,11 @@ export const useMPStore = defineStore('mp', {
         selectedMP: 'wildberries' as String,
         MPTabs: [
             { title: 'Wildberries', value: 'wildberries' },
+            { title: 'Yandex', value: 'ym' },
             { title: 'Ozon', value: 'ozon' },
             { title: 'Avito', value: 'avito' },
             { title: 'Flowwow', value: 'flowwow' },
-            { title: 'VK', value: 'vk' },
-            { title: 'Ym', value: 'ym' },
+            { title: 'Суточно', value: 'sutochno' },
           ],
     }),
     persist: {

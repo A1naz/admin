@@ -205,8 +205,9 @@ await getActs()
           @change="getActs"
           v-model="selectedMP"
         >
-          <option value="wildberries" selected>Wildberries</option>
-          <option value="ozon">Ozon</option>
+        <option v-for="mp in mpStore.MPTabs" :value="mp.value" :key="mp.value">
+          {{ mp.title }}
+        </option>
         </select>
         <button class="btn btn-primary ml-3" @click="getActs">Применить</button>
       </div>

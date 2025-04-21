@@ -57,6 +57,8 @@ export default eventHandler(async (event) => {
     })
   }
 
+  console.log(mp)
+
   const histories = await paymenthistory
     .find({
       user: { $in: users },

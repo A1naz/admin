@@ -141,10 +141,7 @@ async function signTariff() {
           <th>Статус</th>
           <th>Организация</th>
           <th>Дата регистрации</th>
-          <th>Номер договора</th>
           <th>Договор</th>
-          <th>Подписать</th>
-          <th>Тариф</th>
           <th>Реферал</th>
           <th>Детали</th>
         </tr>
@@ -170,12 +167,7 @@ async function signTariff() {
           >
             {{ tariff.registrationDate.slice(0, 10).replace(/-/g, '.') }}
           </th>
-          <th
-            style="max-width: 300px; min-width: 140px"
-            class="overflow-x-auto"
-          >
-            {{ tariff.uuid }}
-          </th>
+
           <th style="max-width: 55px; min-width: 50px" class="overflow-x-auto">
             <a
               target="_blank"
@@ -187,19 +179,6 @@ async function signTariff() {
             <span v-else>Не заполнены данные</span>
           </th>
 
-          <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
-            <button
-              v-if="tariff.isDocumentSigned && !tariff.isDocSigned"
-              class="btn btn-neutral"
-              @click=";[(selectedUser = tariff), (confirmModal = true)]"
-            >
-              Подписать
-            </button>
-            <span v-else-if="tariff.isDocSigned">Подписан</span>
-          </th>
-          <th style="max-width: 100px; min-width: 90px">
-            {{ tariff.tariffPrice }} ₽
-          </th>
           <th style="max-width: 80px; min-width: 70px" class="overflow-x-auto">
             {{ tariff.isUserReferral }}
           </th>
