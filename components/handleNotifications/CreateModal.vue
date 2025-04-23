@@ -139,7 +139,7 @@ function selectTemplate(template: any) {
           v-model="notifactionForm.description"
         />
         <div class="flex justify-start w-[102px]">
-          <DateOnlyPicker
+          <DatePicker
             :disabled="notifactionForm.isImmediate"
             ref="datePicker"
             :modelValue="notifactionForm.activationDate"

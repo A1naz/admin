@@ -54,7 +54,7 @@ async function saveNotification() {
           v-model="selectedNotification.text"
         />
         <div class="flex justify-start w-[102px]">
-          <DateOnlyPicker
+          <DatePicker
             ref="datePicker"
             :modelValue="selectedNotification.activationDate"
             :min-date="new Date(Date.now() - 1000 * 60 * 60 * 24)"

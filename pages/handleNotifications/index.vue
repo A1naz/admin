@@ -95,6 +95,10 @@ function openConfirmModal(notification: any) {
 const findDebounced = useDebounceFn(getNotifications, 300)
 watch(searchQuery, findDebounced)
 watch(dateRange, findDebounced)
+watch(isCreateModalOpen, () => {
+  if (isCreateModalOpen.value) return
+  getNotifications()
+})
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-3 my-2">{{ $route.meta.title }}</h1>
@@ -159,14 +163,14 @@ watch(dateRange, findDebounced)
           <th style="max-width: 95px; min-width: 90px" class="text-xs">
             {{
               notification.date
-                ? $dayjs(notification.date).format('DD.MM.YYYY')
+                ? $dayjs(notification.date).format('DD.MM.YYYY HH:mm')
                 : '-'
             }}
           </th>
           <th style="max-width: 95px; min-width: 90px" class="text-xs">
             {{
               notification.activationDate
-                ? $dayjs(notification.activationDate).format('DD.MM.YYYY')
+                ? $dayjs(notification.activationDate).format('DD.MM.YYYY HH:mm')
                 : '-'
             }}
           </th>

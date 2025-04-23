@@ -41,7 +41,6 @@ function handleDate(modelData: any) {
       :teleport="true"
       :min-date="null"
       :dark="colorMode.value === 'dark'"
-      :timezone="'UTC'"
       cancel-text=""
       select-text="Сохранить"
       @update:model-value="handleDate"
