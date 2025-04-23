@@ -251,10 +251,10 @@ watch(selectedUsers.value, () => {
       <select
         class="select select-bordered w-50 ml-3"
         @change=";[(curPage = 1), getStats()]"
-        v-model="type"
+        v-model="service"
       >
         <option selected value="any">Все операции</option>
-        <option value="Приход">Пополнения</option>
+        <option value="deposit">Пополнения</option>
         <option value="buyouts">Выкупы</option>
         <option value="buyouts service">Услуги выкупа</option>
         <option value="review">Отзывы</option>

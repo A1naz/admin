@@ -23,6 +23,8 @@ export default eventHandler(async (event) => {
 
   const trueFilters = JSON.parse(filters)
 
+  console.log(trueFilters)
+
   const allowedUsersParam = user.isAllUsersAllowed
     ? {
       user: { $nin: user.restrictedUsers.map((id: any) => id) },
