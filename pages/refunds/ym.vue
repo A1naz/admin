@@ -17,7 +17,6 @@ if (
 const currency = useCurrency()
 
 const params = useRoute().query
-const isModalOpen = ref(false)
 const { height, width } = useWindowSize()
 const { upload, getPublicUrl } = useS3Object()
 const handleOperationSumm = ref()
@@ -53,8 +52,6 @@ const refundsOperationsModal = ref()
 const isCreateButtonDisabled = ref(false)
 const phoneNumber = ref('')
 const selectedTabOption = ref('')
-const selectedMp = ref('wildberries')
-const selectedMpCreate = ref('wildberries')
 
 const config = useRuntimeConfig()
 
@@ -97,11 +94,10 @@ const selectedPaymentOperationsSumm = computed(() => {
 
 async function getStats() {
   stats.value = []
-  const { data }: any = await useFetch('/api/refunds/get', {
+  const { data }: any = await useFetch('/api/yandexMarket/refunds/get', {
     method: 'GET',
     query: {
       page: curPage.value,
-      mp: selectedMp.value,
       sortDate: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
       account: query.value,
       sortDateType: sortDateType.value,
@@ -197,7 +193,6 @@ async function getUsers(searchValue: string = '') {
       page: 1,
       searchValue,
     },
-    watch: false,
   })
 
   users.value = data.value.users
@@ -228,6 +223,17 @@ function openFileInput(screenType: string = 'dialog') {
 
 async function createRefundRequest() {
   isCreateButtonDisabled.value = true
+  // if (
+  //   screenshot.value.public === 'null' ||
+  //   accountScreenshot.value.public === 'null'
+  // ) {
+  //   notify({
+  //     type: 'error',
+  //     title: 'Необходимо загрузить скриншоты',
+  //   })
+  //   isCreateButtonDisabled.value = false
+  //   return
+  // }
 
   if (
     !selectedOperationMongoId.value ||
@@ -247,28 +253,33 @@ async function createRefundRequest() {
     (el: any) => el.selected
   )
 
-  const { data, error }: any = await useFetch('/api/refunds/createRequest', {
-    watch: false,
-    method: 'POST',
-    body: {
-    mp: selectedMpCreate.value,
-      phoneNumber: phoneNumber.value.replace(/[\(\)\-\s]/g, ''),
-      handleOperationSumm: handleOperationSumm.value,
-      userId: selectedUser.value._id,
-      screenshot: screenshot.value.public.replace(config.public.IMAGES_URL, ''),
-      accountScreenshot: accountScreenshot.value.public.replace(
-        config.public.IMAGES_URL,
-        ''
-      ),
-      mainOperation: selectedOperationMongoId.value,
-      paymentOperations: selectedPaymentOperations,
-      mainOperationSumm: allPaymentOperationsSumm.value,
-      selectedPaymentOperationsSumm: selectedPaymentOperationsSumm.value,
-      comment: comment.value,
-      refundType: refundType.value,
-      mainOperationType: selectedTabOption.value,
-    },
-  })
+  const { data, error }: any = await useFetch(
+    '/api/yandexMarket/refunds/createRequest',
+    {
+      watch: false,
+      method: 'POST',
+      body: {
+        phoneNumber: phoneNumber.value.replace(/[\(\)\-\s]/g, ''),
+        handleOperationSumm: handleOperationSumm.value,
+        userId: selectedUser.value._id,
+        screenshot: screenshot.value.public.replace(
+          config.public.IMAGES_URL,
+          ''
+        ),
+        accountScreenshot: accountScreenshot.value.public.replace(
+          config.public.IMAGES_URL,
+          ''
+        ),
+        mainOperation: selectedOperationMongoId.value,
+        paymentOperations: selectedPaymentOperations,
+        mainOperationSumm: allPaymentOperationsSumm.value,
+        selectedPaymentOperationsSumm: selectedPaymentOperationsSumm.value,
+        comment: comment.value,
+        refundType: refundType.value,
+        mainOperationType: selectedTabOption.value,
+      },
+    }
+  )
   if (data.value) {
     if (data.value.status == 'ok') {
       notify({
@@ -295,13 +306,13 @@ async function createRefundRequest() {
 }
 
 function openUsersSelectModal() {
-  isModalOpen.value = !isModalOpen.value
+  selectUserClose.value?.click()
 }
 
 function selectUser(user: any) {
   selectedUser.value = user
 
-  isModalOpen.value = false
+  selectUserClose.value?.click()
   selectedOperation.value = ''
   paymentOperations.value = []
 
@@ -323,18 +334,20 @@ async function selectOperation(
   operationMongoId: string,
   tabOption: string
 ) {
-  console.log(operationId, operationMongoId, tabOption)
   selectedTabOption.value = tabOption
   selectedOperation.value = operationId
   selectedOperationMongoId.value = operationMongoId
 
-  const { data, error } = await useFetch('/api/refunds/paymentOperations', {
-    method: 'GET',
-    query: {
-      operationId,
-    },
-    watch: false,
-  })
+  const { data, error } = await useFetch(
+    '/api/yandexMarket/refunds/paymentOperations',
+    {
+      method: 'GET',
+      query: {
+        operationId,
+      },
+      watch: false,
+    }
+  )
   if (data.value) {
     paymentOperations.value = data.value
   } else {
@@ -348,23 +361,22 @@ async function selectOperation(
 const mpStore = useMPStore()
 
 function changeMP(event: any) {
-  if (event.target.value !== 'wildberries') {
-    navigateTo('/refunds/' + event.target.value)
+  if (event.target.value === 'wildberries') {
+    return navigateTo('/refunds')
+  } else if (event.target.value !== 'ym') {
+    return navigateTo('/refunds/' + event.target.value)
   }
 }
 
 onMounted(async () => {
   if (params && params.username && params.actUuid) {
-    const { data, error }: any = await useFetch(
-      '/api/refunds/wildberries/getInfo',
-      {
-        method: 'GET',
-        params: {
-          actUuid: params.actUuid,
-        },
-        watch: false,
-      }
-    )
+    const { data, error }: any = await useFetch('/api/refunds/yandexMarket/getInfo', {
+      method: 'GET',
+      params: {
+        actUuid: params.actUuid,
+      },
+      watch: false,
+    })
     if (error.value) {
       notify({
         type: 'error',
@@ -386,10 +398,9 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <h1 class="text-2xl font-bold ml-5 my-2">
-    Возвраты средств клиентам Wildberries
-  </h1>
+  <h1 class="text-2xl font-bold ml-5 my-2">Возвраты средств клиентам Yandex Market</h1>
   <div class="card p-fluid"></div>
+
   <div class="divider"></div>
   <div class="flex justify-between">
     <div class="flex">
@@ -432,14 +443,13 @@ onMounted(async () => {
       </button>
       <select
         class="select select-bordered max-w-xs ml-2 mb-2"
-        v-model="selectedMp"
-        @change="getStats"
+        @change="($event) => changeMP($event)"
       >
         <option
           v-for="tab in mpStore.MPTabs"
           :key="tab.value"
           :value="tab.value"
-          :selected="tab.value == 'wildberries'"
+          :selected="tab.value == 'ym'"
         >
           {{ tab.title }}
         </option>
@@ -606,19 +616,6 @@ onMounted(async () => {
       </button>
 
       <div class="flex flex-col mt-3">
-        <select
-          class="select select-bordered max-w-xs ml-2 mb-2"
-          v-model="selectedMpCreate"
-        >
-          <option
-            v-for="tab in mpStore.MPTabs"
-            :key="tab.value"
-            :value="tab.value"
-            :selected="tab.value == 'wildberries'"
-          >
-            {{ tab.title }}
-          </option>
-        </select>
         <button class="btn max-w-xl my-1 w-xl" @click="openUsersSelectModal()">
           {{
             selectedUser.username == ''
@@ -655,8 +652,7 @@ onMounted(async () => {
           {{
             selectedPaymentOperationsCount < 1
               ? 'Выберите дополнительные операции для возврата'
-              : `Выбрано дополнительных
-            операций: ${selectedPaymentOperationsCount}`
+              : `Выбрано дополнительных операций: ${selectedPaymentOperationsCount}`
           }}
         </button>
 
@@ -680,21 +676,15 @@ onMounted(async () => {
           или введите сумму для возврата от руки
         </div>
 
-        <!-- <input
+        <input
           v-if="
             selectedTabOption == 'buyouts' &&
             refundType == 'Возврат по вине клиента'
           "
           v-model="handleOperationSumm"
+          type="number"
           placeholder="Сумма возврата"
           class="input input-bordered w-full mr-3"
-        /> -->
-        <PaymentInput
-          v-if="
-            selectedTabOption == 'buyouts' &&
-            refundType == 'Возврат по вине клиента'
-          "
-          v-model="handleOperationSumm"
         />
         <div class="divider my-2" v-if="selectedTabOption == 'buyouts'" />
         <select
@@ -724,7 +714,88 @@ onMounted(async () => {
           class="input input-bordered input-l mb-2 w-full"
         />
       </div>
-      <div class="flex flex-col justify-center gap-2"></div>
+      <!-- <div class="flex flex-col justify-center gap-2">
+        <div>
+          <div class="text-center font-bold mt-1 mb-3">
+            Скриншот запроса клиента
+          </div>
+          <div class="flex justify-center" style="min-height: 200px">
+            <div
+              @click="openFileInput('dialog')"
+              :class="`cursor-pointer flex justify-center border-neutral ${
+                screenshot.public === 'null' ? 'border-2' : ''
+              } rounded-lg`"
+              style="width: 250px; height: 300px"
+            >
+              <nuxt-img
+                v-if="screenshot.public !== 'null'"
+                class="max-w-lg rounded-lg my-2 px-1"
+                style="display: block; max-height: 300px"
+                :src="screenshot.public"
+              />
+              <span
+                v-if="
+                  loadingIndex &&
+                  screenshot.public === 'null' &&
+                  selectedScreenshot == 'dialog'
+                "
+                class="loading loading-spinner text-primary absolute mt-32"
+              />
+              <IconCSS
+                style="max-height: 300px"
+                v-show="screenshot.public === 'null'"
+                class="mt-28"
+                :name="
+                  loadingIndex == true
+                    ? ''
+                    : 'material-symbols:add-photo-alternate-outline'
+                "
+                size="70"
+              />
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="text-center font-bold mt-1 mb-3">
+            Скриншот аккаунта клиента
+          </div>
+          <div class="flex justify-center" style="min-height: 200px">
+            <div
+              @click="openFileInput('account')"
+              :class="`cursor-pointer flex justify-center border-neutral ${
+                accountScreenshot.public === 'null' ? 'border-2' : ''
+              } rounded-lg`"
+              style="width: 250px; height: 300px"
+            >
+              <nuxt-img
+                v-if="accountScreenshot.public !== 'null'"
+                class="max-w-lg rounded-lg my-2 px-1"
+                style="display: block; max-height: 300px"
+                :src="accountScreenshot.public"
+              />
+              <span
+                v-if="
+                  loadingIndex &&
+                  accountScreenshot.public === 'null' &&
+                  selectedScreenshot == 'account'
+                "
+                class="loading loading-spinner text-primary absolute mt-32"
+              />
+              <IconCSS
+                style="max-height: 300px"
+                v-show="accountScreenshot.public == 'null'"
+                class="mt-28"
+                :name="
+                  loadingIndex == true
+                    ? ''
+                    : 'material-symbols:add-photo-alternate-outline'
+                "
+                size="70"
+              />
+            </div>
+          </div>
+        </div>
+      </div> -->
 
       <ClientOnly>
         <div>
@@ -776,17 +847,14 @@ onMounted(async () => {
     </div>
   </div>
 
-  <!-- <input type="checkbox" id="selectUser" :checked="true" class="modal-toggle" /> -->
-  <div
-    class="modal cursor-pointer"
-    :class="{ 'modal-open': isModalOpen }"
-    @click="isModalOpen = false"
-  >
+  <input type="checkbox" id="selectUser" class="modal-toggle" />
+  <div class="modal cursor-pointer" @click="openUsersSelectModal">
     <div class="modal-box w-9/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
         <label
+          for="selectUser"
           class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          @click="isModalOpen = false"
+          ref="selectUserClose"
         >
           ✕
         </label>
@@ -839,11 +907,6 @@ onMounted(async () => {
                     {{ user.organization }}
                   </div>
                 </td>
-                <td style="max-width: 150px" class="overflow-x-auto">
-                  <div class="mx-1 overflow-x-auto">
-                    {{ user.email }}
-                  </div>
-                </td>
                 <td style="max-width: 20px">
                   <button
                     class="btn btn-primary btn-sm"
@@ -863,8 +926,7 @@ onMounted(async () => {
   </div>
 
   <div>
-    <RefundsOperationsModal
-      :selectedMp="selectedMpCreate"
+    <RefundsOzonOperationsModal
       :selected-operation="selectedOperation"
       :selected-user="selectedUser"
       @select-operation="selectOperation"
@@ -875,6 +937,7 @@ onMounted(async () => {
       :refundType="refundType"
     />
   </div>
+
   <!-- Put this part before </body> tag -->
 </template>
 <style scoped>

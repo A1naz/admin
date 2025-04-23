@@ -19,6 +19,7 @@ export default eventHandler(async (event) => {
     refundType,
     phoneNumber,
     mainOperationType,
+    mp
   } = await readBody(event)
 
   if (!comment) {
@@ -52,7 +53,7 @@ export default eventHandler(async (event) => {
     phoneNumber,
     mainOperationType,
     requestDate: new Date(),
-    mp: 'wildberries'
+    mp,
   })
 
   await ActionHistory.create({

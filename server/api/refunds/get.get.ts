@@ -29,7 +29,7 @@ export default eventHandler(async (event) => {
         ],
       }
 
-  const { page, sortDate, dateRange }: any = getQuery(event)
+  const { page, sortDate, dateRange, mp }: any = getQuery(event)
 
   let trueDateRange = {}
   if (dateRange) {
@@ -42,7 +42,7 @@ export default eventHandler(async (event) => {
   }
 
   const requests = await RefundRequest.find({
-    mp: 'wildberries',
+    mp,
     ...allowedUsersParam,
     ...trueDateRange,
   })

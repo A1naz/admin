@@ -255,30 +255,30 @@ watch(selectedUsers.value, () => {
       >
         <option selected value="any">Все операции</option>
         <option value="Приход">Пополнения</option>
-        <option value="allBuyouts">Выкуп + Услуга выкупа</option>
+        <option value="buyouts">Выкупы</option>
         <option value="buyouts service">Услуги выкупа</option>
         <option value="review">Отзывы</option>
         <option value="deliveryStorage">Штрафы</option>
-        <option value="questionProduct">Вопросы</option>
+        <option value="refund">Возвраты</option>
+        <!-- <option value="questionProduct">Вопросы</option> -->
         <!-- <option value="Расход">Расходы</option>
       </select>
       <select
-        class="select select-bordered w-50 ml-3"
-        @change=";[(curPage = 1), getStats()]"
-        v-model="service"
+      class="select select-bordered w-50 ml-3"
+      @change=";[(curPage = 1), getStats()]"
+      v-model="service"
       >
-        <option selected value="any">Все услуги</option>
-        <option value="deposit">Депозит</option>
-        <option value="buyouts">Выкуп</option>
-        <option value="questions">Вопрос</option>
-        <option value="cart">Корзина</option>
-        <option value="likeReview">Лайк отзыва</option> -->
+      <option selected value="any">Все услуги</option>
+      <option value="deposit">Депозит</option>
+      <option value="questions">Вопрос</option>
+      <option value="cart">Корзина</option>
+      <option value="likeReview">Лайк отзыва</option> -->
+      <!-- <option value="allBuyouts">Выкуп + Услуга выкупа</option> -->
         <!-- <option value="autoanswers">автоответчик</option> -->
-        <!-- <option value="refund">Возврат</option>
-        <option value="reviewRemoving">Удаление отзыва</option>
-        <option value="likeProduct">Лайк товара</option>
-        <option value="deliveries">Доставка</option>
-        <option value="other">другое</option> -->
+        <!-- <option value="reviewRemoving">Удаление отзыва</option> -->
+        <!-- <option value="likeProduct">Лайк товара</option> -->
+        <!-- <option value="deliveries">Доставка</option> -->
+        <!-- <option value="other">другое</option>  -->
       </select>
       <div>
         <label

@@ -9,6 +9,7 @@ const props = defineProps({
     },
   },
   selectedOperation: String,
+  selectedMp: String,
 })
 
 const emit = defineEmits(['selectOperation'])
@@ -141,7 +142,11 @@ const search = (event: any) => {
 }
 
 async function getInfo() {
-  const { data }: any = await useFetch('/api/management/get', {
+  const url = props.selectedMp == 'wildberries' ? '/api/management/get' : `/api/${props.selectedMp}/management/get`
+  info.value = []
+  infoCount.value = 0
+  pages.value = 0
+  const { data }: any = await useFetch(url, {
     method: 'GET',
     query: {
       page: curPage.value,
@@ -373,7 +378,6 @@ defineExpose({ getInfo })
           <button class="btn btn-primary ml-3" @click="getInfo">
             Применить
           </button>
-   
         </div>
         <div>
           <div class="join mr-2">
@@ -495,7 +499,12 @@ defineExpose({ getInfo })
               <th>
                 <button
                   class="btn btn-sm btn-primary"
-                  @click="selectOperation(tabOption == 'buyouts' ? item.uuid : item._id, item._id)"
+                  @click="
+                    selectOperation(
+                      tabOption == 'buyouts' ? item.uuid : item._id,
+                      item._id
+                    )
+                  "
                 >
                   Выбрать
                 </button>
