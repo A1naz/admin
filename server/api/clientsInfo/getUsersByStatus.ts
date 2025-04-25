@@ -90,6 +90,9 @@ async function filterUsers(users: any[]) {
         : '',
       orgPhone: user.bankInfo ? user.bankInfo.phone : '',
       INN: user.orgInn,
+      balance: user.balance,
+      partnerBalance: user.partner.balance,
+      referralsCount: user.partner.refCount,
     }
   })
 }

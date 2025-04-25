@@ -29,7 +29,9 @@ const tariffs = ref<any>([])
 const adjustTariffModal = ref(false)
 
 const selectedUser = ref<any>({})
+const selectedUserForStats = ref<any>({})
 const infoModal = ref(false)
+const statsModal = ref(false)
 
 async function getClients() {
   tariffs.value = []
@@ -49,6 +51,10 @@ watch(filtersForm.value, findDebounced)
 const openTariffInfo = (tariff: any) => {
   selectedUser.value = tariff
   infoModal.value = true
+}
+const openUserStats = (tariff: any) => {
+  selectedUserForStats.value = tariff
+  statsModal.value = true
 }
 
 async function signTariff() {
@@ -71,15 +77,17 @@ async function signTariff() {
   <h1 class="text-2xl font-bold ml-3 my-2">Клиенты</h1>
   <div class="ml-3 mb-2 mt-5 flex justify-between">
     <div class="mr-10 flex gap-3">
-      <DateRangePicker
-        v-model="filtersForm.dateRange"
-        :start-date="filtersForm.startDate"
-        @reset="filtersForm.dateRange = []"
-      >
-        <button class="btn btn-neutral">
-          <Icon name="material-symbols:calendar-month-outline" size="26" />
-        </button>
-      </DateRangePicker>
+      <div>
+        <DateRangePicker
+          v-model="filtersForm.dateRange"
+          :start-date="filtersForm.startDate"
+          @reset="filtersForm.dateRange = []"
+        >
+          <button class="btn btn-neutral">
+            <Icon name="material-symbols:calendar-month-outline" size="26" />
+          </button>
+        </DateRangePicker>
+      </div>
       <button
         class="btn -ml-3"
         @click="filtersForm.dateRange = []"
@@ -183,9 +191,15 @@ async function signTariff() {
             {{ tariff.isUserReferral }}
           </th>
 
-          <th>
+          <th class="flex">
             <button class="btn btn-neutral" @click="openTariffInfo(tariff)">
               Информация
+            </button>
+            <button
+              class="btn btn-square btn-neutral ml-2"
+              @click="openUserStats(tariff)"
+            >
+              <Icon name="mdi:eye-outline" size="20" />
             </button>
           </th>
         </tr>
@@ -196,6 +210,10 @@ async function signTariff() {
   <UserInfoModal
     v-model:is-modal-open="infoModal"
     :selectedUser="selectedUser"
+  />
+  <UserStatsModal
+    v-model:is-modal-open="statsModal"
+    :selectedUser="selectedUserForStats"
   />
   <StaticConfirmModal
     :title="'Подтвердить действие'"
