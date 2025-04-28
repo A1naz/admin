@@ -102,7 +102,6 @@ export async function createPickpointsFile() {
     points: collection,
   }
 
-  console.log('creating wildberriesPoints.json')
   fs.writeFileSync('pvz/wildberriesPoints.json', JSON.stringify(cache))
   return
 }
@@ -115,6 +114,7 @@ export async function createOzonPickpointsFile() {
       id: point.pointId,
       lt: point.coordinates.lat,
       lg: point.coordinates.lon,
+      address: point.address
     }
   })
 
