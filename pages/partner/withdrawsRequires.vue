@@ -231,7 +231,7 @@ if (
             style="max-width: 300px; min-width: 250px"
             class="overflow-x-auto"
           >
-            {{ withdraw.details.fio }}
+            {{ withdraw.details && withdraw.details.fio ? withdraw.details.fio : "" }}
           </th>
           <th style="max-width: 80px; min-width: 75px">
             {{ withdraw.type == 'card' ? 'Карта' : 'Аккаунт' }}
@@ -240,7 +240,7 @@ if (
             {{ withdraw.amount }} ₽
           </th>
           <th style="max-width: 180px; min-width: 170px">
-            {{ withdraw.details.card }}
+            {{ withdraw.details ? withdraw.details.card : "" }}
           </th>
           <th style="width: 200px">
             <div class="my-5" v-if="withdraw.isClosed || withdraw.isCancelled">
