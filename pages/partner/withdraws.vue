@@ -238,13 +238,13 @@ if (
             style="max-width: 145px; min-width: 140px"
             class="overflow-x-auto"
           >
-            {{ withdraw.details.fio }}
+            {{ withdraw.details ? withdraw.details.fio : "" }}
           </th>
           <th style="max-width: 40px; min-width: 35px" class="overflow-x-auto">
             {{ withdraw.type == 'card' ? 'карта' : 'аккаунт' }}
           </th>
           <th style="width: 190px" class="overflow-x-auto">
-            {{ withdraw.details.card }}
+            {{  withdraw.details ? withdraw.details.card : "" }}
           </th>
           <th style="max-width: 80px; min-width: 75px" class="overflow-x-auto">
             {{

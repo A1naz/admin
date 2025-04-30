@@ -7,6 +7,7 @@ const ReviewSchema = new Schema({
   rating: { type: Number, required: true },
   text: { type: String, required: false },
   date: { type: Date, required: true },
+  publishDate: { type: Date, required: false },
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   delivery: { type: Schema.Types.ObjectId, ref: 'Delivery', required: true },
   images: { type: Array, required: false },

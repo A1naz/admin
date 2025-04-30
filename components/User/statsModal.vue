@@ -63,13 +63,18 @@ watch(
   }
 )
 
-watch(() => dateRange.value, () => {
-  getStats()
-})
+watch(
+  () => dateRange.value,
+  () => {
+    getStats()
+  }
+)
 
 const close = () => {
   emit('update:isModalOpen', false)
 }
+
+const currency = useCurrency()
 </script>
 <template>
   <div
@@ -90,44 +95,46 @@ const close = () => {
       </form>
       <div v-if="!loading">
         <div class="w-10">
-
           <DateRangePicker
-          v-model="dateRange"
-          @reset="dateRange = []"
-          :start-date="startDate"
+            v-model="dateRange"
+            @reset="dateRange = []"
+            :start-date="startDate"
           >
-          <button class="btn btn-neutral">
-            <Icon name="material-symbols:calendar-month-outline" size="26" />
-          </button>
-        </DateRangePicker>
-      </div>
+            <button class="btn btn-neutral">
+              <Icon name="material-symbols:calendar-month-outline" size="26" />
+            </button>
+          </DateRangePicker>
+        </div>
 
         <div class="mt-1 ml-2">
           Баланс
-          <input
+          <div
             type="text"
-            class="input input-bordered w-full mt-1"
+            class="input input-bordered w-full mt-1 pt-2"
             disabled
-            v-model="selectedUser.balance"
-          />
+          >
+            {{ currency.format(selectedUser.balance) }}
+          </div>
         </div>
         <div class="mt-1 ml-2">
           Оборот
-          <input
+          <div
             type="text"
-            class="input input-bordered w-full mt-1"
+            class="input input-bordered w-full mt-1 pt-2"
             disabled
-            v-model="statsForm.turnOver"
-          />
+          >
+            {{ currency.format(statsForm.turnOver) }}
+          </div>
         </div>
         <div class="mt-1 ml-2">
           Прибыль
-          <input
+          <div
             type="text"
-            class="input input-bordered w-full mt-1"
+            class="input input-bordered w-full mt-1 pt-2"
             disabled
-            v-model="statsForm.profit"
-          />
+          >
+            {{ currency.format(statsForm.profit) }}
+          </div>
         </div>
         <div class="mt-1 ml-2">
           Выкупов
@@ -158,12 +165,13 @@ const close = () => {
         </div>
         <div class="mt-1 ml-2">
           Партнерка(баланс партнерки)
-          <input
+          <div
             type="text"
-            class="input input-bordered w-full mt-1"
+            class="input input-bordered w-full mt-1 pt-2"
             disabled
-            v-model="selectedUser.partnerBalance"
-          />
+          >
+            {{ currency.format(selectedUser.partnerBalance) }}
+          </div>
         </div>
       </div>
       <div v-else class="w-full flex justify-center mt-2">
