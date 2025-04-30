@@ -14,10 +14,10 @@ export default async function (items: any[], article: string) {
       wbItems.push(item)
     }
   }
-
+  
   const ozonCarts = await OzonLike.find({
     _id: {
-      $in: ozonItems.map((item) => item.basisoperation),
+      $in: ozonItems.map((item) => item.basisoperation.replace("Лайк отзыва #", '')),
     },
     article: article ? article : { $exists: true },
   })
@@ -30,7 +30,6 @@ export default async function (items: any[], article: string) {
   })
 
   const allItems = [...ozonCarts, ...wbCarts]
-
   const formatted = allItems.map((item) => {
     const payment = items.find((i) => i.basisoperation === item._id.valueOf())
     delete payment.article

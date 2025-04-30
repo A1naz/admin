@@ -23,7 +23,6 @@ export default eventHandler(async (event) => {
 
   const trueFilters = JSON.parse(filters)
 
-  console.log(trueFilters)
 
   const allowedUsersParam = user.isAllUsersAllowed
     ? {
@@ -59,7 +58,6 @@ export default eventHandler(async (event) => {
     })
   }
 
-  console.log(mp)
 
   const histories = await paymenthistory
     .find({
@@ -169,7 +167,11 @@ export default eventHandler(async (event) => {
     const info = await cartsInfo(formatted, trueFilters.article)
 
     return {
-      stats: info,
+      stats: info.sort((a: any, b: any) =>
+        sortDate === -1
+          ? a.dataoperation - b.dataoperation
+          : b.dataoperation - a.dataoperation
+      ),
       statsCount: 999999,
       productsCountInfo,
     }
@@ -177,7 +179,11 @@ export default eventHandler(async (event) => {
     const info = await likeReviewInfo(formatted, trueFilters.article)
 
     return {
-      stats: info,
+      stats: info.sort((a: any, b: any) =>
+        sortDate === -1
+          ? a.dataoperation - b.dataoperation
+          : b.dataoperation - a.dataoperation
+      ),
       statsCount: 999999,
       productsCountInfo,
     }
@@ -185,7 +191,11 @@ export default eventHandler(async (event) => {
     const info = await likeProductInfo(formatted, trueFilters.article)
 
     return {
-      stats: info,
+      stats: info.sort((a: any, b: any) =>
+        sortDate === -1
+          ? a.dataoperation - b.dataoperation
+          : b.dataoperation - a.dataoperation
+      ),
       statsCount: 999999,
       productsCountInfo,
     }
@@ -215,7 +225,7 @@ export default eventHandler(async (event) => {
       trueFilters.productName,
       trueFilters.article
     )
-    // console.log(buyoutsPayment)
+
     const cartsPayment = await cartsInfo(carts, trueFilters.article)
     const likeReviewsPayment = await likeReviewInfo(
       likeReviews,
@@ -234,14 +244,22 @@ export default eventHandler(async (event) => {
     ]
 
     return {
-      stats: allItemsPayment,
+      stats: allItemsPayment.sort((a: any, b: any) =>
+        sortDate === -1
+          ? a.dataoperation - b.dataoperation
+          : b.dataoperation - a.dataoperation
+      ),
       statsCount: 999999,
       productsCountInfo,
     }
   }
 
   return {
-    stats: formatted,
+    stats: formatted.sort((a: any, b: any) =>
+      sortDate === -1
+        ? a.dataoperation - b.dataoperation
+        : b.dataoperation - a.dataoperation
+    ),
     statsCount: 999999,
     productsCountInfo,
   }
