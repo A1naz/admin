@@ -252,6 +252,12 @@ function closeOverlay() {
           title="Ручные уведмоления"
           href="/handleNotifications"
         />
+        <SidebarItem
+          v-if="store.client.mainAdmin || store.client.tabs.includes('статистика')"
+          icon="gridicons:stats-up"
+          title="Статистика"
+          href="/statistics"
+        />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between w-full items-center p-0 m-0">
