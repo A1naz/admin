@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { NuxtLoadingIndicator } from '#build/components'
 import { notify } from '@kyvg/vue3-notification'
 
 definePageMeta({
@@ -9,6 +10,42 @@ definePageMeta({
 
 const currency = useCurrency()
 const store = useMainStore()
+const loading = ref(true)
+const selectedMp = ref('all')
+const mps = ref([
+  {
+    title: 'Все',
+    value: 'all',
+  },
+  {
+    title: 'Wildberries',
+    value: 'wildberries',
+  },
+  {
+    title: 'Ozon',
+    value: 'ozon',
+  },
+  {
+    title: 'Yandex Market',
+    value: 'ym',
+  },
+  {
+    title: 'Flowwow',
+    value: 'flowwow',
+  },
+  {
+    title: 'Avito',
+    value: 'avito',
+  },
+  {
+    title: 'Sutochno',
+    value: 'sutochno',
+  },
+  {
+    title: 'Ozon Hotels',
+    value: 'ozonhotels',
+  }
+])
 
 if (!store.client.mainAdmin && !store.client.tabs.includes('статистика')) {
   navigateTo('/waitingRoom')
@@ -22,6 +59,7 @@ const categories = ref<
       subtitle?: string
       value: string
       key?: string
+      type?: string
     }[]
   }[]
 >([
@@ -33,18 +71,21 @@ const categories = ref<
         subtitle: 'Всего зарегистрировалось',
         value: '40',
         key: 'allRegistrations',
+        type: 'number',
       },
       {
         title: 'Самостоятельные',
         subtitle: 'Зарегистрировались без реф. ссылки',
         value: '30',
         key: 'selfRegistrations',
+        type: 'number',
       },
       {
         title: 'Рефералка',
         subtitle: 'Зарегистрировались по реф. ссылке',
         value: '10',
         key: 'referralRegistrations',
+        type: 'number',
       },
     ],
   },
@@ -53,29 +94,34 @@ const categories = ref<
     content: [
       {
         title: 'Общее',
-        value: '40 000 ₽',
+        value: '0',
         key: 'allTurnover',
+        type: 'money',
       },
       {
         title: 'QR',
         value: '30 000 ₽',
         key: 'qrTurnover',
+        type: 'money',
       },
       {
         title: 'Ручные',
         value: '10 000 ₽',
         key: 'manualTurnover',
+        type: 'money',
       },
       {
         title: '% прибыли от оборота',
         value: '40 %',
         key: 'profit',
+        type: 'percent',
       },
       {
         title: 'Расход',
         value: '40 000 ₽',
         subtitle: 'Расход на покупку товаров',
-        key: 'expense',
+        key: 'expenses',
+        type: 'money',
       },
     ],
   },
@@ -86,21 +132,25 @@ const categories = ref<
         title: 'Общее',
         value: '40 000 ₽',
         key: 'allProfitFromServices',
+        type: 'money',
       },
       {
         title: 'Выкупы',
         value: '30 000 ₽',
         key: 'buyoutsProfit',
+        type: 'money',
       },
       {
         title: 'Отзывы',
         value: '10 000 ₽',
         key: 'reviewsProfit',
+        type: 'money',
       },
       {
         title: 'Штрафы',
         value: '10 000 ₽',
         key: 'penaltiesProfit',
+        type: 'money',
       },
     ],
   },
@@ -111,21 +161,25 @@ const categories = ref<
         title: 'Всего',
         value: '400 ',
         key: 'allServicesCount',
+        type: 'number',
       },
       {
         title: 'Выкупы',
         value: '300',
         key: 'buyoutsCount',
+        type: 'number',
       },
       {
         title: 'Отзывы',
         value: '80',
         key: 'reviewsCount',
+        type: 'number',
       },
       {
         title: 'Штрафы',
         value: '20',
         key: 'penaltiesCount',
+        type: 'number',
       },
     ],
   },
@@ -136,16 +190,19 @@ const categories = ref<
         title: 'Общий баланс',
         value: '400 ',
         key: 'balance',
+        type: 'money',
       },
       {
         title: 'Партнерский баланс',
         value: '400 ',
         key: 'partnerBalance',
+        type: 'money',
       },
       {
         title: 'Выплачено по партнерке',
         value: '300',
         key: 'paidByPartner',
+        type: 'money',
       },
     ],
   },
@@ -185,15 +242,69 @@ const periods = [
     value: 'lastYear',
   },
 ]
-const selectedPeriod = ref("month")
+const selectedPeriod = ref('month')
+
+const stats: any = ref({
+  allRegistrations: 0,
+  selfRegistrations: 0,
+  referralRegistrations: 0,
+  allTurnover: 0,
+  qrTurnover: 0,
+  manualTurnover: 0,
+  profit: 0,
+  expenses: 0,
+  allProfitFromServices: 0,
+  buyoutsProfit: 0,
+  reviewsProfit: 0,
+  penaltiesProfit: 0,
+  allServicesCount: 0,
+  buyoutsCount: 0,
+  reviewsCount: 0,
+  penaltiesCount: 0,
+  balance: 0,
+  partnerBalance: 0,
+  paidByPartner: 0,
+})
+
+async function getStats() {
+  loading.value = true
+  const { data }: any = await useFetch('/api/statistics/generalInfo', {
+    method: 'GET',
+    query: {
+      date: selectedPeriod.value,
+      mp: selectedMp.value,
+    },
+  })
+  if (data.value) {
+    stats.value = data.value
+  }
+  loading.value = false
+}
+
+getStats()
+
+const getValue = (item: any) => {
+  if (item.type === 'number') {
+    return stats.value[item.key]
+  }
+  if (item.type === 'money') {
+    console.log(item.value)
+    return currency.format(stats.value[item.key])
+  }
+  return stats.value[item.key]
+}
 </script>
 
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Статистика</h1>
   <div class="divider"></div>
+  <select  v-model="selectedMp" @change="getStats" class="select select-bordered max-w-xs ml-2 mb-2">
+    <option  v-for="mp in mps" :key="mp.value" :value="mp.value">{{ mp.title }}</option>
+  </select>
   <div class="lg:block flex mb-2">
     <button
-    @click="selectedPeriod = period.value"
+      :disabled="loading"
+      @click=";[(selectedPeriod = period.value), getStats()]"
       :key="period.value"
       v-for="period in periods"
       :external="true"
@@ -205,16 +316,23 @@ const selectedPeriod = ref("month")
       {{ period.title }}
     </button>
   </div>
-  <div class="p-1 rounded-xl shadow-md" v-for="category in categories">
+  <div
+    class="p-1 rounded-xl shadow-md"
+    v-for="category in categories"
+    v-if="!loading"
+  >
     <h2 class="text-xl font-bold mb-4">{{ category.title }}</h2>
     <div class="flex flex-wrap gap-4 justify-between">
       <StatisticsStatCard
         v-for="item in category.content"
         :title="item.title"
-        :value="item.value"
+        :value="getValue(item)"
         :subtitle="item.subtitle"
       />
     </div>
+  </div>
+  <div v-else class="w-full pt-20 text-center">
+    <span class="loading loading-dots loading-lg"></span>
   </div>
 </template>
 
