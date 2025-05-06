@@ -10,7 +10,6 @@ definePageMeta({
 
 const currency = useCurrency()
 const store = useMainStore()
-const loading = ref(true)
 const selectedMp = ref('all')
 const mps = ref([
   {
@@ -44,7 +43,7 @@ const mps = ref([
   {
     title: 'Ozon Hotels',
     value: 'ozonhotels',
-  }
+  },
 ])
 
 if (!store.client.mainAdmin && !store.client.tabs.includes('статистика')) {
@@ -266,29 +265,22 @@ const stats: any = ref({
   paidByPartner: 0,
 })
 
-async function getStats() {
-  loading.value = true
-  const { data }: any = await useFetch('/api/statistics/generalInfo', {
-    method: 'GET',
-    query: {
-      date: selectedPeriod.value,
-      mp: selectedMp.value,
-    },
-  })
-  if (data.value) {
-    stats.value = data.value
-  }
-  loading.value = false
+const { data, status }: any = useLazyFetch('/api/statistics/generalInfo', {
+  method: 'GET',
+  query: {
+    date: selectedPeriod,
+    mp: selectedMp,
+  },
+})
+if (data.value) {
+  stats.value = data.value
 }
-
-getStats()
 
 const getValue = (item: any) => {
   if (item.type === 'number') {
     return stats.value[item.key]
   }
   if (item.type === 'money') {
-    console.log(item.value)
     return currency.format(stats.value[item.key])
   }
   return stats.value[item.key]
@@ -298,13 +290,18 @@ const getValue = (item: any) => {
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Статистика</h1>
   <div class="divider"></div>
-  <select  v-model="selectedMp" @change="getStats" class="select select-bordered max-w-xs ml-2 mb-2">
-    <option  v-for="mp in mps" :key="mp.value" :value="mp.value">{{ mp.title }}</option>
+  <select
+    v-model="selectedMp"
+    class="select select-bordered max-w-xs ml-2 mb-2"
+  >
+    <option v-for="mp in mps" :key="mp.value" :value="mp.value">
+      {{ mp.title }}
+    </option>
   </select>
   <div class="lg:block flex mb-2">
     <button
-      :disabled="loading"
-      @click=";[(selectedPeriod = period.value), getStats()]"
+    :disabled="status === 'pending'"
+      @click="selectedPeriod = period.value"
       :key="period.value"
       v-for="period in periods"
       :external="true"
@@ -319,7 +316,7 @@ const getValue = (item: any) => {
   <div
     class="p-1 rounded-xl shadow-md"
     v-for="category in categories"
-    v-if="!loading"
+    v-if="status === 'success'"
   >
     <h2 class="text-xl font-bold mb-4">{{ category.title }}</h2>
     <div class="flex flex-wrap gap-4 justify-between">
@@ -331,8 +328,11 @@ const getValue = (item: any) => {
       />
     </div>
   </div>
-  <div v-else class="w-full pt-20 text-center">
+  <div v-else-if="status==='pending'" class="w-full pt-20 text-center">
     <span class="loading loading-dots loading-lg"></span>
+  </div>
+  <div v-else class="w-full pt-20 text-center">
+    <span class="loading loading-dots loading-lg">Ошибка</span>
   </div>
 </template>
 

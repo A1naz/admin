@@ -354,9 +354,10 @@ function changeMP(event: any) {
 }
 
 onMounted(async () => {
-  if (params && params.username && params.actUuid) {
+  if (params && params.username && params.actUuid && params.mp) {
+    selectedMpCreate.value = params.mp
     const { data, error }: any = await useFetch(
-      '/api/refunds/wildberries/getInfo',
+      `/api/refunds/${params.mp}/getInfo`,
       {
         method: 'GET',
         params: {

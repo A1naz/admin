@@ -139,8 +139,8 @@ function changeMP(event: any) {
 }
 
 function openRefund(act: any) {
-  const mp = selectedMP.value == 'wildberries' ? '' : selectedMP.value + '/'
-  navigateTo(`/refunds/${mp}?username=${act.username}&actUuid=${act.uuid}`)
+  const mp =  selectedMP.value 
+  navigateTo(`/refunds?username=${act.username}&actUuid=${act.uuid}&mp=${mp}`)
 }
 
 await getActs()
