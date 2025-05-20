@@ -1,7 +1,15 @@
 import { Service } from "~/server/lib/models/Service";
 import { User } from "~/server/lib/models/User";
+import { AdminUser } from '~/server/lib/models/AdminUser'
+import { getServerSession } from '#auth'
 
 export default defineEventHandler(async (event) => {
+       const session = (await getServerSession(event)) as any
+       if (!session) return sendRedirect(event, '/auth', 302)
+       const user = await AdminUser.findOne({ uuid: session.uuid })
+        if (!user || (!user.mainAdmin && !user.tabs.includes('запросы направлений')))
+         return sendRedirect(event, '/auth', 302)
+
         const { type, query } = getQuery(event)
     
         const services = await Service.find({

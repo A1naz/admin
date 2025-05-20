@@ -234,7 +234,7 @@ async function createBalanceTransferRequest() {
 }
 
 const store = useMainStore()
-if (!store.client.mainAdmin) {
+if (!store.client.mainAdmin && !store.client.tabs.includes('ручные пополнения средств')) {
   navigateTo('/partner')
 }
 

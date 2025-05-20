@@ -34,7 +34,12 @@ export default eventHandler(async (event) => {
   if (!session) return sendRedirect(event, '/auth', 302)
 
   const user = await AdminUser.findOne({ uuid: session.uuid })
-  if (!user || !user.mainAdmin) return sendRedirect(event, '/auth', 302)
+  if (
+    !user ||
+    (!user.mainAdmin && !user.tabs.includes('ручные пополнения средств'))
+  ) {
+    return sendRedirect(event, '/auth', 302)
+  }
 
   const recipientUser = await User.findById(userId)
   if (!recipientUser) {

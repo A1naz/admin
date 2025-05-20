@@ -10,7 +10,7 @@ definePageMeta({
 const store = useMainStore()
 if (
   !store.client.mainAdmin &&
-  !store.client.tabs.includes('запросы скриншотов')
+  !store.client.tabs.includes('запросы направлений')
 ) {
   navigateTo('/partner')
 }
