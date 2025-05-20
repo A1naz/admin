@@ -22,12 +22,12 @@ export default eventHandler(async (event) => {
 
   const user = await AdminUser.findOne({ uuid: session.uuid })
 
-  if (!user || (!user.mainAdmin && !user.tabs.includes('статистика')))
+  if (!user || (!user.mainAdmin && !user.tabs.includes('статистика авито')))
     return sendRedirect(event, '/auth', 302)
 
-  const { date, mp } = getQuery(event)
+  const { date } = getQuery(event)
 
-  const mpQuery = mp && mp !== 'all' ? { mp } : {}
+  const mpQuery = { mp: 'avito' }
   let dateQuery: any = {
     $gte: new Date(2000, 0, 1),
   }

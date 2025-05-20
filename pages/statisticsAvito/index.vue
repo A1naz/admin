@@ -10,7 +10,7 @@ definePageMeta({
 
 const currency = useCurrency()
 const store = useMainStore()
-const selectedMp = ref('all')
+const selectedMp = ref('avito')
 const mps = ref([
   {
     title: 'Все',
@@ -46,7 +46,7 @@ const mps = ref([
   },
 ])
 
-if (!store.client.mainAdmin && !store.client.tabs.includes('статистика')) {
+if (!store.client.mainAdmin && !store.client.tabs.includes('статистика авито')) {
   navigateTo('/waitingRoom')
 }
 
@@ -265,7 +265,7 @@ const stats: any = ref({
   paidByPartner: 0,
 })
 
-const { data, status }: any = useLazyFetch('/api/statistics/generalInfo', {
+const { data, status }: any = useLazyFetch('/api/statistics/generalInfoAvito', {
   method: 'GET',
   query: {
     date: selectedPeriod,
@@ -291,14 +291,14 @@ const getValue = (item: any) => {
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Статистика</h1>
   <div class="divider"></div>
-  <select
+  <!-- <select
     v-model="selectedMp"
     class="select select-bordered max-w-xs ml-2 mb-2"
   >
     <option v-for="mp in mps" :key="mp.value" :value="mp.value">
       {{ mp.title }}
     </option>
-  </select>
+  </select> -->
   <div class="lg:block flex mb-2">
     <button
       :disabled="status === 'pending'"

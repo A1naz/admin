@@ -208,6 +208,8 @@ export async function getServicesCountInfo(dateQuery: any, mp: any = {}): Promis
     penaltiesCount: 0,
   }
 
+  console.log('function', mp)
+
   const servicesCount = await paymenthistory.aggregate([
     {
       $match: {
