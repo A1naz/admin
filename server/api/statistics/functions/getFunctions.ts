@@ -25,7 +25,7 @@ export async function getRegistrationsInfo(dateQuery: any): Promise<any> {
     })
   })
   res.referralRegistrations = refCount
-  res.selfRegistrations = res.allRegistrations - res.referralRegistrations
+  res.selfRegistrations = Math.abs(res.allRegistrations - res.referralRegistrations)
 
   return res
 }
