@@ -15,6 +15,7 @@ if (
 }
 
 const closeCreateModalButton = ref()
+const closePartnerModalButton = ref()
 const standartTariffs = ref<any>([])
 const defaultPriсes = ref<any>([])
 const userTariffs = ref<any>([])
@@ -170,6 +171,36 @@ async function saveTariffs() {
     })
   }
 }
+async function saveTariffssaveTariffsPartner() {
+  isSaveBtnDisabled.value = true
+  let errors = 0
+
+  const { data }: any = await useFetch("api/tariff/savePartner", {
+    method: 'POST',
+    body: {
+      userUuid: isStandartTariffs.value ? null : selectedUser.value.uuid,
+      rewardPercent: selectedUser.value.partnerRewardPercent,
+      secondLevelPercent: selectedUser.value.partnerSecondLevelPercent,
+      partnerServiceRewardSum: selectedUser.value.partnerServiceRewardSum,
+      partnerRewardType: selectedUser.value.partnerRewardType,
+    },
+    watch: false,
+  })
+  if (data.value) {
+    notify({
+      type: 'success',
+      title: 'Партнерка сохранена',
+    })
+    isSaveBtnDisabled.value = false
+    closePartnerModalButton?.value?.click()
+  } else {
+    isSaveBtnDisabled.value = false
+    notify({
+      type: 'error',
+      title: 'Произошла ошибка',
+    })
+  }
+}
 
 async function getStandartTariffs() {
   const { data }: any = await useFetch('/api/tariff/standart', {
@@ -206,6 +237,14 @@ getStandartTariffs()
         :disabled="selectedUser.username == '' && !isStandartTariffs"
       >
         Редактировать тарифы
+      </button>
+      <button
+        class="btn btn-primary"
+        @click="setTariffs"
+        onclick="createPartnerModal.showModal()"
+        :disabled="selectedUser.username == '' && !isStandartTariffs"
+      >
+        Редактировать партнерку
       </button>
     </div>
 
@@ -416,6 +455,41 @@ getStandartTariffs()
           </div>
         </div>
       </div>
+
+      <!-- <div class="flex flex-col">
+        Партнерка, 1 уровень %
+        <input
+          type="number"
+          placeholder="Мин. значение в ₽"
+          v-model="selectedUser.partnerSecondLevelPercent"
+          class="input input-bordered my-1"
+        />
+      </div> -->
+      <div
+        v-if="selectedUser.uuid === 'all'"
+        class="text-center text-lg font-extrabold text-warning"
+      >
+        Выбраны все пользователи!
+      </div>
+      <div class="flex justify-center">
+        <button
+          class="btn btn-primary mt-3 px-10"
+          :disabled="isSaveBtnDisabled"
+          @click="saveTariffs"
+        >
+          Сохранить
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button ref="closeCreateModalButton">close</button>
+    </form>
+  </dialog>
+  <dialog id="createPartnerModal" class="modal">
+    <div class="modal-box max-w-lg">
+ 
+      <div>
+      </div>
       <div class="text-lg text-center mt-2">Партнерка</div>
       <div class="flex flex-col">
         Партнерка %
@@ -480,24 +554,17 @@ getStandartTariffs()
           class="input input-bordered my-1"
         />
       </div> -->
-      <div
-        v-if="selectedUser.uuid === 'all'"
-        class="text-center text-lg font-extrabold text-warning"
-      >
-        Выбраны все пользователи!
-      </div>
       <div class="flex justify-center">
         <button
           class="btn btn-primary mt-3 px-10"
-          :disabled="isSaveBtnDisabled"
-          @click="saveTariffs"
+          @click="saveTariffssaveTariffsPartner"
         >
           Сохранить
         </button>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-      <button ref="closeCreateModalButton">close</button>
+      <button ref="closePartnerModalButton">close</button>
     </form>
   </dialog>
 </template>

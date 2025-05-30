@@ -1,10 +1,10 @@
-﻿import { User } from '@/server/lib/models/User'
+import { User } from '@/server/lib/models/User'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
 import { Buyout } from '@/server/lib/models/Buyout'
 import { Delivery } from '~~/server/lib/models/Delivery'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
-import { HarmexReferrals } from "~/server/lib/models/HarmexReferrals";
+import { HarmexReferrals } from '~/server/lib/models/HarmexReferrals'
 
 function getServiceNameByKey(key: string) {
   switch (key) {
@@ -36,12 +36,22 @@ function getServiceNameByKey(key: string) {
       return 'Отзывы отелей'
     case 'penalty':
       return 'Штрафы'
+      case 'percent':
+      return '%'
+      case 'service':
+      return '₽'
   }
 }
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
-  const { userUuid, tariffs }: any = await readBody(event)
+  const {
+    userUuid,
+    rewardPercent,
+    secondLevelPercent,
+    partnerServiceRewardSum,
+    partnerRewardType,
+  }: any = await readBody(event)
   if (!session) return sendRedirect(event, '/auth', 302)
 
   const user = await AdminUser.findOne({ uuid: session.uuid })
@@ -59,38 +69,53 @@ export default eventHandler(async (event) => {
     })
   }
 
-  foundUser.MPTariffs = tariffs
-  let tariffsStr = ''
-  tariffs.forEach((item: any) => {
-    let pricesStr = `  ${item.mp.toUpperCase()}: \n `
-    let index = 0
-
-    for (let key in item.prices) {
-      index++
-      const symbol = index >= Object.keys(item.prices).length ? '. ' : ', '
-      const valueSymbol = item.prices[key].type == 'percent' ? '%' : '₽'
-      pricesStr =
-        pricesStr +
-        ' - ' +
-        getServiceNameByKey(key.toString()) +
-        ': ' +
-        item.prices[key].value +
-        valueSymbol +
-        symbol + '\n'
-    }
-
-    tariffsStr += pricesStr + '\n'
-  })
+  foundUser.partner.rewardPercent = rewardPercent
+  foundUser.partner.secondLevelPercent = secondLevelPercent
+  foundUser.partner.partnerServiceRewardSum = partnerServiceRewardSum
+  foundUser.partner.partnerRewardType = partnerRewardType
 
   await foundUser.save()
 
   const referralFound = await HarmexReferrals.findOne({ user: foundUser })
-  
+
+  if (!referralFound) {
+    await HarmexReferrals.create({
+      user: foundUser,
+      referrals: [{ user: user._id, date: new Date() }],
+      partnerRewardType: partnerRewardType,
+      rewardPercent: rewardPercent,
+      partnerServiceRewardSum: partnerServiceRewardSum,
+    })
+  } else {
+    referralFound.partnerRewardType = partnerRewardType
+    referralFound.rewardPercent = rewardPercent
+    referralFound.partnerServiceRewardSum = partnerServiceRewardSum
+    await referralFound.save()
+  }
+
+
   await ActionHistory.create({
     adminUser: user._id,
     adminUserUuid: user.uuid,
     actionId: 92,
-    actionDescription: ` Тарифы пользователя ${foundUser.username} были изменены на значения:\n${tariffsStr}`,
+    actionDescription: `Партнеские тарифы пользователя ${
+      foundUser.username
+    } были изменены на значения:\n${
+      rewardPercent ? `Бонус партнерки % - ${rewardPercent}\n` : ''
+    }${
+      secondLevelPercent
+        ? `Бонус партнерки 2 уровня % - ${secondLevelPercent}\n`
+        : ''
+    }${
+      partnerServiceRewardSum
+        ? `Бонус партнерки сумма - ${partnerServiceRewardSum}\n`
+        : ''
+    }${
+      partnerRewardType
+        ? `Тип бонуса - ${getServiceNameByKey(partnerRewardType)}`
+        : ''
+    }`,
+    actionDate: new Date(),
     date: new Date(),
     userUuid: foundUser.uuid,
   })
