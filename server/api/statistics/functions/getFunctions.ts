@@ -41,6 +41,7 @@ export async function getTurnOverInfo(dateQuery: any, mp: any = {}): Promise<any
     buyoutsProfit: 0,
     reviewsProfit: 0,
     penaltiesProfit: 0,
+    nds: 0,
   }
 
   const handleTurnOverSumm = await paymenthistory.aggregate([
@@ -85,6 +86,7 @@ export async function getTurnOverInfo(dateQuery: any, mp: any = {}): Promise<any
 
   if (qrTurnoverSumm && qrTurnoverSumm.length > 0) {
     res.qrTurnover = qrTurnoverSumm[0].summ
+    res.nds = res.qrTurnover * 0.05
   }
   res.allTurnover = res.qrTurnover + res.manualTurnover
   

@@ -98,6 +98,13 @@ const categories = ref<
         type: 'money',
       },
       {
+        title: 'НДС',
+        value: "1",
+        subtitle: 'НДС на пополнения',
+        key: 'nds',
+        type: 'money',
+      },
+      {
         title: 'QR',
         value: '30 000 ₽',
         key: 'qrTurnover',

@@ -119,6 +119,7 @@ export default eventHandler(async (event) => {
     balance: 0,
     partnerBalance: 0,
     paidByPartner: 0,
+    nds: 0,
   }
 
   ///Блок с регистрациями
