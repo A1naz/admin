@@ -27,6 +27,7 @@ const pages = ref(0)
 const isPageBtnsDisabled = ref(false)
 const dateRange = ref([])
 const article = ref('')
+const uuidBuyout = ref('')
 const selectedMP = ref('wildberries')
 const mpStore = useMPStore()
 const config = useRuntimeConfig()
@@ -79,6 +80,7 @@ async function createRequire() {
       typeOperation: createType.value,
       mp: selectedMP.value,
       article: article.value,
+      uuidBuyout: uuidBuyout.value.replaceAll(' ', ''),
     },
     watch: false,
   })
@@ -370,6 +372,13 @@ if (
           v-model="article"
           type="number"
           placeholder="Артикул"
+          class="input input-bordered input-l mb-2 w-full"
+        />
+        <input
+        v-if="selectedMP == 'ym'"
+          v-model="uuidBuyout"
+          type="text"
+          placeholder="Id выкупа(необходимо для ЯМ)"
           class="input input-bordered input-l mb-2 w-full"
         />
       </div>
