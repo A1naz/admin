@@ -10,7 +10,7 @@ const screenshotsRequireSchema = new Schema({
   status: { type: String, default: 'created' },
   article: { type: Number, requred: true },
   screenshots: [{ type: String }],
-  uuidbuyout: { type: String, required: true },
+  uuidbuyout: { type: String, required: false },
   mp: { type: String, required: true },
 })
 
