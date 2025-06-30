@@ -2,8 +2,7 @@
 
 const baseUrl = '/'
 
-const description =
-  'Админка'
+const description = 'Админка'
 export default defineNuxtConfig({
   app: {
     baseURL: baseUrl,
@@ -116,8 +115,8 @@ export default defineNuxtConfig({
   s3: {
     client: {
       credentials: {
-        secretAccessKey: process.env.VK_SECRET_KEY  || '',
-        accessKeyId: process.env.VK_ACCESS_KEY  || '',
+        secretAccessKey: process.env.VK_SECRET_KEY || '',
+        accessKeyId: process.env.VK_ACCESS_KEY || '',
       },
       endpoint: 'https://hb.vkcs.cloud/admin/',
       region: 'ru-msk',
@@ -169,10 +168,10 @@ export default defineNuxtConfig({
     WB_DB_URI: process.env.WB_DB_URI,
     OZON_DB_URI: process.env.OZON_DB_URI,
     AVITO_DB_URI: process.env.AVITO_DB_URI,
-    FLOWWOW_DB_URI: process.env.FLOWWOW_DB_URI,
     YANDEX_MARKET_DB_URI: process.env.YANDEX_MARKET_DB_URI,
     OZON_HOTELS_DB_URI: process.env.OZON_HOTELS_DB_URI,
     SUTOCHNO_DB_URI: process.env.SUTOCHNO_DB_URI,
+    FLOWWOW_DB_URI: process.env.FLOWWOW_DB_URI,
     SECRET: process.env.SECRET,
     smtpHost: process.env.smtpHost,
     smtpPort: process.env.smtpPort,
