@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import { PVZ } from '~/server/lib/models/ozon/PVZ'
+import { PVZ as WBPVZ } from "~/server/lib/models/wildberries/PVZ";
 
 
 export async function removeExtraPickpoints() {
@@ -76,34 +77,25 @@ export async function removeExtraPickpoints() {
 }
 
 export async function createPickpointsFile() {
-  const data: any = await $fetch(
-    'https://static-basket-01.wb.ru/vol0/data/all-poo-fr-v9.json',
-    {
-      method: 'GET',
-      headers: {
-        'x-requested-with': 'XMLHttpRequest',
-      },
-    }
-  )
-
-  const points = data[0].items
+  const points: any = await WBPVZ.find();
   const collection = points.map((point: any) => {
     return {
-      id: point.id,
-      lt: point.coordinates[0],
-      lg: point.coordinates[1],
-      w: point.workTime,
+      id: point.pointId,
+      lt:
+        point.coordinates && point.coordinates[0] ? point.coordinates[0] : null,
+      lg:
+        point.coordinates && point.coordinates[1] ? point.coordinates[1] : null,
       a: point.address,
-    }
-  })
+    };
+  });
 
   const cache = {
     updated: new Date(),
     points: collection,
-  }
+  };
 
-  fs.writeFileSync('pvz/wildberriesPoints.json', JSON.stringify(cache))
-  return
+  fs.writeFileSync("pvz/wildberriesPoints.json", JSON.stringify(cache));
+  return;
 }
 
 export async function createOzonPickpointsFile() {
