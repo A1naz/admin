@@ -158,6 +158,24 @@ const categories = ref<
         key: 'penaltiesProfit',
         type: 'money',
       },
+      {
+        title: 'AI тексты',
+        value: '0 ₽',
+        key: 'aiTextsProfit',
+        type: 'money',
+      },
+      {
+        title: 'AI фото',
+        value: '0 ₽',
+        key: 'aiPhotosProfit',
+        type: 'money',
+      },
+      {
+        title: 'AI видео',
+        value: '0',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
     ],
   },
   {

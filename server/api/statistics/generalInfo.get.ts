@@ -120,6 +120,9 @@ export default eventHandler(async (event) => {
     partnerBalance: 0,
     paidByPartner: 0,
     nds: 0,
+    aiVideosProfit: 0,
+    aiPhotosProfit: 0,
+    aiTextsProfit: 0,
   }
 
   ///Блок с регистрациями
