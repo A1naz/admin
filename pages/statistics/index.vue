@@ -99,7 +99,7 @@ const categories = ref<
       },
       {
         title: 'НДС',
-        value: "1",
+        value: '1',
         subtitle: 'НДС на пополнения',
         key: 'nds',
         type: 'money',
@@ -158,24 +158,6 @@ const categories = ref<
         key: 'penaltiesProfit',
         type: 'money',
       },
-      {
-        title: 'AI тексты',
-        value: '0 ₽',
-        key: 'aiTextsProfit',
-        type: 'money',
-      },
-      {
-        title: 'AI фото',
-        value: '0 ₽',
-        key: 'aiPhotosProfit',
-        type: 'money',
-      },
-      {
-        title: 'AI видео',
-        value: '0',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
     ],
   },
   {
@@ -228,6 +210,151 @@ const categories = ref<
         key: 'paidByPartner',
         type: 'money',
       },
+    ],
+  },
+  {
+    title: 'AI - отзывы',
+    content: [
+      {
+        title: 'AI тексты',
+        value: '0 ₽',
+        key: 'aiTextsProfit',
+        type: 'money',
+      },
+      {
+        title: 'AI фото',
+        value: '0 ₽',
+        key: 'aiPhotosProfit',
+        type: 'money',
+      },
+      {
+        title: 'AI видео',
+        value: '0',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+    ],
+  },
+  {
+    title: 'AI - Аналитика',
+    content: [
+      {
+        title: 'Отзывы+Вопросы',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Цены',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Акции',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Поставки',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Негатив',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+    ],
+  },
+  {
+    title: 'AI - Карточка товара',
+    content: [
+      {
+        title: 'Инфографика',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'SEO',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Видео',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Фото+Видео',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Под ключ',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'A/B тесты',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+    ],
+  },
+  {
+    title: 'AI - Стратегия',
+    content: [
+      {
+        title: 'Самовыкупы',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Реклама',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Блогеры',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      }
+    ],
+  },
+  {
+    title: 'AI - Стратегия',
+    content: [
+      {
+        title: 'Флаер',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Рич контент',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      },
+      {
+        title: 'Упаковка',
+        value: '0 ₽',
+        key: 'aiVideosProfit',
+        type: 'money',
+      }
     ],
   },
 ])
