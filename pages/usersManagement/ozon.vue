@@ -101,6 +101,7 @@ const tabs = ref([
       { key: 'deleting', title: 'на удалении' },
       { key: 'deleted', title: 'удаленные' },
       { key: 'nofunds', title: 'недостаточно средств' },
+           { key: 'archived', title: 'в архиве' },
     ],
   },
   {
@@ -390,11 +391,11 @@ function changeMP(event: any) {
         <option selected value="buyouts">выкупы</option>
         <option value="deliveries">доставки</option>
         <option value="reviews">отзывы</option>
-        <option value="likes">лайки на отзывы</option>
+        <!-- <option value="likes">лайки на отзывы</option>
         <option value="questions">вопросы</option>
         <option value="productLikes">лайки на товары</option>
         <option value="cart">корзина</option>
-        <option value="reports">отчеты по выкупам</option>
+        <option value="reports">отчеты по выкупам</option> -->
       </select>
       <select
         v-if="
