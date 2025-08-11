@@ -28,6 +28,7 @@ const selectedAdminUser: any = ref({
 const serviceId = ref('')
 const statusOption = ref('all')
 const mpStore = useMPStore()
+const selectedFilter = ref('any')
 
 function openAdminUsersSelectModal() {
   selectAdminUserClose.value?.click()
@@ -55,6 +56,7 @@ async function getActs() {
             : null,
         serviceId: serviceId.value === '' ? null : serviceId.value,
         dateRange: statusOption === 'all' ? null : statusOption.value,
+        filter: selectedFilter.value,
       },
     }
   )
@@ -139,7 +141,7 @@ function changeMP(event: any) {
 }
 
 function openRefund(act: any) {
-  const mp =  selectedMP.value 
+  const mp = selectedMP.value
   navigateTo(`/refunds?username=${act.username}&actUuid=${act.uuid}&mp=${mp}`)
 }
 
@@ -205,9 +207,22 @@ await getActs()
           @change="getActs"
           v-model="selectedMP"
         >
-        <option v-for="mp in mpStore.MPTabs" :value="mp.value" :key="mp.value">
-          {{ mp.title }}
-        </option>
+          <option
+            v-for="mp in mpStore.MPTabs"
+            :value="mp.value"
+            :key="mp.value"
+          >
+            {{ mp.title }}
+          </option>
+        </select>
+        <select
+          class="select select-bordered w-50 ml-3"
+          v-model="selectedFilter"
+          @change="getActs"
+        >
+          <option value="any">Все</option>
+          <option value="return">Возврат</option>
+          <option value="cancel">Отмена</option>
         </select>
         <button class="btn btn-primary ml-3" @click="getActs">Применить</button>
       </div>

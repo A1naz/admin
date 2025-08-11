@@ -13,7 +13,9 @@ export default eventHandler(async (event) => {
   if (!user || (!user.mainAdmin && !user.tabs.includes('возврат и задержка')))
     return sendRedirect(event, '/auth', 302)
 
-  const { page, sortDate, userId, dateRange, serviceId }: any = getQuery(event)
+ const { page, sortDate, userId, dateRange, serviceId, filter }: any =
+    getQuery(event)
+
 
   let trueDateRange = {}
   if (dateRange) {
@@ -83,22 +85,28 @@ export default eventHandler(async (event) => {
     uuid = { uuidbuyout: serviceId.trim() }
   }
 
-  const acts = await Delivery.aggregate([
-    {
-
-      $addFields: {
-        lastStatus: { $arrayElemAt: ['$statusdelivery.status', -1] }
-      }
-    },
-    {
-      $match: {
-        ...trueUser,
-        ...trueDateRange,
-        ...uuid,
-        lastStatus: { $regex: /(Отказ|Возврат|Отмен)/i }
-      }
+   let lastStatus = { $regex: /(Отказ|Возврат|Отмен)/i }
+    if (filter == 'return') {
+      lastStatus = { $regex: /(Возврат)/i }
+    } else if (filter == 'cancel') {
+      lastStatus = { $regex: /(Отказ|Отмен)/i }
     }
-  ]).sort({
+  
+    const acts = await Delivery.aggregate([
+      {
+        $addFields: {
+          lastStatus: { $arrayElemAt: ['$statusdelivery.status', -1] },
+        },
+      },
+      {
+        $match: {
+          ...trueUser,
+          ...trueDateRange,
+          ...uuid,
+          lastStatus: lastStatus,
+        },
+      },
+    ]).sort({
     updatedAt: -1,
   })
     .skip(paymentPerPage * (+page - 1))

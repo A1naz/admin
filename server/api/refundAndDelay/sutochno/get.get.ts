@@ -13,7 +13,8 @@ export default eventHandler(async (event) => {
   if (!user || (!user.mainAdmin && !user.tabs.includes('возврат и задержка')))
     return sendRedirect(event, '/auth', 302)
 
-  const { page, sortDate, userId, dateRange, serviceId }: any = getQuery(event)
+  const { page, sortDate, userId, dateRange, serviceId, filter }: any =
+    getQuery(event)
 
   let trueDateRange = {}
   if (dateRange) {
@@ -82,28 +83,33 @@ export default eventHandler(async (event) => {
   if (serviceId) {
     uuid = { uuidbuyout: serviceId.trim() }
   }
+  let lastStatus = { $regex: /(Отказ|Возврат|Отмен)/i }
+  if (filter == 'return') {
+    lastStatus = { $regex: /(Возврат)/i }
+  } else if (filter == 'cancel') {
+    lastStatus = { $regex: /(Отказ|Отмен)/i }
+  }
 
   const acts = await Delivery.aggregate([
     {
-
       $addFields: {
-        lastStatus: { $arrayElemAt: ['$statusdelivery.status', -1] }
-      }
+        lastStatus: { $arrayElemAt: ['$statusdelivery.status', -1] },
+      },
     },
     {
       $match: {
         ...trueUser,
         ...trueDateRange,
         ...uuid,
-        lastStatus: { $regex: /(Отказ|Возврат|Отмен)/i }
-      }
-    }
-  ]).sort({
-    updatedAt: -1,
-  })
+        lastStatus: lastStatus,
+      },
+    },
+  ])
+    .sort({
+      updatedAt: -1,
+    })
     .skip(paymentPerPage * (+page - 1))
     .limit(paymentPerPage)
-
 
   // let acts: any = await Delivery.find({
   //   ...trueUser,
@@ -125,7 +131,7 @@ export default eventHandler(async (event) => {
   const usernames = await User.find({
     _id: { $in: acts.map((act: any) => act.user) },
   })
-  const regex = /(Отказ|Возврат|Отмен)/i;
+  const regex = /(Отказ|Возврат|Отмен)/i
 
   const format = await Promise.all(
     acts.map(async (delivery: any) => {
@@ -136,7 +142,9 @@ export default eventHandler(async (event) => {
         (user: any) => user._id.valueOf() === delivery.user.valueOf()
       )
 
-      const index = delivery.statusdelivery.findIndex((el: any) => regex.test(el.status));
+      const index = delivery.statusdelivery.findIndex((el: any) =>
+        regex.test(el.status)
+      )
 
       return {
         username: user ? user.username : username,
