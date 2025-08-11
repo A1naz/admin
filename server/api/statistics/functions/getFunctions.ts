@@ -92,7 +92,39 @@ export async function getTurnOverInfo(
 
   if (qrTurnoverSumm && qrTurnoverSumm.length > 0) {
     res.qrTurnover = qrTurnoverSumm[0].summ
-    res.nds = res.qrTurnover * 0.05
+  }
+
+  //01.08.2025
+  const firstAugust = new Date('2025-08-01')
+
+  const dateFrom = new Date(
+    Math.max(new Date(dateQuery.$gte).getTime(), firstAugust.getTime())
+  )
+
+  console.log(dateQuery)
+  const ndsTurnoverSumm = await paymenthistory.aggregate([
+    {
+      $match: {
+        dataoperation: {
+          $gte: dateFrom,
+          $lt: dateQuery.$lt,
+        },
+        typeoperations: 'Приход',
+        comment: { $regex: 'Пополнение ' },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        summ: {
+          $sum: '$summ',
+        },
+      },
+    },
+  ])
+
+  if (ndsTurnoverSumm && ndsTurnoverSumm.length > 0) {
+    res.nds = (res.qrTurnover * 5) / 105
   }
   res.allTurnover = res.qrTurnover + res.manualTurnover
 

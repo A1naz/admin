@@ -98,7 +98,7 @@ const categories = ref<
         type: 'money',
       },
       {
-        title: 'НДС',
+        title: 'НДС 5%',
         value: '1',
         subtitle: 'НДС на пополнения',
         key: 'nds',

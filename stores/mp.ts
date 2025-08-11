@@ -10,6 +10,7 @@ export const useMPStore = defineStore('mp', {
             { title: 'Avito', value: 'avito' },
             { title: 'Flowwow', value: 'flowwow' },
             { title: 'Суточно', value: 'sutochno' },
+            { title: 'Золотое яблоко', value: 'zy' },
           ],
     }),
     persist: {

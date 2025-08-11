@@ -26,7 +26,7 @@ const selectedUser: any = ref({
 
 const mpStore = useMPStore()
 
-const userBank = ref('Alfabank')
+const userBank = ref('TBank')
 const userIP = ref('BalashovIP')
 const repaymentType = ref('withoutNDS')
 const operationNumber = ref('')
@@ -485,8 +485,8 @@ function selectUser(user: any) {
           >
             <option disabled>Тип пополнения</option>
             <option value="withoutNDS">Без НДС</option>
-            <option value="WithNDS5">С НДС 5%</option>
-            <option value="WithNDS7">С НДС 7%</option>
+            <!-- <option value="WithNDS5">С НДС 5%</option>
+            <option value="WithNDS7">С НДС 7%</option> -->
           </select>
         </label>
         <label class="w-full">
