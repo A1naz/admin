@@ -1,8 +1,8 @@
 ﻿import ExcelJS from 'exceljs'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
-import { paymenthistory } from "~/server/lib/models/Paymenthistory"
-import { ActionHistory } from "~/server/lib/models/actionHistory"
+import { paymenthistory } from '~/server/lib/models/Paymenthistory'
+import { ActionHistory } from '~/server/lib/models/actionHistory'
 import getAll from './export/getAll'
 import getAllBuyouts from './export/getAllBuyouts'
 import getBuyoutsService from './export/getBuyoutsService'
@@ -19,7 +19,6 @@ export default eventHandler(async (event) => {
   if (!user || !user.tabs.includes('финансовые операции'))
     return sendRedirect(event, '/auth', 302)
 
-
   const workbook = new ExcelJS.Workbook()
 
   const { filters, mp }: any = getQuery(event)
@@ -29,29 +28,31 @@ export default eventHandler(async (event) => {
   const trueType =
     trueFilters.type == 'any'
       ? {}
-      :
-      trueFilters.type == 'allBuyouts' ?
-        { type: { $in: ['buyouts', 'buyouts service'] } } :
-        { type: trueFilters.type }
+      : trueFilters.type == 'allBuyouts'
+      ? { type: { $in: ['buyouts', 'buyouts service'] } }
+      : { type: trueFilters.type }
 
-
-        console.log(trueFilters)
+  console.log(trueFilters)
   const allData: any[] = []
 
-  const dataCount = await paymenthistory.countDocuments({
-    user: trueFilters.clients && trueFilters.clients.length ?
-      {
-        $in: trueFilters.clients
-      } : { $exists: true },
-    dataoperation: trueFilters.dateRange ?
-      {
-        $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
-        $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
-      } : { $exists: true },
-    ...(mp === 'all' ? {} : { mp: mp }),
-    ...trueType
-  }
-  ).limit(500000)
+  const dataCount = await paymenthistory
+    .countDocuments({
+      user:
+        trueFilters.clients && trueFilters.clients.length
+          ? {
+              $in: trueFilters.clients,
+            }
+          : { $exists: true },
+      dataoperation: trueFilters.dateRange
+        ? {
+            $gte: new Date(trueFilters.dateRange[0]).setHours(0, 0, 0, 0),
+            $lt: new Date(trueFilters.dateRange[1]).setHours(23, 59, 0, 0),
+          }
+        : { $exists: true },
+      ...(mp === 'all' ? {} : { mp: mp }),
+      ...trueType,
+    })
+    .limit(500000)
 
   if (!dataCount) throw new Error('Нет данных')
 
@@ -59,59 +60,20 @@ export default eventHandler(async (event) => {
     let foundData: any = []
     try {
       if (trueFilters.type == 'any') {
-
-        foundData = await getAll(
-          trueFilters,
-          mp,
-          limit * i,
-          limit,
-        )
-
-
+        foundData = await getAll(trueFilters, mp, limit * i, limit)
       } else if (trueFilters.type == 'allBuyouts') {
-
-        foundData = await getAllBuyouts(
-          trueFilters,
-          mp,
-          limit * i,
-          limit,
-        )
-
+        foundData = await getAllBuyouts(trueFilters, mp, limit * i, limit)
       } else if (trueFilters.type == 'buyouts service') {
-        foundData = await getBuyoutsService(
-          trueFilters,
-          mp,
-          limit * i,
-          limit,
-        )
+        foundData = await getBuyoutsService(trueFilters, mp, limit * i, limit)
       } else if (trueFilters.type == 'buyouts') {
-
-        foundData = await getBuyouts(
-          trueFilters,
-          mp,
-          limit * i,
-          limit,
-        )
-
+        foundData = await getBuyouts(trueFilters, mp, limit * i, limit)
       } else {
-        foundData = await getCommonData(
-          trueFilters,
-          mp,
-          limit * i,
-          limit
-        )
+        foundData = await getCommonData(trueFilters, mp, limit * i, limit)
       }
 
       if (foundData && foundData.length > 0) allData.push(...foundData)
-
-    }
-    catch (error) {
-
-    }
+    } catch (error) {}
   }
-
-
-
 
   const sheet = workbook.addWorksheet('Отчет о платежах', {
     headerFooter: { firstHeader: `Всего: ${dataCount}` },
@@ -163,9 +125,11 @@ export default eventHandler(async (event) => {
     },
   ]
 
-
-
-  if (trueFilters.type == 'buyouts' || trueFilters.type == 'any' || trueFilters.type == 'allBuyouts') {
+  if (
+    trueFilters.type == 'buyouts' ||
+    trueFilters.type == 'any' ||
+    trueFilters.type == 'allBuyouts'
+  ) {
     columns.splice(8, 0, {
       header: 'Товар',
       key: 'productName',
@@ -181,8 +145,15 @@ export default eventHandler(async (event) => {
   }
 
   sheet.columns = columns
-
-  sheet.addRows(allData.sort((a: any, b: any) => b.dataoperation - a.dataoperation))
+  
+  sheet.addRows(
+    allData
+      .map((row: any) => ({
+        ...row,
+        summ: row.summ ? Number(row.summ) : 0, // Приведение к числу
+      }))
+      .sort((a: any, b: any) => b.dataoperation - a.dataoperation)
+  )
 
   await ActionHistory.create({
     adminUser: user._id,
