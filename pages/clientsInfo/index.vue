@@ -106,7 +106,7 @@ async function signTariff() {
         <input
           v-model="filtersForm.searchQuery"
           type="text"
-          placeholder="Логин, наименование"
+          placeholder="Логин, наименование, номер телефона"
           class="input input-bordered w-60 -mr-[55px]"
         />
 

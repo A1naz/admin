@@ -24,19 +24,45 @@ export default eventHandler(async (event) => {
         $or: [
           { username: { $regex: searchQuery, $options: 'i' } },
           { orgName: { $regex: searchQuery, $options: 'i' } },
+          {
+            phoneNumber: {
+              $regex: searchQuery.replace('+', '').replace(/[()\-\s]/g, ''),
+              $options: 'i',
+            },
+          },
         ],
       }
     : {}
 
   let users = []
   if (status === 'all') {
-    users = await getUsers.allUsers(page, searchQueryParam, dateRange, clientsType)
+    users = await getUsers.allUsers(
+      page,
+      searchQueryParam,
+      dateRange,
+      clientsType
+    )
   } else if (status === 'active') {
-    users = await getUsers.activeUsers(page, searchQueryParam, dateRange, clientsType)
+    users = await getUsers.activeUsers(
+      page,
+      searchQueryParam,
+      dateRange,
+      clientsType
+    )
   } else if (status === 'inactive') {
-    users = await getUsers.inactiveUsers(page, searchQueryParam, dateRange, clientsType)
+    users = await getUsers.inactiveUsers(
+      page,
+      searchQueryParam,
+      dateRange,
+      clientsType
+    )
   } else {
-    users = await getUsers.registeredUsers(page, searchQueryParam, dateRange, clientsType)
+    users = await getUsers.registeredUsers(
+      page,
+      searchQueryParam,
+      dateRange,
+      clientsType
+    )
   }
 
   await ActionHistory.create({
