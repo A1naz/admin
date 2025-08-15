@@ -124,7 +124,7 @@ export async function getTurnOverInfo(
   ])
 
   if (ndsTurnoverSumm && ndsTurnoverSumm.length > 0) {
-    res.nds = (res.qrTurnover * 5) / 105
+    res.nds = ((res.qrTurnover + res.manualTurnover) * 5) / 105
   }
   res.allTurnover = res.qrTurnover + res.manualTurnover
 
