@@ -53,6 +53,8 @@ const screenshot = ref({
   public: 'null',
 })
 
+const searchRequestQuery = ref('')
+
 async function getStats() {
   stats.value = []
   const { data }: any = await useFetch('/api/manualTransfer/get', {
@@ -64,7 +66,9 @@ async function getStats() {
       sortDateType: sortDateType.value,
       type: type.value,
       dateRange: dateRange.value.length > 0 ? dateRange.value : null,
+      searchQuery: searchRequestQuery.value,
     },
+    watch: false,
   })
   if (data.value) {
     stats.value = data.value.balanceTransferRequest
@@ -122,13 +126,7 @@ function sortByDate() {
 
 async function swapPage(destination: number) {
   if (destination < 0 && curPage.value <= 1) return
-  if (curPage.value >= pages.value && destination > 0) {
-    notify({
-      type: 'error',
-      title: 'Последняя страница',
-    })
-    return
-  }
+ 
   curPage.value += destination
   isPageBtnsDisabled.value = true
   await getStats()
@@ -154,6 +152,9 @@ async function getUsers(searchValue: string = '') {
 async function onInput(event: Event) {
   findSearchQueryDebounced()
 }
+async function onInputRequest(event: Event) {
+  findSearchQueryRequestDebounced()
+}
 
 const findSearchQuery = async () => {
   //@ts-ignore
@@ -164,8 +165,15 @@ const findSearchQuery = async () => {
   await getUsers(userQuery.value)
   inputLoading.value = false
 }
+const findSearchQueryRequest = async () => {
+  
+  inputLoading.value = true
+  await getStats()
+  inputLoading.value = false
+}
 
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
+const findSearchQueryRequestDebounced = useDebounceFn(findSearchQueryRequest, 1000)
 
 getStats()
 
@@ -234,7 +242,10 @@ async function createBalanceTransferRequest() {
 }
 
 const store = useMainStore()
-if (!store.client.mainAdmin && !store.client.tabs.includes('ручные пополнения средств')) {
+if (
+  !store.client.mainAdmin &&
+  !store.client.tabs.includes('ручные пополнения средств')
+) {
   navigateTo('/partner')
 }
 
@@ -305,7 +316,23 @@ function selectUser(user: any) {
       >
         Применить
       </button>
+      <div>
+        <label
+          ><input
+            v-model="searchRequestQuery"
+            type="text"
+            placeholder="Логин, сумма, организация"
+            class="input input-bordered input-l ml-4 w-72"
+            @input="onInputRequest($event)"
+          />
+        </label>
+        <span
+          v-if="inputLoading"
+          class="loading loading-spinner text-primary loading-large ml-4"
+        />
+      </div>
     </div>
+
     <div>
       <label class="btn btn-primary mr-3" for="createRequireModal">
         Создать запрос

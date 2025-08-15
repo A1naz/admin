@@ -37,7 +37,7 @@ export default eventHandler(async (event) => {
   //     ],
   //   }
 
-  const { page, sortDate, dateRange }: any = getQuery(event)
+  const { page, sortDate, dateRange, searchQuery }: any = getQuery(event)
 
   let trueDateRange = {}
   if (dateRange) {
@@ -61,12 +61,30 @@ export default eventHandler(async (event) => {
   //       }
   //     : {}
 
-  const requests = await manualBalanceTransferRequest
-    .find({
-      // ...accountOperation,
-      // ...allowedUsersParam,
-      ...trueDateRange,
+  let foundUsers: any[] = []
+  if (searchQuery && searchQuery.length > 0) {
+    foundUsers = await User.find({
+      $or: [
+        { username: { $regex: searchQuery, $options: 'i' } },
+        { orgName: { $regex: searchQuery, $options: 'i' } },
+      ],
     })
+  }
+
+  const filter: any = {
+    ...(foundUsers.length > 0 && {
+      user: { $in: foundUsers.map((u) => u._id) },
+    }),
+    ...trueDateRange,
+  }
+
+  // Проверяем, что searchQuery — число
+  if (searchQuery && !isNaN(Number(searchQuery))) {
+    filter.summ = Number(searchQuery)
+  }
+
+  const requests = await manualBalanceTransferRequest
+    .find(filter)
     .sort({ createdAt: Number(sortDate) === -1 ? -1 : 1 })
     .limit(elPerPage)
     .skip((page - 1) * elPerPage)
