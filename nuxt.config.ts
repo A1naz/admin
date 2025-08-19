@@ -172,6 +172,7 @@ export default defineNuxtConfig({
     OZON_HOTELS_DB_URI: process.env.OZON_HOTELS_DB_URI,
     SUTOCHNO_DB_URI: process.env.SUTOCHNO_DB_URI,
     FLOWWOW_DB_URI: process.env.FLOWWOW_DB_URI,
+    GOLD_APPLE_DB_URI: process.env.GOLD_APPLE_DB_URI,
     SECRET: process.env.SECRET,
     smtpHost: process.env.smtpHost,
     smtpPort: process.env.smtpPort,
