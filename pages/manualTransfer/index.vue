@@ -126,7 +126,7 @@ function sortByDate() {
 
 async function swapPage(destination: number) {
   if (destination < 0 && curPage.value <= 1) return
- 
+
   curPage.value += destination
   isPageBtnsDisabled.value = true
   await getStats()
@@ -166,14 +166,16 @@ const findSearchQuery = async () => {
   inputLoading.value = false
 }
 const findSearchQueryRequest = async () => {
-  
   inputLoading.value = true
   await getStats()
   inputLoading.value = false
 }
 
 const findSearchQueryDebounced = useDebounceFn(findSearchQuery, 1000)
-const findSearchQueryRequestDebounced = useDebounceFn(findSearchQueryRequest, 1000)
+const findSearchQueryRequestDebounced = useDebounceFn(
+  findSearchQueryRequest,
+  1000
+)
 
 getStats()
 
@@ -261,6 +263,24 @@ function selectUser(user: any) {
   userQuery.value = ''
   users.value = []
 }
+
+const isExportBtnDisabled = ref(false)
+
+async function exportXLS() {
+  isExportBtnDisabled.value = true
+  const { data } = await useFetch('/api/manualTransfer/exportToExcel', {
+    responseType: 'blob',
+    method: 'GET',
+    watch: false,
+  })
+  const fileURL = window.URL.createObjectURL(new Blob([data.value as any]))
+  const fileLink = document.createElement('a')
+  fileLink.href = fileURL
+  fileLink.setAttribute('download', 'Финансовые операции.xlsx')
+  document.body.appendChild(fileLink)
+  fileLink.click()
+  isExportBtnDisabled.value = false
+}
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Ручные пополнения средств</h1>
@@ -331,6 +351,20 @@ function selectUser(user: any) {
           class="loading loading-spinner text-primary loading-large ml-4"
         />
       </div>
+      <button
+        :disabled="isExportBtnDisabled"
+        @click="exportXLS"
+        class="btn flex flex-shrink btn-primary hover:text-black active:text-white font-medium rounded-lg relative group ml-2"
+      >
+        <div class="flex items-center justify-center">
+          <Icon
+            v-if="!isExportBtnDisabled"
+            name="lucide:download"
+            size="22px"
+          />
+          <span v-else class="loading loading-spinner" />
+        </div>
+      </button>
     </div>
 
     <div>
