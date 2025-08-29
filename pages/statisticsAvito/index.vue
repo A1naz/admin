@@ -33,10 +33,6 @@ const mps = ref([
     value: 'flowwow',
   },
   {
-    title: 'Avito',
-    value: 'avito',
-  },
-  {
     title: 'Sutochno',
     value: 'sutochno',
   },

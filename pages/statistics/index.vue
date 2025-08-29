@@ -32,10 +32,7 @@ const mps = ref([
     title: 'Flowwow',
     value: 'flowwow',
   },
-  {
-    title: 'Avito',
-    value: 'avito',
-  },
+  
   {
     title: 'Sutochno',
     value: 'sutochno',
