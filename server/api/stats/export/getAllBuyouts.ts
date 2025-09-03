@@ -43,7 +43,7 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
                                 if (item.mp && item.mp === 'ozon') {
                                         ozonBuyoutUuids.push(item.basisoperation.split('Выкуп #')[1])
                                 } else
-                                        if (item.mp && item.mp === 'yandexmarket') {
+                                        if (item.mp && item.mp === 'ym') {
                                                 yandexMarketBuyoutUuids.push(item.basisoperation.split('Выкуп #')[1])
                                         } else
                                                 if (item.mp && item.mp === 'avito') {

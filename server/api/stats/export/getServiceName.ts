@@ -30,6 +30,8 @@ export default function getServiceNameByKey(key: string | undefined) {
                         return 'Отзывы отелей'
                 case 'penalty':
                         return 'Штрафы'
+                case 'commission':
+                        return 'Комиссия портала'
                 default: ''
         }
 }

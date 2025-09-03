@@ -260,6 +260,7 @@ watch(selectedUsers.value, () => {
         <option value="review">Отзывы</option>
         <option value="deliveryStorage">Штрафы</option>
         <option value="refund">Возвраты</option>
+        <option value="commission">Комиссия</option>
         <!-- <option value="questionProduct">Вопросы</option> -->
         <!-- <option value="Расход">Расходы</option>
       </select>

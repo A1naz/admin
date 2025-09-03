@@ -9,7 +9,7 @@ import getServiceName from "./getServiceName"
 export default async function (trueFilters: any, mp: string, skip: number, limit: number) {
 
         const type = { ...trueFilters.typeoperations == 'any' ? {} : { typeoperations: trueFilters.typeoperations }, }
-        console.log(type)
+
 
         const history = await paymenthistory.find({
                 ...trueFilters.typeoperations == 'any' ? {} : { typeoperations: trueFilters.typeoperations },
@@ -25,7 +25,6 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
                 ...mp === 'all' ? {} : { mp: mp }
         }).skip(skip).limit(limit)
 
-        console.log(history.length)
 
         const users = await User.find({
                 _id: history.map((item: any) => item.user)
@@ -48,7 +47,7 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
                                 if (item.mp && item.mp === 'ozon') {
                                         ozonBuyoutUuids.push(item.basisoperation.split('Выкуп #')[1])
                                 } else
-                                        if (item.mp && item.mp === 'yandexmarket') {
+                                        if (item.mp && item.mp === 'ym') {
                                                 yandexMarketBuyoutUuids.push(item.basisoperation.split('Выкуп #')[1])
                                         } else
                                                 if (item.mp && item.mp === 'avito') {
@@ -79,6 +78,7 @@ export default async function (trueFilters: any, mp: string, skip: number, limit
         const format: any[] = []
 
         for (const item of history) {
+              
                 if ((item.type === 'buyouts' || item.type === 'buyouts service') && item.basisoperation && item.basisoperation.includes('Выкуп #')) {
                         const buyout = allBuyouts.find(buyout => buyout.uuid === item.basisoperation.split('Выкуп #')[1])
                         const foundUser = users.find(user => user._id.valueOf() === item.user.valueOf())
