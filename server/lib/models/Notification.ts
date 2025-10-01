@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose'
 
 const notificationSchema = new Schema({
         comment: { type: String },
-        text: { type: String, required: true, text: true },
+        text: { type: String, required: true },
         category: { type: String },
         admin: { type: Schema.Types.ObjectId, ref: 'AdminUserHarmex' },
         uuid: { type: String },
