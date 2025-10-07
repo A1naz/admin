@@ -55,6 +55,36 @@ watch(selectedType, () => {
   getData()
 })
 
+const isExportBtnDisabled = ref(false)
+
+async function exportXLS() {
+  isExportBtnDisabled.value = true
+  try {
+    const response = await $fetch('/api/serviceRequests/export', {
+      method: 'POST',
+      body: {
+        type: selectedType.value,
+        underType: selectedUnderType.value,
+        query: query.value,
+      },
+      responseType: 'blob',
+    })
+
+    const blob = new Blob([response], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = 'service-requests.xlsx'
+    link.click()
+    URL.revokeObjectURL(link.href)
+  } catch (error) {
+    console.error('Error exporting data:', error)
+  } finally {
+    isExportBtnDisabled.value = false
+  }
+}
+
 const findSearchQueryDebounced = useDebounceFn(getData, 1000)
 async function onInput(event: Event) {
   findSearchQueryDebounced()
@@ -87,6 +117,7 @@ async function onInput(event: Event) {
           @input="onInput($event)"
         />
       </label>
+      <button class="btn btn-primary ml-3" @click="exportXLS" :disabled="isExportBtnDisabled">Экспорт в Excel</button>
     </div>
   </div>
   <div
