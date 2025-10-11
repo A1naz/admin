@@ -33,12 +33,12 @@ export default eventHandler(async (event) => {
       ...rolesParam,
       uuidCompany: { $exists: false },
       $or: [
-        { uuid: { $regex: searchValue, $options: 'i' } },
-        { email: { $regex: searchValue, $options: 'i' } },
-        { telegram: { $regex: searchValue, $options: 'i' } },
-        { username: { $regex: searchValue, $options: 'i' } },
-        { orgInn: { $regex: searchValue, $options: 'i' } },
-        { orgName: { $regex: searchValue, $options: 'i' } },
+        { uuid: { $regex: searchValue.replace('	', ''), $options: 'i' } },
+        { email: { $regex: searchValue.replace('	', ''), $options: 'i' } },
+        { telegram: { $regex: searchValue.replace('	', ''), $options: 'i' } },
+        { username: { $regex: searchValue.replace('	', ''), $options: 'i' } },
+        { orgInn: { $regex: searchValue.replace('	', ''), $options: 'i' } },
+        { orgName: { $regex: searchValue.replace('	', ''), $options: 'i' } },
       ],
     })
       .skip(usersPerPage * (+page - 1))

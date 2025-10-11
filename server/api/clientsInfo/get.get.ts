@@ -22,11 +22,11 @@ export default eventHandler(async (event) => {
   const searchQueryParam: any = searchQuery
     ? {
         $or: [
-          { username: { $regex: searchQuery, $options: 'i' } },
-          { orgName: { $regex: searchQuery, $options: 'i' } },
+          { username: { $regex: searchQuery.replace('	', ''), $options: 'i' } },
+          { orgName: { $regex: searchQuery.replace('	', ''), $options: 'i' } },
           {
             phoneNumber: {
-              $regex: searchQuery.replace('+', '').replace(/[()\-\s]/g, ''),
+              $regex: searchQuery.replace('+', '').replace(/[()\-\s]/g, '').replace('	', ''),
               $options: 'i',
             },
           },
