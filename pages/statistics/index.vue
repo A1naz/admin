@@ -230,130 +230,136 @@ const categories = ref<
         key: 'aiVideosProfit',
         type: 'money',
       },
-    ],
-  },
-  {
-    title: 'AI - Аналитика',
-    content: [
       {
-        title: 'Отзывы+Вопросы',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Цены',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Акции',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Поставки',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Негатив',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
+        title: 'AI аудио',
+        value: '0',
+        key: 'aiAudioProfit',
         type: 'money',
       },
     ],
   },
-  {
-    title: 'AI - Карточка товара',
-    content: [
-      {
-        title: 'Инфографика',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'SEO',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Видео',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Фото+Видео',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Под ключ',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'A/B тесты',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-    ],
-  },
-  {
-    title: 'AI - Стратегия',
-    content: [
-      {
-        title: 'Самовыкупы',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Реклама',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Блогеры',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      }
-    ],
-  },
-  {
-    title: 'AI - Стратегия',
-    content: [
-      {
-        title: 'Флаер',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Рич контент',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      },
-      {
-        title: 'Упаковка',
-        value: '0 ₽',
-        key: 'aiVideosProfit',
-        type: 'money',
-      }
-    ],
-  },
+  // {
+  //   title: 'AI - Аналитика',
+  //   content: [
+  //     {
+  //       title: 'Отзывы+Вопросы',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Цены',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Акции',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Поставки',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Негатив',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //   ],
+  // },
+  // {
+  //   title: 'AI - Карточка товара',
+  //   content: [
+  //     {
+  //       title: 'Инфографика',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'SEO',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Видео',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Фото+Видео',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Под ключ',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'A/B тесты',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //   ],
+  // },
+  // {
+  //   title: 'AI - Стратегия',
+  //   content: [
+  //     {
+  //       title: 'Самовыкупы',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Реклама',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Блогеры',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     }
+  //   ],
+  // },
+  // {
+  //   title: 'AI - Стратегия',
+  //   content: [
+  //     {
+  //       title: 'Флаер',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Рич контент',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     },
+  //     {
+  //       title: 'Упаковка',
+  //       value: '0 ₽',
+  //       key: 'aiVideosProfit',
+  //       type: 'money',
+  //     }
+  //   ],
+  // },
 ])
 
 const periods = [
@@ -414,6 +420,10 @@ const stats: any = ref({
   paidByPartner: 0,
 })
 
+const { data: ndsData, status: ndsStatus } = useLazyFetch('/api/statistics/nds', {
+  method: 'GET',
+})
+
 const { data, status }: any = useLazyFetch('/api/statistics/generalInfo', {
   method: 'GET',
   query: {
@@ -423,10 +433,13 @@ const { data, status }: any = useLazyFetch('/api/statistics/generalInfo', {
 })
 
 watch(data, () => {
-  stats.value = data.value
+  if (data.value) {
+    stats.value = data.value
+  }
 })
 
 const getValue = (item: any) => {
+  if (!data.value) return ''
   if (item.type === 'number') {
     return data.value[item.key]
   }
@@ -466,7 +479,7 @@ const getValue = (item: any) => {
   <div
     class="p-1 rounded-xl shadow-md"
     v-for="category in categories"
-    v-if="status === 'success'"
+    v-if="status === 'success' && data"
   >
     <h2 class="text-xl font-bold mb-4">{{ category.title }}</h2>
     <div class="flex flex-wrap gap-4 justify-between">
@@ -484,6 +497,32 @@ const getValue = (item: any) => {
   <div v-else class="w-full pt-20 text-center">
     <span class="loading loading-dots loading-lg">Ошибка</span>
   </div>
+  <div class="divider"></div>
+  
+  <div v-if="ndsStatus === 'success' && ndsData && ndsData.length" class="p-1 rounded-xl shadow-md">
+    <h2 class="text-xl font-bold mb-4">НДС</h2>
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full">
+        <thead>
+          <tr>
+            <th>Месяц</th>
+            <th>QR-код</th>
+            <th>Счета</th>
+            <th>Общий НДС</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in ndsData" :key="item.month">
+            <td>{{ item.month }}</td>
+            <td>{{ currency.format(item.qrNds) }}</td>
+            <td>{{ currency.format(item.manualNds) }}</td>
+            <td>{{ currency.format(item.totalNds) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="divider h-10 mb-10"></div>
 </template>
 
 <style scoped>

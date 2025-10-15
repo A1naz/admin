@@ -101,7 +101,6 @@ export async function getTurnOverInfo(
     Math.max(new Date(dateQuery.$gte).getTime(), firstAugust.getTime())
   )
 
-  console.log(dateQuery)
   const ndsTurnoverSumm = await paymenthistory.aggregate([
     {
       $match: {
@@ -110,7 +109,10 @@ export async function getTurnOverInfo(
           $lt: dateQuery.$lt,
         },
         typeoperations: 'Приход',
-        comment: { $regex: 'Пополнение ' },
+        $or: [
+          { comment: { $regex: 'Пополнение ' } },
+          { comment: { $regex: 'Ручное пополнение' } },
+        ],
       },
     },
     {
@@ -123,8 +125,8 @@ export async function getTurnOverInfo(
     },
   ])
 
-  if (ndsTurnoverSumm && ndsTurnoverSumm.length > 0) {
-    res.nds = ((res.qrTurnover + res.manualTurnover) * 5) / 105
+  if (ndsTurnoverSumm && ndsTurnoverSumm.length > 0 && ndsTurnoverSumm[0]?.summ) {
+    res.nds = (ndsTurnoverSumm[0].summ * 5) / 105
   }
   res.allTurnover = res.qrTurnover + res.manualTurnover
 

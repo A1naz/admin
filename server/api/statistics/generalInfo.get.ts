@@ -123,6 +123,7 @@ export default eventHandler(async (event) => {
     aiVideosProfit: 0,
     aiPhotosProfit: 0,
     aiTextsProfit: 0,
+    aiAudioProfit: 0,
   }
 
   ///Блок с регистрациями
