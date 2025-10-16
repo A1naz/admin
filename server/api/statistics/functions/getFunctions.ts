@@ -45,9 +45,15 @@ export async function getTurnOverInfo(
     allProfitFromServices: 0,
     buyoutsProfit: 0,
     reviewsProfit: 0,
+    reviewsAddingProfit: 0,
+    reviewsAddingCount: 0,
     penaltiesProfit: 0,
+    penaltiesCount: 0,
     nds: 0,
     aiTextsProfit: 0,
+    aiPhotosProfit: 0,
+    aiVideosProfit: 0,
+    aiAudioProfit: 0,
   }
 
   const handleTurnOverSumm = await paymenthistory.aggregate([
@@ -206,6 +212,34 @@ export async function getTurnOverInfo(
     res.reviewsProfit = reviewsProfit[0].summ
   }
 
+  const reviewsAddingProfit = await paymenthistory.aggregate([
+    {
+      $match: {
+        type: 'addition',
+        dataoperation: dateQuery,
+        ...mp,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        summ: {
+          $sum: '$summ',
+        },
+      },
+    },
+  ])
+
+  if (
+    reviewsAddingProfit &&
+    reviewsAddingProfit.length > 0 &&
+    reviewsAddingProfit[0] &&
+    reviewsAddingProfit[0].summ
+  ) {
+    res.reviewsAddingProfit = reviewsAddingProfit[0].summ
+
+  }
+
   const penaltiesProfit = await paymenthistory.aggregate([
     {
       $match: {
@@ -234,7 +268,7 @@ export async function getTurnOverInfo(
   }
 
   res.allProfitFromServices =
-    res.buyoutsProfit + res.reviewsProfit + res.penaltiesProfit
+    res.buyoutsProfit + res.reviewsProfit + res.penaltiesProfit + res.reviewsAddingProfit
 
   res.profit = ((res.allProfitFromServices / res.allTurnover) * 100).toFixed(3)
 
@@ -276,6 +310,7 @@ export async function getServicesCountInfo(
     buyoutsCount: 0,
     reviewsCount: 0,
     penaltiesCount: 0,
+    reviewsAddingCount: 0,
   }
 
   console.log('function', mp)
@@ -283,7 +318,7 @@ export async function getServicesCountInfo(
   const servicesCount = await paymenthistory.aggregate([
     {
       $match: {
-        type: { $in: ['buyouts service', 'review', 'deliveryStorage'] },
+        type: { $in: ['buyouts service', 'review', 'deliveryStorage', 'addition'] },
         dataoperation: dateQuery,
         ...mp,
       },
@@ -309,9 +344,12 @@ export async function getServicesCountInfo(
       if (item._id === 'deliveryStorage') {
         res.penaltiesCount = item.count
       }
+      if (item._id === 'addition') {
+        res.reviewsAddingCount = item.count
+      }
     })
     res.allServicesCount =
-      res.buyoutsCount + res.reviewsCount + res.penaltiesCount
+      res.buyoutsCount + res.reviewsCount + res.penaltiesCount + res.reviewsAddingCount
   }
 
   return res

@@ -150,6 +150,12 @@ const categories = ref<
         type: 'money',
       },
       {
+        title: 'Дополнение отзывов',
+        value: '10 000 ₽',
+        key: 'reviewsAddingProfit',
+        type: 'money',
+      },
+      {
         title: 'Штрафы',
         value: '10 000 ₽',
         key: 'penaltiesProfit',
@@ -176,6 +182,12 @@ const categories = ref<
         title: 'Отзывы',
         value: '80',
         key: 'reviewsCount',
+        type: 'number',
+      },
+      {
+        title: 'Дополнение отзывов',
+        value: '10 000 ₽',
+        key: 'reviewsAddingCount',
         type: 'number',
       },
       {
@@ -410,10 +422,12 @@ const stats: any = ref({
   allProfitFromServices: 0,
   buyoutsProfit: 0,
   reviewsProfit: 0,
+  reviewsAddingProfit: 0,
   penaltiesProfit: 0,
   allServicesCount: 0,
   buyoutsCount: 0,
   reviewsCount: 0,
+  reviewsAddingCount: 0,
   penaltiesCount: 0,
   balance: 0,
   partnerBalance: 0,
