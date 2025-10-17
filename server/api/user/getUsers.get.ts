@@ -28,32 +28,38 @@ export default eventHandler(async (event) => {
   let allUsers = []
 
   if (searchValue && searchValue.length > 0) {
-    allUsers = await User.find({
-      ...allowedUsersParam,
-      ...rolesParam,
-      uuidCompany: { $exists: false },
-      $or: [
-        { uuid: { $regex: searchValue.replace('	', ''), $options: 'i' } },
-        { email: { $regex: searchValue.replace('	', ''), $options: 'i' } },
-        { telegram: { $regex: searchValue.replace('	', ''), $options: 'i' } },
-        { username: { $regex: searchValue.replace('	', ''), $options: 'i' } },
-        { orgInn: { $regex: searchValue.replace('	', ''), $options: 'i' } },
-        { orgName: { $regex: searchValue.replace('	', ''), $options: 'i' } },
-      ],
-    })
-      .skip(usersPerPage * (+page - 1))
-      .limit(usersPerPage)
-      .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? -1 : 1 })
-    if (Types.ObjectId.isValid(searchValue)) {
+    const cleanedSearchValue = searchValue.trim()
+    const isObjectId =
+      Types.ObjectId.isValid(cleanedSearchValue) &&
+      /^[0-9a-fA-F]{24}$/.test(cleanedSearchValue)
+
+    if (isObjectId) {
       allUsers = await User.find({
         uuidCompany: { $exists: false },
         ...allowedUsersParam,
         ...rolesParam,
-        _id: searchValue,
+        _id: cleanedSearchValue,
       })
         .skip(usersPerPage * (+page - 1))
         .limit(usersPerPage)
-        .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? -1 : 1 })
+        .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? 1 : -1 })
+    } else {
+      allUsers = await User.find({
+        ...allowedUsersParam,
+        ...rolesParam,
+        uuidCompany: { $exists: false },
+        $or: [
+          { uuid: { $regex: cleanedSearchValue, $options: 'i' } },
+          { email: { $regex: cleanedSearchValue, $options: 'i' } },
+          { telegram: { $regex: cleanedSearchValue, $options: 'i' } },
+          { username: { $regex: cleanedSearchValue, $options: 'i' } },
+          { orgInn: { $regex: cleanedSearchValue, $options: 'i' } },
+          { orgName: { $regex: cleanedSearchValue, $options: 'i' } },
+        ],
+      })
+        .skip(usersPerPage * (+page - 1))
+        .limit(usersPerPage)
+        .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? 1 : -1 })
     }
   } else {
     allUsers = await User.find({
