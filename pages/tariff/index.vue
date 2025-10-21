@@ -175,7 +175,7 @@ async function saveTariffssaveTariffsPartner() {
   isSaveBtnDisabled.value = true
   let errors = 0
 
-  const { data }: any = await useFetch("api/tariff/savePartner", {
+  const { data }: any = await useFetch('api/tariff/savePartner', {
     method: 'POST',
     body: {
       userUuid: isStandartTariffs.value ? null : selectedUser.value.uuid,
@@ -212,6 +212,23 @@ async function getStandartTariffs() {
   defaultPriсes.value = data.value
 }
 getStandartTariffs()
+
+const isButtonsDisabled = ref(false)
+async function exportXLS() {
+  isButtonsDisabled.value = true
+  const { data } = await useFetch('/api/tariff/exportUsersInfo', {
+    responseType: 'blob',
+    watch: false,
+    method: 'GET',
+  })
+  isButtonsDisabled.value = false
+  const fileURL = window.URL.createObjectURL(new Blob([data.value as any]))
+  const fileLink = document.createElement('a')
+  fileLink.href = fileURL
+  fileLink.setAttribute('download', 'Тарифы.xlsx')
+  document.body.appendChild(fileLink)
+  fileLink.click()
+}
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Управление тарифами</h1>
@@ -246,6 +263,7 @@ getStandartTariffs()
       >
         Редактировать партнерку
       </button>
+      <button class="btn btn-primary ml-2" @click="exportXLS" :disabled="isButtonsDisabled">Экспортировать</button>
     </div>
 
     <div class="join mr-2">
@@ -487,9 +505,7 @@ getStandartTariffs()
   </dialog>
   <dialog id="createPartnerModal" class="modal">
     <div class="modal-box max-w-lg">
- 
-      <div>
-      </div>
+      <div></div>
       <div class="text-lg text-center mt-2">Партнерка</div>
       <div class="flex flex-col">
         Партнерка %
