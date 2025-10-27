@@ -14,6 +14,16 @@ const editModal = ref(false)
 const confirmModal = ref(false)
 const selectedWithdraw = ref<any>({})
 
+const selectedStatus = ref('all')
+
+const statusOptions = [
+  { label: 'Все', value: 'all' },
+  { label: 'Активен', value: 'created' },
+  { label: 'В работе', value: 'work' },
+  { label: 'Завершен', value: 'completed' },
+  { label: 'Отменен', value: 'cancelled' },
+]
+
 const isPageBtnsDisabled = ref(false)
 const curPage = ref(1)
 const pages = ref(5000)
@@ -24,6 +34,7 @@ async function getData() {
     method: 'GET',
     params: {
       page: curPage.value,
+      status: selectedStatus.value,
     },
   })
 
@@ -51,6 +62,11 @@ async function swapPage(destination: number) {
 }
 getData()
 
+watch(selectedStatus, () => {
+  curPage.value = 1
+  getData()
+})
+
 function getStatusText(status: string) {
   switch (status) {
     case 'created':
@@ -59,7 +75,7 @@ function getStatusText(status: string) {
       return 'Завершен'
     case 'work':
       return 'В работе'
-    case 'canceled':
+    case 'cancelled':
       return 'Отменен'
   }
 }
@@ -84,7 +100,24 @@ async function deleteWithdraw() {
 <template>
   <div>
     <h1 class="text-2xl font-bold ml-5 my-2">Вывод с баланса</h1>
-    <div class="card p-fluid"></div>
+    <div class="card p-fluid">
+      <div class="p-4">
+        <label for="statusFilter" class="label font-bold">Статус</label>
+        <select
+          id="statusFilter"
+          v-model="selectedStatus"
+          class="select select-bordered w-full max-w-xs"
+        >
+          <option
+            v-for="option in statusOptions"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+    </div>
 
     <div class="divider"></div>
     <div class="w-full flex justify-end">

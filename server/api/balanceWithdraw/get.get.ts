@@ -12,7 +12,14 @@ export default eventHandler(async (event) => {
         )
                 return sendRedirect(event, '/auth', 302)
 
-        const { page }: any = getQuery(event)
-        const history = await BalanceWithdraw.find({}).sort({ _id: -1 }).skip((page - 1) * 50).limit(50)
+        const { page, status }: any = getQuery(event)
+        const findQuery: any = {}
+        if (status && status !== 'all') {
+                findQuery.status = status
+        }
+        const history = await BalanceWithdraw.find(findQuery)
+                .sort({ _id: -1 })
+                .skip((page - 1) * 50)
+                .limit(50)
         return history
 })
