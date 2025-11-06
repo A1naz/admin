@@ -71,7 +71,7 @@ export default eventHandler(async (event) => {
     fullDate: mskDate,
     clientPC,
     bank: repaymentType == 'refund' ? '' : bank,
-    userIP: repaymentType == 'refund' ? '' : bank,
+    userIP: repaymentType == 'refund' ? '' : userIP,
   })
 
   await ActionHistory.create({
