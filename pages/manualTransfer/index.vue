@@ -546,23 +546,25 @@ async function exportXLS() {
           >
             <option disabled>Тип пополнения</option>
             <option value="withoutNDS">Без НДС</option>
+            <option value="refund">Возврат</option>
             <!-- <option value="WithNDS5">С НДС 5%</option>
             <option value="WithNDS7">С НДС 7%</option> -->
           </select>
         </label>
-        <label class="w-full">
+        <label class="w-full" v-if="repaymentType !== 'refund'">
           <select v-model="userIP" class="select select-bordered w-full mb-1">
             <option disabled>ИП клиента</option>
             <option value="BalashovIP">BalashovIP</option>
             <option value="BalIP">BalIP</option>
           </select>
         </label>
-        <label class="w-full">
+        <label class="w-full" v-if="repaymentType !== 'refund'">
           <select class="select select-bordered w-full mb-1" v-model="userBank">
             <option disabled>Банк клента</option>
             <option value="PSB">PSB</option>
             <option value="Sber">Sber</option>
             <option value="TBank">TBank</option>
+            <option value="Sovcombank">Sovcombank</option>
           </select>
         </label>
       </div>
