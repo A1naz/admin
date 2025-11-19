@@ -264,6 +264,7 @@ if (
       <!-- head -->
       <thead>
         <tr>
+          <th>Маркетплейс</th>
           <th>Тип операции</th>
           <th>
             <div
@@ -302,6 +303,9 @@ if (
       <tbody>
         <!-- row 1 -->
         <tr v-for="stat in stats" class="hover">
+          <th class="overflow-x-auto text-xs">
+            {{ stat.mp }}
+          </th>
           <th class="overflow-x-auto text-xs">
             {{ stat.typeOperation }}
           </th>
