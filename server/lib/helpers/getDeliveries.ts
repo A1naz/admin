@@ -36,9 +36,11 @@ export default async function getDeliveries(
             ],
           },
         }
-      : { status: status }
+      : status === 'active' ? {
+        status: { $in: ["active", "work"] }
+      } :
+      { status: status }
 
-  console.log('statusObj', statusObj, 'status', status)
   let serviceIdFilter: any = {}
   if (serviceId) {
     const trueServiceId = serviceId.replaceAll('#', '')
@@ -56,8 +58,7 @@ export default async function getDeliveries(
     .skip((page - 1) * 50)
     .limit(50)
   
-  console.log('deliveries', deliveries[0] || '')
-    
+
   const count = await Delivery.count({ user })
 
   const format: any = deliveries.map((delivery: any) => {
@@ -71,7 +72,6 @@ export default async function getDeliveries(
       trueDate: formattedDate,
     }
   })
-  console.log('format', format[0] || '')
 
   return { info: format, count }
 }
