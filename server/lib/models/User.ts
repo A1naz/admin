@@ -90,6 +90,15 @@ const UserSchema = new Schema({
 
   votedFor: { type: [String], default: [] },
   votedForService: { type: [Object], default: [] },
+  emailAutoSentCount: { type: Number, default: 0 },
+  emailLastSentDate: { type: Date },
+  emailFunnel: [
+    {
+      isClicked: { type: Boolean, default: false },
+      clickedAt: { type: Date },
+    },
+  ],
+  emailFunnelClicksCount: { type: Number, default: 0 },
 })
 
 // UserSchema.pre('save', function (next) {

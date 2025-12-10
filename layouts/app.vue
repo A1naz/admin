@@ -270,6 +270,12 @@ function closeOverlay() {
           title="Коды регистраций"
           href="/phoneCodes"
         />
+        <SidebarItem
+          v-if="store.client.mainAdmin || store.client.tabs.includes('рассылка клиентам')"
+          icon="icon-park-outline:send-email"
+          title="Рассылка клиентам"
+          href="/userMails"
+        />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between w-full items-center p-0 m-0">
