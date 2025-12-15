@@ -33,6 +33,10 @@ const selectedUser: any = ref({
 const dateRange = ref([])
 const mpStore = useMPStore()
 
+// State for LogModal
+const logModalState = ref(false)
+const selectedReview: any = ref({})
+
 definePageMeta({
   layout: 'app',
   auth: true,
@@ -91,6 +95,7 @@ const tabs = ref([
       { key: 'text', title: 'текст' },
       { key: 'recipientphone', title: 'телефон' },
       { key: 'trueDate', title: 'дата' },
+      { key: 'details', title: 'детали' },
     ],
     statuses: [
       // { key: 'available', title: 'доступные' },
@@ -319,6 +324,15 @@ function changeMP(event: any) {
     } else navigateTo('/usersManagement/' + event.target.value)
   }
 }
+
+function openLogModal(item: any) {
+  selectedReview.value = item
+  logModalState.value = true
+}
+
+function closeLogModal() {
+  logModalState.value = false
+}
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-5 my-2">Управление пользователями</h1>
@@ -530,7 +544,8 @@ function changeMP(event: any) {
           >
             {{
               header.key == 'article' ||
-              (header.key == 'name' && tabOption == 'productLikes')
+              (header.key == 'name' && tabOption == 'productLikes') ||
+              header.key == 'details'
                 ? null
                 : Array.isArray(item[header.key])
                 ? item[header.key].join(', ')
@@ -550,6 +565,11 @@ function changeMP(event: any) {
               <a target="_blank" :href="item.url">
                 {{ item[header.key] }}
               </a>
+            </div>
+            <div v-if="header.key == 'details'">
+              <button class="btn btn-sm btn-primary" @click="openLogModal(item)">
+                Детали
+              </button>
             </div>
           </th>
           <th v-if="tabOption == 'reports'">
@@ -668,6 +688,12 @@ function changeMP(event: any) {
       </div>
     </div>
   </div>
+  <LogModal
+    :info="selectedReview"
+    :state="logModalState"
+    mp="avito"
+    @close="closeLogModal"
+  />
 </template>
 <style scoped>
 ::-webkit-scrollbar {
