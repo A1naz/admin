@@ -76,6 +76,7 @@ const tabs = ref([
       { key: 'point', title: 'адрес' },
       { key: 'recipientphone', title: 'телефон' },
       { key: 'trueDate', title: 'обновлено' },
+      { key: 'screenCreate', title: '  ' },
     ],
     statuses: [
       { key: 'any', title: 'Все' },
@@ -106,7 +107,7 @@ const tabs = ref([
       { key: 'deleting', title: 'на удалении' },
       { key: 'deleted', title: 'удаленные' },
       { key: 'nofunds', title: 'недостаточно средств' },
-           { key: 'archived', title: 'в архиве' },
+      { key: 'archived', title: 'в архиве' },
     ],
   },
   {
@@ -330,6 +331,13 @@ function openLogModal(item: any) {
 
 function closeLogModal() {
   logModalState.value = false
+}
+
+function openScreenshots(item: any, mp: string) {
+  window.open(
+    `/screenshots?mp=${mp}&article=${item.article}&recipientphone=${item.recipientphone}&openModal=true`,
+    '_blank'
+  )
 }
 </script>
 <template>
@@ -559,8 +567,19 @@ function closeLogModal() {
               </a>
             </div>
             <div v-if="header.key == 'details'">
-              <button class="btn btn-sm btn-primary" @click="openLogModal(item)">
+              <button
+                class="btn btn-sm btn-primary"
+                @click="openLogModal(item)"
+              >
                 Детали
+              </button>
+            </div>
+            <div v-if="header.key == 'screenCreate'">
+              <button
+                class="btn btn-sm btn-primary btn-square"
+                @click="openScreenshots(item, 'wildberries')"
+              >
+                <Icon name="streamline-flex:screenshot-remix" size="20" />
               </button>
             </div>
           </th>

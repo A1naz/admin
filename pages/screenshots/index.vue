@@ -31,11 +31,42 @@ const uuidBuyout = ref('')
 const selectedMP = ref('wildberries')
 const mpStore = useMPStore()
 const config = useRuntimeConfig()
+const createRequireModalRef: any = ref(null)
 
 definePageMeta({
   layout: 'app',
   auth: true,
   title: 'Запросы скриншотов',
+})
+
+// Handle URL params on mount
+onMounted(() => {
+  const route = useRoute()
+  const { mp, article: urlArticle, recipientphone, openModal, uuidbuyout } = route.query
+  
+  if (openModal === 'true' && mp && urlArticle && recipientphone) {
+    // Fill form fields
+    selectedMP.value = mp as string
+    article.value = urlArticle as string
+    
+    if (uuidbuyout) {
+      uuidBuyout.value = uuidbuyout as string
+    }
+
+    // Format phone number from 79062685452 to +7 (906) 268-54-52
+    const phone = recipientphone as string
+    if (phone.startsWith('7') && phone.length === 11) {
+      const formatted = `+7 (${phone.slice(1, 4)}) ${phone.slice(4, 7)}-${phone.slice(7, 9)}-${phone.slice(9, 11)}`
+      account.value = formatted
+    } else {
+      account.value = recipientphone as string
+    }
+    
+    // Open modal
+    nextTick(() => {
+      createRequireModalRef.value?.showModal()
+    })
+  }
 })
 
 async function getStats() {
@@ -348,7 +379,7 @@ if (
     </table>
   </div>
 
-  <dialog id="createRequireModal" class="modal">
+  <dialog id="createRequireModal" class="modal" ref="createRequireModalRef">
     <div class="modal-box">
       <h3 class="font-bold text-lg"></h3>
       <div class="flex flex-col">
