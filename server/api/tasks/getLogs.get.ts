@@ -16,7 +16,7 @@ export default eventHandler(async (event) => {
   const adminUser = await AdminUser.findOne({ uuid: session.uuid })
   if (
     !adminUser ||
-    (!adminUser.mainAdmin && !adminUser.tabs.includes('тарифные планы'))
+    (!adminUser.mainAdmin && !adminUser.tabs.includes('управление пользователями платформы'))
   )
     return sendRedirect(event, '/auth', 302)
 

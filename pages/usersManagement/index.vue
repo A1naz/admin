@@ -57,6 +57,7 @@ const tabs = ref([
       { key: 'gender', title: 'пол' },
       { key: 'dateRange', title: 'даты выкупов' },
       { key: 'trueDate', title: 'дата' },
+      { key: 'details', title: 'детали' },
     ],
     statuses: [
       { key: 'any', title: 'Все' },
