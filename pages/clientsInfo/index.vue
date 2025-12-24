@@ -176,13 +176,20 @@ async function signTariff() {
             {{ tariff.registrationDate.slice(0, 10).replace(/-/g, '.') }}
           </th>
 
-          <th style="max-width: 55px; min-width: 50px" class="overflow-x-auto">
+          <th style="min-width: 50px" class="overflow-x-auto flex flex-col">
             <a
               target="_blank"
               v-if="tariff.isDocumentSigned"
-              :href="`${publicUrl}/api/docs/get?uuid=${tariff.uuid}`"
+              :href="`${publicUrl}/api/docs/getBalashov?uuid=${tariff.uuid}`"
               class="link link-primary"
-              >Скачать документ</a
+              >Скачать документ Балашов</a
+            >
+            <a
+              target="_blank"
+              v-if="tariff.isDocumentSigned"
+              :href="`${publicUrl}/api/docs/getBall?uuid=${tariff.uuid}`"
+              class="link link-primary mt-2"
+              >Скачать документ Баль</a
             >
             <span v-else>Не заполнены данные</span>
           </th>
