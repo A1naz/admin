@@ -10,26 +10,63 @@ const RATE_LIMITS = {
   SUSPICIOUS_IPS_THRESHOLD: 5,     // Подозрительно если 5+ разных IP для одного идентификатора
 }
 
-export function getClientIP(event: H3Event): string {
-  const forwarded = getHeader(event, 'x-forwarded-for')
-  const realIP = getHeader(event, 'x-real-ip')
+export function getClientIP(event: any): string {
+  let ip: string = 'unknown'
   
-  if (forwarded) {
-    return forwarded.split(',')[0].trim()
+  // Пробуем получить через getHeader (работает в обычных H3Event)
+  try {
+    const forwarded = getHeader(event, 'x-forwarded-for')
+    if (forwarded) {
+      ip = forwarded.split(',')[0].trim()
+    } else {
+      const realIP = getHeader(event, 'x-real-ip')
+      if (realIP) {
+        ip = realIP
+      }
+    }
+  } catch (error) {
+    // getHeader не работает, пробуем через прямой доступ к headers
   }
   
-  if (realIP) {
-    return realIP
+  // Если не получили через getHeader, пробуем напрямую через headers
+  if (ip === 'unknown' && event.headers) {
+    const forwarded = event.headers['x-forwarded-for']
+    if (forwarded) {
+      ip = typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : forwarded[0]
+    } else {
+      const realIP = event.headers['x-real-ip']
+      if (realIP) {
+        ip = typeof realIP === 'string' ? realIP : realIP[0]
+      }
+    }
   }
   
-  return event.node.req.socket?.remoteAddress || 'unknown'
+  // Последняя попытка - через socket
+  if (ip === 'unknown' && event.node?.req?.socket?.remoteAddress) {
+    ip = event.node.req.socket.remoteAddress
+  }
+  
+  // 🔧 Нормализация IPv6-mapped IPv4 адресов
+  // Преобразуем ::ffff:127.0.0.1 -> 127.0.0.1
+  if (ip.startsWith('::ffff:')) {
+    ip = ip.substring(7)
+  }
+  
+  // Преобразуем ::1 (IPv6 localhost) -> 127.0.0.1 (IPv4 localhost)
+  if (ip === '::1') {
+    ip = '127.0.0.1'
+  }
+  
+  return ip
 }
 
 export async function checkRateLimit(
   event: H3Event,
   identifier: string
 ): Promise<{ allowed: boolean; reason?: string; waitTime?: number }> {
+
   const ip = getClientIP(event)
+
   const now = new Date()
   const normalizedIdentifier = identifier.toLowerCase().trim()
   
@@ -98,6 +135,7 @@ export async function checkRateLimit(
     createdAt: { $gte: oneDayAgo }
   })
   
+ 
   if (recentFailedAttempts >= RATE_LIMITS.BLOCK_AFTER_FAILED) {
     const lastFailedAttempt = await LoginAttempt.findOne({
       identifier: normalizedIdentifier,
@@ -118,28 +156,46 @@ export async function checkRateLimit(
       }
     }
   }
-  
+
   return { allowed: true }
 }
 
 export async function logLoginAttempt(
-  event: H3Event,
+  event: any,
   identifier: string,
   success: boolean
 ): Promise<void> {
   const ip = getClientIP(event)
-  const userAgent = getHeader(event, 'user-agent')
+  
+  // Получаем User-Agent (работает в обоих контекстах)
+  let userAgent: string | undefined
+  try {
+    userAgent = getHeader(event, 'user-agent')
+  } catch (error) {
+    // Если getHeader не работает, пробуем напрямую через headers
+    if (event.headers) {
+      userAgent = event.headers['user-agent']
+    }
+  }
   
   try {
-    await LoginAttempt.create({
+    console.log('📝 Попытка записать в БД:', {
+      identifier: identifier.toLowerCase().trim(),
+      ip,
+      success,
+      userAgent,
+    })
+    
+    const attempt = await LoginAttempt.create({
       identifier: identifier.toLowerCase().trim(),
       ip,
       success,
       userAgent,
       createdAt: new Date()
     })
+
   } catch (error) {
-    console.error('Failed to log login attempt:', error)
+    console.error('❌ Ошибка записи в БД:', error)
   }
 }
 

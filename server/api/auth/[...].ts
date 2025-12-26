@@ -150,6 +150,7 @@ export default NuxtAuthHandler({
       async authorize(credentials: any, req: any) {
         const { email, password, code } = credentials
         if (!email || !password) return null
+        
 
         const event = req as any
         const identifier = email.toLowerCase().trim()
@@ -160,21 +161,21 @@ export default NuxtAuthHandler({
           if (!user) return null
           return user
         }
-
+        
         // Проверка rate limit перед попыткой авторизации
         const rateLimitCheck = await checkRateLimit(event, identifier)
         if (!rateLimitCheck.allowed) {
           await logLoginAttempt(event, identifier, false)
           throw new Error(rateLimitCheck.reason || 'Rate limit exceeded')
         }
-
-        const user =
+          
+          const user =
           (await AdminUser.findOne({ email })) ||
           (await AdminUser.findOne({ username: email }))
-        
-        // Унифицированное сообщение об ошибке для защиты от user enumeration
-        const genericError = 'Неверный логин или пароль'
-        
+          
+          // Унифицированное сообщение об ошибке для защиты от user enumeration
+          const genericError = 'Неверный логин или пароль'
+          
         if (!user || user.roles.length <= 1) {
           await logLoginAttempt(event, identifier, false)
           throw new Error(genericError)
@@ -186,10 +187,11 @@ export default NuxtAuthHandler({
           await logLoginAttempt(event, identifier, false)
           throw new Error(genericError)
         }
-
+        
         const isValid = await bcrypt.compareSync(password, user.password)
 
         if (!isValid) {
+
           await logLoginAttempt(event, identifier, false)
           throw new Error(genericError)
         }
@@ -199,11 +201,14 @@ export default NuxtAuthHandler({
           throw new Error(genericError)
         }
         
+
+
         if (user.tg2fa && user.telegramUserId && !code) {
           // Не логируем как неудачную попытку, т.к. требуется 2FA код
           throw new Error('2fa')
         }
 
+        
         // Успешная авторизация
         await logLoginAttempt(event, identifier, true)
         await clearOldLoginAttempts(identifier)
@@ -225,6 +230,10 @@ export default NuxtAuthHandler({
         const { code, uuid } = credentials
         const event = req as any
 
+        // 🔒 ЗАЩИТА: UUID известен только после первого этапа логина
+        // Дополнительная защита - rate limiting (4 попытки/час на uuid)
+        // Middleware проверяет twoFaNeeded в токене перед доступом к /2fa странице
+
         const user = await AdminUser.findOne({
           uuid,
         })
@@ -233,20 +242,20 @@ export default NuxtAuthHandler({
           return null
         }
 
-        const identifier = user.email || user.username || user.uuid
+        const identifier = `2fa_${user.uuid}`
         
         // Проверка rate limit для 2FA
         const rateLimitCheck = await checkRateLimit(event, identifier)
+        console.log(rateLimitCheck)
         if (!rateLimitCheck.allowed) {
           await logLoginAttempt(event, identifier, false)
           throw new Error(rateLimitCheck.reason || 'Rate limit exceeded')
         }
-
         if (!user.twoFaSecret) {
           await logLoginAttempt(event, identifier, false)
           throw new Error('2FA not configured')
         }
-
+        
         const verified = confirmTwoFaCode(code, user.twoFaSecret)
 
         if (!verified) {
