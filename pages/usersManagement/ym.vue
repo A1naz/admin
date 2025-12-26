@@ -61,7 +61,8 @@ const tabs = ref([
     ],
     statuses: [
       { key: 'any', title: 'Все' },
-      { key: 'active', title: 'Активные' },
+      { key: 'active', title: 'Созданные' },
+      { key: 'work', title: 'В работе' },
       { key: 'archived', title: 'В архиве' },
       { key: 'completed', title: 'Завершенные' },
       { key: 'paused', title: 'На пазуе' },
@@ -81,7 +82,7 @@ const tabs = ref([
     ],
     statuses: [
       { key: 'any', title: 'Все' },
-      { key: 'active', title: 'Активные' },
+      { key: 'work', title: 'Активные' },
       { key: 'completed', title: 'Завершенные' },
       { key: 'ready', title: 'Готовы к выдаче' },
       { key: 'canceled', title: 'Возврат/Отмена' },
