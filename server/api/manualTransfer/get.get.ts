@@ -3,6 +3,7 @@ import { getServerSession } from '#auth'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { manualBalanceTransferRequest } from '~/server/lib/models/manualBalanceTransferRequest'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 const runtimeConfig = useRuntimeConfig()
 let paymentPerPage = 50
@@ -61,12 +62,15 @@ export default eventHandler(async (event) => {
   //       }
   //     : {}
 
+  // ✅ FIX: Санитизация searchQuery для защиты от ReDoS
+  const safeSearchQuery = sanitizeSearchQuery(searchQuery || '', 100)
+
   let foundUsers: any[] = []
   if (searchQuery && searchQuery.length > 0) {
     foundUsers = await User.find({
       $or: [
-        { username: { $regex: searchQuery, $options: 'i' } },
-        { orgName: { $regex: searchQuery, $options: 'i' } },
+        { username: { $regex: safeSearchQuery, $options: 'i' } },
+        { orgName: { $regex: safeSearchQuery, $options: 'i' } },
       ],
     })
   }

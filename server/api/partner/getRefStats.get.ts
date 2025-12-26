@@ -5,6 +5,7 @@ import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { ObjectId } from 'mongodb'
 import { PartnerPaymentHistory } from '~/server/lib/models/PartnerPaymentHistory'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 const elPerPage = 50
 
@@ -16,6 +17,9 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const { userId, page, sortType, sort, searchValue }: any = getQuery(event)
+  
+  // ✅ FIX: Санитизация searchValue для защиты от ReDoS
+  const safeSearchValue = sanitizeSearchQuery(searchValue || '', 100)
 
   const ref = await HarmexReferrals.findOne({ user: new ObjectId(userId) })
 
@@ -51,10 +55,10 @@ export default eventHandler(async (event) => {
   const users = await User.find({
     _id: { $in: ref.referrals.map((ref: any) => ref.user) },
     $or: [
-      { uuid: { $regex: searchValue, $options: 'i' } },
-      { email: { $regex: searchValue, $options: 'i' } },
-      { telegram: { $regex: searchValue, $options: 'i' } },
-      { username: { $regex: searchValue, $options: 'i' } },
+      { uuid: { $regex: safeSearchValue, $options: 'i' } },
+      { email: { $regex: safeSearchValue, $options: 'i' } },
+      { telegram: { $regex: safeSearchValue, $options: 'i' } },
+      { username: { $regex: safeSearchValue, $options: 'i' } },
     ],
   })
 

@@ -26,6 +26,15 @@ export default eventHandler(async (event) => {
       message: 'Файл не найден',
     })
   }
+
+  // ✅ FIX: Проверка владельца файла (IDOR protection)
+  if (upload.user && upload.user.toString() !== user._id.toString()) {
+    throw createError({
+      statusCode: 403,
+      message: 'Недостаточно прав для удаления этого файла',
+    })
+  }
+
   const removed = await Upload.findByIdAndDelete(upload._id)
   if (!removed) {
     return createError({

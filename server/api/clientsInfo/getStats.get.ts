@@ -17,18 +17,30 @@ export default eventHandler(async (event) => {
 
   const { uuid, dateRange }: any = getQuery(event)
 
-  const dateRangeFilter = dateRange
-    ? {
+  // ✅ FIX: Обработка JSON.parse с try-catch
+  let dateRangeFilter = {}
+  if (dateRange) {
+    try {
+      const startDate = new Date(JSON.parse(dateRange[0]))
+      const endDate = new Date(JSON.parse(dateRange[1]))
+      
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error('Invalid date')
+      }
+      
+      dateRangeFilter = {
         dataoperation: {
-          $gte: new Date(
-            new Date(JSON.parse(dateRange[0])).setHours(0, 0, 0, 0)
-          ),
-          $lte: new Date(
-            new Date(JSON.parse(dateRange[1])).setHours(23, 59, 59, 999)
-          ),
+          $gte: new Date(startDate.setHours(0, 0, 0, 0)),
+          $lte: new Date(endDate.setHours(23, 59, 59, 999)),
         },
       }
-    : {}
+    } catch (e) {
+      throw createError({
+        statusCode: 400,
+        message: 'Invalid date range format',
+      })
+    }
+  }
 
   const user = await User.findOne({
     uuid,

@@ -1,6 +1,7 @@
 import { ConfirmPhone } from '~/server/lib/models/ConfirmPhone'
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -23,7 +24,8 @@ export default eventHandler(async (event) => {
     if (searchTerm.startsWith('8') && searchTerm.length === 11) {
       searchTerm = '7' + searchTerm.substring(1)
     }
-    query.phone = { $regex: searchTerm, $options: 'i' }
+    // ✅ FIX: Санитизация searchTerm для защиты от ReDoS
+    query.phone = { $regex: sanitizeSearchQuery(searchTerm, 20), $options: 'i' }
   }
   const count = await ConfirmPhone.countDocuments(query)
   const codes = await ConfirmPhone.find(query)

@@ -3,6 +3,8 @@ import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { TariffPayment } from '@/server/lib/models/TariffPayment'
 import { ActionHistory } from '@/server/lib/models/actionHistory'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
+
 const limit = 50
 
 export default eventHandler(async (event) => {
@@ -19,10 +21,13 @@ export default eventHandler(async (event) => {
 
   let foundUsers: any = []
   if (searchQuery) {
+    // ✅ FIX: Санитизация searchQuery для защиты от ReDoS
+    const safeSearchQuery = sanitizeSearchQuery(searchQuery, 100)
+
     foundUsers = await User.find({
       $or: [
-        { username: { $regex: searchQuery, $options: 'i' } },
-        { orgName: { $regex: searchQuery, $options: 'i' } },
+        { username: { $regex: safeSearchQuery, $options: 'i' } },
+        { orgName: { $regex: safeSearchQuery, $options: 'i' } },
       ],
     })
   }

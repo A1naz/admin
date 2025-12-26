@@ -3,6 +3,8 @@ import { User } from '@/server/lib/models/User'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
+
 const itemsPerPage = 100
 
 export default eventHandler(async (event) => {
@@ -14,6 +16,9 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const { searchValue, sortDate, pageNumber }: any = getQuery(event)
+  
+  // ✅ FIX: Санитизация searchValue для защиты от ReDoS
+  const safeSearchValue = sanitizeSearchQuery(searchValue || '', 100)
 
   const allowedUsersParamForUser = user.isAllUsersAllowed
   ? {
@@ -43,10 +48,10 @@ export default eventHandler(async (event) => {
     const foundUsers = await User.find({
       ...allowedUsersParamForUser,
       $or: [
-        { username: { $regex: searchValue, $options: 'i' } },
-        { email: { $regex: searchValue, $options: 'i' } },
-        { telegram: { $regex: searchValue, $options: 'i' } },
-        { uuid: { $regex: searchValue, $options: 'i' } },
+        { username: { $regex: safeSearchValue, $options: 'i' } },
+        { email: { $regex: safeSearchValue, $options: 'i' } },
+        { telegram: { $regex: safeSearchValue, $options: 'i' } },
+        { uuid: { $regex: safeSearchValue, $options: 'i' } },
       ],
     }).limit(50)
 

@@ -1,6 +1,7 @@
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -15,8 +16,11 @@ export default eventHandler(async (event) => {
 
   const { operationId } = getQuery(event)
 
+  // ✅ FIX: Санитизация operationId для защиты от ReDoS
+  const safeOperationId = sanitizeSearchQuery(operationId || '', 100)
+
   const operations: any = await paymenthistory.find({
-    basisoperation: { $regex: operationId, $options: 'i' },
+    basisoperation: { $regex: safeOperationId, $options: 'i' },
   })
 
   const format = operations.map((operation: any) => {

@@ -5,6 +5,7 @@ import { AdminUser } from '~/server/lib/models/AdminUser'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { Buyout } from '~/server/lib/models/Buyout'
 import { Buyout as OzonBuyout } from '~/server/lib/models/ozon/Buyout'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 import buyoutsInfo from './buyouts'
 import cartsInfo from './cart'
@@ -50,11 +51,14 @@ export default eventHandler(async (event) => {
     )
   })
 
+  // ✅ FIX: Санитизация productName для защиты от ReDoS
+  const safeProductName = sanitizeSearchQuery(trueFilters.productName || '', 200)
+
   let buyouts: any = []
   if (trueFilters.productName) {
     buyouts = await Buyout.find({
       user: { $in: users },
-      'product.name': { $regex: trueFilters.productName, $options: 'i' },
+      'product.name': { $regex: safeProductName, $options: 'i' },
     })
   }
 

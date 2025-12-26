@@ -4,6 +4,7 @@ import { AdminUser } from '~/server/lib/models/AdminUser'
 import { PaymentIntend } from '~/server/lib/models/PaymentIntend'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
 import he from 'he'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 const limit = 50
 
@@ -19,11 +20,14 @@ export default eventHandler(async (event) => {
 
   const { dateRange, searchQuery, page }: any = getQuery(event)
 
+  // ✅ FIX: Санитизация searchQuery для защиты от ReDoS
+  const safeSearchQuery = sanitizeSearchQuery(searchQuery || '', 100)
+
   let users = searchQuery
     ? await User.find({
       $or: [
-        { username: { $regex: searchQuery, $options: 'i' } },
-        { orgName: { $regex: searchQuery, $options: 'i' } },
+        { username: { $regex: safeSearchQuery, $options: 'i' } },
+        { orgName: { $regex: safeSearchQuery, $options: 'i' } },
       ],
     }).limit(30)
     : []

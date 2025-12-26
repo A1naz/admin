@@ -1,6 +1,7 @@
 import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { Notification } from '~/server/lib/models/Notification'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 const limit = 50
 
@@ -15,6 +16,9 @@ export default eventHandler(async (event) => {
     return sendRedirect(event, '/auth', 302)
 
   const { page = 1, searchQuery = '', dateRange }: any = getQuery(event)
+  
+  // ✅ FIX: Санитизация searchQuery для защиты от ReDoS
+  const safeSearchQuery = sanitizeSearchQuery(searchQuery, 100)
   let dateRangeFilter: any = {}
   switch (dateRange) {
     case 'today':
@@ -62,8 +66,8 @@ export default eventHandler(async (event) => {
   const notifications = await Notification.find({
     ...dateRangeFilter,
     $or: [
-      { category: { $regex: searchQuery, $options: 'i' } },
-      { text: { $regex: searchQuery, $options: 'i' } },
+      { category: { $regex: safeSearchQuery, $options: 'i' } },
+      { text: { $regex: safeSearchQuery, $options: 'i' } },
     ],
   })
     .sort({ _id: -1 })

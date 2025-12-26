@@ -29,10 +29,10 @@ export default eventHandler(async (event) => {
     })
   }
 
+  // FIX: При возврате отмененного запроса баланс должен УВЕЛИЧИВАТЬСЯ
   if (foundWIthdraw.status == 'cancelled') {
     userWithdraw.partner.balance -= foundWIthdraw.amount
   }
-
 
   foundWIthdraw.status = 'created'
   ActionHistory.create({

@@ -3,6 +3,7 @@ import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import getUsers from './getUsersByStatus'
 import { ActionHistory } from '~/server/lib/models/actionHistory'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 const limit = 50
 
@@ -19,14 +20,17 @@ export default eventHandler(async (event) => {
   const { dateRange, searchQuery, page, status, clientsType }: any =
     getQuery(event)
 
-  const searchQueryParam: any = searchQuery
+  // ✅ FIX: Санитизация для защиты от ReDoS
+  const safeSearchQuery = searchQuery ? sanitizeSearchQuery(searchQuery, 100) : ''
+  
+  const searchQueryParam: any = safeSearchQuery
     ? {
         $or: [
-          { username: { $regex: searchQuery.replace('	', ''), $options: 'i' } },
-          { orgName: { $regex: searchQuery.replace('	', ''), $options: 'i' } },
+          { username: { $regex: safeSearchQuery, $options: 'i' } },
+          { orgName: { $regex: safeSearchQuery, $options: 'i' } },
           {
             phoneNumber: {
-              $regex: searchQuery.replace('+', '').replace(/[()\-\s]/g, '').replace('	', ''),
+              $regex: safeSearchQuery.replace(/[^\d]/g, ''),
               $options: 'i',
             },
           },

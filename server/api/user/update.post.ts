@@ -33,7 +33,7 @@ export default eventHandler(async (event) => {
   if (foundByUsername && foundByUsername.uuid !== user.uuid) {
     throw createError({
       statusCode: 400,
-      message: 'Это имя имя пользователя уже занято',
+      message: 'Не удалось обновить профиль. Проверьте введенные данные.',
     })
   }
 
@@ -41,7 +41,7 @@ export default eventHandler(async (event) => {
   if (foundByEmail && foundByEmail.uuid !== user.uuid) {
     throw createError({
       statusCode: 400,
-      message: 'Email уже занят',
+      message: 'Не удалось обновить профиль. Проверьте введенные данные.',
     })
   }
   user.username = username

@@ -3,6 +3,8 @@ import { getServerSession } from '#auth'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { TariffPlan } from '~/server/lib/models/TariffPlan'
 import { create } from 'domain'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
+
 const limit = 50
 
 export default eventHandler(async (event) => {
@@ -27,11 +29,14 @@ export default eventHandler(async (event) => {
       }
     : {}
 
+  // ✅ FIX: Санитизация searchQuery для защиты от ReDoS
+  const safeSearchQuery = sanitizeSearchQuery(searchQuery || '', 100)
+
   const searchQueryParam: Object = searchQuery
     ? {
         $or: [
-          { username: { $regex: searchQuery, $options: 'i' } },
-          { orgName: { $regex: searchQuery, $options: 'i' } },
+          { username: { $regex: safeSearchQuery, $options: 'i' } },
+          { orgName: { $regex: safeSearchQuery, $options: 'i' } },
         ],
       }
     : {}

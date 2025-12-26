@@ -5,6 +5,7 @@ import { AdminUser } from '~/server/lib/models/AdminUser'
 import { paymenthistory } from '~/server/lib/models/Paymenthistory'
 import { Buyout } from '~/server/lib/models/Buyout'
 import { Buyout as OzonBuyout } from '~/server/lib/models/ozon/Buyout'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -45,16 +46,19 @@ export default eventHandler(async (event) => {
   if (!trueFilters.sumTo) delete trueFilters.sumTo
   if (!trueFilters.sumFrom) delete trueFilters.sumFrom
 
+  // ✅ FIX: Санитизация productName для защиты от ReDoS
+  const safeProductName = sanitizeSearchQuery(trueFilters.productName || '', 200)
+
   if (
     trueFilters.productName &&
     trueFilters.type == 'buyouts' &&
     !trueFilters.article
   ) {
     const wildberriesBuyoutsArticles = await Buyout.find({
-      'product.name': { $regex: trueFilters.productName, $options: 'i' },
+      'product.name': { $regex: safeProductName, $options: 'i' },
     }).select('article')
     const ozonBuyoutsArticles = await OzonBuyout.find({
-      'product.name': { $regex: trueFilters.productName, $options: 'i' },
+      'product.name': { $regex: safeProductName, $options: 'i' },
     }).select('article')
     const allArticles = [...wildberriesBuyoutsArticles, ...ozonBuyoutsArticles]
     trueFilters.article = {
@@ -68,7 +72,7 @@ export default eventHandler(async (event) => {
     const wildberriesBuyoutsWithThisArticle = await Buyout.find({
       article: trueFilters.article,
       'product.name': trueFilters.productName
-        ? { $regex: trueFilters.productName, $options: 'i' }
+        ? { $regex: safeProductName, $options: 'i' }
         : { $exists: true },
     }).sort({
       createdAt: sortDate,
@@ -77,7 +81,7 @@ export default eventHandler(async (event) => {
     const ozonBuyoutsWithThisArticle = await OzonBuyout.find({
       article: trueFilters.article,
       'product.name': trueFilters.productName
-        ? { $regex: trueFilters.productName, $options: 'i' }
+        ? { $regex: safeProductName, $options: 'i' }
         : { $exists: true },
     }).sort({
       createdAt: sortDate,

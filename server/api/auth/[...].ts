@@ -6,6 +6,7 @@ import { AdminUser } from '~/server/lib/models/AdminUser'
 import { NuxtAuthHandler } from '#auth'
 import { Referral } from '~/server/lib/models/Referral'
 import confirmTwoFaCode from '~/server/utils/confirmTwoFaCode'
+import { checkRateLimit, logLoginAttempt, clearOldLoginAttempts } from '~/server/utils/rateLimiter'
 
 const runtimeConfig = useRuntimeConfig()
 export default NuxtAuthHandler({
@@ -58,6 +59,7 @@ export default NuxtAuthHandler({
       name: 'Telegram Login',
       credentials: {},
       async authorize(credentials: any, req: any) {
+        const event = req as any
         const user = { ...req.body }
         delete user.callbackUrl
         delete user.csrfToken
@@ -66,14 +68,29 @@ export default NuxtAuthHandler({
         const referral = JSON.parse(JSON.stringify(user.referral))
         delete user.referral
 
+        const identifier = user.id?.toString() || 'telegram-unknown'
+        
+        // Проверка rate limit для Telegram авторизации
+        const rateLimitCheck = await checkRateLimit(event, identifier)
+        if (!rateLimitCheck.allowed) {
+          await logLoginAttempt(event, identifier, false)
+          throw new Error(rateLimitCheck.reason || 'Rate limit exceeded')
+        }
+
         const valid = checkSignature(runtimeConfig.BOT_TOKEN, user)
 
-        if (!valid) throw new Error('invalid signature')
+        if (!valid) {
+          await logLoginAttempt(event, identifier, false)
+          throw new Error('invalid signature')
+        }
 
         const foundUser = await AdminUser.findOne({
           telegramUserId: user.id.toString(),
         })
+        
         if (foundUser) {
+          await logLoginAttempt(event, identifier, true)
+          await clearOldLoginAttempts(identifier)
           return foundUser
         } else {
           const newUser = new AdminUser({
@@ -108,6 +125,7 @@ export default NuxtAuthHandler({
               await inviter.save()
             }
           }
+          await logLoginAttempt(event, identifier, true)
           return newUser
         }
       },
@@ -129,9 +147,12 @@ export default NuxtAuthHandler({
         },
       },
 
-      async authorize(credentials: any) {
+      async authorize(credentials: any, req: any) {
         const { email, password, code } = credentials
         if (!email || !password) return null
+
+        const event = req as any
+        const identifier = email.toLowerCase().trim()
 
         if (runtimeConfig.env === 'developer1') {
           const user = await AdminUser.findOne({ email })
@@ -140,21 +161,52 @@ export default NuxtAuthHandler({
           return user
         }
 
+        // Проверка rate limit перед попыткой авторизации
+        const rateLimitCheck = await checkRateLimit(event, identifier)
+        if (!rateLimitCheck.allowed) {
+          await logLoginAttempt(event, identifier, false)
+          throw new Error(rateLimitCheck.reason || 'Rate limit exceeded')
+        }
+
         const user =
           (await AdminUser.findOne({ email })) ||
           (await AdminUser.findOne({ username: email }))
+        
+        // Унифицированное сообщение об ошибке для защиты от user enumeration
+        const genericError = 'Неверный логин или пароль'
+        
         if (!user || user.roles.length <= 1) {
-          throw new Error('User not found')
+          await logLoginAttempt(event, identifier, false)
+          throw new Error(genericError)
         }
+        
         if (runtimeConfig.env === 'developer1') return user
-        if (!user.password) throw new Error('Password not set')
+        
+        if (!user.password) {
+          await logLoginAttempt(event, identifier, false)
+          throw new Error(genericError)
+        }
 
         const isValid = await bcrypt.compareSync(password, user.password)
 
-        if (!isValid) throw new Error('Invalid password')
+        if (!isValid) {
+          await logLoginAttempt(event, identifier, false)
+          throw new Error(genericError)
+        }
 
-        if (!user.emailConfirmed) throw new Error('Email is not confirmed')
-        if (user.tg2fa && user.telegramUserId && !code) throw new Error('2fa')
+        if (!user.emailConfirmed) {
+          await logLoginAttempt(event, identifier, false)
+          throw new Error(genericError)
+        }
+        
+        if (user.tg2fa && user.telegramUserId && !code) {
+          // Не логируем как неудачную попытку, т.к. требуется 2FA код
+          throw new Error('2fa')
+        }
+
+        // Успешная авторизация
+        await logLoginAttempt(event, identifier, true)
+        await clearOldLoginAttempts(identifier)
 
         return user
       },
@@ -169,8 +221,9 @@ export default NuxtAuthHandler({
         },
       },
 
-      async authorize(credentials: any, event: any) {
+      async authorize(credentials: any, req: any) {
         const { code, uuid } = credentials
+        const event = req as any
 
         const user = await AdminUser.findOne({
           uuid,
@@ -180,11 +233,30 @@ export default NuxtAuthHandler({
           return null
         }
 
-        const verified = confirmTwoFaCode(code, user?.twoFaSecret)
+        const identifier = user.email || user.username || user.uuid
+        
+        // Проверка rate limit для 2FA
+        const rateLimitCheck = await checkRateLimit(event, identifier)
+        if (!rateLimitCheck.allowed) {
+          await logLoginAttempt(event, identifier, false)
+          throw new Error(rateLimitCheck.reason || 'Rate limit exceeded')
+        }
+
+        if (!user.twoFaSecret) {
+          await logLoginAttempt(event, identifier, false)
+          throw new Error('2FA not configured')
+        }
+
+        const verified = confirmTwoFaCode(code, user.twoFaSecret)
 
         if (!verified) {
+          await logLoginAttempt(event, identifier, false)
           throw new Error('Invalid code')
         }
+
+        // Успешная 2FA верификация
+        await logLoginAttempt(event, identifier, true)
+        await clearOldLoginAttempts(identifier)
 
         user.isTwoFaEnabled = false
         return user

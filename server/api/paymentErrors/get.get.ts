@@ -4,6 +4,7 @@ import { ActionHistory } from '~/server/lib/models/actionHistory'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { TransactionRequest } from '~/server/lib/models/TransactionRequest'
 import { Buyout } from '~/server/lib/models/Buyout'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 const runtimeConfig = useRuntimeConfig()
 let paymentPerPage = 50
@@ -42,13 +43,12 @@ export default eventHandler(async (event) => {
     }
   }
 
+  // ✅ FIX: Санитизация account для защиты от ReDoS
   const accountOperation =
-    account.length > 5
+    account && account.length > 5
       ? {
           account: {
-            $regex: account.includes('+')
-              ? account.replaceAll('+', '\\+')
-              : account,
+            $regex: sanitizeSearchQuery(account, 100),
             $options: 'i',
           },
         }

@@ -2,6 +2,8 @@
 import { PartnerWithdraw } from '~/server/lib/models/PartnerWithdraw'
 import { getServerSession } from '#auth'
 import { ObjectId } from 'mongodb'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
+
 const withdrawsPerPage = 25
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -25,13 +27,16 @@ export default eventHandler(async (event) => {
       ],
     }
 
+  // ✅ FIX: Санитизация searchValue для защиты от ReDoS
+  const safeSearchValue = sanitizeSearchQuery(searchValue || '', 100)
+
   const withdraws = await PartnerWithdraw.find({
     ...allowedUsersParam,
     $or: [
       { _id: ObjectId.isValid(searchValue) ? new ObjectId(searchValue) : null },
-      { userUuid: { $regex: searchValue, $options: 'i' } },
-      { 'details.fio': { $regex: searchValue, $options: 'i' } },
-      { 'details.card': { $regex: searchValue, $options: 'i' } },
+      { userUuid: { $regex: safeSearchValue, $options: 'i' } },
+      { 'details.fio': { $regex: safeSearchValue, $options: 'i' } },
+      { 'details.card': { $regex: safeSearchValue, $options: 'i' } },
     ],
     status: 'created',
   })

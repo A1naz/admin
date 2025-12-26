@@ -1,5 +1,7 @@
 ﻿import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
+
 const usersPerPage = 25
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -9,14 +11,23 @@ export default eventHandler(async (event) => {
   const { page, searchValue }: any = getQuery(event)
 
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
-  if (!userAdmin)
-    return sendRedirect(event, '/auth', 302)
+
+  // Проверка прав доступа - только super admin может видеть список админов
+  if (!userAdmin || !userAdmin.mainAdmin) {
+    throw createError({
+      statusCode: 403,
+      message: 'Недостаточно прав доступа',
+    })
+  }
+
+  // ✅ FIX: Санитизация searchValue для защиты от ReDoS
+  const safeSearchValue = sanitizeSearchQuery(searchValue || '', 100)
 
   const allUsers = await AdminUser.find({
     $or: [
-      { uuid: { $regex: searchValue, $options: 'i' } },
-      { email: { $regex: searchValue, $options: 'i' } },
-      { username: { $regex: searchValue, $options: 'i' } },
+      { uuid: { $regex: safeSearchValue, $options: 'i' } },
+      { email: { $regex: safeSearchValue, $options: 'i' } },
+      { username: { $regex: safeSearchValue, $options: 'i' } },
     ],
   })
     .skip(usersPerPage * (+page - 1))

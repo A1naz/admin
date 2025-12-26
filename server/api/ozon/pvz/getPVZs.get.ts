@@ -2,6 +2,8 @@ import { AdminUser } from '~/server/lib/models/AdminUser'
 import { User } from '~/server/lib/models/User'
 import { Buyout } from '~~/server/lib/models/ozon/Buyout'
 import { getServerSession } from '#auth'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
+
 const usersPerPage = 25
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -13,8 +15,11 @@ export default eventHandler(async (event) => {
   const userAdmin = await AdminUser.findOne({ uuid: session.uuid })
   if (!userAdmin) return sendRedirect(event, '/auth', 302)
 
+  // ✅ FIX: Санитизация searchValue для защиты от ReDoS
+  const safeSearchValue = sanitizeSearchQuery(searchValue || '', 200)
+
   const foundBuyouts = await Buyout.find({
-    point: { $regex: searchValue, $options: 'i' },
+    point: { $regex: safeSearchValue, $options: 'i' },
     user: { $in: users },
   }).limit(1000)
 

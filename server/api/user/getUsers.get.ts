@@ -2,6 +2,7 @@
 import { User } from '~/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { Types } from 'mongoose'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 const usersPerPage = 25
 export default eventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -44,17 +45,20 @@ export default eventHandler(async (event) => {
         .limit(usersPerPage)
         .sort({ registrationDate: sortDate === 'mdi-arrow-up' ? 1 : -1 })
     } else {
+      // ✅ FIX: Санитизация для защиты от ReDoS
+      const safeSearchValue = sanitizeSearchQuery(cleanedSearchValue, 100)
+      
       allUsers = await User.find({
         ...allowedUsersParam,
         ...rolesParam,
         uuidCompany: { $exists: false },
         $or: [
-          { uuid: { $regex: cleanedSearchValue, $options: 'i' } },
-          { email: { $regex: cleanedSearchValue, $options: 'i' } },
-          { telegram: { $regex: cleanedSearchValue, $options: 'i' } },
-          { username: { $regex: cleanedSearchValue, $options: 'i' } },
-          { orgInn: { $regex: cleanedSearchValue, $options: 'i' } },
-          { orgName: { $regex: cleanedSearchValue, $options: 'i' } },
+          { uuid: { $regex: safeSearchValue, $options: 'i' } },
+          { email: { $regex: safeSearchValue, $options: 'i' } },
+          { telegram: { $regex: safeSearchValue, $options: 'i' } },
+          { username: { $regex: safeSearchValue, $options: 'i' } },
+          { orgInn: { $regex: safeSearchValue, $options: 'i' } },
+          { orgName: { $regex: safeSearchValue, $options: 'i' } },
         ],
       })
         .skip(usersPerPage * (+page - 1))
@@ -97,8 +101,7 @@ export default eventHandler(async (event) => {
       partnerSecondLevelPercent: user.partner?.secondLevelPercent
         ? user.partner?.secondLevelPercent
         : 5,
-      twoFaQR: userTwoFa ? userTwoFa.twoFaQR : user.twoFaQR || '',
-      twoFaSecret: userTwoFa ? userTwoFa.twoFaSecret : user.twoFaSecret || '',
+      has2FA: !!(userTwoFa?.twoFaSecret || user.twoFaSecret),
       organization: user.fizFace ? user.username + '(Физ. лицо)' : user.orgName,
       partnerServiceRewardSum: user.partner?.partnerServiceRewardSum
         ? user.partner.partnerServiceRewardSum

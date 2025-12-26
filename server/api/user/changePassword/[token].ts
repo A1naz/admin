@@ -1,9 +1,8 @@
-import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 import { User } from '@/server/lib/models/User'
 
 export default eventHandler(async (event) => {
-  const runtimeConfig = useRuntimeConfig()
   const params = event.context.params
 
   if (!params?.token) {
@@ -14,30 +13,40 @@ export default eventHandler(async (event) => {
   }
 
   try {
-    const data: any = jwt.verify(params.token, runtimeConfig.SECRET)
+    // ✅ FIX: Хешируем токен для поиска в БД
+    const hashedToken = crypto.createHash('sha256')
+      .update(params.token)
+      .digest('hex')
 
-    if (!data) {
-      throw createError({
-        statusCode: 400,
-        message: 'Token is not valid',
-      })
-    }
-    const user = await User.findById(data.id)
+    // Ищем пользователя по хешированному токену
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() }
+    })
 
     if (!user) {
       throw createError({
         statusCode: 400,
-        message: 'User not found',
+        message: 'Токен недействителен или истек',
       })
     }
-    const hash = bcrypt.hashSync(data.password, 7)
 
+    // Хешируем новый пароль
+    const hash = bcrypt.hashSync(user.pendingPassword, 7)
+
+    // Обновляем пароль и очищаем токен
     user.password = hash
+    user.passwordResetToken = undefined
+    user.passwordResetExpires = undefined
+    user.pendingPassword = undefined
     await user.save()
 
     return sendRedirect(event, '/auth?passwordChanged=true', 302)
   }
   catch (e) {
-    return 'Token is not valid'
+    throw createError({
+      statusCode: 400,
+      message: 'Токен недействителен или истек',
+    })
   }
 })

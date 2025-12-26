@@ -3,6 +3,7 @@ import { Service } from '~/server/lib/models/Service'
 import { User } from '~/server/lib/models/User'
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 export default defineEventHandler(async (event) => {
   const session = (await getServerSession(event)) as any
@@ -14,9 +15,12 @@ export default defineEventHandler(async (event) => {
 
   const { type, underType, query } = await readBody(event)
 
+  // ✅ FIX: Санитизация query для защиты от ReDoS
+  const safeQuery = sanitizeSearchQuery(query || '', 100)
+
   const services = await Service.find({
     type: underType === 'any' ? { $exists: true } : underType,
-    name: { $regex: query, $options: 'i' },
+    name: { $regex: safeQuery, $options: 'i' },
   })
 
   const usersWhoVoted = await User.find({

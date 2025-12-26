@@ -2,6 +2,7 @@ import { Service } from "~/server/lib/models/Service";
 import { User } from "~/server/lib/models/User";
 import { AdminUser } from '~/server/lib/models/AdminUser'
 import { getServerSession } from '#auth'
+import { sanitizeSearchQuery } from '~/server/utils/sanitizeRegex'
 
 function getServiceNameByKey(key: string) {
         switch (key) {
@@ -51,8 +52,11 @@ export default defineEventHandler(async (event) => {
 
         const { type, query } = getQuery(event)
 
+        // ✅ FIX: Санитизация query для защиты от ReDoS
+        const safeQuery = sanitizeSearchQuery(query || '', 100)
+
         const services = await Service.find({
-                name: { $regex: query, $options: 'i' },
+                name: { $regex: safeQuery, $options: 'i' },
         })
 
         const usersVotes: any = await User.find({
