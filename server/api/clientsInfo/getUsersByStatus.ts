@@ -251,6 +251,13 @@ export default {
       ? new Date(JSON.parse(dateRange[0]))
       : new Date(curDate.getTime() - 14 * 24 * 60 * 60 * 1000)
 
+    const clientsParam =
+      clientsType === 'fizFace'
+        ? { fizFace: true }
+        : clientsType === 'yurFace'
+        ? { fizFace: { $ne: true } }
+        : {}
+
     const userIds = await paymenthistory.aggregate([
       {
         $match: {
@@ -270,6 +277,7 @@ export default {
       uuidCompany: { $exists: false },
       _id: { $nin: userIds.map((user: any) => user._id) },
       ...searchQueryParam,
+      ...clientsParam,
     })
       .limit(50)
       .skip(limit * (page - 1))

@@ -28,12 +28,13 @@ export default eventHandler(async (event) => {
         $or: [
           { username: { $regex: safeSearchQuery, $options: 'i' } },
           { orgName: { $regex: safeSearchQuery, $options: 'i' } },
-          {
+          // Поиск по телефону только если есть цифры в запросе
+          ...(safeSearchQuery.replace(/[^\d]/g, '') ? [{
             phoneNumber: {
               $regex: safeSearchQuery.replace(/[^\d]/g, ''),
               $options: 'i',
             },
-          },
+          }] : []),
         ],
       }
     : {}
