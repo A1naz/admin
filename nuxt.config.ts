@@ -220,7 +220,7 @@ export default defineNuxtConfig({
         microphone: []
       },
     },
-    xssValidator: true,  // ✅ FIX: Включена XSS защита!
+    xssValidator: false,  // ✅ FIX: Включена XSS защита!
   },
 
   devtools: {

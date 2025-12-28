@@ -262,8 +262,8 @@ if (
     <div>
       <button
         class="btn btn-primary mr-3"
-        onclick="createRequireModal.showModal()"
-        :disable="isCreateButtonDisabled"
+        @click="createRequireModalRef?.showModal()"
+        :disabled="isCreateButtonDisabled"
       >
         Создать запрос
       </button>
