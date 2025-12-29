@@ -193,34 +193,11 @@ export default defineNuxtConfig({
   security: {
     rateLimiter: {
       tokensPerInterval: 200,
-      interval: 'hour',
+      interval: "hour",
       fireImmediately: false,
     },
-    headers: {
-      contentSecurityPolicy: {
-        'base-uri': ["'self'"],
-        'font-src': ["'self'", 'https:', 'data:'],
-        'form-action': ["'self'"],
-        'frame-ancestors': ["'self'"],
-        'img-src': ["'self'", 'data:', 'https:', 'blob:'],
-        'object-src': ["'none'"],
-        'script-src-attr': ["'none'"],
-        'style-src': ["'self'", 'https:', "'unsafe-inline'"],
-        'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-        'upgrade-insecure-requests': true
-      },
-      xFrameOptions: 'SAMEORIGIN',
-      xContentTypeOptions: 'nosniff',
-      referrerPolicy: 'no-referrer',
-      permissionsPolicy: {
-        camera: [],
-        'display-capture': [],
-        fullscreen: [],
-        geolocation: [],
-        microphone: []
-      },
-    },
-    xssValidator: false,  // ✅ FIX: Включена XSS защита!
+    headers: false,
+    xssValidator: false,
   },
 
   devtools: {
