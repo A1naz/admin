@@ -190,9 +190,6 @@ export default NuxtAuthHandler({
         
         const isValid = await bcrypt.compareSync(password, user.password)
 
-        console.log(user.email)
-        console.log(isValid)
-
         if (!isValid) {
 
           await logLoginAttempt(event, identifier, false)
