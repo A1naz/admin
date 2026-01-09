@@ -60,7 +60,7 @@ export default eventHandler(async (event) => {
       userToEdit.lastName = body.lastName ? body.lastName : userToEdit.lastName
 
       if (body.password && body.password.length > 8) {
-        userToEdit.password = await bcrypt.hash(body.password, 7)
+        userToEdit.password = await bcrypt.hashSync(body.password, 7)
       }
 
       if (body.roles.length > 1) {
@@ -144,6 +144,7 @@ export default eventHandler(async (event) => {
   } else {
     let newUuid = unicalUuid()
     const hash = bcrypt.hashSync(body.password, 7)
+
 
     const isUserExist = await User.findOne({ email: body.email })
 
