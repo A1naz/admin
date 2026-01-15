@@ -92,6 +92,7 @@ async function filterUsers(users: any[]) {
       INN: user.orgInn,
       balance: user.balance,
       partnerBalance: user.partner.balance,
+      disableEmailAutoSender: user.disableEmailAutoSender,
       referralsCount: user.partner.refCount,
     }
   })

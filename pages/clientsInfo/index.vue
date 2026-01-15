@@ -72,6 +72,31 @@ async function signTariff() {
     getClients()
   }
 }
+
+async function toggleEmailAutoSender(user: any) {
+  const { data, error }: any = await useFetch('/api/clientsInfo/toggleEmailAutoSender', {
+    method: 'POST',
+    body: {
+      uuid: user.uuid,
+    },
+    watch: false,
+  })
+  
+  if (data.value?.success) {
+    notify({
+      type: 'success',
+      title: data.value.disableEmailAutoSender ? 'Рассылка отключена' : 'Рассылка включена',
+    })
+    getClients()
+  }
+  
+  if (error.value) {
+    notify({
+      type: 'error',
+      title: 'Ошибка при изменении настроек рассылки',
+    })
+  }
+}
 </script>
 <template>
   <h1 class="text-2xl font-bold ml-3 my-2">Клиенты</h1>
@@ -207,6 +232,20 @@ async function signTariff() {
               @click="openUserStats(tariff)"
             >
               <Icon name="mdi:eye-outline" size="20" />
+            </button>
+            <button 
+              class="btn btn-warning btn-neutral ml-2"
+              v-if="!tariff.disableEmailAutoSender"
+              @click="toggleEmailAutoSender(tariff)"
+            >
+              Выкл. рассылку
+            </button>
+            <button 
+              class="btn btn-success btn-neutral ml-2"
+              v-else
+              @click="toggleEmailAutoSender(tariff)"
+            >
+              Вкл. рассылку
             </button>
           </th>
         </tr>

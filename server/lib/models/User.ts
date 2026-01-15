@@ -99,6 +99,7 @@ const UserSchema = new Schema({
     },
   ],
   emailFunnelClicksCount: { type: Number, default: 0 },
+  disableEmailAutoSender: { type: Boolean, default: false },
 })
 
 // UserSchema.pre('save', function (next) {
