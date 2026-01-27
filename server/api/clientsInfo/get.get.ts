@@ -20,24 +20,41 @@ export default eventHandler(async (event) => {
   const { dateRange, searchQuery, page, status, clientsType }: any =
     getQuery(event)
 
+  console.log('Original searchQuery:', searchQuery)
+  console.log('Type:', typeof searchQuery)
+
   // ✅ FIX: Санитизация для защиты от ReDoS
   const safeSearchQuery = searchQuery ? sanitizeSearchQuery(searchQuery, 100) : ''
+  
+  console.log('Safe searchQuery:', safeSearchQuery)
+  
+  // Извлекаем только цифры для поиска по телефону
+  const phoneDigits = safeSearchQuery.replace(/[^\d]/g, '')
+  
+  // Поиск по телефону активируется только если:
+  // 1. Запрос начинается с "+" (например, +7906...)
+  // 2. ИЛИ запрос состоит преимущественно из цифр (>70% цифр) И длина >= 7
+  const looksLikePhone = safeSearchQuery.startsWith('+') || 
+    (phoneDigits.length >= 7 && phoneDigits.length / safeSearchQuery.length > 0.7)
   
   const searchQueryParam: any = safeSearchQuery
     ? {
         $or: [
           { username: { $regex: safeSearchQuery, $options: 'i' } },
           { orgName: { $regex: safeSearchQuery, $options: 'i' } },
-          // Поиск по телефону только если есть цифры в запросе
-          ...(safeSearchQuery.replace(/[^\d]/g, '') ? [{
+          // Добавляем поиск по телефону только если запрос похож на номер телефона
+          ...(looksLikePhone ? [{
             phoneNumber: {
-              $regex: safeSearchQuery.replace(/[^\d]/g, ''),
+              $regex: phoneDigits,
               $options: 'i',
             },
           }] : []),
         ],
       }
     : {}
+
+  console.log('Phone digits:', phoneDigits, 'Looks like phone:', looksLikePhone)
+  console.log('searchQueryParam:', JSON.stringify(searchQueryParam, null, 2))
 
   let users = []
   if (status === 'all') {
