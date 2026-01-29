@@ -17,6 +17,7 @@ const userEditForm = ref({
   tabs: <any>[],
   allowedUsers: <any>[],
   restrictedUsers: <any>[],
+  phoneNumber: '',
 })
 const roles = ref<any>([
   {
@@ -190,6 +191,7 @@ async function selectUser(user: any) {
   userEditForm.value.firstName = user.firstName
   userEditForm.value.lastName = user.lastName
   userEditForm.value.username = user.username
+  userEditForm.value.phoneNumber = user.phoneNumber
   userEditForm.value.roles = user.roles
   userEditForm.value.tabs = []
   selectAdminUserClose.value?.click()
@@ -349,25 +351,12 @@ async function copyToClipboardQR() {
     <div class="flex justify-between">
       <div class="flex">
         <div>
-          <label
-            ><input
-              v-model="query"
-              type="text"
-              placeholder="Заполните поле"
-              class="input input-bordered input-l ml-4 w-80"
-              @input="onInput($event)"
-            />
+          <label><input v-model="query" type="text" placeholder="Заполните поле"
+              class="input input-bordered input-l ml-4 w-80" @input="onInput($event)" />
           </label>
-          <span
-            v-if="inputLoading"
-            class="loading loading-spinner text-primary loading-large ml-4"
-          />
+          <span v-if="inputLoading" class="loading loading-spinner text-primary loading-large ml-4" />
         </div>
-        <select
-          class="select select-bordered w-50 ml-3"
-          @change="getUsers"
-          v-model="selectedUserRole"
-        >
+        <select class="select select-bordered w-50 ml-3" @change="getUsers" v-model="selectedUserRole">
           <option selected value="">все роли</option>
           <option v-for="role in roles" :value="role.value">
             {{ role.text }}
@@ -378,54 +367,40 @@ async function copyToClipboardQR() {
         </button>
       </div>
       <div>
-        <button
-          class="btn btn-primary mr-4 btn"
-          @click="
+        <button class="btn btn-primary mr-4 btn" @click="
             ;[
-              (createMode = true),
-              (userEditForm = {
-                firstName: '',
-                lastName: '',
-                username: '',
-                email: '',
-                roles: ['user'],
-                tabs: [],
-                allowedUsers: [],
-                restrictedUsers: [],
-              }),
-              (selectedUser = {
-                username: '',
-              }),
-              openEditUsersModal(),
-            ]
-          "
-        >
+          (createMode = true),
+          (userEditForm = {
+            firstName: '',
+            lastName: '',
+            username: '',
+            email: '',
+            roles: ['user'],
+            tabs: [],
+            allowedUsers: [],
+            restrictedUsers: [],
+          }),
+          (selectedUser = {
+            username: '',
+          }),
+          openEditUsersModal(),
+        ]
+          ">
           <Icon name="line-md:plus" size="20" />
         </button>
         <div class="join mr-2">
-          <button
-            class="join-item btn"
-            @click="swapPage(-1)"
-            :disabled="isPageBtnsDisabled"
-          >
+          <button class="join-item btn" @click="swapPage(-1)" :disabled="isPageBtnsDisabled">
             «
           </button>
           <button class="join-item btn">{{ curPage }}</button>
-          <button
-            class="join-item btn"
-            @click="swapPage(1)"
-            :disabled="isPageBtnsDisabled"
-          >
+          <button class="join-item btn" @click="swapPage(1)" :disabled="isPageBtnsDisabled">
             »
           </button>
         </div>
       </div>
     </div>
 
-    <div
-      class="my-2 mx-2 overflow-y-auto"
-      :style="{ 'max-height': height - 270 + 'px' }"
-    >
+    <div class="my-2 mx-2 overflow-y-auto" :style="{ 'max-height': height - 270 + 'px' }">
       <table class="table">
         <!-- head -->
         <thead>
@@ -438,10 +413,7 @@ async function copyToClipboardQR() {
             <th>
               <div @click="sortByDate" class="flex cursor-pointer">
                 Регистрация
-                <Icon
-                  class="swap-on fill-current ml-1 w-6 h-5"
-                  :name="dateSortIcon"
-                />
+                <Icon class="swap-on fill-current ml-1 w-6 h-5" :name="dateSortIcon" />
               </div>
             </th>
             <th>Управление</th>
@@ -463,25 +435,19 @@ async function copyToClipboardQR() {
               {{ user.email }}
             </th>
             <th style="max-width: 100px; min-width: 90px">
-              {{ user.roles.map((role: any) => role).join(', ') }}
+              {{user.roles.map((role: any) => role).join(', ')}}
             </th>
-            <th
-              style="max-width: 60px; min-width: 40px"
-              class="overflow-x-auto"
-            >
+            <th style="max-width: 60px; min-width: 40px" class="overflow-x-auto">
               {{ defaultDate(user.registrationDate) }}
             </th>
             <th style="max-width: 10px; min-width: 10px">
-              <button
-                class="btn btn-primary btn-sm"
-                @click="
+              <button class="btn btn-primary btn-sm" @click="
                   ;[
-                    (createMode = false),
-                    selectUser(user),
-                    openEditUsersModal(),
-                  ]
-                "
-              >
+                (createMode = false),
+                selectUser(user),
+                openEditUsersModal(),
+              ]
+                ">
                 <Icon name="material-symbols:edit" size="18" />
               </button>
             </th>
@@ -494,11 +460,8 @@ async function copyToClipboardQR() {
   <div class="modal cursor-pointer" @click="openEditUsersModal">
     <div class="modal-box w-7/12 max-w-full cursor-auto" @click.stop>
       <form method="dialog">
-        <label
-          for="editUsersModal"
-          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          ref="editUsersModalClose"
-        >
+        <label for="editUsersModal" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          ref="editUsersModalClose">
           ✕
         </label>
       </form>
@@ -508,40 +471,24 @@ async function copyToClipboardQR() {
       </div>
       <div>
         <div class="flex mt-4 gap-4">
-          <input
-            placeholder="Никнейм"
-            v-model="userEditForm.username"
-            class="input input-bordered w-full"
-          />
-          <input
-            placeholder="email"
-            v-model="userEditForm.email"
-            class="input input-bordered w-full"
-          />
+          <input placeholder="Номер телефона" 
+          v-model="userEditForm.phoneNumber" 
+          v-maska 
+          data-maska="+7 (###) ###-##-##"
+             type="text"
+            class="input input-bordered w-full" />
         </div>
         <div class="flex mt-4 gap-4">
-          <input
-            placeholder="Имя"
-            v-model="userEditForm.firstName"
-            class="input input-bordered w-full"
-          />
-          <input
-            placeholder="Фамилия"
-            v-model="userEditForm.lastName"
-            class="input input-bordered w-full"
-          />
+          <input placeholder="Никнейм" v-model="userEditForm.username" class="input input-bordered w-full" />
+          <input placeholder="email" v-model="userEditForm.email" class="input input-bordered w-full" />
         </div>
         <div class="flex mt-4 gap-4">
-          <input
-            placeholder="Пароль"
-            v-model="password"
-            class="input input-bordered w-full"
-          />
-          <input
-            placeholder="Повторите пароль"
-            v-model="repeatPassword"
-            class="input input-bordered w-full"
-          />
+          <input placeholder="Имя" v-model="userEditForm.firstName" class="input input-bordered w-full" />
+          <input placeholder="Фамилия" v-model="userEditForm.lastName" class="input input-bordered w-full" />
+        </div>
+        <div class="flex mt-4 gap-4">
+          <input placeholder="Пароль" v-model="password" class="input input-bordered w-full" />
+          <input placeholder="Повторите пароль" v-model="repeatPassword" class="input input-bordered w-full" />
         </div>
       </div>
       <div class="divider"></div>
@@ -599,29 +546,21 @@ async function copyToClipboardQR() {
             <div class="form-control" v-for="role in roles">
               <label class="label cursor-pointer">
                 <span class="label-text mr-2">{{ role.text }}</span>
-                <input
-                  type="checkbox"
-                  :checked="userEditForm.roles.includes(role.value)"
-                  :disabled="role.disabled"
-                  class="checkbox checkbox-primary"
-                  @change="
+                <input type="checkbox" :checked="userEditForm.roles.includes(role.value)" :disabled="role.disabled"
+                  class="checkbox checkbox-primary" @change="
                     userEditForm.roles.includes(role.value)
                       ? userEditForm.roles.splice(
-                          userEditForm.roles.indexOf(role.value),
-                          1
-                        )
+                        userEditForm.roles.indexOf(role.value),
+                        1
+                      )
                       : userEditForm.roles.push(role.value)
-                  "
-                />
+                    " />
               </label>
             </div>
           </div>
         </div>
       </div>
-      <div
-        v-if="isSelectedUserAdmin"
-        class="collapse bg-base-200 collapse-arrow"
-      >
+      <div v-if="isSelectedUserAdmin" class="collapse bg-base-200 collapse-arrow">
         <input type="checkbox" />
         <div class="collapse-title text-xl font-medium">
           Настроить доступные разделы
@@ -631,94 +570,62 @@ async function copyToClipboardQR() {
             <div class="form-control" v-for="tab in tabs">
               <label class="label cursor-pointer">
                 <span class="label-text mr-2">{{ tab }}</span>
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
-                  :checked="userEditForm.tabs.includes(tab)"
+                <input type="checkbox" class="checkbox checkbox-primary" :checked="userEditForm.tabs.includes(tab)"
                   @click="
                     userEditForm.tabs.includes(tab)
                       ? userEditForm.tabs.splice(
-                          userEditForm.tabs.indexOf(tab),
-                          1
-                        )
+                        userEditForm.tabs.indexOf(tab),
+                        1
+                      )
                       : userEditForm.tabs.push(tab)
-                  "
-                />
+                    " />
               </label>
             </div>
           </div>
         </div>
       </div>
-      <div
-        v-if="userEditForm.twoFaQR && userEditForm.twoFaQR !== ''"
-        class="flex flex-col gap-2 justify-center items-center mt-5"
-      >
-        <span class="font-semibold text-lg"
-          >QR-код для подключения двухфакторной аутентификации</span
-        >
-        <NuxtImg
-          class="bg-white"
-          height="250"
-          width="250"
-          :src="`${userEditForm.twoFaQR}`"
-        />
+      <div v-if="userEditForm.twoFaQR && userEditForm.twoFaQR !== ''"
+        class="flex flex-col gap-2 justify-center items-center mt-5">
+        <span class="font-semibold text-lg">QR-код для подключения двухфакторной аутентификации</span>
+        <NuxtImg class="bg-white" height="250" width="250" :src="`${userEditForm.twoFaQR}`" />
         <button class="btn mt-2" @click="copyToClipboardQR">
           <Icon name="material-symbols:content-copy" size="26"></Icon>
         </button>
       </div>
       <div v-else class="flex flex-col justify-center items-center mt-5">
-        <span class="font-semibold text-lg"
-          >Нет QR-кода для подключения двухфакторной аутентификации</span
-        >
+        <span class="font-semibold text-lg">Нет QR-кода для подключения двухфакторной аутентификации</span>
       </div>
       <div>
         <div class="modal-action">
-          <label
-            class="btn btn-error btn-sm bg-red-400"
-            for="editUsersModal"
-            @click="
-              userEditForm = {
-                firstName: '',
-                lastName: '',
-                username: '',
-                email: '',
-                roles: ['user'],
-                tabs: [],
-                allowedUsers: [],
-                restrictedUsers: [],
-              }
-            "
-          >
+          <label class="btn btn-error btn-sm bg-red-400" for="editUsersModal" @click="
+            userEditForm = {
+              firstName: '',
+              lastName: '',
+              username: '',
+              email: '',
+              roles: ['user'],
+              tabs: [],
+              allowedUsers: [],
+              restrictedUsers: [],
+            }
+            ">
             Отмена
           </label>
-          <button
-            v-if="!createMode"
-            class="btn btn-sm btn-primary"
-            @click="saveUser"
-          >
+          <button v-if="!createMode" class="btn btn-sm btn-primary" @click="saveUser">
             Сохранить
           </button>
-          <button
-            v-if="createMode"
-            class="btn btn-sm btn-primary"
-            @click=";[(selectedUser = { username: '' }), saveUser()]"
-          >
+          <button v-if="createMode" class="btn btn-sm btn-primary"
+            @click=";[(selectedUser = { username: '' }), saveUser()]">
             Добавить
           </button>
         </div>
       </div>
     </div>
   </div>
-  <allowedUsersModal
-    ref="allowedUsersModalRef"
-    :selectedUsers="userEditForm.allowedUsers"
-    @clearUsers="userEditForm.allowedUsers = []"
-  />
-  <restrickedUsersModal
-    ref="restrictedUsersModalRef"
-    :selectedUsers="userEditForm.restrictedUsers"
-    @clearUsers="userEditForm.restrictedUsers = []"
-  />
+  <allowedUsersModal ref="allowedUsersModalRef" :selectedUsers="userEditForm.allowedUsers"
+    @clearUsers="userEditForm.allowedUsers = []" />
+  <restrickedUsersModal ref="restrictedUsersModalRef" :selectedUsers="userEditForm.restrictedUsers"
+    @clearUsers="userEditForm.restrictedUsers = []" />
 </template>
 <style scoped>
 ::-webkit-scrollbar {

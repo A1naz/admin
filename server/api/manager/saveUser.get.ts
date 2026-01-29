@@ -167,6 +167,7 @@ export default eventHandler(async (event) => {
         firstName: body.firstName,
         lastName: body.lastName,
         orgInn: 'manager:' + unicalUuid(),
+        phoneNumber: body.phoneNumber.replace(/[\(\)\-\s]/g, '')
       })
 
       await ActionHistory.create({
