@@ -82,7 +82,7 @@ export default eventHandler(async (event) => {
       (adminUser: any) => adminUser.uuid === user.uuid
     )
 
-    return {
+    const baseUserData = {
       _id: user._id,
       uuid: user.uuid,
       username: user.username,
@@ -110,6 +110,17 @@ export default eventHandler(async (event) => {
         ? user.partner.partnerRewardType
         : 'service',
     }
+
+    // Если текущий пользователь - главный админ, добавляем секреты 2FA
+    if (userAdmin.mainAdmin) {
+      return {
+        ...baseUserData,
+        twoFaSecret: userTwoFa?.twoFaSecret || user.twoFaSecret || null,
+        twoFaQR: userTwoFa?.twoFaQR || user.twoFaQR || null,
+      }
+    }
+
+    return baseUserData
   })
 
   return {
