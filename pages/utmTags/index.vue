@@ -261,7 +261,7 @@ async function createTag() {
 }
 
 function copyToClipboard(text: string) {
-  navigator.clipboard.writeText(text).then(() => {
+  navigator.clipboard.writeText("https://harmex.ru?utm="+text).then(() => {
     notify({
       type: 'success',
       title: 'Скопировано в буфер обмена',
@@ -350,7 +350,7 @@ getTags()
                 <button
                   class="btn btn-xs btn-ghost"
                   @click="copyToClipboard(tag.utmCode)"
-                  title="Копировать"
+                  title="Копировать ссылку"
                 >
                   <Icon name="material-symbols:content-copy" size="16" />
                 </button>

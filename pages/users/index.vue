@@ -255,6 +255,7 @@ const tabs = ref<any>([
   'статистика',
   'статистика авито',
   'коды регистраций',
+  'utm метки'
 ])
 
 async function saveUser() {
