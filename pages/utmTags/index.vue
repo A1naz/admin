@@ -50,6 +50,18 @@ const platformModalRef: any = ref(null)
 const closeCategoryModalRef: any = ref(null)
 const closePlatformModalRef: any = ref(null)
 
+// Модалки для подтверждения удаления
+const deleteTagModalRef: any = ref(null)
+const deleteCategoryModalRef: any = ref(null)
+const deletePlatformModalRef: any = ref(null)
+const closeDeleteTagModalRef: any = ref(null)
+const closeDeleteCategoryModalRef: any = ref(null)
+const closeDeletePlatformModalRef: any = ref(null)
+const tagToDelete: any = ref(null)
+const categoryToDelete: any = ref(null)
+const platformToDelete: any = ref(null)
+const isDeleting = ref(false)
+
 async function getTags() {
   curPage.value = 1
   const { data }: any = await useFetch('/api/utmTags', {
@@ -293,6 +305,135 @@ function copyToClipboard(text: string) {
   })
 }
 
+function openDeleteTagModal(tag: any) {
+  tagToDelete.value = tag
+  deleteTagModalRef.value?.showModal()
+}
+
+function openDeleteCategoryModal() {
+  if (!selectedCategory.value) {
+    notify({
+      type: 'error',
+      title: 'Выберите категорию для удаления',
+    })
+    return
+  }
+  const category = categories.value.find(c => c._id === selectedCategory.value)
+  categoryToDelete.value = category
+  deleteCategoryModalRef.value?.showModal()
+}
+
+function openDeletePlatformModal() {
+  if (!selectedPlatform.value) {
+    notify({
+      type: 'error',
+      title: 'Выберите площадку для удаления',
+    })
+    return
+  }
+  const platform = platforms.value.find(p => p._id === selectedPlatform.value)
+  platformToDelete.value = platform
+  deletePlatformModalRef.value?.showModal()
+}
+
+async function deleteTag() {
+  if (!tagToDelete.value) return
+
+  isDeleting.value = true
+  const { data, error }: any = await useFetch('/api/utmTags/delete', {
+    method: 'POST',
+    body: {
+      tagId: tagToDelete.value._id,
+    },
+    watch: false,
+  })
+
+  if (data.value?.success) {
+    notify({
+      type: 'success',
+      title: 'Метка удалена',
+    })
+    closeDeleteTagModalRef.value?.click()
+    tagToDelete.value = null
+    getTags()
+  }
+
+  if (error.value) {
+    notify({
+      type: 'error',
+      title: error.value.data?.statusMessage || 'Ошибка при удалении метки',
+    })
+  }
+
+  isDeleting.value = false
+}
+
+async function deleteCategory() {
+  if (!categoryToDelete.value) return
+
+  isDeleting.value = true
+  const { data, error }: any = await useFetch('/api/utmTags/categories/delete', {
+    method: 'POST',
+    body: {
+      categoryId: categoryToDelete.value._id,
+    },
+    watch: false,
+  })
+
+  if (data.value?.success) {
+    notify({
+      type: 'success',
+      title: 'Категория удалена',
+    })
+    closeDeleteCategoryModalRef.value?.click()
+    categoryToDelete.value = null
+    selectedCategory.value = ''
+    await loadCategories()
+  }
+
+  if (error.value) {
+    notify({
+      type: 'error',
+      title: error.value.data?.statusMessage || 'Ошибка при удалении категории',
+    })
+  }
+
+  isDeleting.value = false
+}
+
+async function deletePlatform() {
+  if (!platformToDelete.value) return
+
+  isDeleting.value = true
+  const { data, error }: any = await useFetch('/api/utmTags/platforms/delete', {
+    method: 'POST',
+    body: {
+      platformId: platformToDelete.value._id,
+    },
+    watch: false,
+  })
+
+  if (data.value?.success) {
+    notify({
+      type: 'success',
+      title: 'Площадка удалена',
+    })
+    closeDeletePlatformModalRef.value?.click()
+    platformToDelete.value = null
+    selectedPlatform.value = ''
+    await loadPlatforms()
+  }
+
+  if (error.value) {
+    notify({
+      type: 'error',
+      title: error.value.data?.statusMessage || 'Ошибка при удалении площадки',
+    })
+  }
+
+  isDeleting.value = false
+}
+
 // Загружаем категории и площадки при инициализации
 loadCategories()
 loadPlatforms()
@@ -439,12 +580,21 @@ getTags()
             <td>{{ tag.registrationsCount }}</td>
             <td>{{ tag.paymentsCount }}</td>
             <td>
-              <button
-                class="btn btn-xs btn-primary"
-                @click="copyToClipboard(tag.utmCode)"
-              >
-                Копировать
-              </button>
+              <div class="flex gap-2">
+                <button
+                  class="btn btn-xs btn-primary"
+                  @click="copyToClipboard(tag.utmCode)"
+                >
+                  Копировать
+                </button>
+                <button
+                  class="btn btn-xs btn-error"
+                  @click="openDeleteTagModal(tag)"
+                  title="Удалить метку"
+                >
+                  <Icon name="material-symbols:delete-outline" size="16" />
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -496,8 +646,18 @@ getTags()
                 class="btn btn-square btn-primary"
                 @click="openCategoryModal"
                 type="button"
+                title="Создать категорию"
               >
                 <Icon name="material-symbols:add" size="20" />
+              </button>
+              <button
+                class="btn btn-square btn-error"
+                @click="openDeleteCategoryModal"
+                type="button"
+                :disabled="!selectedCategory"
+                title="Удалить выбранную категорию"
+              >
+                <Icon name="material-symbols:delete-outline" size="20" />
               </button>
             </div>
           </div>
@@ -525,8 +685,18 @@ getTags()
                 class="btn btn-square btn-primary"
                 @click="openPlatformModal"
                 type="button"
+                title="Создать площадку"
               >
                 <Icon name="material-symbols:add" size="20" />
+              </button>
+              <button
+                class="btn btn-square btn-error"
+                @click="openDeletePlatformModal"
+                type="button"
+                :disabled="!selectedPlatform"
+                title="Удалить выбранную площадку"
+              >
+                <Icon name="material-symbols:delete-outline" size="20" />
               </button>
             </div>
           </div>
@@ -634,6 +804,108 @@ getTags()
       </div>
       <form method="dialog" class="modal-backdrop">
         <button ref="closePlatformModalRef">close</button>
+      </form>
+    </dialog>
+
+    <!-- Delete Tag Confirmation Modal -->
+    <dialog id="deleteTagModal" class="modal" ref="deleteTagModalRef">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Подтверждение удаления</h3>
+        <p class="mb-4">
+          Вы уверены, что хотите удалить UTM метку 
+          <strong>{{ tagToDelete?.name }}</strong>?
+        </p>
+        <p class="text-sm text-warning mb-4">
+          Это действие необратимо!
+        </p>
+        <div class="flex justify-end gap-2">
+          <button
+            class="btn btn-ghost"
+            @click="closeDeleteTagModalRef?.click()"
+            :disabled="isDeleting"
+          >
+            Отмена
+          </button>
+          <button
+            class="btn btn-error"
+            @click="deleteTag"
+            :disabled="isDeleting"
+          >
+            <span v-if="isDeleting" class="loading loading-spinner"></span>
+            <span v-else>Удалить</span>
+          </button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button ref="closeDeleteTagModalRef">close</button>
+      </form>
+    </dialog>
+
+    <!-- Delete Category Confirmation Modal -->
+    <dialog id="deleteCategoryModal" class="modal" ref="deleteCategoryModalRef">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Подтверждение удаления</h3>
+        <p class="mb-4">
+          Вы уверены, что хотите удалить категорию 
+          <strong>{{ categoryToDelete?.name }}</strong>?
+        </p>
+        <p class="text-sm text-warning mb-4">
+          Это действие необратимо!
+        </p>
+        <div class="flex justify-end gap-2">
+          <button
+            class="btn btn-ghost"
+            @click="closeDeleteCategoryModalRef?.click()"
+            :disabled="isDeleting"
+          >
+            Отмена
+          </button>
+          <button
+            class="btn btn-error"
+            @click="deleteCategory"
+            :disabled="isDeleting"
+          >
+            <span v-if="isDeleting" class="loading loading-spinner"></span>
+            <span v-else>Удалить</span>
+          </button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button ref="closeDeleteCategoryModalRef">close</button>
+      </form>
+    </dialog>
+
+    <!-- Delete Platform Confirmation Modal -->
+    <dialog id="deletePlatformModal" class="modal" ref="deletePlatformModalRef">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Подтверждение удаления</h3>
+        <p class="mb-4">
+          Вы уверены, что хотите удалить площадку 
+          <strong>{{ platformToDelete?.name }}</strong>?
+        </p>
+        <p class="text-sm text-warning mb-4">
+          Это действие необратимо!
+        </p>
+        <div class="flex justify-end gap-2">
+          <button
+            class="btn btn-ghost"
+            @click="closeDeletePlatformModalRef?.click()"
+            :disabled="isDeleting"
+          >
+            Отмена
+          </button>
+          <button
+            class="btn btn-error"
+            @click="deletePlatform"
+            :disabled="isDeleting"
+          >
+            <span v-if="isDeleting" class="loading loading-spinner"></span>
+            <span v-else>Удалить</span>
+          </button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button ref="closeDeletePlatformModalRef">close</button>
       </form>
     </dialog>
   </div>
