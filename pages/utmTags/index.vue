@@ -32,6 +32,12 @@ const platforms = ref<any[]>([])
 const selectedCategory = ref('')
 const selectedPlatform = ref('')
 
+// Фильтры по категории и площадке
+const filterCategory = ref('')
+const filterPlatform = ref('')
+
+const dateRange = ref([])
+const startDate = ref(new Date(Date.now() + 1000 * 60 * 5))
 // Модалки для создания категорий/площадок
 const showCategoryModal = ref(false)
 const showPlatformModal = ref(false)
@@ -52,6 +58,9 @@ async function getTags() {
       page: curPage.value,
       sortDate: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
       search: searchQuery.value,
+      dateRange: dateRange.value.length > 0 ? dateRange.value : null,
+      categoryId: filterCategory.value || null,
+      platformId: filterPlatform.value || null,
     },
   })
   if (data.value) {
@@ -65,6 +74,18 @@ const getTagsDebounced = useDebounceFn(getTags, 1000)
 
 watch(searchQuery, () => {
   getTagsDebounced()
+})
+
+watch(dateRange, () => {
+  getTags()
+})
+
+watch(filterCategory, () => {
+  getTags()
+})
+
+watch(filterPlatform, () => {
+  getTags()
 })
 
 async function swapPage(destination: number) {
@@ -84,6 +105,9 @@ async function swapPage(destination: number) {
       page: curPage.value,
       sortDate: dateSortIcon.value == 'mdi-arrow-up' ? 1 : -1,
       search: searchQuery.value,
+      dateRange: dateRange.value.length > 0 ? dateRange.value : null,
+      categoryId: filterCategory.value || null,
+      platformId: filterPlatform.value || null,
     },
   })
   if (data.value) {
@@ -269,6 +293,9 @@ function copyToClipboard(text: string) {
   })
 }
 
+// Загружаем категории и площадки при инициализации
+loadCategories()
+loadPlatforms()
 getTags()
 </script>
 
@@ -279,17 +306,64 @@ getTags()
 
     <div class="divider"></div>
     <div class="flex justify-between">
-      <div class="flex gap-3">
+      <div class="flex gap-2">
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Поиск по названию, коду или создателю"
           class="input input-bordered ml-2 w-80"
         />
+        
+        <select
+          v-model="filterCategory"
+          class="select select-bordered w-48"
+        >
+          <option value="">Все категории</option>
+          <option
+            v-for="category in categories"
+            :key="category._id"
+            :value="category._id"
+          >
+            {{ category.name }}
+          </option>
+        </select>
+
+        <select
+          v-model="filterPlatform"
+          class="select select-bordered w-48"
+        >
+          <option value="">Все площадки</option>
+          <option
+            v-for="platform in platforms"
+            :key="platform._id"
+            :value="platform._id"
+          >
+            {{ platform.name }}
+          </option>
+        </select>
+
         <button class="btn btn-primary" @click="openCreateModal">
           <Icon name="material-symbols:add" size="20" />
           Создать метку
         </button>
+
+        <DateRangePicker
+          class="w-46"
+          v-model="dateRange"
+          :start-date="startDate"
+          @reset="dateRange = []"
+        >
+          <button class="btn btn-primary min-w-2xl">
+            {{
+              dateRange.length > 1
+                ? `${$dayjs(dateRange[0]).format('DD.MM.YYYY')} - ${$dayjs(
+                    dateRange[1]
+                  ).format('DD.MM.YYYY')}`
+                : 'Выбрать даты'
+            }}
+          </button>
+        </DateRangePicker>
+        
       </div>
       <div class="join mr-2">
         <button
