@@ -228,7 +228,7 @@ function closeOverlay() {
           href="/clientsInfo"
         />
       
-        <SidebarItem
+        <!-- <SidebarItem
           v-if="
             store.client.mainAdmin ||
             store.client.tabs.includes('запросы направлений')
@@ -236,7 +236,7 @@ function closeOverlay() {
           icon="solar:users-group-two-rounded-line-duotone"
           title="Запросы направлений"
           href="/serviceRequests"
-        />
+        /> -->
         <SidebarItem
           v-if="
             store.client.mainAdmin ||
@@ -258,12 +258,12 @@ function closeOverlay() {
           title="Статистика"
           href="/statistics"
         />
-        <SidebarItem
+        <!-- <SidebarItem
           v-if="store.client.mainAdmin || store.client.tabs.includes('статистика')"
           icon="arcticons:avito"
           title="Статистика авито"
           href="/statisticsAvito"
-        />
+        /> -->
         <SidebarItem
           v-if="store.client.mainAdmin || store.client.tabs.includes('коды регистраций')"
           icon="tabler:device-mobile-code"
