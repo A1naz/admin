@@ -59,7 +59,7 @@ async function exportXLS() {
         typeoperations: type.value,
         type: service.value,
         dateRange:
-          dateRangeExport.value.length > 0 ? dateRangeExport.value : null,
+        dateRange.value.length > 0 ? dateRange.value : null,
       },
     },
     watch: false,
@@ -292,23 +292,27 @@ watch(selectedUsers.value, () => {
           />
         </label>
       </div>
-      <DateRangePicker
-        class="w-46"
-        v-model="dateRange"
-        :start-date="startDate"
-        @reset="dateRange = []"
-      >
-        <button class="btn btn-primary ml-3 min-w-2xl">
-          <!-- {{
-            dateRange.length > 1
-              ? `${$dayjs(dateRange[0]).format('DD.MM.YYYY')} - ${$dayjs(
-                  dateRange[1]
-                ).format('DD.MM.YYYY')}`
-              : 'Выбрать даты'
-          }} -->
-          <Icon name="lucide:calendar" />
+       <DateRangePicker
+          class="w-46 ml-1 -mt-1"
+          v-model="dateRange"
+          :start-date="startDate"
+          @reset="dateRange = []"
+        >
+          <button
+            class="btn btn-primary text-white ml-1 border-primary mt-1 border-[1px] rounded-[6px]"
+          >
+            <Icon name="solar:calendar-linear" class="-mt-1" size="22px" />
+          </button>
+        </DateRangePicker>
+        <button
+          v-if="dateRange.length"
+          @click="dateRange = []"
+          class="btn btn-square flex flex-shrink btn-primary font-medium rounded-lg relative group ml-0.5"
+        >
+          <div class="flex items-center justify-center text-white">
+            <Icon name="material-symbols:close-rounded" size="22px" />
+          </div>
         </button>
-      </DateRangePicker>
       <button
         class="btn btn-primary ml-3"
         @click=";[(curPage = 1), getStats()]"
@@ -324,11 +328,12 @@ watch(selectedUsers.value, () => {
         <option selected value="all">Все</option>
         <option v-for="mp in mpStore.MPTabs" :value="mp.value" :key="mp.value">
           {{ mp.title }}
+          
         </option>
       </select>
 
-      <div class="flex gap-1">
-        <DateRangePicker
+      <div class="flex gap-1 ml-2">
+        <!-- <DateRangePicker
           class="w-46 -mt-1"
           v-model="dateRangeExport"
           :start-date="startDate"
@@ -339,7 +344,7 @@ watch(selectedUsers.value, () => {
           >
             <Icon name="solar:calendar-linear" class="-mt-1" size="22px" />
           </button>
-        </DateRangePicker>
+        </DateRangePicker> -->
         <button
           v-if="dateRangeExport.length"
           @click="dateRangeExport = []"

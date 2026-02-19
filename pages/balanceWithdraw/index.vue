@@ -21,7 +21,8 @@ const statusOptions = [
   { label: 'Активен', value: 'created' },
   { label: 'В работе', value: 'work' },
   { label: 'Завершен', value: 'completed' },
-  { label: 'Отменен', value: 'cancelled' },
+  { label: 'Отменен', value: 'canceled' },
+
 ]
 
 const isPageBtnsDisabled = ref(false)
@@ -75,7 +76,7 @@ function getStatusText(status: string) {
       return 'Завершен'
     case 'work':
       return 'В работе'
-    case 'cancelled':
+    case 'canceled':
       return 'Отменен'
   }
 }
@@ -222,6 +223,7 @@ async function deleteWithdraw() {
             </th>
             <th style="max-width: 80px; min-width: 70px">
               {{ getStatusText(info.status) }}
+              
             </th>
             <th style="max-width: 80px; min-width: 70px">
               <button
