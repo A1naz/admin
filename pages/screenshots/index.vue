@@ -43,12 +43,12 @@ definePageMeta({
 onMounted(() => {
   const route = useRoute()
   const { mp, article: urlArticle, recipientphone, openModal, uuidbuyout } = route.query
-  
+
   if (openModal === 'true' && mp && urlArticle && recipientphone) {
     // Fill form fields
     selectedMP.value = mp as string
     article.value = urlArticle as string
-    
+
     if (uuidbuyout) {
       uuidBuyout.value = uuidbuyout as string
     }
@@ -61,7 +61,7 @@ onMounted(() => {
     } else {
       account.value = recipientphone as string
     }
-    
+
     // Open modal
     nextTick(() => {
       createRequireModalRef.value?.showModal()
@@ -89,7 +89,7 @@ async function getStats() {
 }
 
 async function createRequire() {
-  
+
   if (
     !article.value ||
     !account.value ||
@@ -212,85 +212,49 @@ if (
     <div class="flex">
       <div>
         <label>
-          <input
-            v-model="query"
-            type="text"
-            v-maska
-            data-maska="+7 (###) ###-##-##"
-            placeholder="Номер телефона"
-            class="input input-bordered input-l mb-2 w-full"
-            @input="onInput($event)"
-          />
+          <input v-model="query" type="text" v-maska data-maska="+7 (###) ###-##-##" placeholder="Номер телефона"
+            class="input input-bordered input-l mb-2 w-full" @input="onInput($event)" />
         </label>
-        <span
-          v-if="inputLoading"
-          class="loading loading-spinner text-primary loading-large ml-4"
-        />
+        <span v-if="inputLoading" class="loading loading-spinner text-primary loading-large ml-4" />
       </div>
 
-      <select
-        class="select select-bordered w-50 ml-3"
-        @change=";[(curPage = 1), getStats()]"
-        v-model="type"
-      >
+      <select class="select select-bordered w-50 ml-3" @change=";[(curPage = 1), getStats()]" v-model="type">
         <option selected value="any">все типы операции</option>
         <option value="deliveries">Доставки</option>
       </select>
-      <DateRangePicker
-        class="w-46"
-        v-model="dateRange"
-        :start-date="startDate"
-        @reset="dateRange = []"
-      >
+      <DateRangePicker class="w-46" v-model="dateRange" :start-date="startDate" @reset="dateRange = []">
         <button class="btn btn-primary ml-3 min-w-2xl">
           {{
             dateRange.length > 1
               ? `${$dayjs(dateRange[0]).format('DD.MM.YYYY')} - ${$dayjs(
-                  dateRange[1]
-                ).format('DD.MM.YYYY')}`
+                dateRange[1]
+              ).format('DD.MM.YYYY')}`
               : 'Выбрать даты'
           }}
         </button>
       </DateRangePicker>
-      <button
-        class="btn btn-primary ml-3"
-        @click=";[(curPage = 1), getStats()]"
-      >
+      <button class="btn btn-primary ml-3" @click=";[(curPage = 1), getStats()]">
         Применить
       </button>
     </div>
     <div>
-      <button
-        class="btn btn-primary mr-3"
-        @click="createRequireModalRef?.showModal()"
-        :disabled="isCreateButtonDisabled"
-      >
+      <button class="btn btn-primary mr-3" @click="createRequireModalRef?.showModal()"
+        :disabled="isCreateButtonDisabled">
         Создать запрос
       </button>
 
       <div class="join mr-2">
-        <button
-          class="join-item btn"
-          @click="swapPage(-1)"
-          :disabled="isPageBtnsDisabled"
-        >
+        <button class="join-item btn" @click="swapPage(-1)" :disabled="isPageBtnsDisabled">
           «
         </button>
         <button class="join-item btn">{{ curPage }}</button>
-        <button
-          class="join-item btn"
-          @click="swapPage(1)"
-          :disabled="isPageBtnsDisabled"
-        >
+        <button class="join-item btn" @click="swapPage(1)" :disabled="isPageBtnsDisabled">
           »
         </button>
       </div>
     </div>
   </div>
-  <div
-    class="my-2 mx-2 overflow-y-auto"
-    :style="{ 'max-height': height - 270 + 'px' }"
-  >
+  <div class="my-2 mx-2 overflow-y-auto" :style="{ 'max-height': height - 270 + 'px' }">
     <table class="table table-pin-rows">
       <!-- head -->
       <thead>
@@ -298,31 +262,17 @@ if (
           <th>Маркетплейс</th>
           <th>Тип операции</th>
           <th>
-            <div
-              @click="sortByDate('requireDate')"
-              class="flex cursor-pointer"
-              style="width: 100px"
-            >
+            <div @click="sortByDate('requireDate')" class="flex cursor-pointer" style="width: 100px">
               Дата запроса
-              <Icon
-                v-if="sortDateType == 'requireDate'"
-                class="swap-on fill-current ml-1 w-6 h-5"
-                :name="dateSortIcon"
-              />
+              <Icon v-if="sortDateType == 'requireDate'" class="swap-on fill-current ml-1 w-6 h-5"
+                :name="dateSortIcon" />
             </div>
           </th>
           <th>
-            <div
-              @click="sortByDate('responseDate')"
-              class="flex cursor-pointer"
-              style="width: 100px"
-            >
+            <div @click="sortByDate('responseDate')" class="flex cursor-pointer" style="width: 100px">
               Дата ответа
-              <Icon
-                v-if="sortDateType == 'responseDate'"
-                class="swap-on fill-current ml-1 w-6 h-5"
-                :name="dateSortIcon"
-              />
+              <Icon v-if="sortDateType == 'responseDate'" class="swap-on fill-current ml-1 w-6 h-5"
+                :name="dateSortIcon" />
             </div>
           </th>
           <th>Аккаунт</th>
@@ -357,20 +307,18 @@ if (
               stat.status == 'created'
                 ? 'создан'
                 : stat.status == 'rejected'
-                ? 'нет доступа к аккаунту'
-                : 'получен'
+                  ? 'нет доступа к аккаунту' :
+                  stat.status == 'work' ? 'в работе'
+                    : 'получен'
+                    
             }}
           </th>
           <th>
             <div class="flex max-w-lg overflow-x-auto justify-center">
               <div v-for="img in stat.screenshots">
-                <img
-                  :src="config.public.IMAGES_URL + img"
-                  class="cursor-pointer rounded w-16 ml-1"
-                  @click="
-                    openImageModal(config.public.IMAGES_URL + img)
-                  "
-                />
+                <img :src="config.public.IMAGES_URL + img" class="cursor-pointer rounded w-16 ml-1" @click="
+                  openImageModal(config.public.IMAGES_URL + img)
+                  " />
               </div>
             </div>
           </th>
@@ -387,35 +335,15 @@ if (
           <option value="deliveries">Доставки</option>
         </select>
         <select class="select select-bordered w-50 my-2" v-model="selectedMP">
-          <option
-            v-for="tab in mpStore.MPTabs"
-            :key="tab.value"
-            :value="tab.value"
-          >
+          <option v-for="tab in mpStore.MPTabs" :key="tab.value" :value="tab.value">
             {{ tab.title }}
           </option>
         </select>
-        <input
-          v-model="account"
-          type="text"
-          v-maska
-          data-maska="+7 (###) ###-##-##"
-          placeholder="Номер телефона"
-          class="input input-bordered input-l mb-2 w-full"
-        />
-        <input
-          v-model="article"
-          type="number"
-          placeholder="Артикул"
-          class="input input-bordered input-l mb-2 w-full"
-        />
-        <input
-        v-if="selectedMP == 'ym'"
-          v-model="uuidBuyout"
-          type="text"
-          placeholder="Id выкупа(необходимо для ЯМ)"
-          class="input input-bordered input-l mb-2 w-full"
-        />
+        <input v-model="account" type="text" v-maska data-maska="+7 (###) ###-##-##" placeholder="Номер телефона"
+          class="input input-bordered input-l mb-2 w-full" />
+        <input v-model="article" type="number" placeholder="Артикул" class="input input-bordered input-l mb-2 w-full" />
+        <input v-if="selectedMP == 'ym'" v-model="uuidBuyout" type="text" placeholder="Id выкупа(необходимо для ЯМ)"
+          class="input input-bordered input-l mb-2 w-full" />
       </div>
       <div class="flex justify-center">
         <button class="btn btn-primary mt-3 px-10" @click="createRequire" :disabled="isCreateButtonDisabled">
@@ -432,11 +360,8 @@ if (
   <div class="modal cursor-pointer" @click="closeImageModal">
     <div class="modal-box w-fit max-w-full cursor-pointer">
       <form method="dialog">
-        <label
-          for="imageModal"
-          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 hidden"
-          ref="imageModalClose"
-        >
+        <label for="imageModal" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 hidden"
+          ref="imageModalClose">
           ✕
         </label>
       </form>
