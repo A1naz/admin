@@ -121,7 +121,11 @@ export default eventHandler(async (event) => {
         return (
           item!.currentstatus === 'Готов к выдаче' ||
           item!.currentstatus === 'Готов к получению' || 
-          item!.currentstatus.includes('Заберите до')
+          item!.currentstatus.includes('Готов к выдаче') ||
+          item!.currentstatus.includes('Заберите до') ||
+          item!.currentstatus.includes('Получите до') ||
+          item!.currentstatus.includes('Ждёт')
+
         )
       else return false
     })
