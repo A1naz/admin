@@ -1,0 +1,345 @@
+import ExcelJS from 'exceljs'
+
+import type { Document } from 'mongoose'
+import { Delivery } from '@/server/lib/models/yandexMarket/Delivery'
+import { Buyout } from '@/server/lib/models/yandexMarket/Buyout'
+import { Buyoutlog } from '@/server/lib/models/yandexMarket/Buyoutlog'
+import { User } from '@/server/lib/models/User'
+import { AdminUser } from '~/server/lib/models/AdminUser'
+import { getServerSession } from '#auth'
+import { ActionHistory } from '@/server/lib/models/actionHistory'
+const prefixesToRemove =
+  /(г\.?|д\.?|с\.?|село|п\.?|пос\.?|посёлок|дер\.?|деревня|поселок городского типа|посёлок станции)\s*/gi
+
+const keys = Object.keys as <T>(
+  obj: T
+) => (keyof T extends infer U
+  ? U extends string
+    ? U
+    : U extends number
+    ? `${U}`
+    : never
+  : never)[]
+
+async function getReady(user: any, pvzs: any, selectedDays: any) {
+  let pvzsArray = []
+  if (typeof pvzs === 'string') {
+    pvzsArray.push(pvzs.trimRight())
+  } else if (typeof pvzs === 'object') {
+    pvzsArray = pvzs.map((p: string) => p.trimRight())
+  }
+
+  const filtered: any = await Delivery.find({
+    user: { $in: user.map((item: any) => item._id) },
+    status: {$ne : 'completed'},
+    point:
+      pvzsArray && pvzsArray.length ? { $in: pvzsArray } : { $exists: true },
+      statusdelivery: {
+        $elemMatch: {
+          $or: [
+            { status: 'Готов к выдаче' },
+            { status: 'Готов к получению' },
+            { status: '^Заберите до.*' },
+            { status: '^Получите до.*' },
+            { status: '^Ждёт.*' },
+            { status: { $regex: '^Готов к получению.*' } },
+            { status: { $regex: '^Готов к выдаче.*' } },
+            { status: { $regex: '^Заберите до.*' } },
+            { status: { $regex: '^Получите до.*' } },
+            { status: { $regex: '^Ждёт.*' } },
+          ],
+        },
+      },
+  })
+
+  const buyoutsId = filtered.map((item: any) => item.idbuyout)
+  const buyouts = await Buyout.find({ _id: { $in: buyoutsId } })
+  const logs = await Buyoutlog.find({ _id: { $in: buyoutsId } })
+
+  const format = await Promise.all(
+    filtered
+      .map(async (delivery: any, index: any) => {
+        const buyout = buyouts.find(
+          (item: any) => item._id.valueOf() === delivery.idbuyout.valueOf()
+        )
+
+        if (!buyout) return undefined
+        const foundLog = logs.find(
+          (item) =>
+            item.buyout.valueOf() === buyout._id.valueOf() &&
+            item.text.includes('Выкуп выполнен')
+        )
+        const finishDate = new Date(foundLog ? foundLog.date : buyout.createdAt)
+        const place = index + 1
+        const finishDateHours = finishDate.getHours()
+        const finishDateMinutes = finishDate.getMinutes()
+        const finishTime = `${finishDateHours
+          .toString()
+          .padStart(2, '0')}:${finishDateMinutes.toString().padStart(2, '0')}`
+
+        const phone: any = delivery.recipientphone
+        const replaced = `+${phone[0]} (***) *** ${phone.slice(7)}`
+        const currentstatus = delivery.statusdelivery?.length
+          ? delivery.statusdelivery[delivery.statusdelivery.length - 1].status
+          : 'Неизвестно'
+        const statusupdated = delivery.statusdelivery?.length
+          ? new Date(
+              delivery.statusdelivery[delivery.statusdelivery.length - 1].date
+            )
+          : new Date()
+          const deliveryDate = delivery.statusdelivery?.length
+          ? new Date(
+            delivery.statusdelivery?.find(
+              item =>
+                item.status.includes('Ждёт в пункте')
+            )?.date,
+          )
+          : new Date()
+        const expireDate = new Date(
+          deliveryDate.getTime() + 1000 * 60 * 60 * 24 * 14,
+        )
+        let username = ''
+
+        user.forEach((el: any) => {
+          if (el._id.valueOf() === buyout.user.valueOf()) {
+            username = el.username
+          }
+        })
+
+        if (!isNaN(selectedDays) && selectedDays.trim() !== '') {
+          const currentDate = new Date()
+          const targetDate = new Date(deliveryDate)
+          const afterDays = Number(selectedDays)
+          currentDate.setHours(0, 0, 0, 0)
+          targetDate.setHours(0, 0, 0, 0)
+          targetDate.setDate(targetDate.getDate() + afterDays)
+
+          if (currentDate <= targetDate) {
+            return
+          }
+        }
+
+        return {
+          index,
+          place,
+          username,
+          uuid: buyout.uuid,
+          article: delivery.article,
+          pricebuy: delivery.pricebuy,
+          size: buyout.sizeparam,
+          point: delivery.point,
+          deliveryDate,
+          expireDate,
+          statusdelivery: delivery.statusdelivery,
+          currentstatus,
+          statusupdated,
+          productname: buyout.product.name,
+          receiptcode: delivery.receiptcode ? delivery.receiptcode : undefined,
+          receiptcodeqr: delivery.receiptcodeqr
+            ? delivery.receiptcodeqr
+            : undefined,
+          recipient: delivery.recipient,
+          createdAt: new Date(buyout.createdAt),
+          recipientphone: replaced,
+          finishDate,
+          finishTime,
+          updatedAt: new Date(delivery.updatedAt),
+          key: buyout.ff ? 'Выкуп под ключ' : 'Выкуп',
+        }
+      })
+      .filter((item: any) => item !== undefined)
+  )
+  format.sort((a: any, b: any) =>
+    a.point
+      .replace(prefixesToRemove, '')
+      .replace(/[^а-яё]/gi, '')
+      .localeCompare(
+        b.point.replace(prefixesToRemove, '').replace(/[^а-яё]/gi, ''),
+        'ru',
+        {
+          sensitivity: 'accent',
+        }
+      )
+  )
+
+  return format
+}
+
+export default eventHandler(async (event) => {
+  try {
+    const session = (await getServerSession(event)) as any
+    const adminUser = await AdminUser.findOne({ uuid: session.uuid })
+    if (
+      !adminUser ||
+      (!adminUser.mainAdmin &&
+        !adminUser.tabs.includes('товары готовые к выдаче'))
+    )
+      return sendRedirect(event, '/auth', 302)
+
+    const { type, uuid, pvzs, selectedDays }: any = getQuery(event)
+
+    const user = await User.find({ uuid })
+    if (!user || user.length === 0) {
+      throw createError({
+        statusCode: 400,
+        message: 'Пользователь не найден',
+      })
+    }
+
+    await ActionHistory.create({
+      adminUser: adminUser._id,
+      usersUuid: uuid,
+      actionId: 102,
+      actionDescription: `Админ ${adminUser.uuid} - ${adminUser.username} экспорт общей таблицы excel`,
+      date: new Date(),
+    })
+
+    // if (!adminUser.isAllUsersAllowed) {
+    //   const allowedUsersParam = adminUser.allowedUsers.map(
+    //     (item: any) => item.valueOf
+    //   )
+    //   const restrictedUsersParam = adminUser.restrictedUsers.map(
+    //     (item: any) => item.valueOf
+    //   )
+
+    //   if (
+    //     !allowedUsersParam.includes(user._id.valueOf()) ||
+    //     restrictedUsersParam.includes(user._id.valueOf())
+    //   ) {
+    //     throw createError({
+    //       statusCode: 400,
+    //       message: 'Пользователь не разрешен',
+    //     })
+    //   }
+    // }
+
+    const workbook = new ExcelJS.Workbook()
+    const ready = (await getReady(user, pvzs, selectedDays)).filter(
+      (item) => item !== undefined
+    )
+
+    const sheet = workbook.addWorksheet('Готовы к выдаче', {
+      headerFooter: { firstHeader: `Всего доставок: ${ready.length}` },
+    })
+
+    sheet.columns = [
+      { header: 'Номер', key: 'place', font: { bold: true } },
+      { header: 'QR код', key: 'receiptcode', width: 32, font: { bold: true } },
+      {
+        header: 'Статус',
+        key: 'currentstatus',
+        width: 16,
+        font: { bold: true },
+      },
+      { header: 'Товар', key: 'productname', width: 48, font: { bold: true } },
+      { header: 'Артикул', key: 'article', width: 16, font: { bold: true } },
+      { header: 'Размер', key: 'size', width: 16, font: { bold: true } },
+      { header: 'Цена товара', key: 'pricebuy', width: 16, font: { bold: true } },
+      {
+        header: 'Дата создания заказа',
+        key: 'finishDate',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Время создания заказа',
+        key: 'finishTime',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Дата доставки в ПВЗ',
+        key: 'deliveryDate',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Дата окончания срока забора с ПВЗ',
+        key: 'expireDate',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Код ПВЗ',
+        key: 'receiptcode',
+        width: 16,
+        font: { bold: true },
+      },
+      { header: 'ID Выкупа', key: 'uuid', width: 16, font: { bold: true } },
+      { header: 'ПВЗ', key: 'point', width: 64, font: { bold: true } },
+      {
+        header: 'Получатель',
+        key: 'recipient',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Телефон',
+        key: 'recipientphone',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Дата обновления',
+        key: 'updatedAt',
+        width: 16,
+        font: { bold: true },
+      },
+      {
+        header: 'Тип выкупа',
+        key: 'key',
+        width: 16,
+        font: { bold: true },
+      },
+    ]
+
+    sheet.addRows(ready)
+    // add qr codes to sheet
+
+    let place = 0
+    for (const item of ready) {
+      place += 1
+      if (!item?.receiptcodeqr || item?.receiptcodeqr?.length < 40) {
+        continue
+      }
+
+      if (
+        item.receiptcodeqr.includes(
+          'data:image/png;base64,data:image/png;base64,'
+        )
+      ) {
+        item.receiptcodeqr = item.receiptcodeqr.replace(
+          'data:image/png;base64,',
+          ''
+        )
+      }
+
+      try {
+        const image = workbook.addImage({
+          base64: item?.receiptcodeqr,
+          extension: 'png',
+        })
+        const rowNumber = item.excelRowNumber || item.place + 1
+      sheet.addImage(image, {
+        tl: { col: 1.5, row: rowNumber - 1 + 0.8 },
+        ext: { width: 175, height: 200 },
+      })
+      sheet.getRow(rowNumber).height = 210
+      } catch (error) {
+        console.log(error)
+
+        continue
+      }
+    }
+    // export table
+    const buffer = await workbook.xlsx.writeBuffer()
+
+    return buffer
+  } catch (e) {
+    console.log(e)
+    throw createError({
+      statusCode: 500,
+      message: 'Не удалось создать таблицу',
+    })
+  }
+})
