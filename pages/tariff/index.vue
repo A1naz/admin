@@ -370,52 +370,55 @@ async function exportXLS() {
             v-for="mp in userTariffs"
             :key="'1user:' + selectedUser.uuid + mp.value"
           >
-            <div
-              v-if="mp.mp === selectedMP"
+            <template
               v-for="(tariff, tariffKey) in mp.prices"
               :key="'1user' + mp.mp + tariffKey"
-              class="flex justify-between"
             >
-              <div class="mt-3">
-                {{ getServiceNameByKey(tariffKey.toString()) }}
-              </div>
-              <div>
-                <div
-                  class="form-control"
-                  v-if="tariffKey.toString() === 'buyouts'"
-                >
-                  <label class="label cursor-pointer mt-1">
-                    Проценты
-                    <input
-                      type="checkbox"
-                      class="toggle toggle-primary ml-1"
-                      :checked="tariff.type === 'percent'"
-                      @change="
-                        tariff.type =
-                          tariff.type === 'percent' ? 'price' : 'percent'
-                      "
-                    />
-                  </label>
+              <div
+                v-if="mp.mp === selectedMP && ['buyouts', 'deliveryStorage', 'review', 'reviewRemoving'].includes(tariffKey.toString())"
+                class="flex justify-between"
+              >
+                <div class="mt-3">
+                  {{ getServiceNameByKey(tariffKey.toString()) }} 
                 </div>
-                <input
-                  type="number"
-                  v-model="tariff.value"
-                  class="input input-bordered my-1"
-                />
-                <div
-                  v-if="tariffKey.toString() === 'buyouts'"
-                  class="flex flex-col"
-                >
-                  Минимальное значение в ₽
+                <div>
+                  <div
+                    class="form-control"
+                    v-if="tariffKey.toString() === 'buyouts'"
+                  >
+                    <label class="label cursor-pointer mt-1">
+                      Проценты
+                      <input
+                        type="checkbox"
+                        class="toggle toggle-primary ml-1"
+                        :checked="tariff.type === 'percent'"
+                        @change="
+                          tariff.type =
+                            tariff.type === 'percent' ? 'price' : 'percent'
+                        "
+                      />
+                    </label>
+                  </div>
                   <input
                     type="number"
-                    placeholder="Мин. значение в ₽"
-                    v-model="tariff.minPrice"
+                    v-model="tariff.value"
                     class="input input-bordered my-1"
                   />
+                  <div
+                    v-if="tariffKey.toString() === 'buyouts'"
+                    class="flex flex-col"
+                  >
+                    Минимальное значение в ₽
+                    <input
+                      type="number"
+                      placeholder="Мин. значение в ₽"
+                      v-model="tariff.minPrice"
+                      class="input input-bordered my-1"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            </template>
           </div>
           <div
             v-else
