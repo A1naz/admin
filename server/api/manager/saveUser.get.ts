@@ -1,4 +1,4 @@
-﻿import { AdminUser } from '~/server/lib/models/AdminUser'
+import { AdminUser } from '~/server/lib/models/AdminUser'
 import { User } from '~/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { v4 as unicalUuid } from 'uuid'
@@ -54,10 +54,11 @@ export default eventHandler(async (event) => {
       userToEdit.email = body.email ? body.email : userToEdit.email
       userToEdit.roles = body.roles ? body.roles : userToEdit.roles
       userToEdit.tabs = body.tabs
-      userToEdit.firstName = body.firstName
-        ? body.firstName
-        : userToEdit.firstName
+      userToEdit.firstName = body.firstName ? body.firstName : userToEdit.firstName
       userToEdit.lastName = body.lastName ? body.lastName : userToEdit.lastName
+      userToEdit.phoneNumber = body.phoneNumber
+        ? body.phoneNumber.replace(/[\(\)\-\s]/g, '')
+        : userToEdit.phoneNumber
 
       if (body.password && body.password.length > 8) {
         userToEdit.password = await bcrypt.hashSync(body.password, 7)

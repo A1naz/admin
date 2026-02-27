@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 definePageMeta({
   layout: 'app',
   auth: true,
@@ -296,7 +296,8 @@ async function saveUser() {
       type: 'success',
       title: 'Успешно',
     })
-    location.reload()
+    editUsersModalClose.value?.click()
+    await getUsers()
   }
 
   if (error.value) {
@@ -376,10 +377,12 @@ async function copyToClipboardQR() {
             lastName: '',
             username: '',
             email: '',
+            twoFaQR: '',
             roles: ['user'],
             tabs: [],
             allowedUsers: [],
             restrictedUsers: [],
+            phoneNumber: '',
           }),
           (selectedUser = {
             username: '',
@@ -604,10 +607,12 @@ async function copyToClipboardQR() {
               lastName: '',
               username: '',
               email: '',
+              twoFaQR: '',
               roles: ['user'],
               tabs: [],
               allowedUsers: [],
               restrictedUsers: [],
+              phoneNumber: '',
             }
             ">
             Отмена

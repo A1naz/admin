@@ -1,4 +1,4 @@
-﻿import { AdminUser } from '~/server/lib/models/AdminUser'
+import { AdminUser } from '~/server/lib/models/AdminUser'
 import { User } from '~/server/lib/models/User'
 import { getServerSession } from '#auth'
 import { Types } from 'mongoose'
@@ -111,10 +111,11 @@ export default eventHandler(async (event) => {
         : 'service',
     }
 
-    // Если текущий пользователь - главный админ, добавляем секреты 2FA
+    // Если текущий пользователь - главный админ, добавляем секреты 2FA и номер телефона
     if (userAdmin.mainAdmin) {
       return {
         ...baseUserData,
+        phoneNumber: user.phoneNumber || '',
         twoFaSecret: userTwoFa?.twoFaSecret || user.twoFaSecret || null,
         twoFaQR: userTwoFa?.twoFaQR || user.twoFaQR || null,
       }
