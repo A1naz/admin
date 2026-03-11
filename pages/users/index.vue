@@ -259,7 +259,8 @@ const tabs = ref<any>([
 ])
 
 async function saveUser() {
-  const body: any = userEditForm.value
+  const { twoFaQR, twoFaSecret, ...rest } = userEditForm.value
+  const body: any = rest
 
   if (createMode.value == true || password.value.length > 0) {
     if (password.value != repeatPassword.value) {
