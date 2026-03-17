@@ -112,6 +112,7 @@ const tabs = ref([
       { key: 'deleted', title: 'удаленные' },
       { key: 'nofunds', title: 'недостаточно средств' },
       { key: 'archived', title: 'в архиве' },
+      { key: 'reviewsUpdate', title: 'Отзыв на проверке' },
     ],
   },
   {
