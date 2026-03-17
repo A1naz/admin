@@ -84,8 +84,10 @@ const tabs = ref([
       { key: 'any', title: 'Все' },
       { key: 'work', title: 'Активные' },
       { key: 'completed', title: 'Завершенные' },
+      { key: 'completed', title: 'Завершенные' },
       { key: 'ready', title: 'Готовы к выдаче' },
       { key: 'canceled', title: 'Возврат/Отмена' },
+      { key: 'reviewsUpdate', title: 'Отзыв на проверке' },
     ],
   },
   {
