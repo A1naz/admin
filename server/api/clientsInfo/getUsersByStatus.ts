@@ -93,6 +93,7 @@ async function filterUsers(users: any[]) {
       balance: user.balance,
       partnerBalance: user.partner.balance,
       disableEmailAutoSender: user.disableEmailAutoSender,
+      phoneConfirmed: user.phoneConfirmed || false,
       referralsCount: user.partner.refCount,
     }
   })

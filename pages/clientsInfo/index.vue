@@ -73,6 +73,41 @@ async function signTariff() {
   }
 }
 
+// Подтверждение телефона
+const confirmPhoneModalRef: any = ref(null)
+const closeConfirmPhoneModalRef: any = ref(null)
+const userToConfirmPhone: any = ref(null)
+const isConfirmingPhone = ref(false)
+
+function openConfirmPhoneModal(user: any) {
+  userToConfirmPhone.value = user
+  confirmPhoneModalRef.value?.showModal()
+}
+
+async function confirmPhone() {
+  if (!userToConfirmPhone.value) return
+
+  isConfirmingPhone.value = true
+  const { data, error }: any = await useFetch('/api/clientsInfo/confirmPhone', {
+    method: 'POST',
+    body: { uuid: userToConfirmPhone.value.uuid },
+    watch: false,
+  })
+
+  if (data.value?.success) {
+    notify({ type: 'success', title: 'Телефон подтверждён' })
+    closeConfirmPhoneModalRef.value?.click()
+    userToConfirmPhone.value = null
+    getClients()
+  }
+
+  if (error.value) {
+    notify({ type: 'error', title: 'Ошибка при подтверждении телефона' })
+  }
+
+  isConfirmingPhone.value = false
+}
+
 async function toggleEmailAutoSender(user: any) {
   const { data, error }: any = await useFetch('/api/clientsInfo/toggleEmailAutoSender', {
     method: 'POST',
@@ -247,6 +282,13 @@ async function toggleEmailAutoSender(user: any) {
             >
               Вкл. рассылку
             </button>
+            <button
+              v-if="!tariff.phoneConfirmed"
+              class="btn btn-info ml-2"
+              @click="openConfirmPhoneModal(tariff)"
+            >
+              Подтвердить телефон
+            </button>
           </th>
         </tr>
       </tbody>
@@ -267,6 +309,37 @@ async function toggleEmailAutoSender(user: any) {
     :confirmFunction="signTariff"
     v-model:state="confirmModal"
   />
+
+  <!-- Confirm Phone Modal -->
+  <dialog id="confirmPhoneModal" class="modal" ref="confirmPhoneModalRef">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Подтверждение телефона</h3>
+      <p class="mb-2">
+        Вы уверены, что хотите подтвердить телефон для пользователя
+        <strong>{{ userToConfirmPhone?.login }}</strong>?
+      </p>
+      <div class="flex justify-end gap-2 mt-4">
+        <button
+          class="btn btn-ghost"
+          @click="closeConfirmPhoneModalRef?.click()"
+          :disabled="isConfirmingPhone"
+        >
+          Отмена
+        </button>
+        <button
+          class="btn btn-info"
+          @click="confirmPhone"
+          :disabled="isConfirmingPhone"
+        >
+          <span v-if="isConfirmingPhone" class="loading loading-spinner"></span>
+          <span v-else>Подтвердить</span>
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button ref="closeConfirmPhoneModalRef">close</button>
+    </form>
+  </dialog>
 </template>
 
 <style scoped>
