@@ -319,6 +319,7 @@ if (
                 <img :src="config.public.IMAGES_URL + img" class="cursor-pointer rounded w-16 ml-1" @click="
                   openImageModal(config.public.IMAGES_URL + img)
                   " />
+                
               </div>
             </div>
           </th>

@@ -1,5 +1,6 @@
 ﻿import { Schema, model } from 'mongoose'
 import { AdminUser } from './AdminUser'
+import { reportsConnection } from '~/server/connections/reports'
 
 const screenshotsRequireSchema = new Schema({
   adminUser: { type: Schema.Types.ObjectId, ref: AdminUser, required: true },
@@ -14,7 +15,7 @@ const screenshotsRequireSchema = new Schema({
   mp: { type: String, required: true },
 })
 
-export const ScreenshotsRequire = model(
+export const ScreenshotsRequire = reportsConnection.model(
   'ScreenshotsRequire',
   screenshotsRequireSchema
 )
