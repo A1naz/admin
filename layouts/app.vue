@@ -3,31 +3,26 @@ const store = useMainStore()
 const colorMode = useColorMode()
 const partnerStore = usePartnerStore()
 
-const theme = ref('light')
 const route = useRoute()
 const infoModal = ref(false)
-const { status, data, signIn, signOut } = useAuth()
-const currency = useCurrency()
-const pageContent = ref()
+const { signOut } = useAuth()
 const lightMode = ref(colorMode.value === 'dark')
+const drawerCloseOverlay: any = ref(null)
+
+const hasAccess = (tab: string) =>
+  store.client.mainAdmin || store.client.tabs.includes(tab)
+
 function changeTheme() {
-  if (colorMode.value === 'light') colorMode.preference = 'dark'
-  else colorMode.preference = 'light'
+  colorMode.preference = colorMode.value === 'light' ? 'dark' : 'light'
+}
+
+function closeOverlay() {
+  drawerCloseOverlay.value?.click()
 }
 
 async function logout() {
-  await signOut({
-    callbackUrl: '/auth',
-  })
+  await signOut({ callbackUrl: '/auth' })
   store.setClient({})
-}
-
-onMounted(() => {
-  theme.value = localStorage.getItem('theme') || 'light'
-})
-const drawerCloseOverlay: any = ref(null)
-function closeOverlay() {
-  drawerCloseOverlay.value?.click()
 }
 </script>
 
@@ -88,202 +83,135 @@ function closeOverlay() {
           href="/manualTransfer"
         />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('история действий')
-          "
+          v-if="hasAccess('история действий')"
           title="История действий"
           icon="mdi:clipboard-text-clock"
           href="/actionsHistory"
         />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('история действий пользователей')
-          "
+          v-if="hasAccess('история действий пользователей')"
           title="История действий пользователей"
           icon="mdi:clipboard-account"
           href="/usersHistory"
         />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('возврат и задержка')
-          "
+          v-if="hasAccess('возврат и задержка')"
           title="Возврат и задержка"
           icon="vaadin:rotate-left"
           href="/refundAndDelay"
         />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('финансовые операции')
-          "
+          v-if="hasAccess('финансовые операции')"
           title="Финансовые операции"
           icon="nimbus:stats"
           href="/salesAndStatistics"
         />
-
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('управление партнеркой')
-          "
-          :title="`Партнерская программа ${
-            partnerStore.quantity > 0
-              ? partnerStore.quantity + '+'
-              : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-          }`"
+          v-if="hasAccess('управление партнеркой')"
           icon="fluent:people-team-24-filled"
           href="/partner"
-        >
-          <template #title> Партнерская программа </template>
-        </SidebarItem>
+          :title="`Партнерская программа${partnerStore.quantity > 0 ? ' ' + partnerStore.quantity + '+' : ''}`"
+        />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('управление пользователями платформы')
-          "
+          v-if="hasAccess('управление пользователями платформы')"
           title="Управление пользователями"
           icon="mdi:clipboard-account"
           href="/usersManagement"
         />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin || store.client.tabs.includes('аналитика')
-          "
+          v-if="hasAccess('аналитика')"
           icon="mdi:google-analytics"
           title="Аналитика"
           href="/stats?type=all&period=today"
         />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('запросы скриншотов')
-          "
+          v-if="hasAccess('запросы скриншотов')"
           icon="mdi:monitor-screenshot"
           title="Запросы скриншотов"
           href="/screenshots"
         />
         <SidebarItem
           class="hidden"
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('ошибки финансовых операции')
-          "
+          v-if="hasAccess('ошибки финансовых операции')"
           icon="mdi:money-off"
           title="Ошибки финансовых операции"
           href="/paymentErrors"
         />
         <SidebarItem
           class="hidden"
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('переводы с аккаунта на аккаунт')
-          "
+          v-if="hasAccess('переводы с аккаунта на аккаунт')"
           icon="mdi:account-credit-card-outline"
           title="Переводы с аккаунта на аккаунт"
           href="/balanceTransfer"
         />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('управление тарифами')
-          "
+          v-if="hasAccess('управление тарифами')"
           icon="mdi:account-details"
           title="Управление тарифами"
           href="/tariff"
         />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('возвраты средств клиентам')
-          "
+          v-if="hasAccess('возвраты средств клиентам')"
           icon="mdi:credit-card-refund"
           title="Возвраты средств клиентам"
           href="/refunds"
         />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('товары готовые к выдаче')
-          "
+          v-if="hasAccess('товары готовые к выдаче')"
           icon="game-icons:card-pickup"
           title="Товары готовые к выдаче"
           href="/delivery/wildberries"
         />
         <SidebarItem
-          v-if="
-            store.client.mainAdmin || store.client.tabs.includes('фулфилмент')
-          "
+          v-if="hasAccess('фулфилмент')"
           icon="mdi:courier-fast"
           title="Фулфилмент"
           href="/fulfilment/wildberries"
         />
-
         <SidebarItem
-          v-if="store.client.mainAdmin || store.client.tabs.includes('клиенты')"
+          v-if="hasAccess('клиенты')"
           icon="solar:users-group-two-rounded-line-duotone"
           title="Клиенты"
           href="/clientsInfo"
         />
-      
-        <!-- <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('запросы направлений')
-          "
-          icon="solar:users-group-two-rounded-line-duotone"
-          title="Запросы направлений"
-          href="/serviceRequests"
-        /> -->
         <SidebarItem
-          v-if="
-            store.client.mainAdmin ||
-            store.client.tabs.includes('вывод с баланса')
-          "
+          v-if="hasAccess('вывод с баланса')"
           icon="ph:hand-withdraw"
           title="Вывод с баланса"
           href="/balanceWithdraw"
         />
         <SidebarItem
-          v-if="store.client.mainAdmin || store.client.tabs.includes('ручные уведомления')"
+          v-if="hasAccess('ручные уведомления')"
           icon="iconamoon:notification-bold"
-          title="Ручные уведмоления"
+          title="Ручные уведомления"
           href="/handleNotifications"
         />
         <SidebarItem
-          v-if="store.client.mainAdmin || store.client.tabs.includes('статистика')"
+          v-if="hasAccess('статистика')"
           icon="gridicons:stats-up"
           title="Статистика"
           href="/statistics"
         />
-        <!-- <SidebarItem
-          v-if="store.client.mainAdmin || store.client.tabs.includes('статистика')"
-          icon="arcticons:avito"
-          title="Статистика авито"
-          href="/statisticsAvito"
-        /> -->
         <SidebarItem
-          v-if="store.client.mainAdmin || store.client.tabs.includes('коды регистраций')"
+          v-if="hasAccess('коды регистраций')"
           icon="tabler:device-mobile-code"
           title="Коды регистраций"
           href="/phoneCodes"
         />
         <SidebarItem
-          v-if="store.client.mainAdmin || store.client.tabs.includes('рассылка клиентам')"
+          v-if="hasAccess('рассылка клиентам')"
           icon="icon-park-outline:send-email"
           title="Рассылка клиентам"
           href="/userMails"
         />
         <SidebarItem
-          v-if="store.client.mainAdmin || store.client.tabs.includes('utm метки')"
+          v-if="hasAccess('utm метки')"
           icon="dinkie-icons:page-curl-small-filled"
           title="UTM метки"
           href="/utmTags"
         />
         <SidebarItem
-          v-if="store.client.mainAdmin || store.client.tabs.includes('попытки входа')"
+          v-if="hasAccess('попытки входа')"
           icon="mdi:login-variant"
           title="Попытки входа"
           href="/loginAttempts"
