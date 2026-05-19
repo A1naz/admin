@@ -1,7 +1,7 @@
-onlyBuiltDependencies:
-  - aws-sdk
-  - core-js
-  - esbuild
-  - fast-folder-size
-  - sharp
-  - vue-demi
+allowBuilds:
+  aws-sdk: true
+  core-js: true
+  esbuild: true
+  fast-folder-size: true
+  sharp: true
+  vue-demi: true
