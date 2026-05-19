@@ -3,6 +3,13 @@ lockfileVersion: '9.0'
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
+  onlyBuiltDependencies:
+    - aws-sdk
+    - core-js
+    - esbuild
+    - fast-folder-size
+    - sharp
+    - vue-demi
 
 importers:
 
