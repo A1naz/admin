@@ -63,6 +63,9 @@
     "vue3-html2pdf": "^1.1.2",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": ["aws-sdk", "core-js", "esbuild", "fast-folder-size", "sharp", "vue-demi"]
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^0.38.6",
     "@bg-dev/nuxt-s3": "0.2.8",
