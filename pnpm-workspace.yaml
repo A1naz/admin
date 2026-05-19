@@ -1,0 +1,7 @@
+onlyBuiltDependencies:
+  - aws-sdk
+  - core-js
+  - esbuild
+  - fast-folder-size
+  - sharp
+  - vue-demi
