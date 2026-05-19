@@ -19,16 +19,17 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Идентификатор обязателен' })
   }
 
-  // Находим все записи с этим identifier, чтобы собрать связанные IP
-  const relatedRecords = await LoginAttempt.find(
-    { identifier },
-    { ip: 1 }
-  )
+  const identifierFilter = {
+    $or: [{ identifier }, { phoneNumber: identifier }],
+  }
 
-  const relatedIPs = [...new Set(relatedRecords.map((r) => r.ip).filter(Boolean))]
+  // Находим все записи с этим identifier/phoneNumber, чтобы собрать связанные IP
+  const relatedRecords = await LoginAttempt.find(identifierFilter, { ip: 1 })
 
-  // Удаляем все записи с этим identifier
-  await LoginAttempt.deleteMany({ identifier })
+  const relatedIPs = [...new Set(relatedRecords.map((r: any) => r.ip).filter(Boolean))]
+
+  // Удаляем все записи с этим identifier или phoneNumber
+  await LoginAttempt.deleteMany(identifierFilter)
 
   // Удаляем все записи с этими IP (даже без identifier)
   if (relatedIPs.length > 0) {

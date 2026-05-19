@@ -15,13 +15,28 @@ export default eventHandler(async (event) => {
 
   const { page = 1, search, sortDate }: any = getQuery(event)
 
-  const query: any = {
-    identifier: { $exists: true, $ne: '' },
+  const baseCondition = {
+    $or: [
+      { identifier: { $exists: true, $ne: '' } },
+      { phoneNumber: { $exists: true, $ne: '' } },
+    ],
   }
+
+  let query: any = baseCondition
 
   if (search && search.length > 0) {
     const safeSearch = sanitizeSearchQuery(search, 100)
-    query.identifier = { $regex: safeSearch, $options: 'i' }
+    query = {
+      $and: [
+        baseCondition,
+        {
+          $or: [
+            { identifier: { $regex: safeSearch, $options: 'i' } },
+            { phoneNumber: { $regex: safeSearch, $options: 'i' } },
+          ],
+        },
+      ],
+    }
   }
 
   const count = await LoginAttempt.countDocuments(query)
@@ -30,5 +45,13 @@ export default eventHandler(async (event) => {
     .skip((+page - 1) * elPerPage)
     .limit(elPerPage)
 
-  return { attempts, count }
+  const normalizedAttempts = attempts.map((a: any) => {
+    const obj = a.toObject()
+    if (!obj.identifier && obj.phoneNumber) {
+      obj.identifier = obj.phoneNumber
+    }
+    return obj
+  })
+
+  return { attempts: normalizedAttempts, count }
 })
