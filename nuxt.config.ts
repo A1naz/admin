@@ -110,6 +110,10 @@ export default defineNuxtConfig({
     '@vuepic/vue-datepicker/dist/main.css',
   ],
 
+  tailwindcss: {
+    cssPath: '~/assets/css/tailwind.css',
+  },
+
   extends: ['nuxt-seo-kit'],
 
   s3: {
