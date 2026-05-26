@@ -86,8 +86,7 @@ export default defineEventHandler(async (event) => {
                         name: getServiceNameByKey(vote[0].split('/')[1]),
                         votes: vote[1],
                 }
-        }).filter((item) => item.slug !== undefined)
+        }).filter((item) => item.slug !== undefined).sort((a, b) => b.votes - a.votes)
 
-        return format
-}
-)
+  return format
+})

@@ -216,6 +216,12 @@ async function logout() {
           title="Попытки входа"
           href="/loginAttempts"
         />
+        <SidebarItem
+          v-if="hasAccess('запросы направлений')"
+          icon="mdi:directions-fork"
+          title="Запросы направлений"
+          href="/serviceRequests"
+        />
         <div class="mt-auto">
           <div class="w-full hover:cursor-default p-0 block mt-8">
             <div class="join flex justify-between w-full items-center p-0 m-0">

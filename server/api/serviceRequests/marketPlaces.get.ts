@@ -48,6 +48,6 @@ export default defineEventHandler(async (event) => {
                 }
         }).filter((item) => item.slug !== undefined)
 
-        return format
+        return format.sort((a, b) => b.votes - a.votes)
 }
 )
